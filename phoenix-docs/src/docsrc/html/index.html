@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head><meta http-equiv="Content-Type" content="text/html;charset=utf-8" /><title>
+SQL Grammar
+</title><link rel="stylesheet" type="text/css" href="stylesheet.css" />
+<!-- [search] { -->
+<script type="text/javascript" src="navigation.js"></script>
+</head><body>
+<table class="content"><tr class="content"><td class="content"><div class="contentDiv">
+<!-- } -->
+<h3 id="grammar">Commands</h3>
+<!-- syntax-start
+<p class="notranslate">
+<c:forEach var="item" items="commands">
+    <a href="#${item.link}">${item.topic}</a><br />
+</c:forEach>
+</p>
+syntax-end -->
+<!-- railroad-start -->
+<table class="notranslate index">
+    <tr>
+        <td class="index">
+            <c:forEach var="item" items="commands-0">
+                <a href="#${item.link}" >${item.topic}</a><br />
+            </c:forEach>
+        </td><td class="index">
+            <c:forEach var="item" items="commands-1">
+                <a href="#${item.link}" >${item.topic}</a><br />
+            </c:forEach>
+        </td><td class="index">
+            <c:forEach var="item" items="commands-2">
+                <a href="#${item.link}" >${item.topic}</a><br />
+            </c:forEach>
+        </td>
+    </tr>
+</table>
+<!-- railroad-end -->
+
+<h3>Other Grammar</h3>
+<!-- syntax-start
+<p class="notranslate">
+<c:forEach var="item" items="otherGrammar">
+    <a href="#${item.link}" >${item.topic}</a><br />
+</c:forEach>
+</p>
+syntax-end -->
+<!-- railroad-start -->
+<table class="notranslate index">
+    <tr>
+        <td class="index">
+            <c:forEach var="item" items="otherGrammar-0">
+                <a href="#${item.link}" >${item.topic}</a><br />
+            </c:forEach>
+        </td><td class="index">
+            <c:forEach var="item" items="otherGrammar-1">
+                <a href="#${item.link}" >${item.topic}</a><br />
+            </c:forEach>
+        </td><td class="index">
+            <c:forEach var="item" items="otherGrammar-2">
+                <a href="#${item.link}" >${item.topic}</a><br />
+            </c:forEach>
+        </td>
+    </tr>
+</table>
+<!-- railroad-end -->
+
+<c:forEach var="item" items="commands">
+<h3 id="${item.link}" class="notranslate">${item.topic}</h3>
+<!-- railroad-start -->
+<pre name="bnf" style="display: none">
+${item.syntax}
+</pre>
+<div name="railroad">
+${item.railroad}
+</div>
+<!-- railroad-end -->
+<!-- syntax-start
+<pre>
+${item.syntax}
+</pre>
+syntax-end -->
+<p>${item.text}</p>
+<p>Example:</p>
+<p class="notranslate">
+${item.example}</p>
+</c:forEach>
+
+<c:forEach var="item" items="otherGrammar">
+<h3 id="${item.link}" class="notranslate">${item.topic}</h3>
+<!-- railroad-start -->
+${item.railroad}
+<!-- railroad-end -->
+<!-- syntax-start
+<pre>
+${item.syntax}
+</pre>
+syntax-end -->
+<p>${item.text}</p>
+<p>Example:</p>
+<p class="notranslate">${item.example}</p>
+</c:forEach>
+
+<!-- [close] { --></div></td></tr></table><!-- } --></body></html>

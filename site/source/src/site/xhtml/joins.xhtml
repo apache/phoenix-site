@@ -1,0 +1,384 @@
+<html>
+<body>
+ <h1>Joins</h1>
+<p>The standard SQL join syntax (with some limitations) is now supported by Phoenix to combine records from two or more tables based on their fields having common values.</p> 
+<p>For example, we have the following tables to store our order records, our customer information and the item information we sell in those orders.</p> 
+<p>The "Orders" table:</p>
+<table class="bodyTable table table-striped table-hover" border="0"> 
+ <tbody> 
+  <tr class="a"> 
+   <td><small><b>OrderID </b></small></td> 
+   <td><small><b>CustomerID </b></small></td> 
+   <td><small><b>ItemID </b></small></td> 
+   <td><small><b>Quantity </b></small></td> 
+   <td><small><b>Date </b></small></td> 
+  </tr> 
+  <tr class="b"> 
+   <td><small>1630781 </small></td> 
+   <td><small>C004 </small></td> 
+   <td><small>I001 </small></td> 
+   <td><small>650 </small></td> 
+   <td><small>09-01-2013 </small></td> 
+  </tr> 
+  <tr class="a"> 
+   <td><small>1630782 </small></td> 
+   <td><small>C003 </small></td> 
+   <td><small>I006 </small></td> 
+   <td><small>2500 </small></td> 
+   <td><small>09-02-2013 </small></td> 
+  </tr> 
+  <tr class="b"> 
+   <td><small>1630783 </small></td> 
+   <td><small>C002 </small></td> 
+   <td><small>I002 </small></td> 
+   <td><small>340 </small></td> 
+   <td><small>09-03-2013 </small></td> 
+  </tr> 
+  <tr class="a"> 
+   <td><small>1630784 </small></td> 
+   <td><small>C004 </small></td> 
+   <td><small>I006 </small></td> 
+   <td><small>1260 </small></td> 
+   <td><small>09-04-2013 </small></td> 
+  </tr> 
+  <tr class="b"> 
+   <td><small>1630785 </small></td> 
+   <td><small>C005 </small></td> 
+   <td><small>I003 </small></td> 
+   <td><small>1500 </small></td> 
+   <td><small>09-05-2013 </small></td> 
+  </tr> 
+ </tbody> 
+</table> 
+<p>The "Customers" table:</p>
+<table class="bodyTable table table-striped table-hover" border="0"> 
+ <tbody> 
+  <tr class="a"> 
+   <td><small><b>CustomerID </b></small></td> 
+   <td><small><b>CustomerName </b></small></td> 
+   <td><small><b>Country </b></small></td> 
+  </tr> 
+  <tr class="b"> 
+   <td><small>C001 </small></td> 
+   <td><small>Telefunken </small></td> 
+   <td><small>Germany </small></td> 
+  </tr> 
+  <tr class="a"> 
+   <td><small>C002 </small></td> 
+   <td><small>Logica </small></td> 
+   <td><small>Belgium </small></td> 
+  </tr> 
+  <tr class="b"> 
+   <td><small>C003 </small></td> 
+   <td><small>Salora Oy </small></td> 
+   <td><small>Finland </small></td> 
+  </tr> 
+  <tr class="a"> 
+   <td><small>C004 </small></td> 
+   <td><small>Alps Nordic AB </small></td> 
+   <td><small>Sweden </small></td> 
+  </tr> 
+  <tr class="b"> 
+   <td><small>C005 </small></td> 
+   <td><small>Deister Electronics </small></td> 
+   <td><small>Germany </small></td> 
+  </tr> 
+  <tr class="a"> 
+   <td><small>C006 </small></td> 
+   <td><small>Thales Nederland </small></td> 
+   <td><small>Netherlands </small></td> 
+  </tr> 
+ </tbody> 
+</table> 
+<p>The "Items" table:</p>
+<table class="bodyTable table table-striped table-hover" border="0"> 
+ <tbody> 
+  <tr class="a"> 
+   <td><small><b>ItemID </b></small></td> 
+   <td><small><b>ItemName </b></small></td> 
+   <td><small><b>Price </b></small></td> 
+  </tr> 
+  <tr class="b"> 
+   <td><small>I001 </small></td> 
+   <td><small>BX016 </small></td> 
+   <td><small>15.96 </small></td> 
+  </tr> 
+  <tr class="a"> 
+   <td><small>I002 </small></td> 
+   <td><small>MU947 </small></td> 
+   <td><small>20.35 </small></td> 
+  </tr> 
+  <tr class="b"> 
+   <td><small>I003 </small></td> 
+   <td><small>MU3508 </small></td> 
+   <td><small>9.60 </small></td> 
+  </tr> 
+  <tr class="a"> 
+   <td><small>I004 </small></td> 
+   <td><small>XC7732 </small></td> 
+   <td><small>55.24 </small></td> 
+  </tr> 
+  <tr class="b"> 
+   <td><small>I005 </small></td> 
+   <td><small>XT0019 </small></td> 
+   <td><small>12.65 </small></td> 
+  </tr> 
+  <tr class="a"> 
+   <td><small>I006 </small></td> 
+   <td><small>XT2217 </small></td> 
+   <td><small>12.35 </small></td> 
+  </tr> 
+ </tbody> 
+</table> 
+<p>You may get a combined view of the "Orders" table and the "Customers" table by running the following join query:</p>
+<div class="source"> 
+ <pre>SELECT O.OrderID, C.CustomerName, C.Country, O.Date
+FROM Orders AS O
+INNER JOIN Customers AS C
+ON O.CustomerID = C.CustomerID;
+</pre> 
+</div> 
+<p>This will produce results like:</p> 
+<table class="bodyTable table table-striped table-hover" border="0"> 
+ <tbody> 
+  <tr class="a"> 
+   <td><small><b>O.OrderID </b></small></td> 
+   <td><small><b>C.CustomerName </b></small></td> 
+   <td><small><b>C.Country </b></small></td> 
+   <td><small><b>O.Date </b></small></td> 
+  </tr> 
+  <tr class="b"> 
+   <td><small>1630781 </small></td> 
+   <td><small>Alps Nordic AB </small></td> 
+   <td><small>Sweden </small></td> 
+   <td><small>09-01-2013 </small></td> 
+  </tr> 
+  <tr class="a"> 
+   <td><small>1630782 </small></td> 
+   <td><small>Salora Oy </small></td> 
+   <td><small>Finland </small></td> 
+   <td><small>09-02-2013 </small></td> 
+  </tr> 
+  <tr class="b"> 
+   <td><small>1630783 </small></td> 
+   <td><small>Logica </small></td> 
+   <td><small>Belgium </small></td> 
+   <td><small>09-03-2013 </small></td> 
+  </tr> 
+  <tr class="a"> 
+   <td><small>1630784 </small></td> 
+   <td><small>Alps Nordic AB </small></td> 
+   <td><small>Sweden </small></td> 
+   <td><small>09-04-2013 </small></td> 
+  </tr> 
+  <tr class="b"> 
+   <td><small>1630785 </small></td> 
+   <td><small>Deister Electronics </small></td> 
+   <td><small>Germany </small></td> 
+   <td><small>09-05-2013 </small></td> 
+  </tr> 
+ </tbody> 
+</table> 
+<p>You can also use the below multi-join query to combine the records from the "Orders" table, the "Customers" table and the "Items" table:</p>
+<div class="source"> 
+ <pre>SELECT O.OrderID, C.CustomerName, I.ItemName, I.Price, O.Quantity
+FROM Orders AS O
+INNER JOIN Customers AS C
+ON O.CustomerID = C.CustomerID
+INNER JOIN Items AS I
+ON O.ItemID = I.ItemID;
+</pre> 
+</div> 
+<p>This will produce results like:</p> 
+<table class="bodyTable table table-striped table-hover" border="0"> 
+ <tbody> 
+  <tr class="a"> 
+   <td><small><b>O.OrderID </b></small></td> 
+   <td><small><b>C.CustomerName </b></small></td> 
+   <td><small><b>I.ItemName </b></small></td> 
+   <td><small><b>I.Price </b></small></td> 
+   <td><small><b>O.Quantity </b></small></td> 
+  </tr> 
+  <tr class="b"> 
+   <td><small>1630781 </small></td> 
+   <td><small>Alps Nordic AB </small></td> 
+   <td><small>BX016 </small></td> 
+   <td><small>15.96 </small></td> 
+   <td><small>650 </small></td> 
+  </tr> 
+  <tr class="a"> 
+   <td><small>1630782 </small></td> 
+   <td><small>Salora Oy </small></td> 
+   <td><small>XT2217 </small></td> 
+   <td><small>12.35 </small></td> 
+   <td><small>2500 </small></td> 
+  </tr> 
+  <tr class="b"> 
+   <td><small>1630783 </small></td> 
+   <td><small>Logica </small></td> 
+   <td><small>MU947 </small></td> 
+   <td><small>20.35 </small></td> 
+   <td><small>340 </small></td> 
+  </tr> 
+  <tr class="a"> 
+   <td><small>1630784 </small></td> 
+   <td><small>Alps Nordic AB </small></td> 
+   <td><small>XT2217 </small></td> 
+   <td><small>12.35 </small></td> 
+   <td><small>1260 </small></td> 
+  </tr> 
+  <tr class="b"> 
+   <td><small>1630785 </small></td> 
+   <td><small>Deister Electronics </small></td> 
+   <td><small>MU3508 </small></td> 
+   <td><small>9.60 </small></td> 
+   <td><small>1500 </small></td> 
+  </tr> 
+ </tbody> 
+</table> 
+<div class="section"> 
+ <h2 id="Joining_Tables_with_Indices">Joining Tables with Indices</h2> 
+ <p>Secondary indices will be automatically utilized when running join queries. For example, if we create indices on the "Orders" table and the "Items" table respectively, which are defined as follows:</p> 
+ <div class="source"> 
+  <pre>CREATE INDEX iOrders ON Orders (ItemID) INCLUDE (CustomerID, Quantity);
+CREATE INDEX i2Orders ON Orders (CustomerID) INCLUDE (ItemID, Quantity);
+CREATE INDEX iItems ON Items (ItemName) INCLUDE (Price);
+</pre> 
+ </div> 
+ <p>We can find out each item's total sales value by joining the "Items" table and the "Orders" table and then grouping the joined result with "ItemName" (and also adding some filtering conditions):</p> 
+ <div class="source">
+  <pre>SELECT ItemName, sum(Price * Quantity) AS OrderValue
+FROM Items
+JOIN Orders
+ON Items.ItemID = Orders.ItemID
+WHERE Orders.CustomerID &gt; 'C002'
+GROUP BY ItemName;
+</pre>
+ </div>
+ <p>The results will be like:</p>
+<table class="bodyTable table table-striped table-hover" border="0">
+ <tbody>
+  <tr class="a">
+   <td><small><b>ItemName </b></small></td>
+   <td><small><b>OrderValue </b></small></td>
+  </tr>
+  <tr class="b">
+   <td><small>BX016 </small></td>
+   <td><small>10374 </small></td>
+  </tr>
+  <tr class="a">
+   <td><small>MU3508 </small></td>
+   <td><small>14400 </small></td>
+  </tr>
+  <tr class="b">
+   <td><small>XT2217 </small></td>
+   <td><small>46436 </small></td>
+  </tr>
+ </tbody>
+</table>
+ <p>The execution plan for this query (by running "EXPLAIN <i>query</i>") will be:</p> 
+ <div class="source"> 
+  <pre>CLIENT PARALLEL 32-WAY FULL SCAN OVER iItems 
+    SERVER AGGREGATE INTO ORDERED DISTINCT ROWS BY [iItems.0:ItemName] 
+CLIENT MERGE SORT 
+    PARALLEL EQUI-JOIN 1 HASH TABLES: 
+    BUILD HASH TABLE 0 
+        CLIENT PARALLEL 32-WAY RANGE SCAN OVER i2Orders ['C002'] - [*]
+</pre> 
+ </div> 
+ <p>In this case, the index table "iItems" is used in place of the data table "Items" since the index table "iItems" is indexed on column "ItemName" and will hence benefit the GROUP-BY clause in this query. Meanwhile, the index table "i2Orders" is favored over the data table "Orders" and another index table "iOrders" because a range scan instead of a full scan can be applied as a result of the WHERE clause.</p> 
+</div> 
+<div class="section"> 
+ <h2 id="Configuration">Configuration</h2> 
+ <p>The join functionality is now implemented through hash joins, which means one side of the join operator has to be small enough to fit into memory in order to be broadcast over all servers that have the data of concern from the other side of join.</p> 
+ <p>The servers-side caches are used to hold the hashed sub-query results. The size and the living time of the caches are controlled by the following parameters.</p>
+ <ol style="list-style-type: decimal"> 
+  <li> <p>phoenix.query.maxServerCacheBytes</p> 
+   <ul> 
+    <li>Maximum size (in bytes) of a single sub-query result (usually the filtered result of a table) before compression and conversion to a hash map.</li> 
+    <li>Attempting to hash an intermediate sub-query result of a size bigger than this setting will result in a <tt>MaxServerCacheSizeExceededException</tt>.</li> 
+    <li><b>Default: 104,857,600</b></li> 
+   </ul></li> 
+  <li> <p>phoenix.query.maxGlobalMemoryPercentage</p>
+   <ul>
+    <li>Percentage of total heap memory (i.e. Runtime.getRuntime().maxMemory()) that all threads may use.</li>
+    <li>The summed size of all living caches must be smaller than this global memory pool size. Otherwise, you would get an <tt>InsufficientMemoryException</tt>.</li>
+    <li><b>Default: 15</b></li>
+   </ul></li>
+  <li> <p>phoenix.coprocessor.maxServerCacheTimeToLiveMs</p>
+   <ul>
+    <li>Maximum living time (in milliseconds) of server caches. A cache entry expires after this amount of time has passed since last access.</li>
+    <li>Consider adjusting this parameter when a server-side <tt>IOException</tt>("<i>Could not find hash cache for joinId</i>") happens. Getting warnings like "<i>Earlier hash cache(s) might have expired on servers</i>" might also be a sign that this number should be increased.</li>
+    <li><b>Default: 30,000</b></li>
+   </ul></li>
+ </ol>
+ <p>See our <a href="tuning.html">Configuration and Tuning Guide</a> for more details.</p>
+ <p>Although changing parameters can sometimes be a solution to getting rid of the exceptions mentioned above, it is highly recommended that you first consider optimizing the join queries according to the information provided in the following chapter.</p> 
+</div> 
+<div class="section"> 
+ <h2 id="Optimizing_Your_Query">Optimizing Your Query</h2> 
+ <p>As mentioned in the previous chapter, it is most crucial to make sure that there will be enough memory for the join query execution. But other than rush to change the configuration immediately, sometimes all you need to do is to know a bit of the interiors and adjust the sequence of the tables that appear in your join query.</p>
+ <p>Below is a description of the default join order (without the presence of table statistics) and of which side of the query will be executed as a sub-query and put into server cache:</p>
+ <ol style="list-style-type: decimal">
+  <li> <p><i>lhs</i> <tt>INNER JOIN</tt> <i>rhs</i></p>
+   <ul>
+    <li><i>rhs</i> will be built as hash map in server cache.</li>
+   </ul></li>
+  <li> <p><i>lhs</i> <tt>LEFT OUTER JOIN</tt> <i>rhs</i></p>
+   <ul>
+    <li><i>rhs</i> will be built as hash map in server cache.</li>
+   </ul></li>
+  <li> <p><i>lhs</i> <tt>RIGHT OUTER JOIN</tt> <i>rhs</i></p>
+   <ul>
+    <li><i>lhs</i> will be built as hash map in server cache.</li>
+   </ul></li>
+ </ol>
+ <p>The join order is more complicated with multiple-join queries. You can try running "EXPLAIN <i>join_query</i>" to look at the actual execution plan. For multiple-inner-join queries, we apply star-join optimization by default, which means the leading (left-hand-side) table will be scanned only once joining all right-hand-side tables at the same time. You can turn off this optimization by specifying the hint "NO_STAR_JOIN" in your query if the overall size of all right-hand-side tables would exceed the memory size limit.</p>
+ <p>Let's take the previous query for example:</p>
+ <div class="source">
+  <pre>SELECT O.OrderID, C.CustomerName, I.ItemName, I.Price, O.Quantity
+FROM Orders AS O
+INNER JOIN Customers AS C
+ON O.CustomerID = C.CustomerID
+INNER JOIN Items AS I
+ON O.ItemID = I.ItemID;
+</pre>
+ </div>
+ <p>The default join order (using star-join optimization) will be:</p>
+ <div class="source">
+  <pre>1. SCAN Customers --&gt; BUILD HASH[0]
+   SCAN Items --&gt; BUILD HASH[1]
+2. SCAN Orders JOIN HASH[0], HASH[1] --&gt; Final Resultset
+</pre>
+ </div>
+ <p>Alternatively, if we use hint "NO_STAR_JOIN":</p>
+ <div class="source">
+  <pre>SELECT /*+ NO_STAR_JOIN*/ O.OrderID, C.CustomerName, I.ItemName, I.Price, O.Quantity
+FROM Orders AS O
+INNER JOIN Customers AS C
+ON O.CustomerID = C.CustomerID
+INNER JOIN Items AS I
+ON O.ItemID = I.ItemID;
+</pre>
+ </div>
+ <p>The join order will be:</p>
+ <div class="source">
+  <pre>1. SCAN Customers --&gt; BUILD HASH[0]
+2. SCAN Orders JOIN HASH[0]; CLOSE HASH[0] --&gt; BUILD HASH[1]
+3. SCAN Items JOIN HASH[1] --&gt; Final Resultset
+</pre>
+ </div>
+ <p>It is also worth mentioning that not the entire dataset of the table should be counted into the memory consumption. Instead, only those columns used by the query, and of only the records that satisfy the predicates will be built into the server hash map.</p>
+</div> 
+<div class="section"> 
+ <h2 id="Limitations">Limitations</h2> 
+ <p>In our Phoenix 3.0 release, joins have the following restrictions:</p> 
+ <ol style="list-style-type: decimal"> 
+  <li>FULL OUTER JOIN and CROSS JOIN are not supported.</li> 
+  <li>Equi-joins: Only equality (=) comparison is supported in joining conditions (conditions that specify the connecting rules between the two sides of the join operator). However there is no restriction on other predicates in the ON clause concerning only one side of the join operator.</li> 
+  <li>Derived tables and sub-joins are not supported.</li>
+ </ol>
+ <p>Continuous efforts are being made to enhance Phoenix with more complete join functionalities. Please refer to our <a href="roadmap.html">Roadmap</a> for more information.</p> 
+</div>
+</body>
+</html>

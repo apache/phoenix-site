@@ -1,0 +1,1411 @@
+"SECTION","TOPIC","SYNTAX","TEXT","EXAMPLE"
+"Commands","SELECT","
+SELECT [/*+ hint */] [DISTINCT | ALL] selectExpression [,...]
+FROM aliasedTable [ { [joinType] JOIN aliasedTable ON expression } [...] ]
+[ WHERE expression ]
+[ GROUP BY expression [,...] ] [ HAVING expression ]
+[ ORDER BY order [,...] ] [ LIMIT {bindParameter | number} ]
+","
+Selects data from a table.
+DISTINCT filters out duplicate results while ALL, the default, includes all results.
+FROM identifies the table being queried. Columns may be dynamically defined in parenthesis
+after the table name and then used in the query. Joins are processed in reverse order through a
+broadcast hash join mechanism. For best performance, order tables from largest to smallest in
+terms of how many rows you expect to be used from each table.
+GROUP BY groups the the result by the given expression(s).
+HAVING filters rows after grouping.
+ORDER BY sorts the result based on the given expressions.
+LIMIT limits the number of rows returned by the query with no limit applied if unspecified or specified
+as null or less than zero. The LIMIT clause is executed after the ORDER BY clause to support top-N type
+queries.
+An optional hint may be used to override decisions made by the query optimizer.
+
+","
+SELECT * FROM TEST;
+SELECT a.* FROM TEST;
+SELECT DISTINCT NAME FROM TEST;
+SELECT ID, COUNT(1) FROM TEST GROUP BY ID;
+SELECT NAME, SUM(VAL) FROM TEST GROUP BY NAME HAVING COUNT(1) > 2;
+SELECT 'ID' COL, MAX(ID) AS MAX FROM TEST;
+SELECT * FROM TEST LIMIT 1000;
+SELECT d.dept_id,e.dept_id,e.name FROM DEPT d JOIN EMPL e ON e.dept_id = d.dept_id;
+"
+"Commands","UPSERT VALUES","
+UPSERT INTO tableName [( { columnRef | columnDef } [,...] )] VALUES ( constantTerm [,...] )
+","
+Inserts if not present and updates otherwise the value in the table. The list of
+columns is optional and if not present, the values will map to the column in the
+order they are declared in the schema. The values must evaluate to constants.
+
+","
+UPSERT INTO TEST VALUES('foo','bar',3);
+UPSERT INTO TEST(NAME,ID) VALUES('foo',123);
+"
+"Commands","UPSERT SELECT","
+UPSERT [/*+ hint */] INTO tableName [( { columnRef | columnDef } [,...] )] select
+","
+Inserts if not present and updates otherwise rows in the table based on the
+results of running another query. The values are set based on their matching
+position between the source and target tables. The list of columns is optional
+and if not present will map to the column in the order they are declared in the
+schema. If auto commit is on, and both a) the target
+table matches the source table, and b) the select performs no aggregation, then the population of the target table will
+be done completely on the server-side (with constraint violations logged, but otherwise ignored). Otherwise, data is
+buffered on the client and, if auto commit is on, committed in row batches as specified by the UpsertBatchSize
+connection property (or the phoenix.mutate.upsertBatchSize HBase config property which defaults to 10000 rows)
+
+","
+UPSERT INTO test.targetTable(col1, col2) SELECT col3, col4 FROM test.sourceTable WHERE col5 < 100
+UPSERT INTO foo SELECT * FROM bar;
+"
+"Commands","DELETE","
+DELETE [/*+ hint */] FROM tableName [ WHERE expression ]
+[ ORDER BY order [,...] ] [ LIMIT {bindParameter | number} ]
+","
+Deletes the rows selected by the where clause. If auto commit is on, the
+deletion is performed completely server-side.
+
+","
+DELETE FROM TEST;
+DELETE FROM TEST WHERE ID=123;
+DELETE FROM TEST WHERE NAME LIKE 'foo%';
+"
+
+"Commands","CREATE TABLE","
+CREATE TABLE [IF NOT EXISTS] tableRef
+( columnDef [,...] [constraint] )
+[tableOptions] [ SPLIT ON ( splitPoint [,...] ) ]
+","
+Creates a new table. The HBase table and any column families referenced are created
+if they don't already exist. All table, column family and column names are uppercased unless they are double quoted in which case they are case sensitive.
+Column families that exist in the HBase table but are not listed are ignored.
+At create time, to improve query performance, an empty key value is added to the first column family of any existing rows or the default column family if no column families are explicitly defined. Upserts will also add this empty key value. This improves query performance by having a key value column we can guarantee always being there and thus minimizing the amount of data that must be projected and subsequently returned back to the client. HBase table and column configuration options may be passed through as key/value pairs to configure the HBase table as desired. Note that when using the IF NOT EXISTS clause, if a table already exists, then no change will be made to it. Additionally, no validation is done to check whether the existing table metadata matches the proposed table metadata. so it's better to use DROP TABLE followed by CREATE TABLE is the table metadata may be changing.
+
+","
+CREATE TABLE my_schema.my_table ( id BIGINT not null primary key, date DATE not null)
+CREATE TABLE my_table ( id INTEGER not null primary key desc, date DATE not null,
+    m.db_utilization DECIMAL, i.db_utilization)
+    m.DATA_BLOCK_ENCODING='DIFF'
+CREATE TABLE stats.prod_metrics ( host char(50) not null, created_date date not null,
+    txn_count bigint CONSTRAINT pk PRIMARY KEY (host, created_date) )
+CREATE TABLE IF NOT EXISTS ""my_case_sensitive_table""
+    ( ""id"" char(10) not null primary key, ""value"" integer)
+    DATA_BLOCK_ENCODING='NONE',VERSIONS=?,MAX_FILESIZE=2000000 split on (?, ?, ?)
+"
+
+"Commands","DROP TABLE","
+DROP TABLE [IF EXISTS] tableRef
+","
+Drops a table. When dropping a table, by default the underlying HBase data and index tables are dropped. The phoenix.schema.dropMetaData
+may be used to override this and keep the HBase table for point-in-time queries.
+
+","
+DROP TABLE my_schema.my_table;
+DROP TABLE IF EXISTS my_table;
+"
+
+"Commands","CREATE VIEW","
+CREATE VIEW [IF NOT EXISTS] newTableRef
+[ ( columnDef [,...] ) ]
+[AS SELECT * FROM existingTableRef [WHERE expression] ]
+[tableOptions]
+","
+Creates a new view over an existing HBase or Phoenix table. As expected, the WHERE expression is always automatically applied to any query run against the view. As with CREATE TABLE, the table, column family, and column names are uppercased unless they are double quoted. The newTableRef may refer directly to an HBase table, in which case, the table, column family, and column names must match the existing metadata exactly or an exception will occur. When a view is mapped directly to an HBase table, no empty key value will be added to rows and the view will be read-only.
+A view will be updatable (i.e. referenceable in a DML statement such as UPSERT or DELETE) if its WHERE clause expression contains only simple equality expressions separated by ANDs. Updatable views are not required to set the columns which appear in the equality expressions, as the equality expressions define the default values for those columns. If they are set, then they must match the value used in the WHERE clause, or an error will occur.
+All columns from the existingTableRef are included as columns in the new view as are columns defined in the columnDef list. An ALTER VIEW statement may be issued against a view to remove or add columns, however, no changes may be made to the primary key constraint. In addition, columns referenced in the WHERE clause are not allowed to be removed.
+Once a view is created for a table, that table may no longer altered or dropped until all of its views have been dropped.
+
+","
+CREATE VIEW ""my_hbase_table""
+    ( k VARCHAR primary key, ""v"" UNSIGNED_LONG) default_column_family='a';
+CREATE VIEW my_view ( new_col SMALLINT )
+    AS SELECT * FROM my_table WHERE k = 100;
+CREATE VIEW my_view_on_view
+    AS SELECT * FROM my_view WHERE new_col > 70;
+"
+
+"Commands","DROP VIEW","
+DROP VIEW [IF EXISTS] tableRef
+","
+Drops a view. When dropping a view, the table data is not affected. However, index data for the view will be deleted.
+
+","
+DROP VIEW my_view
+DROP VIEW IF EXISTS my_schema.my_view
+"
+
+"Commands","CREATE SEQUENCE","
+CREATE SEQUENCE [IF NOT EXISTS] sequenceRef
+[START [WITH] {number | bindParameter}]
+[INCREMENT [BY] {number | bindParameter}]
+[CACHE {number | bindParameter}]
+","
+Creates a monotonically increasing sequence. START controls the initial sequence value while INCREMENT controls
+by how much the sequence is incremented after each call to NEXT VALUE FOR. By default, the sequence will start
+with 1 and be incremented by 1. CACHE controls how many sequence values will be reserved from the server,
+cached on the client, and doled out as need by subsequent NEXT VALUE FOR calls for that client connection to the
+cluster to save on RPC calls. If not specified, the phoenix.sequence.cacheSize config parameter defaulting to
+100 will be used for the CACHE value.
+","
+CREATE SEQUENCE my_sequence;
+CREATE SEQUENCE my_sequence START WITH -1000
+CREATE SEQUENCE my_sequence INCREMENT BY 10
+CREATE SEQUENCE my_schema.my_sequence START 0 CACHE 10
+"
+
+"Commands","DROP SEQUENCE","
+DROP SEQUENCE [IF EXISTS] sequenceRef
+","
+Drops a sequence.
+
+","
+DROP SEQUENCE my_sequence
+DROP SEQUENCE IF EXISTS my_schema.my_sequence
+"
+
+"Commands","ALTER","
+ALTER {TABLE | VIEW} tableRef { { ADD [IF NOT EXISTS] columnDef [,...] [options] } | { DROP COLUMN [IF EXISTS] columnRef [,...] } | { SET options } }
+","
+Alters an existing table by adding or removing columns or updating table options. When a column is dropped from a table, the data in
+that column is deleted as well. PK columns may not be dropped, and only nullable PK columns may be added. For a view,
+the data is not affected when a column is dropped. Note that creating or dropping columns
+only affects subsequent queries and data modifications. Snapshot queries that are connected at an earlier timestamp
+will still use the prior schema that was in place when the data was written.
+
+","
+ALTER TABLE my_schema.my_table ADD d.dept_id char(10) VERSIONS=10
+ALTER TABLE my_table ADD dept_name char(50), parent_id char(15) null primary key
+ALTER TABLE my_table DROP COLUMN d.dept_id, parent_id;
+ALTER VIEW my_view DROP COLUMN new_col;
+ALTER TABLE my_table SET IMMUTABLE_ROWS=true,DISABLE_WAL=true;
+"
+
+"Commands","CREATE INDEX","
+CREATE INDEX [IF NOT EXISTS] indexName
+ON tableRef ( columnRef [ASC | DESC] [,...] )
+[ INCLUDE ( columnRef [,...] ) ]
+[indexOptions] [ SPLIT ON ( splitPoint [,...] ) ]
+","
+Creates a new secondary index on a table or view. The index will be automatically kept in sync with the table as the data changes.
+At query time, the optimizer will use the index if it contains all columns referenced in the query and produces the most efficient
+execution plan.
+If a table has rows that are write-once and append-only, then the table may set the IMMUTABLE_ROWS property to true (either up-front
+in the CREATE TABLE statement or afterwards in an ALTER TABLE statement). This reduces the overhead at write time to maintain the index.
+Otherwise, if this property is not set on the table, then incremental index maintenance will be performed on the server side when
+the data changes.
+","
+CREATE INDEX my_idx ON sales.opportunity(last_updated_date DESC)
+CREATE INDEX my_idx ON log.event(created_date DESC) INCLUDE (name, payload) SALT_BUCKETS=10
+CREATE INDEX IF NOT EXISTS my_comp_idx ON server_metrics ( gc_time DESC, created_date DESC )
+    DATA_BLOCK_ENCODING='NONE',VERSIONS=?,MAX_FILESIZE=2000000 split on (?, ?, ?)
+"
+
+"Commands","DROP INDEX","
+DROP INDEX [IF EXISTS] indexName ON tableRef
+","
+Drops an index from a table. When dropping an index, the data in the index is deleted. Note that since metadata is versioned,
+snapshot queries connecting at an earlier time stamp may still use the index, as the HBase table backing the index is not deleted.
+
+","
+DROP INDEX my_idx ON sales.opportunity
+DROP INDEX IF EXISTS my_idx ON server_metrics
+"
+
+"Commands","ALTER INDEX","
+ALTER INDEX [IF EXISTS] indexName ON tableRef { DISABLE | REBUILD | UNUSABLE | USABLE }
+","
+Alters the state of an existing index.  DISABLE will cause the no further index maintenance to be performed on the index and it
+will no longer be considered for use in queries. REBUILD will completely rebuild the index and upon completion will enable
+the index to be used in queries again. UNUSABLE will cause the index to no longer be considered for use in queries, however
+index maintenance will continue to be performed. USABLE will cause the index to again be considered for use in queries. Note
+that a disabled index must be rebuild and cannot be set as USABLE.
+","
+ALTER INDEX my_idx ON sales.opportunity DISABLE
+ALTER INDEX IF EXISTS my_idx ON server_metrics REBUILD
+"
+
+"Commands","EXPLAIN","
+EXPLAIN {select|upsertSelect|delete}
+","
+Computes the logical steps necessary to execute the given command. Each step is represented as a string in a single column result set row.
+
+","
+EXPLAIN SELECT NAME, COUNT(*) FROM TEST GROUP BY NAME HAVING COUNT(*) > 2;
+EXPLAIN SELECT entity_id FROM CORE.CUSTOM_ENTITY_DATA WHERE organization_id='00D300000000XHP' AND SUBSTR(entity_id,1,3) = '002' AND created_date < CURRENT_DATE()-1;
+"
+
+"Other Grammar","Constraint","
+CONSTRAINT constraintName PRIMARY KEY (columnName [ASC | DESC] [,...])
+","
+Defines a multi-part primary key constraint. Each column may be declared to be
+sorted in ascending or descending ordering. The default is ascending.
+
+","
+CONSTRAINT my_pk PRIMARY KEY (host,created_date)
+CONSTRAINT my_pk PRIMARY KEY (host ASC,created_date DESC)
+"
+
+"Other Grammar","Options","
+{ [familyName .] name= {value | bindParameter}} [,...]
+","
+Sets a built-in Phoenix table property or an HBase table or column descriptor metadata attribute.
+The name is case insensitive. Built-in Phoenix table options include SALT_BUCKETS, DISABLE_WAL,
+IMMUTABLE_ROWS, MULTI_TENANT, and DEFAULT_COLUMN_FAMILY. If the name is a known HColumnDescriptor
+attribute, then the value is applied to the specified column family or, if omitted, to all column
+families. Otherwise, the HBase metadata attribute value is applied to the HTableDescriptor.
+Note that no validation is performed on the property name or value, so unknown or misspelled
+options will end up as adhoc metadata attributes values on the HBase table.
+
+The SALT_BUCKETS numeric property causes an extra byte to be transparently
+prepended to every row key to ensure an evenly distributed read and write load across all
+region servers. This is especially useful when your row key is always monotonically increasing
+and causing hot spotting on a single region server. However, even if it's not, it often improves
+performance by ensuring an even distribution of data across your cluster.  The byte is
+determined by hashing the row key and modding it with the SALT_BUCKETS value. The value may
+be from 0 to 256, with 0 being a special means of turning salting off for an index in which the
+data table is salted (since by default an index has the same number of salt buckets as its
+data table). If split points are not defined for the table, the table will automatically be pre-split
+at each possible salt bucket value. For more information, see http://phoenix.incubator.apache.org/salted.html
+
+The DISABLE_WAL boolean option when true causes HBase not to write data to the write-ahead-log,
+thus making updates faster at the expense of potentially losing data in the event of a region server
+failure. This option is useful when updating a table which is not the source-of-truth and thus making
+the lose of data acceptable.
+
+The IMMUTABLE_ROWS boolean option when true declares that your table has rows which are write-once,
+append-only (i.e. the same row is never updated or deleted). With this option set, indexes added to
+the table are managed completely on the client-side, with no need to perform incremental index
+maintenance., thus improving performance. Deletes are not allowed (beyond dropping the entire table)
+and updates are expected to never update an existing row (failure to follow this will result in
+invalid indexes). For more information, see http://phoenix.incubator.apache.org/secondary_indexing.html
+
+The MULTI_TENANT boolean option when true enables views to be created over the table across different
+tenants. This option is useful to share the same physical HBase table across many different
+tenants. For more information, see http://phoenix.incubator.apache.org/multi-tenancy.html
+
+The DEFAULT_COLUMN_FAMILY string option determines the column family used used when none
+is specified. The value is case sensitive. If this option is not present, a column family
+name of '0' is used.
+
+","
+IMMUTABLE_ROWS=true
+DEFAULT_COLUMN_FAMILY='a'
+SALT_BUCKETS=10
+DATA_BLOCK_ENCODING='NONE',a.VERSIONS=10
+MAX_FILESIZE=2000000000,MEMSTORE_FLUSHSIZE=80000000
+"
+
+"Other Grammar","Hint","
+{ scanHint | indexHint | cacheHint | parallelizationHint | joinHint | seekToColumnHint } [,...]
+","
+An advanced features that overrides default query processing behavior for decisions such as
+whether to use a range scan versus skip scan and an index versus no index. Note that strict
+parsing is not done on hints. If hints are misspelled or invalid, they are silently ignored.
+
+","
+SKIP_SCAN,NO_INDEX
+NO_CACHE
+INDEX(employee emp_name_idx emp_start_date_idx)
+"
+
+"Other Grammar","Scan Hint","
+SKIP_SCAN | RANGE_SCAN
+","
+Use the SKIP_SCAN hint to force a skip scan to be performed on the query when
+it otherwise would not be. This option may improve performance if a query does
+not include the leading primary key column, but does include other, very
+selective primary key columns.
+
+Use the RANGE_SCAN hint to force a range scan to be
+performed on the query. This option may improve performance if a query
+filters on a range for non selective leading primary key column along
+with other primary key columns
+
+","
+SKIP_SCAN
+RANGE_SCAN
+"
+
+"Other Grammar","Cache Hint","
+NO_CACHE
+","
+Use the NO_CACHE hint to prevent the results of the query from populating the HBase block cache.
+This is useful in situation where you're doing a full table scan and know that it's unlikely
+that the rows being returned will be queried again.
+
+","
+NO_CACHE
+"
+
+"Other Grammar","Index Hint","
+INDEX | NO_INDEX | USE_INDEX_OVER_DATA_TABLE | USE_DATA_OVER_INDEX_TABLE
+","
+Use the INDEX(<table_name> <index_name>...) to suggest which index to use for a given
+query. Double quotes may be used to surround a table_name and/or index_name to make
+them case sensitive.
+
+Use the NO_INDEX hint to force the data table to be used for a query.
+
+Use the USE_INDEX_OVER_DATA_TABLE hint to act as a tiebreaker for choosing the index
+table over the data table when all other criteria are equal. Note that this is the
+default optimizer decision.
+
+Use the USE_DATA_OVER_INDEX_TABLE hint to act as a tiebreaker for choosing the data
+table over the index table when all other criteria are equal.
+
+","
+INDEX(employee emp_name_idx emp_start_date_idx)
+NO_INDEX
+USE_INDEX_OVER_DATA_TABLE
+USE_DATA_OVER_INDEX_TABLE
+"
+
+"Other Grammar","Parallelization Hint","
+NO_INTRA_REGION_PARALLELIZATION
+","
+Use the NO_INTRA_REGION_PARALLELIZATION hint to prevent the
+spawning of multiple threads to process data within a single region. This
+option is useful when the overall data set being queries is known to be
+very small or highly skewed.
+
+","
+NO_INTRA_REGION_PARALLELIZATION
+"
+
+"Other Grammar","Seek To Column Hint","
+SEEK_TO_COLUMN | NO_SEEK_TO_COLUMN
+","
+Use the SEEK_TO_COLUMN hint to force the server to seek to navigate between columns instead of doing a next.
+If there are many versions of the same column value or if there are many columns between the columns
+that are projected, then this may be more efficient.
+
+Use the NO_SEEK_TO_COLUMN hint to force the server to do a next to navigate between columns instead
+of a seek. If there are few versions of the same column value or if the columns that are projected are
+adjacent to each other, then this may be more efficient.
+
+","
+SEEK_TO_COLUMN
+NO_SEEK_TO_COLUMN
+"
+
+"Other Grammar","Join Hint","
+NO_STAR_JOIN
+","
+Use the NO_STAR_JOIN hint to prevent the optimizer from using the star join query to broadcast
+the results of the querying one common table to all region servers. This is useful when the
+results of the querying the one common table is too large and would likely be substantially
+filtered when joined against one or more of the other joined tables.
+
+","
+NO_STAR_JOIN
+"
+
+"Other Grammar","Column Def","
+columnRef dataType [ [ARRAY] '[' [number] ']' ]
+[[NOT] NULL] [PRIMARY KEY [ASC | DESC] ]
+","
+Define a new primary key column. The column name is case insensitive by default and
+case sensitive if double quoted. The sort order of a primary key may be ascending (ASC)
+or descending. The default is ascending.
+
+","
+id char(15) not null primary key
+key integer null
+m.response_time bigint
+"
+
+"Other Grammar","Table Ref","
+[schemaName .] tableName
+","
+References a table or view with an optional schema name qualifier
+","
+Sales.Contact
+HR.Employee
+Department
+"
+
+"Other Grammar","Sequence Ref","
+[schemaName .] sequenceName
+","
+References a sequence with an optional schema name qualifier
+","
+my_id_generator
+my_seq_schema.id_generator
+"
+
+"Other Grammar","Column Ref","
+[familyName .] columnName
+","
+References a column with an optional family name qualifier
+","
+e.salary
+dept_name
+"
+
+"Other Grammar","Select Expression","
+* | ( familyName . *) | expression [ [ AS ] columnAlias ]
+","
+An expression in a SELECT statement. All columns in a table may be selected using
+*, and all columns in a column family may be selected using <familyName>.*.
+","
+*
+cf.*
+ID AS VALUE
+VALUE + 1 VALUE_PLUS_ONE
+"
+
+"Other Grammar","Split Point","
+value | bindParameter
+
+","
+Defines a split point for a table. Use a bind parameter with
+preparedStatement.setBinary(int,byte[]) to supply arbitrary bytes.
+","
+'A'
+"
+
+"Other Grammar","Aliased Table","
+{ [ schemaName. ] tableName } [ [ AS ] tableAlias ] [( columnDef [,...] )]
+","
+A reference to an optionally aliased table optionally followed by dynamic column definitions.
+
+","
+PRODUCT_METRICS AS PM
+PRODUCT_METRICS(referrer VARCHAR)
+"
+
+
+"Other Grammar","Join Type","
+INNER | {  { LEFT | RIGHT } [OUTER] }
+","
+The type of join
+
+","
+INNER
+LEFT OUTER
+RIGHT
+"
+
+"Other Grammar","Order","
+{ expression } [ ASC | DESC ] [ NULLS { FIRST | LAST } ]
+","
+Sorts the result by an expression.
+","
+NAME DESC NULLS LAST
+"
+
+"Other Grammar","Expression","
+andCondition [ { OR andCondition } [...] ]
+","
+Value or condition.
+","
+ID=1 OR NAME='Hi'
+"
+
+"Other Grammar","And Condition","
+condition [ { AND condition } [...] ]
+","
+Value or condition.
+","
+ID=1 AND NAME='Hi'
+"
+
+"Other Grammar","Condition","
+operand [ compare { operand }
+    | [ NOT ] IN ( { constantOperand [,...] } )
+    | [ NOT ] LIKE operand
+    | [ NOT ] BETWEEN operand AND operand
+    | IS [ NOT ] NULL ]
+    | NOT expression
+","
+Boolean value or condition.
+When comparing with LIKE, the wildcards characters are ""_"" (any one character)
+and ""%"" (any characters). To search for the characters ""%"" and
+""_"", the characters need to be escaped. The escape character is "" \ "" (backslash).
+Patterns that end with an escape character are invalid and the expression returns NULL.
+BETWEEN does an inclusive comparison for both operands.
+","
+NAME LIKE 'Jo%'
+"
+
+"Other Grammar","Compare","
+<> | <= | >= | = | < | > | !=
+","
+Comparison operator. The operator != is the same as <>.
+","
+<>
+"
+
+"Other Grammar","Operand","
+summand [ { || } summand [...] ]
+","
+A string concatenation.
+","
+'foo'|| s
+"
+
+"Other Grammar","Summand","
+factor [ { + | - } factor [...] ]
+","
+An addition or subtraction of numeric or date type values
+","
+a + b
+a - b
+"
+
+"Other Grammar","Factor","
+term [ { * | / } term [...] ]
+","
+A multiplication or division.
+","
+c * d
+e / 5
+"
+
+"Other Grammar","Term","
+{ value
+    | ( expression )
+    | bindParameter
+    | function
+    | case
+    | caseWhen
+    | [ tableAlias. ] columnRef
+    | rowValueConstructor
+    | cast
+    | sequence
+    | arrayConstructor } [ '[' expression ']' ]
+","
+A term which may use subscript notation if it's an array.
+","
+'Hello'
+23
+my_array[my_index]
+array_col[1]
+"
+
+"Other Grammar","Array Constructor","
+ARRAY '[' expression [,...] ']'
+","
+Constructs an ARRAY out of the list of expressions.
+","
+ARRAY[1.0,2.2,3.3]
+ARRAY['foo','bas']
+ARRAY[col1,col2,col3+1,?]
+"
+
+"Other Grammar","Sequence","
+{NEXT | CURRENT} VALUE FOR sequenceRef
+","
+Gets the CURRENT or NEXT value for a sequence, a monotonically incrementing BIGINT
+value. Each call to NEXT VALUE FOR increments the sequence value and returns the current value.
+A sequence is only increment once for a given statement, so multiple references to
+the same sequence by NEXT VALUE FOR produce the same value. Use CURRENT VALUE FOR to
+access the last sequence allocated with NEXT VALUE FOR for cluster connection of your
+client. If no NEXT VALUE FOR had been previously called, an error will occur. These
+calls are only allowed in the SELECT expressions or UPSERT VALUES expressions.
+","
+NEXT VALUE FOR my_table_id
+CURRENT VALUE FOR my_schema.my_id_generator
+"
+
+"Other Grammar","Cast","
+CAST ( expression AS dataType )
+","
+The CAST operator coerces the given expression to a different dataType. This
+is useful, for example, to convert a BIGINT or INTEGER to a DECIMAL or DOUBLE
+to prevent truncation to a whole number during arithmetic operations. It is
+also useful to coerce from a more precise type to a less precise type since
+this type of coercion will not automatically occur, for example from a TIMESTAMP
+to a DATE. If the coercion is not possible, an error will occur.
+","
+CAST ( my_int AS DECIMAL )
+CAST ( my_timestamp AS DATE )
+"
+
+"Other Grammar","Row Value Constructor","
+( expression { ,expression } [...] )
+","
+A row value constructor is a list of other terms which are treated together as
+a kind of composite structure. They may be compared to each other or to other
+other terms. The main use case is 1) to enable efficiently stepping through
+a set of rows in support of query-more type functionality, or 2) to allow
+IN clause to perform point gets on composite row keys.
+","
+(col1, col2, 5)
+"
+
+"Other Grammar","Bind Parameter","
+?
+    | :number
+","
+A parameters can be indexed, for example "":1"" meaning the first parameter.
+","
+:1
+?
+"
+
+"Other Grammar","Value","
+string | numeric | boolean | null
+","
+A literal value of any data type, or null.
+","
+10
+"
+
+"Other Grammar","Case","
+CASE term { WHEN expression THEN term } [...]
+[ ELSE expression ] END
+","
+Returns the first expression where the value is equal to the test expression. If
+no else part is specified, return NULL.
+","
+CASE CNT WHEN 0 THEN 'No' WHEN 1 THEN 'One' ELSE 'Some' END
+"
+
+"Other Grammar","Case When","
+CASE { WHEN expression THEN term} [...]
+[ ELSE term ] END
+","
+Returns the first expression where the condition is true. If no else part is
+specified, return NULL.
+","
+CASE WHEN CNT<10 THEN 'Low' ELSE 'High' END
+"
+
+"Other Grammar","Name","
+{ { A-Z|_  } [ { A-Z|_|0-9 } [...] ] } | quotedName
+","
+Unquoted names are not case sensitive. There is no maximum name length.
+","
+my_column
+"
+
+"Other Grammar","Quoted Name","
+""anythingExceptDoubleQuote""
+","
+Quoted names are case sensitive, and can contain spaces. There is no maximum
+name length. Two double quotes can be used to create a single double quote
+inside an identifier.
+","
+""first-name""
+"
+
+"Other Grammar","Alias","
+name
+","
+An alias is a name that is only valid in the context of the statement.
+","
+A
+"
+
+"Other Grammar","Null","
+NULL
+","
+NULL is a value without data type and means 'unknown value'.
+","
+NULL
+"
+
+"Other Grammar","Data Type","
+charType | varcharType | decimalType | tinyintType | smallintType | integerType | bigintType | floatType | doubleType | timestampType | dateType | timeType | unsignedTimestampType | unsignedDateType | unsignedTimeType | unsignedTinyintType | unsignedSmallintType | unsignedIntType | unsignedLongType | unsignedFloatType | unsignedDoubleType | binaryType | varbinaryType
+","
+A type name.
+","
+TINYINT
+CHAR(15)
+VARCHAR
+VARCHAR(1000)
+DECIMAL(10,2)
+DOUBLE
+INTEGER
+BINARY(200)
+DATE
+"
+
+"Other Grammar","String","
+'anythingExceptSingleQuote'
+","
+A string starts and ends with a single quote. Two single quotes can be used to
+create a single quote inside a string.
+","
+'John''s car'
+"
+
+"Other Grammar","Boolean","
+TRUE | FALSE
+","
+A boolean value.
+","
+TRUE
+"
+
+"Other Grammar","Numeric","
+int | long | decimal
+","
+The data type of a numeric value is always the lowest possible for the given value.
+If the number contains a dot this is decimal; otherwise it is int, long, or decimal (depending on the value).
+","
+SELECT -10.05
+SELECT 5
+SELECT 12345678912345
+"
+
+"Other Grammar","Int","
+[ - ] number
+","
+The maximum integer number is 2147483647, the minimum is -2147483648.
+","
+10
+"
+
+"Other Grammar","Long","
+[ - ] number
+","
+Long numbers are between -9223372036854775808 and 9223372036854775807.
+","
+100000
+"
+
+"Other Grammar","Decimal","
+[ - ] { number [ . number ] }
+","
+A decimal number with fixed precision and scale.
+Internally, ""java.lang.BigDecimal"" is used.
+","
+SELECT -10.5
+"
+
+"Other Grammar","Number","
+0-9 [...]
+","
+The maximum length of the number depends on the data type used.
+","
+100
+"
+
+"Other Grammar","Comments","
+-- anythingUntilEndOfLine | // anythingUntilEndOfLine | /* anythingUntilEndComment */
+","
+Comments can be used anywhere in a command and are ignored by the database. Line
+comments end with a newline. Block comments cannot be nested, but can be
+multiple lines long.
+","
+// This is a comment
+"
+
+"Data Types","INTEGER Type","
+INTEGER
+","
+Possible values: -2147483648 to 2147483647.
+
+Mapped to ""java.lang.Integer"". The binary representation is a 4 byte
+integer with the sign bit flipped (so that negative values sorts before positive values).
+","
+INTEGER
+"
+
+"Data Types","UNSIGNED_INT Type","
+UNSIGNED_INT
+","
+Possible values: 0 to 2147483647.
+Mapped to ""java.lang.Integer"". The binary representation is a 4 byte
+integer, matching the HBase Bytes.toBytes(int) method.
+The purpose of this type is to map to existing HBase data that was serialized using
+this HBase utility method. If that is not the case, use the regular signed type instead.
+","
+UNSIGNED_INT
+"
+
+"Data Types","BIGINT Type","
+BIGINT
+","
+Possible values: -9223372036854775807 to 9223372036854775807.
+Mapped to ""java.lang.Long"". The binary representation is an 8 byte
+long with the sign bit flipped (so that negative values sorts before positive values).
+","
+BIGINT
+"
+
+"Data Types","UNSIGNED_LONG Type","
+UNSIGNED_LONG
+","
+Possible values: 0 to 9223372036854775807.
+Mapped to ""java.lang.Long"". The binary representation is an 8 byte
+integer, matching the HBase Bytes.toBytes(long) method.
+The purpose of this type is to map to existing HBase data that was serialized using
+this HBase utility method. If that is not the case, use the regular signed type instead.
+","
+UNSIGNED_LONG
+"
+
+"Data Types","TINYINT Type","
+TINYINT
+","
+Possible values: -128 to 127.
+Mapped to ""java.lang.Byte"". The binary representation is a single byte,
+with the sign bit flipped (so that negative values sorts before positive values).
+","
+TINYINT
+"
+
+"Data Types","UNSIGNED_TINYINT Type","
+UNSIGNED_TINYINT
+","
+Possible values: 0 to 127.
+Mapped to ""java.lang.Byte"". The binary representation is a single byte,
+matching the HBase Bytes.toBytes(byte) method.
+The purpose of this type is to map to existing HBase data that was serialized using
+this HBase utility method. If that is not the case, use the regular signed type instead.
+","
+UNSIGNED_TINYINT
+"
+
+"Data Types","SMALLINT Type","
+SMALLINT
+","
+Possible values: -32768 to 32767.
+Mapped to ""java.lang.Short"". The binary representation is a 2 byte
+short with the sign bit flipped (so that negative values sort before positive values).
+","
+SMALLINT
+"
+
+"Data Types","UNSIGNED_SMALLINT Type","
+UNSIGNED_SMALLINT
+","
+Possible values: 0 to 32767.
+Mapped to ""java.lang.Short"". The binary representation is an 2 byte
+integer, matching the HBase Bytes.toBytes(short) method.
+The purpose of this type is to map to existing HBase data that was serialized using
+this HBase utility method. If that is not the case, use the regular signed type instead.
+","
+UNSIGNED_SMALLINT
+"
+
+"Data Types","FLOAT Type","
+FLOAT
+","
+Possible values: -3.402823466 E + 38 to 3.402823466 E + 38.
+Mapped to ""java.lang.Float"". The binary representation is an 4 byte
+float with the sign bit flipped (so that negative values sort before
+positive values).
+","
+FLOAT
+"
+
+"Data Types","UNSIGNED_FLOAT Type","
+UNSIGNED_FLOAT
+","
+Possible values: 0 to 3.402823466 E + 38.
+Mapped to ""java.lang.Float"". The binary representation is an 4 byte
+float matching the HBase Bytes.toBytes(float) method.
+The purpose of this type is to map to existing HBase data that was serialized using
+this HBase utility method. If that is not the case, use the regular signed type instead.
+","
+UNSIGNED_FLOAT
+"
+
+"Data Types","DOUBLE Type","
+DOUBLE
+","
+Possible values: -1.7976931348623158 E + 308 to 1.7976931348623158 E + 308.
+Mapped to ""java.lang.Double"". The binary representation is an 8 byte
+double with the sign bit flipped (so that negative values sort before positive value).
+","
+DOUBLE
+"
+
+"Data Types","UNSIGNED_DOUBLE Type","
+UNSIGNED_DOUBLE
+","
+Possible values: 0 to  1.7976931348623158 E + 308.
+Mapped to ""java.lang.Double"". The binary representation is an 8 byte
+double matching the HBase Bytes.toBytes(double) method.
+The purpose of this type is to map to existing HBase data that was serialized using
+this HBase utility method. If that is not the case, use the regular signed type instead.
+","
+UNSIGNED_DOUBLE
+"
+
+"Data Types","DECIMAL Type","
+DECIMAL
+","
+Data type with fixed precision and scale. The maximum precision is 18 digits.
+Mapped to ""java.math.BigDecimal"". The binary representation is binary
+comparable, variable length format. When used in a row key, it is terminated
+with a null byte unless it is the last column.
+","
+DECIMAL
+"
+
+"Data Types","BOOLEAN Type","
+BOOLEAN
+","
+Possible values: TRUE and FALSE.
+
+Mapped to ""java.lang.Boolean"". The binary representation is a single byte with 0 for false and 1 for true
+","
+BOOLEAN
+"
+
+"Data Types","TIME Type","
+TIME
+","
+The time data type. The format is yyyy-MM-dd hh:mm:ss, with both the date
+and time parts maintained. Mapped to ""java.sql.Time"".
+The binary representation is an 8 byte long (the number of milliseconds from the epoch).
+","
+TIME
+"
+
+"Data Types","DATE Type","
+DATE
+","
+The date data type. The format is yyyy-MM-dd hh:mm:ss, with both the date
+and time parts maintained to a millisecond accuracy. Mapped to ""java.sql.Date"".
+The binary representation is an 8 byte long (the number of milliseconds from the epoch).
+","
+DATE
+"
+
+"Data Types","TIMESTAMP Type","
+TIMESTAMP
+","
+The timestamp data type. The format is yyyy-MM-dd hh:mm:ss[.nnnnnnnnn].
+Mapped to ""java.sql.Timestamp"" with an internal representation of the
+number of nanos from the epoch. The binary representation is 12 bytes:
+an 8 byte long for the epoch time plus a 4 byte integer for the nanos.
+
+","
+TIMESTAMP
+"
+
+
+"Data Types","UNSIGNED_TIME Type","
+UNSIGNED_TIME
+","
+The unsigned time data type. The format is yyyy-MM-dd hh:mm:ss, with both the date
+and time parts maintained to the millisecond accuracy. Mapped to ""java.sql.Time"".
+The binary representation is an 8 byte long (the number of milliseconds from the epoch)
+matching the HBase.toBytes(long) method.
+The purpose of this type is to map to existing HBase data that was serialized using
+this HBase utility method. If that is not the case, use the regular signed type instead.
+","
+UNSIGNED_TIME
+"
+
+"Data Types","UNSIGNED_DATE Type","
+UNSIGNED_DATE
+","
+The unsigned date data type. The format is yyyy-MM-dd hh:mm:ss, with both the date
+and time parts maintained to a millisecond accuracy. Mapped to ""java.sql.Date"".
+The binary representation is an 8 byte long (the number of milliseconds from the epoch)
+matching the HBase.toBytes(long) method.
+The purpose of this type is to map to existing HBase data that was serialized using
+this HBase utility method. If that is not the case, use the regular signed type instead.
+","
+UNSIGNED_DATE
+"
+
+"Data Types","UNSIGNED_TIMESTAMP Type","
+UNSIGNED_TIMESTAMP
+","
+The timestamp data type. The format is yyyy-MM-dd hh:mm:ss[.nnnnnnnnn].
+Mapped to ""java.sql.Timestamp"" with an internal representation of the
+number of nanos from the epoch. The binary representation is 12 bytes:
+an 8 byte long for the epoch time plus a 4 byte integer for the nanos with the
+long serialized through the HBase.toBytes(long) method.
+The purpose of this type is to map to existing HBase data that was serialized using
+this HBase utility method. If that is not the case, use the regular signed type instead.
+
+","
+UNSIGNED_TIMESTAMP
+"
+
+"Data Types","VARCHAR Type","
+VARCHAR  [ ( precisionInt ) ]
+","
+A variable length String with an optional max byte length. The binary representation
+is UTF8 matching the HBase Bytes.toBytes(String) method. When used in a row key, it
+is terminated with a null byte unless it is the last column.
+
+Mapped to ""java.lang.String"".
+","
+VARCHAR
+VARCHAR(255)
+"
+
+"Data Types","CHAR Type","
+CHAR ( precisionInt )
+","
+A fixed length String with single-byte characters. The binary representation
+is UTF8 matching the HBase Bytes.toBytes(String) method.
+
+Mapped to ""java.lang.String"".
+","
+CHAR(10)
+"
+
+"Data Types","BINARY Type","
+BINARY ( precisionInt )
+","
+Raw fixed length byte array.
+
+Mapped to ""byte[]"".
+","
+BINARY
+"
+
+"Data Types","VARBINARY Type","
+VARBINARY
+","
+Raw variable length byte array.
+
+Mapped to ""byte[]"".
+","
+VARBINARY
+"
+
+"Functions (Aggregate)","AVG","
+AVG ( { numericTerm } )
+","
+The average (mean) value.
+If no rows are selected, the result is NULL.
+Aggregates are only allowed in select statements.
+The returned value is of the same data type as the parameter.
+","
+AVG(X)
+"
+
+"Functions (Aggregate)","COUNT","
+COUNT( [ DISTINCT ] { * | { term } } )
+","
+The count of all row, or of the non-null values.
+This method returns a long.
+When DISTINCT is used, it counts only distinct values.
+If no rows are selected, the result is 0.
+Aggregates are only allowed in select statements.
+","
+COUNT(*)
+"
+
+"Functions (Aggregate)","MAX","
+MAX(term)
+","
+The highest value.
+If no rows are selected, the result is NULL.
+Aggregates are only allowed in select statements.
+The returned value is of the same data type as the parameter.
+","
+MAX(NAME)
+"
+
+"Functions (Aggregate)","MIN","
+MIN(term)
+","
+The lowest value.
+If no rows are selected, the result is NULL.
+Aggregates are only allowed in select statements.
+The returned value is of the same data type as the parameter.
+","
+MIN(NAME)
+"
+
+"Functions (Aggregate)","SUM","
+SUM( { numericTerm } )
+","
+The sum of all values.
+If no rows are selected, the result is NULL.
+Aggregates are only allowed in select statements.
+The returned value is of the same data type as the parameter.
+","
+SUM(X)
+"
+
+"Functions (Aggregate)","PERCENTILE_CONT","
+PERCENTILE_CONT( { numeric } ) WITHIN GROUP (ORDER BY { numericTerm } { ASC | DESC } )
+","
+The nth percentile of values in the column.
+The percentile value can be between 0 and 1 inclusive.
+Aggregates are only allowed in select statements.
+The returned value is of decimal data type.
+","
+PERCENTILE_CONT( 0.9 ) WITHIN GROUP (ORDER BY X ASC)
+"
+
+"Functions (Aggregate)","PERCENTILE_DISC","
+PERCENTILE_DIST( { numeric } ) WITHIN GROUP (ORDER BY { numericTerm } { ASC | DESC } )
+","
+PERCENTILE_DISC is an inverse distribution function that assumes a discrete distribution model. It takes a percentile value and a sort specification and returns an element from the set. Nulls are ignored in the calculation.
+","
+PERCENTILE_DISC( 0.9 ) WITHIN GROUP (ORDER BY X DESC)
+"
+
+"Functions (Aggregate)","PERCENT_RANK","
+PERCENT_RANK( { numeric } ) WITHIN GROUP (ORDER BY { numericTerm } { ASC | DESC } )
+","
+The percentile rank for a hypothetical value, if inserted into the column.
+Aggregates are only allowed in select statements.
+The returned value is of decimal data type.
+","
+PERCENT_RANK( 100 ) WITHIN GROUP (ORDER BY X ASC)
+"
+
+"Functions (Aggregate)","STDDEV_POP","
+STDDEV_POP( { numericTerm } )
+","
+The population standard deviation of all values.
+Aggregates are only allowed in select statements.
+The returned value is of decimal data type.
+","
+STDDEV_POP( X )
+"
+
+"Functions (Aggregate)","STDDEV_SAMP","
+STDDEV_SAMP( { numericTerm } )
+","
+The sample standard deviation of all values.
+Aggregates are only allowed in select statements.
+The returned value is of decimal data type.
+","
+STDDEV_SAMP( X )
+"
+
+"Functions (Numeric)","ROUND","
+ROUND({numericTerm | dateTimeTerm} [, scaleNumber | {'DAY' | 'HOUR' | 'MINUTE' | 'SECOND' | 'MILLISECOND'} [, multiplierNumber]])
+","
+Rounds the numeric or timestamp expression to the nearest scale or time unit specified. If the expression
+is a numeric type, then the second argument is the scale to be used for rounding off the number,
+defaulting to zero. If the expression is a date/time type, then the second argument may be one of
+the time units listed to determine the remaining precision of the date/time. A default of
+MILLISECONDS is used if not present. The multiplier is
+only applicable for a date/time type and is used to round to a multiple of a time unit (i.e.
+10 minute) and defaults to 1 if not specified. This method returns the same type as its first
+argument.
+","
+ROUND(number)
+ROUND(number, 2)
+ROUND(timestamp)
+ROUND(time, 'HOUR')
+ROUND(date, 'MINUTE', 30)
+"
+
+"Functions (Numeric)","CEIL","
+CEIL({numericTerm | dateTimeTerm} [, scaleNumber | {'DAY' | 'HOUR' | 'MINUTE' | 'SECOND' | 'MILLISECOND'} [, multiplierInt]])
+","
+Same as ROUND, except it rounds any fractional value up to the next even multiple.
+","
+CEIL(number, 3)
+CEIL(2.34)
+CEIL(timestamp, 'SECOND', 30)
+CEIL(date, 'DAY', 7)
+"
+
+"Functions (Numeric)","FLOOR","
+FLOOR({numericTerm | dateTimeTerm} [, scaleNumber | {'DAY' | 'HOUR' | 'MINUTE' | 'SECOND' | 'MILLISECOND'} [, multiplierInt]])
+","
+Same as ROUND, except it rounds any fractional value down to the previous even multiple.
+","
+FLOOR(timestamp)
+FLOOR(date, 'DAY', 7)
+"
+
+"Functions (Numeric)","TRUNC","
+TRUNC({numericTerm | dateTimeTerm} [, scaleNumber | {'DAY' | 'HOUR' | 'MINUTE' | 'SECOND' | 'MILLISECOND'} [, multiplierInt]])
+","
+Same as FLOOR
+","
+TRUNC(timestamp, 'SECOND', 30)
+TRUNC(date, 'DAY', 7)
+"
+
+"Functions (String)","SUBSTR","
+SUBSTR( stringTerm, startInt [, lengthInt ] )
+","
+Returns a substring of a string starting at the one-based position.
+If zero is used, the position is zero-based. If the start index is
+negative, then the start index is relative to the end of the string.
+The length is optional and if not supplied, the rest of the string
+will be returned.
+","
+SUBSTR('[Hello]', 2, 5)
+SUBSTR('Hello World', -5)
+"
+
+"Functions (String)","TRIM","
+TRIM( stringTerm )
+","
+Removes leading and trailing spaces from the input string.
+","
+TRIM('  Hello  ')
+"
+
+"Functions (String)","LTRIM","
+LTRIM( stringTerm )
+","
+Removes leading spaces from the input string.
+","
+LTRIM('  Hello')
+"
+
+"Functions (String)","RTRIM","
+RTRIM( stringTerm )
+","
+Removes trailing spaces from the input string.
+","
+RTRIM('Hello   ')
+"
+
+"Functions (Array)","ARRAY_ELEM","
+ARRAY_ELEM( arrayTerm, numericTerm )
+","
+Alternative to using array subscript notation to access an array element.
+Returns the element in the array at the given position. The position is one-based.
+","
+ARRAY_ELEM(my_array_col, 5)
+ARRAY_ELEM(ARRAY[1,2,3], 1)
+"
+
+"Functions (Array)","ARRAY_LENGTH","
+ARRAY_LENGTH( arrayTerm )
+","
+Returns the current length of the array.
+","
+ARRAY_LENGTH(my_array_col)
+ARRAY_LENGTH(ARRAY[1,2,3])
+"
+
+"Functions (String)","LENGTH","
+LENGTH( stringTerm )
+","
+Returns the length of the string in characters.
+","
+LENGTH('Hello')
+"
+
+"Functions (String)","REGEXP_SUBSTR","
+REGEXP_SUBSTR( stringTerm, patternString [, startInt ] )
+","
+Returns a substring of a string by applying a regular
+expression start from the offset of a one-based position. Just like with SUBSTR,
+if the start index is negative, then it is relative to the end of the string. If not
+specified, the start index defaults to 1.
+","
+REGEXP_SUBSTR('na1-appsrv35-sj35', '[^-]+') evaluates to 'na1'
+"
+
+"Functions (String)","REGEXP_REPLACE","
+REGEXP_REPLACE( stringTerm, patternString [, replacementString ] )
+","
+Returns a string by applying a regular expression and replacing the matches with the replacement
+string. If the replacement string is not specified, it defaults to an empty string.
+","
+REGEXP_REPLACE('abc123ABC', '[0-9]+', '#') evaluates to 'abc#ABC'
+"
+
+"Functions (General)","MD5","
+MD5( term )
+","
+Computes the MD5 hash of the argument, returning the result as a BINARY(16).
+","
+MD5(my_column)
+"
+
+"Functions (General)","INVERT","
+INVERT( term )
+","
+Inverts the bits of the argument. The return type will be the same as the argument.
+","
+INVERT(my_column)
+"
+
+"Functions (Numeric)","TO_NUMBER","
+TO_NUMBER( { stringTerm | dateTimeTerm } [, formatString] )
+","
+Formats a string or date/time type as a number, optionally accepting a format string.
+For details on the format, see ""java.text.DecimalFormat"". For date, time, and timeStamp
+terms, the result is the time in milliseconds since the epoch.
+This method returns a decimal number.
+","
+TO_NUMBER('$123.33', '\u00A4###.##')
+"
+
+"Functions (String)","UPPER","
+UPPER( stringTerm )
+","
+Returns upper case string of the string argument.
+","
+UPPER('Hello')
+"
+
+"Functions (String)","LOWER","
+LOWER( stringTerm )
+","
+Returns lower case string of the string argument.
+","
+LOWER('HELLO')
+"
+
+"Functions (String)","REVERSE","
+REVERSE( stringTerm )
+","
+Returns reversed string of the string argument.
+","
+REVERSE('Hello')
+"
+
+"Functions (String)","TO_CHAR","
+TO_CHAR( timestampTerm | numberTerm [, formatString] )
+","
+Formats a date, time, timestamp, or number as a string.
+The default date format is ""yyyy-MM-dd HH:mm:ss"" and
+the default number format is ""#,##0.###"".
+For details, see ""java.text.SimpleDateFormat""
+for date/time values and ""java.text.DecimalFormat"" for
+numbers. This method returns a string.
+","
+TO_CHAR(myDate, '2001-02-03 04:05:06')
+TO_CHAR(myDecimal, '#,##0.###')
+"
+
+"Functions (Time and Date)","TO_DATE","
+TO_DATE( stringTerm [, formatString] )
+","
+Parses a string and returns a date.
+The most important format characters are:
+y year, M month, d day, H hour, m minute, s second.
+The default format string is ""yyyy-MM-dd HH:mm:ss"".
+For details of the format, see ""java.text.SimpleDateFormat"".
+","
+TO_DATE('Sat, 3 Feb 2001 03:05:06 GMT', 'EEE, d MMM yyyy HH:mm:ss z')
+"
+
+"Functions (Time and Date)","CURRENT_DATE","
+CURRENT_DATE()
+","
+Returns the current server-side date, bound at the start of the execution
+of a query based on the current time on the region server owning the
+metadata of the table being queried.
+","
+CURRENT_DATE()
+"
+
+"Functions (Time and Date)","CURRENT_TIME","
+CURRENT_TIME()
+","
+Same as CURRENT_DATE(), except returns a value of type TIME. In either case,
+the underlying representation is the epoch time as a long value.
+","
+CURRENT_TIME()
+"
+
+"Functions (General)","COALESCE","
+COALESCE( firstTerm, secondTerm )
+","
+Returns the value of the first argument if not null and the second argument otherwise. Useful
+to guarantee that a column in an UPSERT SELECT command will evaluate to a non null value.
+","
+COALESCE(last_update_date, CURRENT_DATE())
+"
+
+
