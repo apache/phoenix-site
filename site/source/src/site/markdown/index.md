@@ -62,8 +62,3 @@ Most commonly, an application will let HBase manage timestamps. However, under s
 
 ## Metadata ##
 The catalog of tables, their columns, primary keys, and types may be retrieved via the java.sql metadata interfaces: `DatabaseMetaData`, `ParameterMetaData`, and `ResultSetMetaData`. For retrieving schemas, tables, and columns through the DatabaseMetaData interface, the schema pattern, table pattern, and column pattern are specified as in a LIKE expression (i.e. % and _ are wildcards escaped through the \ character). The table catalog argument to the metadata APIs deviates from a more standard relational database model, and instead is used to specify a column family name (in particular to see all columns in a given column family).
-
-<hr/>
-## Disclaimer ##
-Apache Phoenix is an effort undergoing incubation at The Apache Software Foundation (ASF), sponsored by the [Apache Incubator PMC](http://incubator.apache.org/). Incubation is required of all newly accepted projects until a further review indicates that the infrastructure, communications, and decision making process have stabilized in a manner consistent with other successful ASF projects. While incubation status is not necessarily a reflection of the completeness or stability of the code, it does indicate that the project has yet to be fully endorsed by the ASF.
-<br/><br/><img src="http://incubator.apache.org/images/apache-incubator-logo.png"/>

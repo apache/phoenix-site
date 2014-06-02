@@ -3,7 +3,7 @@
 1. Make a local copy of source markdown files and html web pages
 
 ```
- $ svn checkout https://svn.apache.org/repos/asf/incubator/phoenix
+ $ svn checkout https://svn.apache.org/repos/asf/phoenix
 ```
 
 2. Edit/Add source markdown files in `/src/site/markdown` directory

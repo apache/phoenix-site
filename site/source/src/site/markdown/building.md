@@ -54,12 +54,12 @@ Phoenix is also hosted at Apache Maven Repository. You can add it to your maveni
     <dependency>
         <groupId>org.apache.phoenix</groupId>
         <artifactId>phoenix-core</artifactId>
-        <version>[version]-incubating</version>
+        <version>[version]</version>
     </dependency>
     ...
   </dependencies>
 ```
-Note: [version] can be replaced by 3.0.0, 4.0.0, etc.
+Note: [version] can be replaced by 3.0.0-incubating, 4.0.0-incubating, etc.
 
 ## Branches ##
 Phoenix 3.0 is running against hbase0.94+, Phoenix 4.0 is running against hbase0.98.1+ and Phoenix master branch is running against hbase trunk branch.

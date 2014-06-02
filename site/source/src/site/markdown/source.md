@@ -2,19 +2,19 @@
 
 Apache Phoenix source is available on Apache Git server:
 
-https://git-wip-us.apache.org/repos/asf/incubator-phoenix.git
+https://git-wip-us.apache.org/repos/asf/phoenix.git
 
 ### Source access 
 
 The source can be checked out from GIT with this command. See http://git-scm.com/docs/git-clone:
 
 ```
-$ git clone https://git-wip-us.apache.org/repos/asf/incubator-phoenix.git
+$ git clone https://git-wip-us.apache.org/repos/asf/phoenix.git
 ```
 
 <hr/>
 
-Mirror on Github: https://github.com/apache/incubator-phoenix
+Mirror on Github: https://github.com/apache/phoenix
 
 <hr/>
 
