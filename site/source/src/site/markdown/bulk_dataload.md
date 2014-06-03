@@ -31,10 +31,12 @@ The following parameters can be used for loading data with PSQL:
 
 | *Parameter* | *Description* |
 |-------------|---------------|
-| -t          | Provide the name of the table in which to load data. By default, the name of the table is taken from the name of the CSV file. |
+| -t          | Provide the name of the table in which to load data. By default, the name of the table is taken from the name of the CSV file. This parameter is case-sensitive |
 | -h          | Overrides the column names to which the CSV data maps and is case sensitive. A special value of in-line indicating that the first line of the CSV file determines the column to which the data maps. |
 | -s          | Run in strict mode, throwing an error on CSV parsing errors |
 | -d          | Supply a custom delimiter or delimiters for CSV parsing |
+| -q          | Supply a custom phrase delimiter, defaults to double quote character |
+| -e          | Supply a custom escape character, default is a backslash |
 | -a          | Supply an array delimiter (explained in more detail below) |
 
 ## Loading via MapReduce
