@@ -3431,7 +3431,7 @@ public class JdbcResultSet extends TraceObject implements ResultSet {
      * @param columnIndex the column index (1, 2, ...)
      * @param type the class of the returned value
      */
-/*## Java 1.7 ##
+//## Java 1.7 ##
     public <T> T getObject(int columnIndex, Class<T> type) {
         return null;
     }
@@ -3443,7 +3443,7 @@ public class JdbcResultSet extends TraceObject implements ResultSet {
      * @param columnName the column name
      * @param type the class of the returned value
      */
-/*## Java 1.7 ##
+//## Java 1.7 ##
     public <T> T getObject(String columnName, Class<T> type) {
         return null;
     }
