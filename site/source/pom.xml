@@ -8,7 +8,7 @@
   </parent>
   <artifactId>phoenix-site</artifactId>
   <name>Phoenix</name>
-  <url>http://phoenix.incubator.apache.org/</url>
+  <url>http://phoenix.apache.org/</url>
   <description>Phoenix site</description>
 
   <licenses>

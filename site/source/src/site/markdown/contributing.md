@@ -35,7 +35,7 @@ The commit message should reference the jira ticket issue (which has the format
 
 #### GitHub workflow
 
-1. Create a pull request in GitHub for the [mirror of the Phoenix Git repository](https://github.com/apache/incubator-phoenix). 
+1. Create a pull request in GitHub for the [mirror of the Phoenix Git repository](https://github.com/apache/phoenix). 
 2. Add a comment in the Jira issue with a link to the pull request. This makes it clear that the patch is ready for review.
 
 #### Local Git workflow
@@ -61,9 +61,9 @@ All new source files should include the Apache license header.
 
 In general, the "rebase" workflow should be used with the Phoenix codebase  (see [this blog post](http://randyfay.com/content/rebase-workflow-git) for more information on the difference between the "merge" and "rebase" workflows in Git).
 
-A patch file can be downloaded from a GitHub pull request by adding ".patch" to the end of the pull request url, e.g. https://github.com/apache/incubator-phoenix/pull/35.patch
+A patch file can be downloaded from a GitHub pull request by adding ".patch" to the end of the pull request url, e.g. https://github.com/apache/phoenix/pull/35.patch
 
-When applying a patch contributed from a user, please use the "git am" command if a fully-formatted patch file is available, as this preserves the contributor's contact information. Otherwise, the contributor's name should be added to the commit messge.
+When applying a patch contributed from a user, please use the "git am" command if a fully-formatted patch file is available, as this preserves the contributor's contact information. Otherwise, the contributor's name should be added to the commit message.
 
 If a single ticket consists of a patch with multiple commits, the commits can be squashed into a single commit using `git rebase`.
 

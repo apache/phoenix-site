@@ -30,7 +30,7 @@ serializer.headers        |       |Headers of the Flume Events that go as part o
 serializer.rowkeyType     |     |A custom row key generator . Can be one of timestamp,date,uuid,random and     nanotimestamp. This should be configured in cases  where we need a custom row key value to be auto generated and set for the primary key column.
 
 
-For an example configuration for ingesting Apache access logs onto Phoenix, see [this](https://git-wip-us.apache.org/repos/asf?p=incubator-phoenix.git;a=blob_plain;f=config/apache-access-logs.properties;hb=master) property file. Here we are using UUID as a row key generator for the primary key.	
+For an example configuration for ingesting Apache access logs onto Phoenix, see [this](https://git-wip-us.apache.org/repos/asf?p=phoenix.git;a=blob_plain;f=config/apache-access-logs.properties;hb=master) property file. Here we are using UUID as a row key generator for the primary key.	
 		   	
 #### Starting the agent:
        $ bin/flume-ng agent -f conf/flume-conf.properties -c ./conf -n agent
