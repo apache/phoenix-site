@@ -35,7 +35,7 @@ import org.h2.util.New;
 import org.h2.message.DbException;
 //*/
 
-/*## Java 1.7 ##
+//## Java 1.7 ##
 import java.util.logging.Logger;
 //*/
 
@@ -330,7 +330,7 @@ public class JdbcConnectionPool implements DataSource, ConnectionEventListener {
     /**
      * [Not supported]
      */
-/*## Java 1.7 ##
+//## Java 1.7 ##
     public Logger getParentLogger() {
         return null;
     }
