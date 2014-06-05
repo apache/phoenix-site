@@ -150,7 +150,7 @@ We track secondary index performance via our [performance framework](http://phoe
 That said, we have seen secondary indexing (both immutable and mutable) go as quickly as < 2x the regular write path on a small, (3 node) desktop-based cluster. This is actually a phenomenal as we have to write to multiple tables as well as build the index update.
 
 # Presentations
-There have been several presentations given on how secondary indexing works in Phoenix that have a more indepth look at how indexing works (with pretty pictures!):
+There have been several presentations given on how secondary indexing works in Phoenix that have a more in-depth look at how indexing works (with pretty pictures!):
  
 * [San Francisco HBase Meetup](http://files.meetup.com/1350427/PhoenixIndexing-SF-HUG_09-26-13.pptx) - Sept. 26, 2013
 * [Los Anglees HBase Meetup](http://www.slideshare.net/jesse_yates/phoenix-secondary-indexing-la-hug-sept-9th-2013) - Sept, 4th, 2013

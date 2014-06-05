@@ -30,7 +30,7 @@ of the
       size in bytes after which results from parallelly executed
       query results are spooled to disk. Default is 20 mb.</td><td>20971520</td></tr>
 <tr><td><small>phoenix.query.maxSpoolToDiskBytes</small></td><td style="text-align: left;">Threshold
-      size in bytes upto which results from parallelly executed
+      size in bytes up to which results from parallelly executed
       query results are spooled to disk above which the query will fail. Default is 1 gb.</td><td>1024000000</td></tr>
 <tr><td><small>phoenix.query.maxGlobalMemoryPercentage</small></td><td style="text-align: left;">Percentage of total heap memory (i.e. Runtime.getRuntime().maxMemory()) that all threads may use. Only course grain memory usage is tracked, mainly accounting for memory usage in the intermediate map built during group by aggregation.  When this limit is reached the clients block attempting to get more memory, essentially throttling memory usage. Defaults to 15%</td><td>15</td></tr>
 <tr><td><small>phoenix.query.maxGlobalMemorySize</small></td><td style="text-align: left;">Max size in bytes of total tracked memory usage. By default not specified, however, if present, the lower of this parameter and the phoenix.query.maxGlobalMemoryPercentage will be used

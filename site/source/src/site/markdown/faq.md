@@ -169,7 +169,7 @@ Column family contains related data in separate files. If you query use selected
 
 Example:
 
-Following create table DDL will create two column familes A and B.
+Following create table DDL will create two column faimiles A and B.
 
 ` CREATE TABLE TEST (MYKEY VARCHAR NOT NULL PRIMARY KEY, A.COL1 VARCHAR, A.COL2 VARCHAR, B.COL3 VARCHAR)`
 

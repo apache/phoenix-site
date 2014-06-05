@@ -84,4 +84,4 @@ Both the PSQL loader and MapReduce loader support loading array values with the 
     1,2:3:4
     2,3:4,5
 
-To load this file, the default delimiter (comma) would be used, and the array delimiter (colon) would be supplied with the parametr `-a ':'`.
+To load this file, the default delimiter (comma) would be used, and the array delimiter (colon) would be supplied with the parameter `-a ':'`.

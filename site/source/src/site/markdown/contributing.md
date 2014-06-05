@@ -13,7 +13,7 @@ These steps are explained in greater detail below.
 
 ### Discuss on the mailing list
 
-It's often best to discuss a change on the public mailing lists before creating and sumbitting a patch.
+It's often best to discuss a change on the public mailing lists before creating and submitting a patch.
 
 If you're unsure whether certain behavior in Phoenix is a bug, please send a mail to the [user mailing list](mailing_list.html) to check.
 
