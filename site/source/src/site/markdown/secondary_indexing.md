@@ -70,6 +70,7 @@ There is a single write path that guarantees the failure properties. All writes 
 If we get any failure up to this point, we return the failure to the client and no data is persisted or made visible to the client. 
 
 Once the WAL is written, we ensure that the index and primary table data will become visible, even in the case of a failure.
+
 * If the server does _not_ crash, we just insert the index updates to their respective tables.
 * If the server _does_ crash, we then replay the index updates with the usual WAL replay mechanism
 ** If any of the index updates fails, we then fail the server, ensuring we get the WAL replay of the updates later.

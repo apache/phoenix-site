@@ -4,7 +4,7 @@ As items are implemented from our road map, they are moved here to track the pro
 
 1. **[Joins](joins.html)**. Join support through hash joins (where one side of the query is small enough to fit into memory). **Available in our 3.0/4.0 release**
 2. **[Views](views.html)**. Allows the creation of multiple tables using the same physical HBase table. **Available in our 3.0/4.0 release**
-3. **[Multi-tenancy](multi_tenancy.html)**. Allows independent views to be created by different tenants on a per-connection basis that all share the same physical HBase table. **Available in our 3.0/4.0 release**
+3. **[Multi-tenancy](multi-tenancy.html)**. Allows independent views to be created by different tenants on a per-connection basis that all share the same physical HBase table. **Available in our 3.0/4.0 release**
 2. **[Sequences](sequences.html)**. Support for CREATE/DROP SEQUENCE, NEXT VALUE FOR, and CURRENT VALUE FOR has been implemented. **Available in our 3.0/4.0 release**
 4. **[ARRAY Type](array_type.html)**. Suppport for the standard JDBC ARRAY type. **Available in our 3.0/4.0 release**
 1. **[Secondary Indexes](secondary_indexing.html)**. Allows users to create indexes over mutable or immutable data through a new `CREATE INDEX` DDL command. Behind the scenes, Phoenix creates a separate HBase table with a different row key for the index. At query time, Phoenix takes care of choosing the best table to use based on how much of the row key can be formed. We support getting at the uncommitted <code>List&lt;KeyValue&gt;</code> for both the data and the index tables to allow an HFile to be built without needing an HBase connection using the "connectionless" of our JDBC driver.

@@ -32,6 +32,7 @@ Didn't make it to the last HBase Meetup did you? SQL is just a way of expressing
 
 *<strong>Blah, blah, blah - I just want to get started!</strong>*<br/>
 Ok, great! Just follow our [install instructions](download.html#Installation):
+
 * [download](download.html) and expand our installation tar
 * copy the phoenix jar into the HBase lib directory of every region server
 * restart the region servers
