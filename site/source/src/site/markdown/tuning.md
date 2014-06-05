@@ -107,7 +107,7 @@ overridden at connection
 </td><td>100</td></tr>
 <tr><td><small>phoenix.client.autoUpgradeWhiteList</small></td><td style="text-align: left;">Comma separated list of case sensitive full table names to automatically upgrade from 2.2.x format to 3.0/4.0 format. Use * to upgrade all tables. Only applies on the first connection to a 3.0/4.0 cluster. Not specified by default. For more information, see [here](http://phoenix.apache.org/upgrade_from_2_2.html)
 </td><td>&nbsp;</td></tr>
-<tr><td><small>phoenix.clock.skew.interval</small></td><td style="text-align: left;">Delay interval(in milliseconds) when openning SYSTEM.CATALOG to compensate possible time clock skew when SYSTEM.CATALOG moves among region servers. 
+<tr><td><small>phoenix.clock.skew.interval</small></td><td style="text-align: left;">Delay interval(in milliseconds) when opening SYSTEM.CATALOG to compensate possible time clock skew when SYSTEM.CATALOG moves among region servers. 
 </td><td>2000</td></tr>
 </tbody></table>
 <br />
