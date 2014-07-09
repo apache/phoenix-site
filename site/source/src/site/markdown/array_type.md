@@ -46,10 +46,24 @@ The length of the array grows dynamically as needed with the current length and 
 
 Attempts to access an array element beyond the current length will evaluate to <code>null</code>.
 
+For searching in an array, built-in functions like ANY and ALL are provided.  For example,
+
+    SELECT region_name FROM regions WHERE '94030' = ANY(zip);
+    SELECT region_name FROM regions WHERE '94030' = ALL(zip);
+
+The built-in function ANY checks if any of the element in the array satisfies the condition and it is equivalent to OR condition:
+
+    SELECT region_name FROM regions WHERE zip[1] = '94030' OR zip[2] = '94030' OR zip[3] = '94030';
+
+The built-in function ALL checks if all the elements in the array satisfies the condition and it is equivalent to AND condition:
+
+    SELECT region_name FROM regions WHERE zip[1] = '94030' AND zip[2] = '94030' AND zip[3] = '94030';
+
+
+
 ###Limitations
 * Only one dimensional arrays are currently supported
 * For an array of fixed width types, null elements occurring in the middle of an array are not tracked.
 * The declaration of an array length at DDL time is not enforced currently, but maybe in the future. Note that it is persisted with the table metadata.
 * An array may only be used as the last column in a primary key constraint.
 * Partial update of an array is currently not possible. Instead, the array may be manipulated on the client-side and then upserted back in its entirety.
-* No support currently exists for searching in an array through the ALL or ANY built-in functions, but we welcome community contributions.
