@@ -876,7 +876,7 @@ public class JdbcStatement extends TraceObject implements Statement {
     /**
      * [Not supported]
      */
-//## Java 1.7 ##
+/*## Java 1.7 ##
     public void closeOnCompletion() {
         // not supported
     }
@@ -885,7 +885,7 @@ public class JdbcStatement extends TraceObject implements Statement {
     /**
      * [Not supported]
      */
-//## Java 1.7 ##
+/*## Java 1.7 ##
     public boolean isCloseOnCompletion() {
         return true;
     }
