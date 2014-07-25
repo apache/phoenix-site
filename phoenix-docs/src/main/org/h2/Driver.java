@@ -17,7 +17,7 @@ import org.h2.message.DbException;
 import org.h2.message.TraceSystem;
 import org.h2.upgrade.DbUpgrade;
 
-/*## Java 1.7 ##
+//## Java 1.7 ##
 import java.util.logging.Logger;
 //*/
 
@@ -138,7 +138,7 @@ public class Driver implements java.sql.Driver {
     /**
      * [Not supported]
      */
-/*## Java 1.7 ##
+//## Java 1.7 ##
     public Logger getParentLogger() {
         return null;
     }
