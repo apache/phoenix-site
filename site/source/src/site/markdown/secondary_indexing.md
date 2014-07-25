@@ -94,6 +94,7 @@ If the index tables are not setup correctly (Phoenix ensures that they are), thi
 Only mutable indexing requires special configuration options in the region server to run - phoenix ensures that they are setup correctly when you enable mutable indexing on the table; if the correct properties are not set, you will not be able to turn it on.
 
 You will need to add the following parameters to `hbase-site.xml`:
+
 ```
 <property>
   <name>hbase.regionserver.wal.codec</name>
@@ -103,6 +104,65 @@ You will need to add the following parameters to `hbase-site.xml`:
 
 This enables custom WAL edits to be written, ensuring proper writing/replay of the index updates. This codec supports the usual host of WALEdit options, most notably WALEdit compression.
 
+### Advanced Setup - Removing Index Deadlocks (0.98.4+)
+
+Phoenix releases that include these changes (4.1+, 5.0.0+) are still backwards compatible with older versions of phoenix (to the extent that they are semantically compatible) as well as with older versions of HBase (0.98.1-0.98.3).
+
+As of HBase 0.98.4 we can finally remove the change of index deadlocks. In HBase you can tune the number of RPC threads to match client writes + index writes, but there is still a chance you could have a deadlock in an unlucky scenario (i.e. Client A -> Server A, Client B -> Server B, each taking the last RPC thread. Then each server attempts to make an index update to the other, Server A -> Server B, and vice versa, but they can't as there are no more available RPC threads).
+
+As of [PHOENIX-938](https://issues.apache.org/jira/browse/PHOENIX-938) and [HBASE-11513](https://issues.apache.org/jira/browse/HBASE-11513) we can remove these deadlocks by providing a different set of RPC handlers for index updates by giving index updates their own 'rpc priority' and handling the priorities via a custom Phoenix RPC Handler.
+
+The properties you need to set to enable this are
+
+#### Server Side
+
+```
+<property>
+  <name>hbase.region.server.rpc.scheduler.factory.class</name>
+  <value>org.apache.phoenix.hbase.index.ipc.PhoenixIndexRpcSchedulerFactory</value>
+  <description>Factory to create the Phoenix RPC Scheduler that knows to put index updates into index queues</description>
+</property>
+```
+
+After adding these settings to your hbase-site.xml, you just need to do a rolling restart of your cluster.
+
+
+Note that having the configs on both client and server side will not impact correctness or performance.
+
+#### Tuning
+
+By default, index priority range is between (1000, 1050]. Higher priorites within the index range, at this time, do not means updates are processed sooner. However, we reserve this range to provide that possibility in the future.
+
+You can specifiy this range however to suit your individual cluster requirements by adjusting the follwing parameters
+
+```
+<property>
+	<name>org.apache.phoenix.regionserver.index.priority.min</name>
+	<value>1050</value>
+	<description>Value to specify to bottom (inclusive) of the range in which index priority may lie</description>
+</property>
+<property>
+	<name>org.apache.phoenix.regionserver.index.priority.max</name>
+	<value>1050</value>
+	<description>Value to specify to top (exclusive) of the range in which index priority may lie</description>
+</property>
+```
+
+The number of RPC Handler Threads can be specified via:
+
+```
+<property>
+	<name>org.apache.phoenix.regionserver.index.handler.count</name>
+	<value>30</value>
+	<description>Number of threads to use when serving index write requests</description>
+</property>
+```
+
+Though the actual number of threads is dictated by the Max(number of call queues, handler count), where the number of call queues is determined by standard HBase configuration (see below).
+
+
+To further tune the queues, you can adjust the standard rpc queue length parameters (currently, there are no special knobs for the index queues), specifically "ipc.server.max.callqueue.length" and "ipc.server.callqueue.handler.factor". See the [HBase Reference Guide](http://hbase.apache.org/book.html) for more details.
+ 
 ## Tuning
 Out the box, indexing is pretty fast. However, to optimize for your particular environment and workload, there are several properties you can tune.
 
