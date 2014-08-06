@@ -50,6 +50,36 @@ If you have an existing table that you'd like to switch from immutable indexing 
     ALTER TABLE my_table SET IMMUTABLE_ROWS=false;
 For the complete syntax, see our [Language Reference Guide](language/index.html#create_index).
 
+# Local(Region level) indexing
+
+Local indexing targets _write heavy_, _low latency_ and _space constraint_ use cases. With local indexes index data and table data are co-reside at same server so no network overhead during writes and reads. Local indexes can be used even when the query isn't fully covered i.e. Phoenix automatically retrieve the columns not in the index through point gets against the data table. Unlike global indexes all local indexes data of a table are stored in a separate shared table.
+
+Reading data via the local index does however require to contact each region until unless query contains equal/range condition(s) on leading primary key column(s) of the data table.
+
+## Example
+
+To use local indexing, just supply a <code>LOCAL</code> keyword when you create index like this:
+
+	CREATE LOCAL INDEX my_index ON my_table (v1);
+For the complete syntax, see our [Language Reference Guide](language/index.html#create_index).
+
+### Setup
+
+Local indexing requires special configurations in the master to ensure data table and local index regions co-location.
+
+You will need to add the following parameters to `hbase-site.xml`:
+
+```
+<property>
+  <name>hbase.master.loadbalancer.class</name>
+  <value>org.apache.phoenix.hbase.index.balancer.IndexLoadBalancer</value>
+</property>
+<property>
+  <name>hbase.coprocessor.master.classes</name>
+  <value>org.apache.phoenix.hbase.index.master.IndexMasterObserver</value>
+</property>
+```
+
 ## Data Guarantees and Failure Management
 
 On successful return to the client, all data is guaranteed to be written to all interested indexes and the primary table. For each individual data row, updates are an all-or-nothing, with a small gap of being behind. From the perspective of a single client, it either thinks all-or-none of the update worked.
