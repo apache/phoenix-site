@@ -3,25 +3,39 @@
 Secondary indexes are an orthogonal way to access data from its primary access path. In HBase, you have a single index that is lexicographically sorted on 
 the primary row key. Access to records in any way other than through the primary row requires scanning over potentially all the rows in the table to test them against your filter. With secondary indexing, the columns you index form an alternate row key to allow point lookups and range scans along this new axis. Phoenix is particularly powerful in that we provide _covered_ indexes - we do not need to go back to the primary table once we have found the index entry. Instead, we bundle the data we care about right in the index rows, saving read-time overhead.
 
-Phoenix supports two main forms of indexing: mutable and immutable indexing. They are useful in different scenarios and have their own failure profiles and performance characteristics. Both indexes are 'global' indexes - they live on their own tables and are copies of primary table data, which Phoenix ensures remain in-sync.
+Phoenix supports three types of indexing techniques: immutable, global, and local indexing.
+They are each useful in different scenarios and have their own failure profiles and performance characteristics.
 
-# Mutable Indexing
+## Immutable Indexing
 
-Often, the rows you are inserting are changing - pretty much any time you are not doing time-series data. In this case, use mutable indexing to ensure that your index is properly maintained as your data changes.
+Immutable indexing targets use cases that are _write once_, _append only_; this is common in time-series data, where you log once, but read multiple times. In this case, the indexing is managed entirely on the client - either we successfully write all the primary and index data or we return a failure to the client. Since once written, rows are never updated, no incremental index maintenance is required making them perform very well. This reduces the overhead of secondary indexing at write time. However, keep in mind that immutable indexing are only applicable in a limited set of use cases.
 
-All the performance penalties for indexes occur at write time. We intercept the primary table updates on write ([DELETE](language/index.html#delete), [UPSERT VALUES](language/index.html#upsert_values) and [UPSERT SELECT](language/index.html#upsert_select)), build the index update and then sent any necessary updates to all interested index tables. At read time, Phoenix will select the index table to use that will produce the fastest query time and directly scan it just like any other HBase table.
+One restriction of immutable indexes is that rows from the data table may not be deleted. Instead, the only way to delete rows is to drop the entire data table. This is likely to change once [PHOENIX-619](https://issues.apache.org/jira/browse/PHOENIX-619) is implemented.
 
-## Example
+## Mutable Indexing
+
+If a column values of the same row changes, you must use mutable indexing to ensure that your index is properly maintained. There are two types of mutable indexes: global and local. From a functional standpoint, these are nearly identical with the difference being in their performance characteristics and tradeoffs.
+
+### Global Indexing
+Global indexing targets _read heavy_, _low write_ uses cases. With global indexes, all the performance penalties for indexes occur at write time. We intercept the data table updates on write ([DELETE](language/index.html#delete), [UPSERT VALUES](language/index.html#upsert_values) and [UPSERT SELECT](language/index.html#upsert_select)), build the index update and then sent any necessary updates to all interested index tables. At read time, Phoenix will select the index table to use that will produce the fastest query time and directly scan it just like any other HBase table. Note, however, if a column is referenced in a query that isn't part of the index, the index will not be used for that query.
+
+### Local Indexing
+Local indexing targets _write heavy_, _space constrained_ use cases. With local indexes index data and table data are co-reside at same server so no network overhead during writes and reads. Local indexes can be used even when the query isn't fully covered i.e. Phoenix automatically retrieve the columns not in the index through point gets against the data table. Unlike global indexes all local indexes data of a table are stored in a separate shared table. At read time when the local index is used, every region must be examined for the data as the exact region location of index data cannot be predetermined which incurs some overhead.
+
+## Examples
 
 Given the schema shown here:
 
     CREATE TABLE my_table (k VARCHAR PRIMARY KEY, v1 VARCHAR, v2 BIGINT);
-you'd create an index on the v1 column like this:
+you'd create a global index on the v1 column like this:
 
     CREATE INDEX my_index ON my_table (v1);
+while the equivalent local index would be created like this:
+
+    CREATE LOCAL INDEX my_index ON my_table (v1);
 A table may contain any number of indexes, but note that your write speed will drop as you add additional indexes.
 
-We can also include columns from the data table in the index apart from the indexed columns. This allows an index to be used more frequently, as it will only be used if all columns referenced in the query are contained by it.
+We can also include columns from the data table in the index apart from the indexed columns. This allows a global index to be used more frequently, as a global index will only be used if all columns referenced in the query are contained by it. This is not the case for local indexes.
 
     CREATE INDEX my_index ON my_table (v1) INCLUDE (v2);
 In addition, multiple columns may be indexed and their values may be stored in ascending or descending order.
@@ -31,54 +45,23 @@ Finally, just like with the <code>CREATE TABLE</code> statement, the <code>CREAT
 
     CREATE INDEX my_index ON my_table (v2 DESC, v1) INCLUDE (v3)
         SALT_BUCKETS=10, DATA_BLOCK_ENCODING='NONE';
-Note that if the primary table is salted, then the index is automatically salted in the same way. In addition, the MAX_FILESIZE for the index is adjusted down, relative to the size of the primary versus index table. For more on salting see [here](salted.html).
+Note that if the primary table is salted, then the index is automatically salted in the same way for global indexes. In addition, the MAX_FILESIZE for the index is adjusted down, relative to the size of the primary versus index table. For more on salting see [here](salted.html). With local indexes, on the other hand, specifying SALT_BUCKETS is not allowed.
 
-# Immutable Indexing
+To drop an index, you'd issue the following statement:
+    DROP INDEX my_index ON my_table
 
-Immutable indexing targets use cases that are _write once_, _append only_; this is common in time-series data, where you log once, but read multiple times. In this case, the indexing is managed entirely on the client - either we successfully write all the primary and index data or we return a failure to the client. Since once written, rows are never updated, no incremental index maintenance is required. This reduces the overhead of secondary indexing at write time. However, keep in mind that immutable indexing are only applicable in a limited set of use cases.
-
-## Example
+If an indexed column is dropped in the data table, the index will automatically be dropped. In addition, if a covered column is dropped in the data table, it will be automatically dropped from the index as well.
 
 To use immutable indexing, supply an <code>IMMUTABLE_ROWS=true</code> property when you create your table like this:
 
     CREATE TABLE my_table (k VARCHAR PRIMARY KEY, v VARCHAR) IMMUTABLE_ROWS=true;
-
-Other than that, all of the previous examples are identical for immutable indexing.
+In that case, all indexes on the table are immutable indexes and local indexes are not allowed.
 
 If you have an existing table that you'd like to switch from immutable indexing to mutable indexing, use the <code>ALTER TABLE</code> command as show below:
 
     ALTER TABLE my_table SET IMMUTABLE_ROWS=false;
-For the complete syntax, see our [Language Reference Guide](language/index.html#create_index).
 
-# Local(Region level) indexing
-
-Local indexing targets _write heavy_, _low latency_ and _space constraint_ use cases. With local indexes index data and table data are co-reside at same server so no network overhead during writes and reads. Local indexes can be used even when the query isn't fully covered i.e. Phoenix automatically retrieve the columns not in the index through point gets against the data table. Unlike global indexes all local indexes data of a table are stored in a separate shared table.
-
-Reading data via the local index does however require to contact each region until unless query contains equal/range condition(s) on leading primary key column(s) of the data table.
-
-## Example
-
-To use local indexing, just supply a <code>LOCAL</code> keyword when you create index like this:
-
-	CREATE LOCAL INDEX my_index ON my_table (v1);
-For the complete syntax, see our [Language Reference Guide](language/index.html#create_index).
-
-### Setup
-
-Local indexing requires special configurations in the master to ensure data table and local index regions co-location.
-
-You will need to add the following parameters to `hbase-site.xml`:
-
-```
-<property>
-  <name>hbase.master.loadbalancer.class</name>
-  <value>org.apache.phoenix.hbase.index.balancer.IndexLoadBalancer</value>
-</property>
-<property>
-  <name>hbase.coprocessor.master.classes</name>
-  <value>org.apache.phoenix.hbase.index.master.IndexMasterObserver</value>
-</property>
-```
+For the complete syntax, see our [Language Reference Guide](language/index.html).
 
 ## Data Guarantees and Failure Management
 
@@ -115,38 +98,21 @@ ALTER INDEX my_index ON my_table REBUILD;
 
 If we cannot disable the index, then the server will be immediately aborted. If the abort fails, we call System.exit on the JVM, forcing the server to die. By killing the server, we ensure that the WAL will be replayed on recovery, replaying the index updates to their appropriate tables.
 
-**WARNING: indexing has the potential to bring down your entire cluster very quickly.**
+**WARNING: global indexing has the potential to bring down your entire cluster very quickly.**
 
 If the index tables are not setup correctly (Phoenix ensures that they are), this failure policy can cause a cascading failure as each region server attempts and fails to write the index update, subsequently killing itself to ensure the visibility concerns outlined above.
 
 ## Setup
 
-Only mutable indexing requires special configuration options in the region server to run - phoenix ensures that they are setup correctly when you enable mutable indexing on the table; if the correct properties are not set, you will not be able to turn it on.
+Mutable indexing requires special configuration options on the region server and master to run - Phoenix ensures that they are setup correctly when you enable mutable indexing on the table; if the correct properties are not set, you will not be able to use secondary indexing. After adding these settings to your hbase-site.xml, you'll need to do a rolling restart of your cluster.
 
-You will need to add the following parameters to `hbase-site.xml`:
+You will need to add the following parameters to `hbase-site.xml` on each region server:
 
 ```
 <property>
   <name>hbase.regionserver.wal.codec</name>
   <value>org.apache.hadoop.hbase.regionserver.wal.IndexedWALEditCodec</value>
 </property>
-```
-
-This enables custom WAL edits to be written, ensuring proper writing/replay of the index updates. This codec supports the usual host of WALEdit options, most notably WALEdit compression.
-
-### Advanced Setup - Removing Index Deadlocks (0.98.4+)
-
-Phoenix releases that include these changes (4.1+, 5.0.0+) are still backwards compatible with older versions of phoenix (to the extent that they are semantically compatible) as well as with older versions of HBase (0.98.1-0.98.3).
-
-As of HBase 0.98.4 we can finally remove the change of index deadlocks. In HBase you can tune the number of RPC threads to match client writes + index writes, but there is still a chance you could have a deadlock in an unlucky scenario (i.e. Client A -> Server A, Client B -> Server B, each taking the last RPC thread. Then each server attempts to make an index update to the other, Server A -> Server B, and vice versa, but they can't as there are no more available RPC threads).
-
-As of [PHOENIX-938](https://issues.apache.org/jira/browse/PHOENIX-938) and [HBASE-11513](https://issues.apache.org/jira/browse/HBASE-11513) we can remove these deadlocks by providing a different set of RPC handlers for index updates by giving index updates their own 'rpc priority' and handling the priorities via a custom Phoenix RPC Handler.
-
-The properties you need to set to enable this are
-
-#### Server Side
-
-```
 <property>
   <name>hbase.region.server.rpc.scheduler.factory.class</name>
   <value>org.apache.phoenix.hbase.index.ipc.PhoenixIndexRpcSchedulerFactory</value>
@@ -154,93 +120,80 @@ The properties you need to set to enable this are
 </property>
 ```
 
-After adding these settings to your hbase-site.xml, you just need to do a rolling restart of your cluster.
+The first property enables custom WAL edits to be written, ensuring proper writing/replay of the index updates. This codec supports the usual host of WALEdit options, most notably WALEdit compression.
 
+The second property prevents deadlocks from occurring during index maintenance for global indexes (HBase 0.98.4+ only) by ensuring index updates are processed with a higher priority than data updates.
 
-Note that having the configs on both client and server side will not impact correctness or performance.
+Local indexing also requires special configurations in the master to ensure data table and local index regions co-location.
 
-#### Tuning
-
-By default, index priority range is between (1000, 1050]. Higher priorites within the index range, at this time, do not means updates are processed sooner. However, we reserve this range to provide that possibility in the future.
-
-You can specifiy this range however to suit your individual cluster requirements by adjusting the follwing parameters
+You will need to add the following parameters to `hbase-site.xml` on the master:
 
 ```
 <property>
-	<name>org.apache.phoenix.regionserver.index.priority.min</name>
-	<value>1050</value>
-	<description>Value to specify to bottom (inclusive) of the range in which index priority may lie</description>
+  <name>hbase.master.loadbalancer.class</name>
+  <value>org.apache.phoenix.hbase.index.balancer.IndexLoadBalancer</value>
 </property>
 <property>
-	<name>org.apache.phoenix.regionserver.index.priority.max</name>
-	<value>1050</value>
-	<description>Value to specify to top (exclusive) of the range in which index priority may lie</description>
+  <name>hbase.coprocessor.master.classes</name>
+  <value>org.apache.phoenix.hbase.index.master.IndexMasterObserver</value>
 </property>
 ```
 
-The number of RPC Handler Threads can be specified via:
-
-```
-<property>
-	<name>org.apache.phoenix.regionserver.index.handler.count</name>
-	<value>30</value>
-	<description>Number of threads to use when serving index write requests</description>
-</property>
-```
-
-Though the actual number of threads is dictated by the Max(number of call queues, handler count), where the number of call queues is determined by standard HBase configuration (see below).
-
-
-To further tune the queues, you can adjust the standard rpc queue length parameters (currently, there are no special knobs for the index queues), specifically "ipc.server.max.callqueue.length" and "ipc.server.callqueue.handler.factor". See the [HBase Reference Guide](http://hbase.apache.org/book.html) for more details.
- 
 ## Tuning
 Out the box, indexing is pretty fast. However, to optimize for your particular environment and workload, there are several properties you can tune.
 
 All the following parameters must be set in `hbase-site.xml` - they are true for the entire cluster and all index tables, as well as across all regions on the same server (so, for instance, a single server would not write to too many different index tables at once).
 
 1. index.builder.threads.max
-
     * Number of threads to used to build the index update from the primary table update
     * Increasing this value overcomes the bottleneck of reading the current row state from the underlying HRegion. Tuning this value too high will just bottleneck at the HRegion as it will not be able to handle too many concurrent scan requests as well as general thread-swapping concerns.
     * **Default: 10**
 2. index.builder.threads.keepalivetime
-
     * Amount of time in seconds after we expire threads in the builder thread pool.
     * Unused threads are immediately released after this amount of time and not core threads are retained (though this last is a small concern as tables are expected to sustain a fairly constant write load), but simultaneously allows us to drop threads if we are not seeing the expected load.
     * **Default: 60**
-
 3. index.writer.threads.max
     * Number of threads to use when writing to the target index tables.
     * The first level of parallelization, on a per-table basis - it should roughly correspond to the number of index tables
     * **Default: 10**
-
 4. index.writer.threads.keepalivetime
     * Amount of time in seconds after we expire threads in the writer thread pool.
     * Unused threads are immediately released after this amount of time and not core threads are retained (though this last is a small concern as tables are expected to sustain a fairly constant write load), but simultaneously allows us to drop threads if we are not seeing the expected load.
     * **Default: 60**
-
 5. hbase.htable.threads.max
     * Number of threads each index HTable can use for writes.
     * Increasing this allows more concurrent index updates (for instance across batches), leading to high overall throughput.
     * **Default: 2,147,483,647**
-
 6. hbase.htable.threads.keepalivetime
     * Amount of time in seconds after we expire threads in the HTable's thread pool.
     * Using the "direct handoff" approach, new threads will only be created if it is necessary and will grow unbounded. This could be bad but HTables  only create as many Runnables as there are region servers; therefore, it also scales when new region servers are added.
     * **Default: 60** 
- 
 7. index.tablefactory.cache.size
     * Number of index HTables we should keep in cache.
     * Increasing this number ensures that we do not need to recreate an HTable for each attempt to write to an index table. Conversely, you could see memory pressure if this value is set too high.
     * **Default: 10**
+8. org.apache.phoenix.regionserver.index.priority.min
+    * Value to specify to bottom (inclusive) of the range in which index priority may lie.
+    * **Default: 1000**
+9. org.apache.phoenix.regionserver.index.priority.max
+    * Value to specify to top (exclusive) of the range in which index priority may lie.
+    * Higher priorites within the index min/max range do not means updates are processed sooner.
+    * **Default: 1050**
+10. org.apache.phoenix.regionserver.index.handler.count
+    * Number of threads to use when serving index write requests for global index maintenance.
+    * Though the actual number of threads is dictated by the Max(number of call queues, handler count), where the number of call queues is determined by standard HBase configuration. To further tune the queues, you can adjust the standard rpc queue length parameters (currently, there are no special knobs for the index queues), specifically <code>ipc.server.max.callqueue.length</code> and <code>ipc.server.callqueue.handler.factor</code>. See the [HBase Reference Guide](http://hbase.apache.org/book.html) for more details.
+    * **Default: 30**
+
 
 # Performance
 We track secondary index performance via our [performance framework](http://phoenix-bin.github.io/client/performance/latest.htm). This is a generic test of performance based on defaults - your results will vary based on hardware specs as well as you individual configuration.
 
 That said, we have seen secondary indexing (both immutable and mutable) go as quickly as < 2x the regular write path on a small, (3 node) desktop-based cluster. This is actually a phenomenal as we have to write to multiple tables as well as build the index update.
 
-# Presentations
+# Resources
 There have been several presentations given on how secondary indexing works in Phoenix that have a more in-depth look at how indexing works (with pretty pictures!):
  
 * [San Francisco HBase Meetup](http://files.meetup.com/1350427/PhoenixIndexing-SF-HUG_09-26-13.pptx) - Sept. 26, 2013
 * [Los Anglees HBase Meetup](http://www.slideshare.net/jesse_yates/phoenix-secondary-indexing-la-hug-sept-9th-2013) - Sept, 4th, 2013
+* [Local Indexes](https://github.com/Huawei-Hadoop/hindex/blob/master/README.md#how-it-works) by Huawei
+* [PHOENIX-938](https://issues.apache.org/jira/browse/PHOENIX-938) and [HBASE-11513](https://issues.apache.org/jira/browse/HBASE-11513) for deadlock prevention during global index maintenance.
