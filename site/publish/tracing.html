@@ -8,7 +8,7 @@
 
 	<head>
 		<meta charset="UTF-8" />
-		<title>Apache Pig Integration | Apache Phoenix</title>
+		<title>Tracing | Apache Phoenix</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="description" content="" />
 		<meta http-equiv="content-language" content="en" />
@@ -34,7 +34,7 @@
 
 	</head>
 
-	<body class="page-pig_integration project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
+	<body class="page-tracing project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
 
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
@@ -88,11 +88,11 @@
 									<li ><a href="dynamic_columns.html" title="Dynamic Columns">Dynamic Columns</a></li>
 									<li ><a href="skip_scan.html" title="Skip Scan">Skip Scan</a></li>
 									<li ><a href="bulk_dataload.html" title="Bulk Loading">Bulk Loading</a></li>
-									<li ><a href="tracing.html" title="Request Tracing">Request Tracing</a></li>
+									<li class="active"><a href="" title="Request Tracing">Request Tracing</a></li>
 									<li class="divider"/>
 									<li ><a href="phoenix_on_emr.html" title="Amazon EMR Support">Amazon EMR Support</a></li>
 									<li ><a href="flume.html" title="Apache Flume Plugin">Apache Flume Plugin</a></li>
-									<li class="active"><a href="" title="Apache Pig Integration">Apache Pig Integration</a></li>
+									<li ><a href="pig_integration.html" title="Apache Pig Integration">Apache Pig Integration</a></li>
 								</ul>
 							</li>
 							<li class="dropdown">
@@ -122,77 +122,103 @@
 		<div class="span12">
 			<div class="body-content">
 <div class="page-header">
- <h1>Apache Pig Integration</h1>
+ <h1>Tracing</h1>
 </div> 
-<p>Pig integration may be divided into two parts: a <b>StoreFunc</b> as a means to generate Phoenix-encoded data through Pig, and a <b>Loader</b> which enables Phoenix-encoded data to be read by Pig.</p> 
+<p>As of Phoenix 4.1.0 we have added the ability to collect per-request traces. This allows you to see each important step in a query or insertion, all they way from the client through into the HBase side, and back again.</p> 
+<p>We leverage Cloudera’s <a class="externalLink" href="https://github.com/cloudera/htrace">HTrace</a> library to seamlessly integrate with HBase’s tracing utilities. We then take it a step further by then depositing these metrics into a Hadoop metrics2 sink that writes them into a phoenix table.</p> 
+<p><b>Writing traces to a phoenix table is not supported on Hadoop1</b></p> 
 <div class="section"> 
- <h2 id="Pig_StoreFunc">Pig StoreFunc</h2> 
- <p>The StoreFunc allows users to write data in Phoenix-encoded format to HBase tables using Pig scripts. This is a nice way to bulk upload data from a MapReduce job in parallel to a Phoenix table in HBase. All you need to specify is the endpoint address, HBase table name and a batch size. For example:</p> 
- <div class="source"> 
-  <pre>A = load 'testdata' as (a:chararray, b:chararray, c:chararray, d:chararray, e: datetime); 
-STORE A into 'hbase://CORE.ENTITY_HISTORY' using
-    org.apache.phoenix.pig.PhoenixHBaseStorage('localhost','-batchSize 5000');
-</pre> 
- </div> 
- <p>The above reads a file ‘testdata’ and writes the elements to a table “CORE.ENTITY_HISTORY” in HBase that is running on localhost. First argument to this StoreFunc is the server, the 2nd argument is the batch size for upserts via Phoenix. The batch size is related to how many rows you are able to hold in memory. A good default is 1000 rows, but if your row is wide, you may want to decrease this.</p> 
- <p>Note that Pig types must be in sync with the target Phoenix data types. This StoreFunc tries best to cast based on input Pig types and target Phoenix data types, but it is recommended to provide an appropriate schema.</p> 
+ <h2 id="Usage">Usage</h2> 
+ <p>There are only a couple small things you need to do to enable tracing a given request with Phoenix.</p> 
  <div class="section"> 
-  <h3 id="Gotchas">Gotchas</h3> 
-  <p>It is advised that the upsert operation be idempotent. That is, trying to re-upsert data should not cause any inconsistencies. This is important in the case when a Pig job fails in process of writing to a Phoenix table. There is no notion of rollback (due to lack of transactions in HBase), and re-trying the upsert with PhoenixHBaseStorage must result in the same data in HBase table.</p> 
-  <p>For example, let’s assume we are writing records n1…n10 to HBase. If the job fails in the middle of this process, we are left in an inconsistent state where n1…n7 made it to the phoenix tables but n8…n10 were missed. If we retry the same operation, n1…n7 would be re-upserted and n8…n10 would be upserted this time.</p> 
- </div> 
-</div> 
-<div class="section"> 
- <h2 id="Pig_Loader">Pig Loader</h2> 
- <p>A Pig data loader allows users to read data from Phoenix backed HBase tables within a Pig script. </p> 
- <p>The Load func provides two alternative ways to load data.</p> 
- <ol style="list-style-type: decimal"> 
-  <li> <p>Given a table name, the following will load the data for all the columns in the HIRES table:</p> 
-   <div class="source"> 
-    <pre>A = load 'hbase://table/HIRES' using org.apache.phoenix.pig.PhoenixHBaseLoader('localhost');
-</pre> 
-   </div>To restrict the list of columns, you may specify the column names as part of LOAD as shown below: 
-   <div class="source"> 
-    <pre>A = load 'hbase://table/HIRES/ID,NAME' using org.apache.phoenix.pig.PhoenixHBaseLoader('localhost');
-</pre> 
-   </div> <p>Here, only data for ID and NAME columns are returned.</p></li> 
-  <li> <p>Given a query, the following loads data for all those rows whose AGE column has a value of greater than 50:</p> 
-   <div class="source"> 
-    <pre>A = load 'hbase://query/SELECT ID,NAME FROM HIRES WHERE AGE &gt; 50' using org.apache.phoenix.pig.PhoenixHBaseLoader('localhost');
-</pre> 
-   </div>The LOAD func merely executes the given SQL query and returns the results. Though there is a provision to provide a query as part of LOAD, it is restricted to the following: 
-   <ul> 
-    <li>Only a SELECT query is allowed. No DML statements such as UPSERT or DELETE.</li> 
-    <li>The query may not contain any GROUP BY, ORDER BY, LIMIT, or DISTINCT clauses.</li> 
-    <li>The query may not contain any AGGREGATE functions.</li> 
-   </ul></li> 
- </ol> 
- <p>In both the cases, the zookeeper quorum should be passed to the PhoenixHBaseLoader as an argument to the constructor. </p> 
- <p>The Loadfunc makes best effort to map Phoenix Data Types to Pig datatype. You can have a look at org.apache.phoenix.pig.util.TypeUtil to see how each of Phoenix data type is mapped to Pig data type.</p> 
- <div class="section"> 
-  <h3 id="Example">Example</h3> 
-  <p>Determine the number of users by a CLIENT ID</p> 
-  <p><b>Ddl</b></p> 
+  <h3 id="Client_Property">Client Property</h3> 
+  <p>The frequency of tracing is determined by the client JDBC property:</p> 
   <div class="source"> 
-   <pre>CREATE TABLE HIRES( CLIENTID INTEGER NOT NULL, EMPID INTEGER NOT NULL, NAME VARCHAR CONSTRAINT pk PRIMARY KEY(CLIENTID,EMPID));
+   <pre>org.apache.phoenix.trace.frequency
 </pre> 
   </div> 
-  <p><b>Pig Script</b> </p> 
-  <div class="source"> 
-   <pre>raw = LOAD 'hbase://table/HIRES USING org.apache.phoenix.pig.PhoenixHBaseLoader('localhost')';
-grpd = GROUP raw BY CLIENTID; 
-cnt = FOREACH grpd GENERATE group AS CLIENT,COUNT(raw);
-DUMP cnt;  
-</pre> 
-  </div> 
- </div> 
- <div class="section"> 
-  <h3 id="Future_Work">Future Work</h3> 
+  <p>There are three possible tracing frequencies you can use:</p> 
   <ol style="list-style-type: decimal"> 
-   <li>Support for ARRAY data type.</li> 
-   <li>Usage of expressions within the SELECT clause when providing a full query.</li> 
+   <li>never 
+    <ul> 
+     <li>This is the default</li> 
+    </ul></li> 
+   <li>always 
+    <ul> 
+     <li>Every request will be traced</li> 
+    </ul></li> 
+   <li>probability 
+    <ul> 
+     <li>take traces with a probabilistic frequency</li> 
+     <li>probability threshold set by: “com.salesforce.phoenix.trace.probability.threshold”</li> 
+    </ul></li> 
   </ol> 
+  <p>By turning one of these properties on, you turn on merely collecting the traces. However, the traces need to be deposited somewhere</p> 
+  <p>Example:</p> 
+  <div class="source"> 
+   <pre># Enable tracing on every request
+Properties props = new Properties();
+props.setProperty(&quot;org.apache.phoenix.trace.frequency&quot;, &quot;always&quot;);
+
+# Or more simply
+org.apache.phoenix.trace.Tracing.setSampling(props, Tracing.Frequency.ALWAYS);
+
+# Enable tracing on 50% of requests
+org.apache.phoenix.trace.Tracing.setSampling(props, Tracing.Frequency.ALWAYS);
+props.setProperty(&quot;com.salesforce.phoenix.trace.probability.threshold&quot;, .5)
+</pre> 
+  </div> 
  </div> 
+ <div class="section"> 
+  <h3 id="Enabling_TracingMetrics2_Sink">Enabling Tracing/Metrics2 Sink</h3> 
+  <p>This is where the traces are taken from the tracing framework and then deposited into a Phoenix table. Because the traces are transported through the Hadoop metrics2 framework, you need to add the following configs to your hadoop-metrics2.properties (or hadoop-metrics2-phoenix.properties) file on the classpath of both the * phoenix client* and <i>HBase regionservers</i>, and then restart all necessary processes to get them to pick up the configs.</p> 
+  <div class="source"> 
+   <pre># Hadoop2 metrics sink
+phoenix.sink.*.class=org.apache.phoenix.trace.PhoenixMetricsWriter
+# Writer that generically writes to phoenix tables
+phoenix.sink.writer-class=org.apache.phoenix.trace.PhoenixTableMetricsWriter
+</pre> 
+  </div> 
+ </div> 
+</div> 
+<div class="section"> 
+ <h2 id="Reading_Traces">Reading Traces</h2> 
+ <p>Once the traces are deposited into the tracing table, by default “PHOENIX.TRACING_STATS”, but it is configurable in the HBase configuration via:</p> 
+ <div class="source"> 
+  <pre>  &lt;property&gt;
+    &lt;name&gt;rg.apache.phoenix._internal.trace.tablename&lt;/name&gt;
+    &lt;value&gt;&lt;your custom tracing table name&gt;&lt;/value&gt;
+  &lt;/property&gt;
+</pre> 
+ </div> 
+ <p>The tracing table is initialized via the ddl:</p> 
+ <div class="source"> 
+  <pre>&quot;create table if not exists &quot; + table + &quot;( &quot; + 
+  &quot;trace_id bigint not null, &quot; +
+  &quot;parent_id bigint not null, &quot; +
+  &quot;span_id bigint not null, &quot; +
+  &quot;description varchar, &quot; +
+  &quot;star_time bigint, &quot; +
+  &quot;end_time bigint, &quot; +
+  &quot;hostname varchar, &quot; +
+  # column for the number of tags
+  &quot;tags.count smallint, &quot; + 
+  # column for the number of annotations
+  &quot;annotations.count smallint&quot; +
+  &quot;  CONSTRAINT pk PRIMARY KEY (trace_id, parent_id, span_id)&quot;
+</pre> 
+ </div> 
+ <p>And contains a number of dynamic columns as each trace, identified by a unique trace-id (id of the request), parent-id (id of the parent span) and individual span-id (id of the individual segment), may have multiple tags and annotations about what happened during the trace. Once you have the number of tags and annotations, you can retrieve them the table with a request like:</p> 
+ <div class="source"> 
+  <pre>&quot;SELECT &quot; + columns + &quot; from &quot; 
+  + table + &quot;(&quot; + columns + &quot;) WHERE &quot;
+  + &quot;trace_id=&quot; + traceid + &quot; AND &quot;
+  + &quot;parent_id=&quot; + parent + &quot; AND &quot;
+  + &quot;span_id=&quot; + span
+</pre> 
+ </div> 
+ <p>where columns is either “annotations.aX” or “tags.tX” where ‘X’ is the index of the dynamic column to lookup.</p> 
+ <p>For more usage, look at our generic <a class="externalLink" href="https://github.com/apache/phoenix/blob/master/phoenix-core/src/main/java/org/apache/phoenix/trace/TraceReader.java">TraceReader</a> which can programatically read a number of traces from the tracing results table.</p> 
 </div>
 			</div>
 		</div>
@@ -313,8 +339,8 @@ DUMP cnt;
 						<li >
 							<a href="bulk_dataload.html" title="Bulk Loading">Bulk Loading</a>
 						</li>
-						<li >
-							<a href="tracing.html" title="Request Tracing">Request Tracing</a>
+						<li class="active">
+							<a href="#" title="Request Tracing">Request Tracing</a>
 						</li>
 						<li >
 							<a href="http:divider" title=""></a>
@@ -325,8 +351,8 @@ DUMP cnt;
 						<li >
 							<a href="flume.html" title="Apache Flume Plugin">Apache Flume Plugin</a>
 						</li>
-						<li class="active">
-							<a href="#" title="Apache Pig Integration">Apache Pig Integration</a>
+						<li >
+							<a href="pig_integration.html" title="Apache Pig Integration">Apache Pig Integration</a>
 						</li>
 					</ul>
 				</div>
