@@ -12,7 +12,7 @@ There are only a couple small things you need to do to enable tracing a given re
 
 ### Client Property
 
-The frequency of tracing is determined by the client JDBC property:
+The frequency of tracing is determined by the following client-side HBase configuration property:
 
 ```
 phoenix.trace.frequency
@@ -26,8 +26,9 @@ There are three possible tracing frequencies you can use:
     * Every request will be traced
 3. probability
     * take traces with a probabilistic frequency
-    * probability threshold set by: "phoenix.trace.probability.threshold"
+    * probability threshold is set by <code>phoenix.trace.probability.threshold</code> with a default of 0.05 (5%).
 
+As with other configuration properties, this property may be specified at JDBC connection time as a connection property.
 By turning one of these properties on, you turn on merely collecting the traces. However, the traces need to be deposited somewhere
 
 Example:
@@ -36,13 +37,12 @@ Example:
 # Enable tracing on every request
 Properties props = new Properties();
 props.setProperty("phoenix.trace.frequency", "always");
-
-# Or more simply
-org.apache.phoenix.trace.Tracing.setSampling(props, Tracing.Frequency.ALWAYS);
+Connection conn = DriverManager.getConnection("jdbc:phoenix:localhost", props);
 
 # Enable tracing on 50% of requests
-org.apache.phoenix.trace.Tracing.setSampling(props, Tracing.Frequency.ALWAYS);
-props.setProperty("phoenix.trace.probability.threshold", .5)
+props.setProperty("phoenix.trace.frequency", "probability");
+props.setProperty("phoenix.trace.probability.threshold", 0.5)
+Connection conn = DriverManager.getConnection("jdbc:phoenix:localhost", props);
 ```
 
 ### Enabling Tracing/Metrics2 Sink
@@ -58,11 +58,11 @@ phoenix.sink.writer-class=org.apache.phoenix.trace.PhoenixTableMetricsWriter
 
 ## Reading Traces
 
-Once the traces are deposited into the tracing table, by default <code>PHOENIX.TRACING_STATS</code>, but it is configurable in the HBase configuration via:
+Once the traces are deposited into the tracing table, by default <code>SYSTEM.TRACING_STATS</code>, but it is configurable in the HBase configuration via:
 
 ```
   <property>
-    <name>phoenix._internal.trace.tablename</name>
+    <name>phoenix.trace.statsTableName</name>
     <value><your custom tracing table name></value>
   </property>
 ```
@@ -70,7 +70,7 @@ Once the traces are deposited into the tracing table, by default <code>PHOENIX.T
 The tracing table is initialized via the ddl:
 
 <pre>
-    CREATE TABLE <b>PHOENIX.TRACING_STATS</b> (
+    CREATE TABLE <b>SYSTEM.TRACING_STATS</b> (
       <b>trace_id</b> BIGINT NOT NULL,
       <b>parent_id</b> BIGINT NOT NULL,
       <b>span_id</b> BIGINT NOT NULL,
@@ -87,11 +87,11 @@ The tracing table also contains a number of dynamic columns for each trace, iden
 
 ```
 SELECT <columns>
-  FROM PHOENIX.TRACING_STATS
+  FROM SYSTEM.TRACING_STATS
   WHERE trace_id = ?
   AND parent_id = ?
   ANd span_id = ?
 ```
-where columns is either "annotations.aX" or "tags.tX" where 'X' is the index of the dynamic column to lookup.
+where columns is either <code>annotations.aX</code> or <code>tags.tX</code> where <code>X</code> is the index of the dynamic column to lookup.
 
 For more usage, look at our generic [TraceReader](https://github.com/apache/phoenix/blob/master/phoenix-core/src/main/java/org/apache/phoenix/trace/TraceReader.java) which can programatically read a number of traces from the tracing results table.
