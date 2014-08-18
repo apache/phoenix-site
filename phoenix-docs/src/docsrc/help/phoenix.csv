@@ -1,7 +1,7 @@
 "SECTION","TOPIC","SYNTAX","TEXT","EXAMPLE"
 "Commands","SELECT","
 SELECT [/*+ hint */] [DISTINCT | ALL] selectExpression [,...]
-FROM aliasedTable [ { [joinType] JOIN aliasedTable ON expression } [...] ]
+FROM tableSpec [ { [joinType] JOIN tableSpec ON expression } [...] ]
 [ WHERE expression ]
 [ GROUP BY expression [,...] ] [ HAVING expression ]
 [ ORDER BY order [,...] ] [ LIMIT {bindParameter | number} ]
@@ -136,16 +136,18 @@ DROP VIEW IF EXISTS my_schema.my_view
 
 "Commands","CREATE SEQUENCE","
 CREATE SEQUENCE [IF NOT EXISTS] sequenceRef
-[START [WITH] {number | bindParameter}]
-[INCREMENT [BY] {number | bindParameter}]
+[START [WITH] {number | bindParameter}] [INCREMENT [BY] {number | bindParameter}]
+[MINVALUE {number | bindParameter}] [MAXVALUE {number | bindParameter}] [CYCLE]
 [CACHE {number | bindParameter}]
 ","
 Creates a monotonically increasing sequence. START controls the initial sequence value while INCREMENT controls
 by how much the sequence is incremented after each call to NEXT VALUE FOR. By default, the sequence will start
-with 1 and be incremented by 1. CACHE controls how many sequence values will be reserved from the server,
-cached on the client, and doled out as need by subsequent NEXT VALUE FOR calls for that client connection to the
-cluster to save on RPC calls. If not specified, the phoenix.sequence.cacheSize config parameter defaulting to
-100 will be used for the CACHE value.
+with 1 and be incremented by 1. Specify CYCLE to indicate that the sequence should continue to generate values
+after reaching either its MINVALUE or MAXVALUE. After an ascending sequence reaches its MAXVALUE, it generates
+its MINVALUE. After a descending sequence reaches its MINVALUE, it generates its MAXVALUE. CACHE controls how
+many sequence values will be reserved from the server, cached on the client, and doled out as need by subsequent
+NEXT VALUE FOR calls for that client connection to the cluster to save on RPC calls. If not specified, the
+phoenix.sequence.cacheSize config parameter defaulting to 100 will be used for the CACHE value.
 ","
 CREATE SEQUENCE my_sequence;
 CREATE SEQUENCE my_sequence START WITH -1000
@@ -464,7 +466,19 @@ preparedStatement.setBinary(int,byte[]) to supply arbitrary bytes.
 'A'
 "
 
-"Other Grammar","Aliased Table","
+"Other Grammar","Table Spec","
+aliasedTableRef | ( select ) [ [ AS ] tableAlias ]
+","
+An optionally aliased table reference,
+or an optionally aliased select statement in paranthesis.
+
+","
+PRODUCT_METRICS AS PM
+PRODUCT_METRICS(referrer VARCHAR)
+( SELECT feature FROM PRODUCT_METRICS ) AS PM
+"
+
+"Other Grammar","Aliased Table Ref","
 { [ schemaName. ] tableName } [ [ AS ] tableAlias ] [( columnDef [,...] )]
 ","
 A reference to an optionally aliased table optionally followed by dynamic column definitions.
@@ -554,12 +568,13 @@ a - b
 "
 
 "Other Grammar","Factor","
-term [ { * | / } term [...] ]
+term [ { * | / | % } term [...] ]
 ","
-A multiplication or division.
+A multiplication, division, or modulus of numeric type values.
 ","
 c * d
 e / 5
+f % 10
 "
 
 "Other Grammar","Term","
@@ -1151,6 +1166,30 @@ The returned value is of decimal data type.
 PERCENT_RANK( 100 ) WITHIN GROUP (ORDER BY X ASC)
 "
 
+"Functions (Aggregate)","FIRST_VALUE","
+FIRST_VALUE( { expression } ) WITHIN GROUP (ORDER BY { expression } { ASC | DESC } )
+","
+The first value in each distinct group ordered according to the ORDER BY specification.
+","
+FIRST_VALUE( name ) WITHIN GROUP (ORDER BY salary DESC)
+"
+
+"Functions (Aggregate)","LAST_VALUE","
+LAST_VALUE( { expression } ) WITHIN GROUP (ORDER BY { expression } { ASC | DESC } )
+","
+The last value in each distinct group ordered according to the ORDER BY specification.
+","
+LAST_VALUE( name ) WITHIN GROUP (ORDER BY salary DESC)
+"
+
+"Functions (Aggregate)","NTH_VALUE","
+NTH_VALUE( { expression, nthNumeric } ) WITHIN GROUP (ORDER BY { expression } { ASC | DESC } )
+","
+The nth value in each distinct group ordered according to the ORDER BY specification.
+","
+NTH_VALUE( name, 2 ) WITHIN GROUP (ORDER BY salary DESC)
+"
+
 "Functions (Aggregate)","STDDEV_POP","
 STDDEV_POP( { numericTerm } )
 ","
@@ -1256,6 +1295,14 @@ Removes trailing spaces from the input string.
 RTRIM('Hello   ')
 "
 
+"Functions (String)","LPAD","
+LPAD( stringTerm, lengthNumeric, [padString] )
+","
+Pads the string expression with the specific pad character (space by default) up to the length argument.
+","
+LPAD('John',30)
+"
+
 "Functions (Array)","ARRAY_ELEM","
 ARRAY_ELEM( arrayTerm, numericTerm )
 ","
@@ -1273,6 +1320,27 @@ Returns the current length of the array.
 ","
 ARRAY_LENGTH(my_array_col)
 ARRAY_LENGTH(ARRAY[1,2,3])
+"
+
+"Functions (Array)","ANY","
+ANY( arrayTerm )
+","
+Used on the right-hand side of a comparison expression to test that any array
+element satisfies the comparison expression against the left-hand side.
+","
+1 = ANY(my_array)
+10 > ANY(my_array)
+"
+
+"Functions (Array)","ALL","
+ALL( arrayTerm )
+","
+Used on the right-hand side of a comparison expression to test that all array
+elements satisfy the comparison expression against the left-hand side.
+of the array.
+","
+1 = ALL(my_array)
+10 > ALL(my_array)
 "
 
 "Functions (String)","LENGTH","
@@ -1317,6 +1385,27 @@ INVERT( term )
 Inverts the bits of the argument. The return type will be the same as the argument.
 ","
 INVERT(my_column)
+"
+
+"Functions (General)","ENCODE","
+ENCODE( expression, 'BASE62' )
+","
+Encodes the expression according to the encoding format provided and returns the
+resulting string. For 'BASE62', converts the given base 10 number to a base 62
+number and returns a string representing the number.
+","
+ENCODE(myNumber, 'BASE62')
+"
+
+"Functions (General)","DECODE","
+DECODE( expression, 'HEX' )
+","
+Decodes the expression according to the encoding format provided and returns the
+resulting value as a VARBINARY. For 'HEX', converts the hex string expression to
+its binary representation, providing a mechanism for inputting binary data through
+the console.
+","
+DECODE('000000008512af277ffffff8', 'HEX')
 "
 
 "Functions (Numeric)","TO_NUMBER","
@@ -1397,6 +1486,22 @@ Same as CURRENT_DATE(), except returns a value of type TIME. In either case,
 the underlying representation is the epoch time as a long value.
 ","
 CURRENT_TIME()
+"
+
+"Functions (Time and Date)","CONVERT_TZ","
+CONVERT_TZ(dateTerm|timeTerm|timestampTerm, fromTimeZoneString, toTimeZoneString)
+","
+Converts date/time from one time zone to another returning the shifted date/time value.
+","
+CONVERT_TZ(myDate, 'UTC', 'Europe/Prague')
+"
+
+"Functions (Time and Date)","TIMEZONE_OFFSET","
+TIMEZONE_OFFSET(timeZoneString, dateTerm|timeTerm|timestampTerm)
+","
+Returns offset (shift in minutes) of a time zone at particular date/time in minutes.
+","
+TIMEZONE_OFFSET('Indian/Cocos', myDate)
 "
 
 "Functions (General)","COALESCE","
