@@ -2,12 +2,16 @@
 
 As items are implemented from our road map, they are moved here to track the progress we've made:
 
+1. **[Tracing](tracing.html)**. Allows visibility into the various steps of an <code>UPSERT</code> or <code>SELECT</code> statement along with how long each step took across all the machines in your cluster. **Available in our 4.1 release**
+2. **[Local Indexing](secondary_indexing.html#Local_Indexing)**. A new, complementary indexing stragegry for _write heavy_, _space constrained_ use cases. With local indexes, index and table data co-reside on same server so no network overhead occurs during writes. Local indexes can be used even when the query isn’t fully covered (i.e. Phoenix automatically retrieve the columns not in the index through point gets against the data table). **Available in our 4.1 release**
+8. **[Derived Tables](https://issues.apache.org/jira/browse/PHOENIX-136)**. Allows a <code>SELECT</code> clause to be used in the FROM clause to define a _derived_ table (including join queries). **Available in our 3.1/4.1 release**
+9. **[Apache Pig Loader](pig_integration.html#Pig_Loader)** . Support for a Pig loader to leverage the performance of Phoenix when processing data through Pig. **Available in our 3.1/4.1 release**
 1. **[Joins](joins.html)**. Join support through hash joins (where one side of the query is small enough to fit into memory). **Available in our 3.0/4.0 release**
 2. **[Views](views.html)**. Allows the creation of multiple tables using the same physical HBase table. **Available in our 3.0/4.0 release**
 3. **[Multi-tenancy](multi-tenancy.html)**. Allows independent views to be created by different tenants on a per-connection basis that all share the same physical HBase table. **Available in our 3.0/4.0 release**
 2. **[Sequences](sequences.html)**. Support for CREATE/DROP SEQUENCE, NEXT VALUE FOR, and CURRENT VALUE FOR has been implemented. **Available in our 3.0/4.0 release**
 4. **[ARRAY Type](array_type.html)**. Support for the standard JDBC ARRAY type. **Available in our 3.0/4.0 release**
-1. **[Secondary Indexes](secondary_indexing.html)**. Allows users to create indexes over mutable or immutable data through a new `CREATE INDEX` DDL command. Behind the scenes, Phoenix creates a separate HBase table with a different row key for the index. At query time, Phoenix takes care of choosing the best table to use based on how much of the row key can be formed. We support getting at the uncommitted <code>List&lt;KeyValue&gt;</code> for both the data and the index tables to allow an HFile to be built without needing an HBase connection using the "connectionless" of our JDBC driver.
+1. **[Secondary Indexes](secondary_indexing.html)**. Allows users to create indexes over mutable or immutable data.
 2. **[Paged Queries](paged.html)**. Paged queries through row value constructors, a standard SQL construct to efficiently locate the row at or after a composite key value. Enables a query-more capability to efficiently step through your data and optimizes IN list of composite key values to be point gets.
 3. **[CSV Bulk Loader](bulk_dataload.html)**. Bulk load CSV files into HBase either through map-reduce or a client-side script.
 2. **Aggregation Enhancements**. <code>COUNT DISTINCT</code>, <code>PERCENTILE</code>, and <code>STDDEV</code> are now supported.
@@ -17,4 +21,4 @@ As items are implemented from our road map, they are moved here to track the pro
 3. **Salting Row Key**. To prevent hot spotting on writes, the row key may be *"salted"* by inserting a leading byte into the row key which is a mod over N buckets of the hash of the entire row key. This ensures even distribution of writes when the row key is a monotonically increasing value (often a timestamp representing the current time).
 4. **TopN Queries**. Support a query that returns the top N rows, through support for ORDER BY when used in conjunction with TopN.
 6. **Dynamic Columns**. For some use cases, it's difficult to model a schema up front. You may have columns that you'd like to specify only at query time. This is possible in HBase, in that every row (and column family) contains a map of values with keys that can be specified at run time. So, we'd like to support that.
-7. **Phoenix package for the Apache Bigtop distribution**. See [BIGTOP-993](http://issues.apache.org/jira/browse/BIGTOP-993) for more information.
+7. **Apache Bigtop Inclusion**. See [BIGTOP-993](http://issues.apache.org/jira/browse/BIGTOP-993) for more information.
