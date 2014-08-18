@@ -22,7 +22,6 @@ For any omitted part, the relevant property value, hbase.zookeeper.quorum, hbase
 Here's a list of what is currently **not** supported:
 
 * **Full Transaction Support**. Although we allow client-side batching and rollback as described [here](#transactions), we do not provide transaction semantics above and beyond what HBase gives you out-of-the-box.
-* **Derived tables**. Nested queries are coming soon.
 * **Relational operators**. Union, Intersect, Minus.
 * **Miscellaneous built-in functions**. These are easy to add - read this [blog](http://phoenix-hbase.blogspot.com/2013/04/how-to-add-your-own-built-in-function.html) for step by step instructions.
 
