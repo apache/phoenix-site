@@ -19,3 +19,8 @@ Mirror on Github: https://github.com/apache/phoenix
 <hr/>
 
 Related: [Using > Building](building.html)
+
+### Site source access
+
+Source for the Apache Phoenix website is kept in ASF SVN in https://svn.apache.org/repos/asf/phoenix
+
