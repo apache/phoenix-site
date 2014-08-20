@@ -8,7 +8,7 @@ The following is a list of contributors with commit privileges that have directl
 Name| Company| Email| Role
 ----|--------|------|-----
 Lars Hofhansl | Salesforce | larsh@apache.org | PMC
-Andrew Purtell | Intel | apurtell@apache.org | PMC
+Andrew Purtell | Salesforce | apurtell@apache.org | PMC
 Enis Soztutar | Hortonworks | enis@apache.org | PMC
 Deveraj Das | Hortonworks | ddas@apache.org | PMC
 Steven Noels | NG Data | stevenn@apache.org | PMC
