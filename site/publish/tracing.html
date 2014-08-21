@@ -147,8 +147,7 @@
   <p>They are essentially the same properties as in the hadoop-metrics2-phoenix.properties but prefixed by “hbase” rather than “phoenix” so they are loaded in the HBase metrics system.</p> 
  </div> 
  <div class="section"> 
-  <h3 id="Disabling_Tracing">Disabling Tracing</h3> 
-  <p>======================</p> 
+  <h3 id="Disabling_Tracing"><u>Disabling Tracing</u></h3> 
   <p>You can disable tracing client requests merely by creating a new Connection that doesn’t have the tracing property enabled (see below).</p> 
   <p>However, on the server-side once the metrics sink has been enabled you cannot turn of trace collection and writing unless you <b>remove the Phoenix metrics2 confgiuration and bounce the regionserver</b>. This is enforced by the metrics2 framework as its assumed that you will always want to collect information about the server you are running on.</p> 
  </div> 

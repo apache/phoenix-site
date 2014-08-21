@@ -29,8 +29,7 @@ HBase already comes with a metrics2 configuration, so the metrics2 configuration
 
 They are essentially the same properties as in the hadoop-metrics2-phoenix.properties but prefixed by "hbase" rather than "phoenix" so they are loaded in the HBase metrics system.
 
-### Disabling Tracing
-======================
+### <u>Disabling Tracing</u>
 
 You can disable tracing client requests merely by creating a new Connection that doesn't have the tracing property enabled (see below).
 
