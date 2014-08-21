@@ -6,13 +6,44 @@ We leverage Cloudera's [HTrace](https://github.com/cloudera/htrace) library to s
 
 **Writing traces to a phoenix table is not supported on Hadoop1**
 
+## Configuration
+
+In the Phoenix release tarball (phoenix-XXXX.tar.gz) for Hadoop2 there are two files in the bin/ directory:
+
+  * hadoop-metrics2-phoenix.properties
+  * hadoop-metrics2-hbase.properties
+
+They contain the properties you need to set on the client and server, respectively, as well as information on how the metrics2 system uses the configuation files.
+
+Put these filse on their respective classpaths and restart the process to pick-up the new configurations.
+
+### hadoop-metrics2-phoenix.properties
+
+This file will configure the [Hadoop Metrics2](http://hadoop.apache.org/docs/current/api/index.html?org/apache/hadoop/metrics2/package-summary.html) system for *Phoenix clients*. By placing the file as-is on the classpath you will use the standard Phoenix metrics sink (which collects the trace information) and writer (which writes the traces to the Phoenix SYSTEM.TRACING_STATS table).
+
+See the properties file for more information on setting your own sinks and writer.
+
+### hadoop-metrics2-hbase.properties
+
+HBase already comes with a metrics2 configuration, so the metrics2 configuration included in the phoenix distribution can either replace the existing file (if you don't have any special configurations) or the properties can be copied to your exisiting metrics2 configuration file.
+
+They are essentially the same properties as in the hadoop-metrics2-phoenix.properties but prefixed by "hbase" rather than "phoenix" so they are loaded in the HBase metrics system.
+
+### Disabling Tracing
+======================
+
+You can disable tracing client requests merely by creating a new Connection that doesn't have the tracing property enabled (see below).
+
+However, on the server-side once the metrics sink has been enabled you cannot turn of trace collection and writing unless you **remove the Phoenix metrics2 confgiuration and bounce the regionserver**. This is enforced by the metrics2 framework as its assumed that you will always want to collect information about the server you are running on.
+
+
 ## Usage
 
 There are only a couple small things you need to do to enable tracing a given request with Phoenix.
 
 ### Client Property
 
-The frequency of tracing is determined by the following client-side HBase configuration property:
+The frequency of tracing is determined by the following client-side Phoenix property:
 
 ```
 phoenix.trace.frequency
@@ -45,15 +76,17 @@ props.setProperty("phoenix.trace.probability.threshold", 0.5)
 Connection conn = DriverManager.getConnection("jdbc:phoenix:localhost", props);
 ```
 
-### Enabling Tracing/Metrics2 Sink
+#### hbase-site.xml
 
-This is where the traces are taken from the tracing framework and then deposited into a Phoenix table. Because the traces are transported through the Hadoop metrics2 framework, you need to add the following configs to your hadoop-metrics2.properties (or hadoop-metrics2-phoenix.properties) file on the classpath of both the * phoenix client* and *HBase regionservers*, and then restart all necessary processes to get them to pick up the configs.
+You can also enable tracing via hbase-site.xml. However, only "always" and "never" are currently supported.
 
 ```
-# Hadoop2 metrics sink
-phoenix.sink.*.class=org.apache.phoenix.trace.PhoenixMetricsWriter
-# Writer that generically writes to phoenix tables
-phoenix.sink.writer-class=org.apache.phoenix.trace.PhoenixTableMetricsWriter
+<configuration>
+  <property>
+	<name>phoenix.trace.frequency</name>
+    <value>always</value>
+  </property>
+</configuration>
 ```
 
 ## Reading Traces
