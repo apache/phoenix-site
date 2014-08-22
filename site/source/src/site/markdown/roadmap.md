@@ -2,7 +2,7 @@
 
 Our roadmap is driven by our user community. Below, in prioritized order, is the current plan for Phoenix:
 
-1. **[Transaction Support](https://issues.apache.org/jira/browse/PHOENIX-400)**. Support transactions through snapshot isolation by integrating with an open source solution like [Tephra](https://github.com/continuuity/tephra) or some other similar option.
+1. **[Transaction Support](https://issues.apache.org/jira/browse/PHOENIX-400)**. Support transactions by integrating with an open source solution like [Tephra](https://github.com/continuuity/tephra), [Themis](https://github.com/XiaoMi/themis), or some other similar option.
 1. **[Join Improvements](https://issues.apache.org/jira/browse/PHOENIX-1167)**. Enhance our join capabilities in a variety of ways:<br/>
     * **[Optimize foreign key joins](https://issues.apache.org/jira/browse/PHOENIX-852)**. Optimize foreign key joins by leveraging our skip scan filter.
     * **[Correlated sub-queries](https://issues.apache.org/jira/browse/PHOENIX-1168)**. Support correlated sub queries on top of hash joins.
