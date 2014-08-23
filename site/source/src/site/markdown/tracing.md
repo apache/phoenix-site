@@ -8,7 +8,7 @@ We leverage Cloudera's [HTrace](https://github.com/cloudera/htrace) library to s
 
 ## Configuration
 
-In the Phoenix release tarball (phoenix-XXXX.tar.gz) for Hadoop2 there are two files in the bin/ directory:
+There are two key configuration files that you will need to update.
 
   * hadoop-metrics2-phoenix.properties
   * hadoop-metrics2-hbase.properties
@@ -19,15 +19,42 @@ Put these filse on their respective classpaths and restart the process to pick-u
 
 ### hadoop-metrics2-phoenix.properties
 
-This file will configure the [Hadoop Metrics2](http://hadoop.apache.org/docs/current/api/index.html?org/apache/hadoop/metrics2/package-summary.html) system for *Phoenix clients*. By placing the file as-is on the classpath you will use the standard Phoenix metrics sink (which collects the trace information) and writer (which writes the traces to the Phoenix SYSTEM.TRACING_STATS table).
+This file will configure the [Hadoop Metrics2](http://hadoop.apache.org/docs/current/api/index.html?org/apache/hadoop/metrics2/package-summary.html) system for *Phoenix clients*. 
 
-See the properties file for more information on setting your own sinks and writer.
+The default properties you should set are:
+
+```
+# Sample from all the sources every 10 seconds
+*.period=10
+
+# Write Traces to Phoenix
+##########################
+# ensure that we receive traces on the server
+phoenix.sink.tracing.class=org.apache.phoenix.trace.PhoenixMetricsSink
+# Tell the sink where to write the metrics
+phoenix.sink.tracing.writer-class=org.apache.phoenix.trace.PhoenixTableMetricsWriter
+# Only handle traces with a context of "tracing"
+phoenix.sink.tracing.context=tracing
+```
+
+This enables standard Phoenix metrics sink (which collects the trace information) and writer (writes the traces to the Phoenix SYSTEM.TRACING_STATS table). You can modify this to set your own custom classes as well, if you have them.
+
+See the properties file in the source (phoenix-hadop2-compat/bin) for more information on setting your own sinks and writer.
 
 ### hadoop-metrics2-hbase.properties
 
-HBase already comes with a metrics2 configuration, so the metrics2 configuration included in the phoenix distribution can either replace the existing file (if you don't have any special configurations) or the properties can be copied to your exisiting metrics2 configuration file.
+HBase default deployment already comes with a metrics2 configuration, so the metrics2 configuration from phoenix can either replace the existing file (if you don't have any special configurations) or the properties can be copied to your exisiting metrics2 configuration file.
 
-They are essentially the same properties as in the hadoop-metrics2-phoenix.properties but prefixed by "hbase" rather than "phoenix" so they are loaded in the HBase metrics system.
+```
+# ensure that we receive traces on the server
+hbase.sink.tracing.class=org.apache.phoenix.trace.PhoenixMetricsSink
+# Tell the sink where to write the metrics
+hbase.sink.tracing.writer-class=org.apache.phoenix.trace.PhoenixTableMetricsWriter
+# Only handle traces with a context of "tracing"
+hbase.sink.tracing.context=tracing
+```
+
+They are essentially the same properties as in the hadoop-metrics2-phoenix.properties but prefixed by "hbase" rather than "phoenix" so they are loaded with the rest of the HBase metrics.
 
 ### <u>Disabling Tracing</u>
 
