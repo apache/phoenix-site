@@ -90,17 +90,10 @@ Once the WAL is written, we ensure that the index and primary table data will be
 
 ### Failure Policy
 
-In the event that the region server handling the data updates cannot write to the region server handling the index updates, the index is automatically disabled and will no longer be considered for use in queries (as it will no longer be in sync with the data table). To use it again, it must be manually rebuilt with the following command:
-
-```
-ALTER INDEX my_index ON my_table REBUILD;
-```
+In the event that the region server handling the data updates cannot write to the region server handling the index updates, the index will be automatically disabled temporally and will no longer be considered for use in queries (as it will no longer be in sync with the data table). There is a backend job will soon rebuild the index from where it failed before as soon as all regions of the underlying index table are online. A user can turn off this auto rebuild index behavior by setting configuration “phoenix.index.failure.handling.rebuild” to false in hbase-site.xml on each region server.
 
 If we cannot disable the index, then the server will be immediately aborted. If the abort fails, we call System.exit on the JVM, forcing the server to die. By killing the server, we ensure that the WAL will be replayed on recovery, replaying the index updates to their appropriate tables.
 
-**WARNING: global indexing has the potential to bring down your entire cluster very quickly.**
-
-If the index tables are not setup correctly (Phoenix ensures that they are), this failure policy can cause a cascading failure as each region server attempts and fails to write the index update, subsequently killing itself to ensure the visibility concerns outlined above.
 
 ## Setup
 
@@ -197,3 +190,4 @@ There have been several presentations given on how secondary indexing works in P
 * [Los Anglees HBase Meetup](http://www.slideshare.net/jesse_yates/phoenix-secondary-indexing-la-hug-sept-9th-2013) - Sept, 4th, 2013
 * [Local Indexes](https://github.com/Huawei-Hadoop/hindex/blob/master/README.md#how-it-works) by Huawei
 * [PHOENIX-938](https://issues.apache.org/jira/browse/PHOENIX-938) and [HBASE-11513](https://issues.apache.org/jira/browse/HBASE-11513) for deadlock prevention during global index maintenance.
+* [PHOENIX-1112: Atomically rebuild index partially when index update fails](https://issues.apache.org/jira/browse/PHOENIX-1112)

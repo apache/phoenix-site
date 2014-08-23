@@ -109,6 +109,12 @@ overridden at connection
 </td><td>&nbsp;</td></tr>
 <tr><td><small>phoenix.clock.skew.interval</small></td><td style="text-align: left;">Delay interval(in milliseconds) when opening SYSTEM.CATALOG to compensate possible time clock skew when SYSTEM.CATALOG moves among region servers. 
 </td><td>2000</td></tr>
+<tr><td><small>phoenix.index.failure.handling.rebuild</small></td><td style="text-align: left;">Boolean flag which turns on/off auto-rebuild a failed index from when some updates are failed to be updated into the index.
+</td><td>true</td></tr>
+<tr><td><small>phoenix.index.failure.handling.rebuild.interval</small></td><td style="text-align: left;">Time interval(in milliseconds) for index rebuild backend Job to check if there is an index to be rebuilt
+</td><td>10000</td></tr>
+<tr><td><small>phoenix.index.failure.handling.rebuild.overlap.time</small></td><td style="text-align: left;">Index rebuild job builds an index from when it failed - the time interval(in milliseconds) in order to create a time overlap to prevent missing updates when there exists time clock skew.
+</td><td>300000</td></tr>
 </tbody></table>
 <br />
 <h4>
