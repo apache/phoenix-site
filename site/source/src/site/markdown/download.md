@@ -1,8 +1,11 @@
 ## Phoenix Downloads
 
-### [Download Phoenix Binary and Source Releases](http://www.apache.org/dyn/closer.cgi/incubator/phoenix/)
+### [Download Latest Phoenix Binary and Source Releases](http://www.apache.org/dyn/closer.cgi/phoenix/)
 
-[List of New Features](recent.html)<hr/>
+[List of New Features](recent.html)
+
+
+[Download Previous Releases](http://www.apache.org/dyn/closer.cgi/incubator/phoenix/)<hr/>
 
 ### HBase Compatibility
 * Phoenix 2.x - HBase 0.94.x
@@ -12,10 +15,10 @@
 ### Installation ###
 To install a pre-built phoenix, use these directions:
 
-* Download and expand the latest phoenix-[version]-incubating.tar
-* Add the phoenix-core-[version]-incubating.jar to the classpath of every HBase region server. An easy way to do this is to copy it into the HBase lib directory.
+* Download and expand the latest phoenix-[version]-bin.tar. Use either hadoop1 and hadoop2 artifacts which match your HBase installation.
+* Add the phoenix-[version]-server.jar to the classpath of every HBase region server and remove any previous version. An easy way to do this is to copy it into the HBase lib directory (use phoenix-core-[version].jar for Phoenix 3.x)
 * Restart all region servers.
-* Add the phoenix-[version]-incubating-client.jar to the classpath of any Phoenix client (both Hadoop-1 or Hadoop-2 compatible client jars are available in latest release).
+* Add the phoenix-[version]-client.jar to the classpath of any Phoenix client.
 
 ### Getting Started ###
 Wanted to get started quickly? Take a look at our [FAQs](faq.html) and take our quick start guide [here](Phoenix-in-15-minutes-or-less.html).
