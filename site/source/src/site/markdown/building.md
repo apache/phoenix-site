@@ -66,5 +66,8 @@ Phoenix 3.0 is running against hbase0.94+, Phoenix 4.0 is running against hbase0
 
 <hr/>
 
-See also: [Building Project Web Site](building_website.html)
+See also: 
 
+[Building Project Web Site](building_website.html)
+
+[How to do a release](release.html)

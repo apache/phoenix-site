@@ -8,7 +8,7 @@
 
 	<head>
 		<meta charset="UTF-8" />
-		<title>Upgrading from Phoenix 2.2.x | Apache Phoenix</title>
+		<title>How to do a release | Apache Phoenix</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="description" content="" />
 		<meta http-equiv="content-language" content="en" />
@@ -34,7 +34,7 @@
 
 	</head>
 
-	<body class="page-upgrade_from_2_2 project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
+	<body class="page-release project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
 
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
@@ -75,7 +75,7 @@
 									<li ><a href="Phoenix-in-15-minutes-or-less.html" title="Quick Start">Quick Start</a></li>
 									<li ><a href="building.html" title="Building">Building</a></li>
 									<li ><a href="tuning.html" title="Tuning">Tuning</a></li>
-									<li class="active"><a href="" title="Upgrade from 2.2">Upgrade from 2.2</a></li>
+									<li ><a href="upgrade_from_2_2.html" title="Upgrade from 2.2">Upgrade from 2.2</a></li>
 									<li class="divider"/>
 									<li ><a href="secondary_indexing.html" title="Secondary Indexes">Secondary Indexes</a></li>
 									<li ><a href="joins.html" title="Joins">Joins</a></li>
@@ -122,39 +122,32 @@
 		<div class="span12">
 			<div class="body-content">
 <div class="page-header">
- <h1>Upgrading from Phoenix 2.2.x</h1>
+ <h1>How to do a release</h1>
 </div> 
-<p>By default, Phoenix 2.2.x tables are not automatically upgraded to Apache Phoenix 3.0/4.0 tables. Since pre-Apache 2.2.x code lines have a different package structure (<tt>com.salesforce.phoenix</tt>) than the 3.0/4.0 code line (<tt>org.apache.phoenix</tt>), the two installations may actually coexist. An existing Phoenix table may either remain as a 2.2.x table or be upgraded to 3.0/4.0 table, but not both. In addition, a client JVM may either use the 3.0/4.0 driver or the 2.2.x driver, but not both. Upgrade, however, is a one way street: once a table is upgrade to 3.0/4.0, it stays that way.</p> 
-<p>Note that upgrading a table will not affect its data - only the metadata of the table will change. In order to upgrade tables from 2.2.x to 3.0/4.0, the following must be done <b>BEFORE</b> the first connection to a cluster which has 3.0/4.0 installed on it. </p> 
-<ul> 
- <li> <p>Add a new <tt>phoenix.client.autoUpgradeWhiteList</tt> config parameter to your client-side hbase-sites.xml. Make sure the directory containing the hbase-sites.xml is on the classpath of your client so that HBase finds it. The value you use for the parameter depends on which tables you want to upgrade:</p> 
-  <ul> 
-   <li>To upgrade all tables use a value of *. This will cause all Phoenix 2.2.x tables to be automatically converted to the new 3.0.0 structure when the first connection occurs. For example:</li> 
-  </ul> 
-  <div class="source"> 
-   <pre>  &lt;configuration&gt;
-    &lt;property&gt;
-      &lt;name&gt;phoenix.client.autoUpgradeWhiteList&lt;/name&gt;
-      &lt;value&gt;*&lt;/value&gt;
-    &lt;/property&gt;
-  &lt;/configuration&gt;
-</pre>
-  </div> 
-  <ul> 
-   <li>To upgrade only some tables use a comma separated list of full table names. In that case, only those tables and their secondary indexes will be upgraded on first connection to a cluster. Note that table names are case sensitive. For example, the following would upgrade <tt>my_schema.my_table</tt> and <tt>MY_OTHER_TABLE</tt>:</li> 
-  </ul> 
-  <div class="source"> 
-   <pre>  &lt;configuration&gt;
-    &lt;property&gt;
-      &lt;name&gt;phoenix.client.autoUpgradeWhiteList&lt;/name&gt;
-      &lt;value&gt;my_schema.my_table,MY_OTHER_TABLE&lt;/value&gt;
-    &lt;/property&gt;
-  &lt;/configuration&gt;
-</pre>
-  </div></li> 
- <li>After the first connection has been made to a cluster with Phoenix 3.0/4.0 installed, no further upgrade will take place. However, you may force it to take place again by removing the <tt>UpgradeTo30</tt> attribute from the <tt>SYSTEM.CATALOG</tt> HBase table metadata. Then, on the next connection to the cluster, upgrade will again occur as describe above.</li> 
- <li>If you’ve been using a pre-release Phoenix 3.0/4.0 SNAPSHOT jar, your metadata won’t be compatible with the released metadata schema. You should disable and drop your SYSTEM.CATALOG and SYSTEM.SEQUENCE tables from an HBase shell and re-run your DDL commands to re-create your Phoenix table. In addition, make sure the SNAPSHOT jar is removed from your HBase lib directory and client directories.</li> 
-</ul>
+<div class="section"> 
+ <h2 id="Pre-Reqs">Pre-Reqs</h2> 
+ <ol style="list-style-type: decimal"> 
+  <li>Make sure you have setup your user for release signing. Details <a class="externalLink" href="http://www.apache.org/dev/release-signing.html">http://www.apache.org/dev/release-signing.html</a>.</li> 
+  <li>Clone the branch locally from which you want to do a release.</li> 
+  <li>Verify CHANGES file is updated</li> 
+  <li>Verify all pom.xml files in project have the correct release version (i.e. does not contain SNAPSHOT)</li> 
+ </ol> 
+</div> 
+<div class="section"> 
+ <h2 id="Command_for_building_binary_and_source_tars">Command for building binary and source tars</h2> 
+ <div class="source"> 
+  <pre>$ cd dev; ./make_rc.sh
+</pre> 
+ </div> 
+ <p>Follow the instructions. Signed binary and source tars will be generated in <i>release</i> directory. As last part of this script, it will ask if you want to tag branch at this time. If all looks good then svn commit binary and source tars to <a class="externalLink" href="https://dist.apache.org/repos/dist/dev/phoenix">https://dist.apache.org/repos/dist/dev/phoenix</a> </p> 
+</div> 
+<div class="section"> 
+ <h2 id="Final_step">Final step</h2> 
+ <ol style="list-style-type: decimal"> 
+  <li>Initiate vote email. See example <a class="externalLink" href="http://mail-archives.apache.org/mod_mbox/phoenix-dev/201408.mbox/%3cCAAF1JdgVOLLVVuymR6hzo9PxGeKOa_fz2ZAZX4C6R4TCSaiZcg@mail.gmail.com%3e">here</a></li> 
+  <li>Svn commit binary and source tars to <a class="externalLink" href="https://dist.apache.org/repos/dist/dev/phoenix">https://dist.apache.org/repos/dist/dev/phoenix</a></li> 
+ </ol> 
+</div>
 			</div>
 		</div>
 	</div>
@@ -235,8 +228,8 @@
 						<li >
 							<a href="tuning.html" title="Tuning">Tuning</a>
 						</li>
-						<li class="active">
-							<a href="#" title="Upgrade from 2.2">Upgrade from 2.2</a>
+						<li >
+							<a href="upgrade_from_2_2.html" title="Upgrade from 2.2">Upgrade from 2.2</a>
 						</li>
 						<li >
 							<a href="http:divider" title=""></a>
