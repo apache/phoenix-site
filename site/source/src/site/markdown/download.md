@@ -1,6 +1,6 @@
 ## Phoenix Downloads
 
-### [Download Latest Phoenix Binary and Source Releases](http://www.apache.org/dyn/closer.cgi/phoenix/)
+### [<u>Download Latest Phoenix Binary and Source Releases</u>](http://www.apache.org/dyn/closer.cgi/phoenix/)
 
 [List of New Features](recent.html)
 
