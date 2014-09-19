@@ -154,3 +154,5 @@ SELECT <columns>
 where columns is either <code>annotations.aX</code> or <code>tags.tX</code> where <code>X</code> is the index of the dynamic column to lookup.
 
 For more usage, look at our generic [TraceReader](https://github.com/apache/phoenix/blob/master/phoenix-core/src/main/java/org/apache/phoenix/trace/TraceReader.java) which can programatically read a number of traces from the tracing results table.
+
+Custom annotations can also be passed into Phoenix to be added to traces. Phoenix looks for connection properties whose names start with `phoenix.annotation.` and adds these as annotations to client-side traces. e.g. A connection property `phoenix.annotation.myannotation=abc` will result in annotations with key `myannotation` and value `abc` to be added to traces. Use this feature to link traces to other request identifiers in your system, such as user or session ids.
