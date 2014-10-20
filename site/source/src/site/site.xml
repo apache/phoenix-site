@@ -90,6 +90,7 @@
             <item href="skip_scan.html" name="Skip Scan"/>
             <item href="bulk_dataload.html" name="Bulk Loading"/>
             <item href="tracing.html" name="Tracing"/>
+            <item href="update_statistcs.html" name="Statistics Collection"/>
             <item href="http:divider" name=""/>
             <item href="phoenix_on_emr.html" name="Amazon EMR Support"/>
             <item href="flume.html" name="Apache Flume Plugin"/>

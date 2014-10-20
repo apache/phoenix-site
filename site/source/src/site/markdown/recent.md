@@ -1,7 +1,7 @@
 # New Features
 
 As items are implemented from our road map, they are moved here to track the progress we've made:
-
+1. **[Collect Statistics](update_statistics.html)**. Collects the statistics for a table to improve query parallelization.** Available in our 3.2/4.2 release**
 1. **[Tracing](tracing.html)**. Allows visibility into the various steps of an <code>UPSERT</code> or <code>SELECT</code> statement along with how long each step took across all the machines in your cluster. **Available in our 4.1 release**
 2. **[Local Indexing](secondary_indexing.html#Local_Indexing)**. A new, complementary indexing stragegry for _write heavy_, _space constrained_ use cases. With local indexes, index and table data co-reside on same server so no network overhead occurs during writes. Local indexes can be used even when the query isn’t fully covered (i.e. Phoenix automatically retrieve the columns not in the index through point gets against the data table). **Available in our 4.1 release**
 8. **[Derived Tables](https://issues.apache.org/jira/browse/PHOENIX-136)**. Allows a <code>SELECT</code> clause to be used in the FROM clause to define a _derived_ table (including join queries). **Available in our 3.1/4.1 release**
@@ -22,3 +22,4 @@ As items are implemented from our road map, they are moved here to track the pro
 4. **TopN Queries**. Support a query that returns the top N rows, through support for ORDER BY when used in conjunction with TopN.
 6. **Dynamic Columns**. For some use cases, it's difficult to model a schema up front. You may have columns that you'd like to specify only at query time. This is possible in HBase, in that every row (and column family) contains a map of values with keys that can be specified at run time. So, we'd like to support that.
 7. **Apache Bigtop Inclusion**. See [BIGTOP-993](http://issues.apache.org/jira/browse/BIGTOP-993) for more information.
+

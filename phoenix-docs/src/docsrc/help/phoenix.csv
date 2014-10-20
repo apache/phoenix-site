@@ -247,6 +247,13 @@ CONSTRAINT my_pk PRIMARY KEY (host,created_date)
 CONSTRAINT my_pk PRIMARY KEY (host ASC,created_date DESC)
 "
 
+"Commands","UPDATE STATISTICS","
+UPDATE STATISTICS tableRef [ALL | INDEX | COLUMNS]
+","
+Updates the statistics i.e collects the guideposts on the table and all its associated index tables,
+views and view indices.
+"
+
 "Other Grammar","Options","
 { [familyName .] name= {value | bindParameter}} [,...]
 ","
@@ -1512,5 +1519,6 @@ to guarantee that a column in an UPSERT SELECT command will evaluate to a non nu
 ","
 COALESCE(last_update_date, CURRENT_DATE())
 "
+
 
 
