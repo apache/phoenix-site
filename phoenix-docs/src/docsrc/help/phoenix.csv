@@ -250,8 +250,16 @@ CONSTRAINT my_pk PRIMARY KEY (host ASC,created_date DESC)
 "Commands","UPDATE STATISTICS","
 UPDATE STATISTICS tableRef [ALL | INDEX | COLUMNS]
 ","
-Updates the statistics i.e collects the guideposts on the table and all its associated index tables,
-views and view indices.
+Updates the statistics on the table and by default all of its associated index tables. To only
+update the table, use the COLUMNS option and to only update the INDEX, use the INDEX option.
+Note that the statistics for a single index may also be updated by using its full index name
+for the tableRef.
+
+","
+UPDATE STATISTICS my_table
+UPDATE STATISTICS my_schema.my_table INDEX
+UPDATE STATISTICS my_index
+UPDATE STATISTICS my_table COLUMNS
 "
 
 "Other Grammar","Options","

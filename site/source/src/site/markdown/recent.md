@@ -1,12 +1,15 @@
 # New Features
 
 As items are implemented from our road map, they are moved here to track the progress we've made:
-1. **[Collect Statistics](update_statistics.html)**. Collects the statistics for a table to improve query parallelization.** Available in our 3.2/4.2 release**
+
+1. **[Statistics Collection](update_statistics.html)**. Collects the statistics for a table to improve query parallelization. **Available in our 3.2/4.2 release**
+2. **[Join Improvements](joins.html)**. Improve existing hash join implementation.
+    * **[Optimize foreign key joins](https://issues.apache.org/jira/browse/PHOENIX-852)**. Optimize foreign key joins by leveraging our skip scan filter. **Available in our 3.2/4.2 release**
+    * **[Semi/anti joins](https://issues.apache.org/jira/browse/PHOENIX-167)**. Support semi/anti sub queries through the standard [NOT] IN and [NOT] EXISTS keywords. **Available in our 3.2/4.2 release**
 1. **[Tracing](tracing.html)**. Allows visibility into the various steps of an <code>UPSERT</code> or <code>SELECT</code> statement along with how long each step took across all the machines in your cluster. **Available in our 4.1 release**
 2. **[Local Indexing](secondary_indexing.html#Local_Indexing)**. A new, complementary indexing stragegry for _write heavy_, _space constrained_ use cases. With local indexes, index and table data co-reside on same server so no network overhead occurs during writes. Local indexes can be used even when the query isn’t fully covered (i.e. Phoenix automatically retrieve the columns not in the index through point gets against the data table). **Available in our 4.1 release**
 8. **[Derived Tables](https://issues.apache.org/jira/browse/PHOENIX-136)**. Allows a <code>SELECT</code> clause to be used in the FROM clause to define a _derived_ table (including join queries). **Available in our 3.1/4.1 release**
 9. **[Apache Pig Loader](pig_integration.html#Pig_Loader)** . Support for a Pig loader to leverage the performance of Phoenix when processing data through Pig. **Available in our 3.1/4.1 release**
-1. **[Joins](joins.html)**. Join support through hash joins (where one side of the query is small enough to fit into memory). **Available in our 3.0/4.0 release**
 2. **[Views](views.html)**. Allows the creation of multiple tables using the same physical HBase table. **Available in our 3.0/4.0 release**
 3. **[Multi-tenancy](multi-tenancy.html)**. Allows independent views to be created by different tenants on a per-connection basis that all share the same physical HBase table. **Available in our 3.0/4.0 release**
 2. **[Sequences](sequences.html)**. Support for CREATE/DROP SEQUENCE, NEXT VALUE FOR, and CURRENT VALUE FOR has been implemented. **Available in our 3.0/4.0 release**

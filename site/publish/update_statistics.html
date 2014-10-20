@@ -8,7 +8,7 @@
 
 	<head>
 		<meta charset="UTF-8" />
-		<title>Mailing Lists | Apache Phoenix</title>
+		<title>Statistics Collection | Apache Phoenix</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="description" content="" />
 		<meta http-equiv="content-language" content="en" />
@@ -34,7 +34,7 @@
 
 	</head>
 
-	<body class="page-mailing_list project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
+	<body class="page-update_statistics project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
 
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
@@ -57,7 +57,7 @@
 									<li ><a href="team.html" title="Team">Team</a></li>
 									<li ><a href="contributing.html" title="Contributing">Contributing</a></li>
 									<li ><a href="resources.html" title="Resources">Resources</a></li>
-									<li class="active"><a href="" title="Mailing Lists">Mailing Lists</a></li>
+									<li ><a href="mailing_list.html" title="Mailing Lists">Mailing Lists</a></li>
 									<li ><a href="source.html" title="Source Repository">Source Repository</a></li>
 									<li ><a href="issues.html" title="Issue Tracking">Issue Tracking</a></li>
 									<li ><a href="download.html" title="Download">Download</a></li>
@@ -89,7 +89,7 @@
 									<li ><a href="skip_scan.html" title="Skip Scan">Skip Scan</a></li>
 									<li ><a href="bulk_dataload.html" title="Bulk Loading">Bulk Loading</a></li>
 									<li ><a href="tracing.html" title="Tracing">Tracing</a></li>
-									<li ><a href="update_statistics.html" title="Statistics Collection">Statistics Collection</a></li>
+									<li class="active"><a href="" title="Statistics Collection">Statistics Collection</a></li>
 									<li class="divider"/>
 									<li ><a href="phoenix_on_emr.html" title="Amazon EMR Support">Amazon EMR Support</a></li>
 									<li ><a href="flume.html" title="Apache Flume Plugin">Apache Flume Plugin</a></li>
@@ -123,52 +123,57 @@
 		<div class="span12">
 			<div class="body-content">
 <div class="page-header">
- <h1>Mailing Lists</h1>
+ <h1>Statistics Collection</h1>
 </div> 
-<p>These are the mailing lists that have been established for this project. For each list, there is a subscribe, unsubscribe and post link.</p> 
-<hr /> 
-<table border="0" class="bodyTable table table-striped table-hover"> 
- <thead> 
-  <tr class="a"> 
-   <th>Name</th> 
-   <th>Subscribe</th> 
-   <th>Unsubscribe</th> 
-   <th>Post </th> 
-   <th>Archive</th> 
-  </tr> 
- </thead> 
- <tbody> 
-  <tr class="b"> 
-   <td>User List </td> 
-   <td><a class="externalLink" href="mailto:user-subscribe@phoenix.apache.org">Subscribe</a> </td> 
-   <td><a class="externalLink" href="mailto:user-unsubscribe@phoenix.apache.org">Unsubscribe</a> </td> 
-   <td><a class="externalLink" href="mailto:user@phoenix.apache.org">Post</a> </td> 
-   <td><a class="externalLink" href="http://mail-archives.apache.org/mod_mbox/phoenix-user/">Archive</a></td> 
-  </tr> 
-  <tr class="a"> 
-   <td>Developer List </td> 
-   <td><a class="externalLink" href="mailto:dev-subscribe@phoenix.apache.org">Subscribe</a> </td> 
-   <td><a class="externalLink" href="mailto:dev-unsubscribe@phoenix.apache.org">Unsubscribe</a> </td> 
-   <td><a class="externalLink" href="mailto:dev@phoenix.apache.org">Post</a> </td> 
-   <td><a class="externalLink" href="http://mail-archives.apache.org/mod_mbox/phoenix-dev/">Archive</a></td> 
-  </tr> 
-  <tr class="b"> 
-   <td>Private List </td> 
-   <td><a class="externalLink" href="mailto:private-subscribe@phoenix.apache.org">Subscribe</a> </td> 
-   <td><a class="externalLink" href="mailto:private-unsubscribe@phoenix.apache.org">Unsubscribe</a> </td> 
-   <td><a class="externalLink" href="mailto:private@phoenix.apache.org">Post</a> </td> 
-   <td>&nbsp;</td> 
-  </tr> 
-  <tr class="a"> 
-   <td>Commits List </td> 
-   <td><a class="externalLink" href="mailto:commits-subscribe@phoenix.apache.org">Subscribe</a> </td> 
-   <td><a class="externalLink" href="mailto:commits-unsubscribe@phoenix.apache.org">Unsubscribe</a> </td> 
-   <td><a class="externalLink" href="mailto:commits@phoenix.apache.org">Post</a> </td> 
-   <td><a class="externalLink" href="http://mail-archives.apache.org/mod_mbox/phoenix-commits/">Archive</a></td> 
-  </tr> 
- </tbody> 
-</table> 
-<hr />
+<p>The UPDATE STATISTICS command updates the statistics collected on a table, to improve query performance. This command collects a set of keys per region per column family that are equal byte distanced from each other. These collected keys are called <i>guideposts</i> and they act as <i>hints/guides</i> to improve the parallelization of queries on a given target region.</p> 
+<p>The statistics are also collected during major compaction and when ever a region split happens so manually running the command may not be necessary.</p> 
+<div class="section"> 
+ <h2 id="Examples">Examples</h2> 
+ <p>For a given table <tt>my_table</tt>:</p> 
+ <div class="source"> 
+  <pre>UPDATE STATISTICS &lt;code&gt;my_table&lt;/code&gt;
+</pre> 
+ </div> 
+ <p>The above syntax would collect the statistics for the table my_table and all the index tables, views and view index tables associated with the table my_table.</p> 
+ <p>The equivalent of the above syntax is</p> 
+ <div class="source"> 
+  <pre>UPDATE STATISTICS &lt;code&gt;my_table&lt;/code&gt; ALL
+</pre> 
+ </div> 
+ <p>To collect the statistics on the index table alone</p> 
+ <div class="source"> 
+  <pre>UPDATE STATISTICS &lt;code&gt;my_table&lt;/code&gt; INDEX
+</pre> 
+ </div> 
+ <p>To collect the statistics on the table alone</p> 
+ <div class="source"> 
+  <pre>UPDATE STATISTICS &lt;code&gt;my_table&lt;/code&gt; COLUMNS
+</pre> 
+ </div> 
+</div> 
+<div class="section"> 
+ <h2 id="Configurations">Configurations</h2> 
+ <p>Some of the configurations associated with the UPDATE STATISTICS command are</p> 
+ <ol style="list-style-type: decimal"> 
+  <li><tt>phoenix.stats.guidepost.width</tt> 
+   <ul> 
+    <li>A server-side configuration that specifies the absolute byte value that determines the number of bytes between the collected guideposts.</li> 
+   </ul></li> 
+  <li><tt>phoenix.stats.guidepost.per.region</tt> 
+   <ul> 
+    <li>Determines the number of guideposts per region. If the configuration ‘phoenix.stats.guidepost.width’ is not set then the MAX_FILE_SIZE associated with the table (for which statistics collection is needed) divided by the values set for this configuration will be used for ‘phoenix.stats.guidepost.width’.</li> 
+    <li>The default value is 20</li> 
+   </ul></li> 
+  <li><tt>phoenix.stats.minUpdateFrequency</tt> 
+   <ul> 
+    <li>Minimum time in milliseconds that must be passed before another UPDATE STATISTICS call be issued once again to collect the statistics again.</li> 
+   </ul></li> 
+  <li><tt>phoenix.stats.updateFrequency</tt> 
+   <ul> 
+    <li>Minimum frequency in milliseconds that new statistics will be checked for when pulling over new metadata from the client to the server.</li> 
+   </ul></li> 
+ </ol> 
+</div>
 			</div>
 		</div>
 	</div>
@@ -205,8 +210,8 @@
 						<li >
 							<a href="resources.html" title="Resources">Resources</a>
 						</li>
-						<li class="active">
-							<a href="#" title="Mailing Lists">Mailing Lists</a>
+						<li >
+							<a href="mailing_list.html" title="Mailing Lists">Mailing Lists</a>
 						</li>
 						<li >
 							<a href="source.html" title="Source Repository">Source Repository</a>
@@ -291,8 +296,8 @@
 						<li >
 							<a href="tracing.html" title="Tracing">Tracing</a>
 						</li>
-						<li >
-							<a href="update_statistics.html" title="Statistics Collection">Statistics Collection</a>
+						<li class="active">
+							<a href="#" title="Statistics Collection">Statistics Collection</a>
 						</li>
 						<li >
 							<a href="http:divider" title=""></a>

@@ -4,12 +4,10 @@ Our roadmap is driven by our user community. Below, in prioritized order, is the
 
 1. **[Transaction Support](https://issues.apache.org/jira/browse/PHOENIX-400)**. Support transactions by integrating with an open source solution like [Tephra](https://github.com/continuuity/tephra), [Themis](https://github.com/XiaoMi/themis), or some other similar option.
 1. **[Join Improvements](https://issues.apache.org/jira/browse/PHOENIX-1167)**. Enhance our join capabilities in a variety of ways:<br/>
-    * **[Optimize foreign key joins](https://issues.apache.org/jira/browse/PHOENIX-852)**. Optimize foreign key joins by leveraging our skip scan filter.
     * **[Correlated sub-queries](https://issues.apache.org/jira/browse/PHOENIX-1168)**. Support correlated sub queries on top of hash joins.
-    * **[Semi/anti joins](https://issues.apache.org/jira/browse/PHOENIX-167)**. Support semi/anti sub queries through the standard [NOT] IN and [NOT] EXISTS keywords.
     *  **[Many-to-many joins](https://issues.apache.org/jira/browse/PHOENIX-1179)**. Support joins where both sides are too large to fit into memory. 
     *  **[Inlined parent/child joins](https://issues.apache.org/jira/browse/PHOENIX-150)**. Optimize parent/child joins by storing child rows inside of a parent row, forming the column qualifier through a known prefix plus the child row primary key.
-15. **[Cost-based Query Optimization]((https://issues.apache.org/jira/browse/PHOENIX-1177))**. With [statistics collection](update_statistics.html) in place, we would like to enable further query optmizations based on the size and cardinality of the data.
+15. **[Cost-based Query Optimization]((https://issues.apache.org/jira/browse/PHOENIX-1177))**. Enhance existing [statistics collection](update_statistics.html) by enabling further query optmizations based on the size and cardinality of the data.
     * **[Generate histograms](https://issues.apache.org/jira/browse/PHOENIX-1178)** to drive query optimization decisions such as secondary index usage and join ordering based on cardinalities to produce the most efficient query plan.
 9. **[Functional Indexes](https://issues.apache.org/jira/browse/PHOENIX-514)**. Enables an index to contain the evaluation of an expression as opposed to just a column value and use the index when a statement contains this expression.
 6. **Type Enhancements**. Additional work includes support for [DEFAULT declaration](https://issues.apache.org/jira/browse/PHOENIX-476) when creating a table, and for [STRUCT](https://issues.apache.org/jira/browse/PHOENIX-477) and [JSON](https://issues.apache.org/jira/browse/PHOENIX-628) data types.
