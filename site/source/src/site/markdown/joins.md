@@ -4,7 +4,7 @@ The standard SQL join syntax (with some limitations) is now supported by Phoenix
 
 For example, we have the following tables to store our order records, our customer information and the item information we sell in those orders.
 
-####The "Orders" table:
+The "**Orders**" table:
 
 OrderID         |CustomerID      |ItemID          |Quantity        |Date
 ----------------|----------------|----------------|----------------|----
@@ -14,7 +14,7 @@ OrderID         |CustomerID      |ItemID          |Quantity        |Date
 1630784         |C004            |I006            |1260            |09-04-2013
 1630785         |C005            |I003            |1500            |09-05-2013
 
-####The "Customers" table:
+The "**Customers**" table:
 
 CustomerID      |CustomerName        |Country
 ----------------|--------------------|------- 
@@ -25,7 +25,7 @@ C004            |Alps Nordic AB      |Sweden
 C005            |Deister Electronics |Germany
 C006            |Thales Nederland    |Netherlands
 
-####The "Items" table:
+The "**Items**" table:
 
 ItemID          |ItemName            |Price
 ----------------|--------------------|-----
@@ -61,7 +61,7 @@ Secondary indices will be automatically utilized when running join queries. For 
     CREATE INDEX i2Orders ON Orders (CustomerID) INCLUDE (ItemID, Quantity);
     CREATE INDEX iItems ON Items (ItemName) INCLUDE (Price);
 
-We can find out each item's total sales value by joining the "Items" table and the "Orders" table and then grouping the joined result with "ItemName" (and also adding some filtering conditions):
+<a name="ex1"></a>We can find out each item's total sales value by joining the "Items" table and the "Orders" table and then grouping the joined result with "ItemName" (and also adding some filtering conditions):
 
     SELECT ItemName, sum(Price * Quantity) AS OrderValue
     FROM Items
@@ -88,9 +88,88 @@ The execution plan for this query (by running "EXPLAIN _query_") will be:
 
 In this case, the index table "iItems" is used in place of the data table "Items" since the index table "iItems" is indexed on column "ItemName" and will hence benefit the GROUP-BY clause in this query. Meanwhile, the index table "i2Orders" is favored over the data table "Orders" and another index table "iOrders" because a range scan instead of a full scan can be applied as a result of the WHERE clause.
 
+## Grouped Joins and Derived Tables
+
+Phoenix also supports complex join syntax such as grouped joins (or sub joins) and joins with derived-tables. You can group joins by using parenthesis to prioritize certain joins before other joins are executed. You can also replace any one (or more) of your join tables with a sub-query (derived table), which could be yet another join query.
+
+For grouped joins, you can write something like:
+
+    SELECT O.OrderID, I.ItemName, S.SupplierName
+    FROM Orders AS O
+    LEFT JOIN
+        (Items AS I
+         INNER JOIN Suppliers AS S
+         ON I.SupplierID = S.SupplierID)
+    ON O.ItemID = I.ItemID;
+
+By replacing the sub join with a sub-query (derived table), we get an equivalent query as:
+
+    SELECT O.OrderID, J.ItemName, J.SupplierName
+    FROM Orders AS O
+    LEFT JOIN
+        (SELECT ItemID, ItemName, SupplierName
+         FROM Items AS I
+         INNER JOIN Suppliers AS S
+         ON I.SupplierID = S.SupplierID) AS J
+    ON O.ItemID = J.ItemID;
+
+As an alternative to the [earlier example](#ex1) where we try to find out each item's sales figures, instead of using group-by after joining the two tables, we can join the "Items" table with the grouped result from the "Orders" table:
+
+    SELECT ItemName, O.OrderValue
+    FROM Items
+    JOIN
+        (SELECT ItemID, sum(Price * Quantity) AS OrderValue
+         FROM Orders
+         WHERE CustomerID > 'C002'
+         GROUP BY ItemID) AS O
+    ON Items.ItemID = O.ItemID;
+
+## Foreign Key to Primary Key Join Optimization
+
+Oftentimes a join will occur from a child table to a parent table, mapping the foreign key of the child table to the primary key of the parent. So instead of doing a full scan on the parent table, Phoenix will drive a skip-scan or a range-scan based on the foreign key values it got from the child table result.
+
+Phoenix will extract and sort multiple key parts from the join keys so that it can get the most accurate key hints/ranges possible for the parent table scan.
+
+For example, we have parent table "Employee" and child table "Patent" defined as:
+
+    CREATE TABLE Employee (
+        Region VARCHAR NOT NULL,
+        LocalID VARCHAR NOT NULL,
+        Name VARCHAR NOT NULL,
+        StartDate DATE NOT NULL,
+        CONSTRAINT pk PRIMARY KEY (Region, LocalID));
+
+    CREATE TABLE Patent (
+        PatentID VARCHAR NOT NULL,
+        DeptID VARCHAR NOT NULL,
+        LocalID VARCHAR NOT NULL,
+        Title VARCHAR NOT NULL,
+        Category VARCHAR NOT NULL,
+        FileDate DATE NOT NULL,
+        CONSTRAINT pk PRIMARY KEY (PatentID));
+
+Now we’d like to find out all those employees who filed patents after January 2000 and list their names according to their patent count:
+
+    SELECT E.Name, E.Region, P.PCount
+    FROM Employee AS E
+    JOIN
+        (SELECT Region, LocalID, count(*) AS PCount
+         FROM Patent
+         WHERE P.FileDate >= to_date('2000/01/01')
+         GROUP BY Region, LocalID) AS P
+    ON E.Region = P.Region AND E.LocalID = P.LocalID
+
+The above statement will do a skip-scan over the "Employee" table and will use both join key "Region" and "LocalID" for runtime key hint calculation. Below is the execution time of this query with and without this optimization on an "Employee" table of about _5000000_ records and a "Patent" table of about _1000_ records: 
+
+W/O Optimization    |W/ Optimization
+--------------------|---------------
+8.1s                |0.4s
+
+However, there are times when the foreign key values from the child table account for a complete primary key space in the parent table, thus using skip-scans would only be slower not faster. In order to avoid such situations, Phoenix currently does a range-scan by default and only chooses to do a skip-scan when there is a child table filter in the WHERE clause or the ON clause, as in the above example. Table statistics will come to help making smarter choices between the two schemes in future. Yet you can always use hints "SKIP_SCAN_HASH_JOIN" or "RANGE_SCAN_HASH_JOIN" to change the default behavior.
+
 ## Configuration
 
-The join functionality is now implemented through hash joins, which means one side of the join operator has to be small enough to fit into memory in order to be broadcast over all servers that have the data of concern from the other side of join.
+The join functionality is now implemented through hash joins, which means one side of the join operator has to be small enough to fit into memory in order to be broadcast over all servers that have the data of concern from the other side of join. This limitation will be eliminated once [PHOENIX-1179](https://issues.apache.org/jira/browse/PHOENIX-1179) is implemented.
 
 The servers-side caches are used to hold the hashed sub-query results. The size and the living time of the caches are controlled by the following parameters.
 
@@ -129,7 +208,7 @@ Below is a description of the default join order (without the presence of table 
 
     _lhs_ will be built as hash map in server cache.
 
-The join order is more complicated with multiple-join queries. You can try running "EXPLAIN _join\_query_" to look at the actual execution plan. For multiple-inner-join queries, we apply star-join optimization by default, which means the leading (left-hand-side) table will be scanned only once joining all right-hand-side tables at the same time. You can turn off this optimization by specifying the hint "NO_STAR_JOIN" in your query if the overall size of all right-hand-side tables would exceed the memory size limit.
+The join order is more complicated with multiple-join queries. You can try running "EXPLAIN _join\_query_" to look at the actual execution plan. For multiple-inner-join queries, Phoenix applies star-join optimization by default, which means the leading (left-hand-side) table will be scanned only once joining all right-hand-side tables at the same time. You can turn off this optimization by specifying the hint "NO_STAR_JOIN" in your query if the overall size of all right-hand-side tables would exceed the memory size limit.
 
 Let's take the previous query for example:
 
@@ -169,6 +248,7 @@ In our Phoenix 3.2 and 4.2 releases, joins have the following restrictions:
 
 1. FULL OUTER JOIN and CROSS JOIN are not supported.
 2. Equi-joins: Only equality (=) comparison is supported in joining conditions (conditions that specify the connecting rules between the two sides of the join operator). However there is no restriction on other predicates in the ON clause concerning only one side of the join operator.
+3. [PHOENIX-1179](https://issues.apache.org/jira/browse/PHOENIX-1179): Joins between two large tables that can neither fit into memory.
 
 Continuous efforts are being made to enhance Phoenix with more complete join functionalities. Please refer to our [Roadmap](roadmap.html) for more information.
 
