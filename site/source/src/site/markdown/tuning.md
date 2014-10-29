@@ -1,6 +1,6 @@
 # Configuration and Tuning
 
-Phoenix provides many different knobs and dials to configure and tune the system to run more optimally on your cluster. The configuration is done through a series of Phoenix-specific properties specified for the most part in your client-side <code>hbase-site.xml</code> file. In addition to these properties, there are of course all the <a href="http://hbase.apache.org/book/config.files.html" target="_blank">HBase configuration</a> properties with the most important ones documented <a href="http://hbase.apache.org/book/important_configurations.html" target="_blank">here</a>. This blog will focus on the Phoenix-specific properties and touch on some important considerations to maximize Phoenix and HBase performance.<br />
+Phoenix provides many different knobs and dials to configure and tune the system to run more optimally on your cluster. The configuration is done through a series of Phoenix-specific properties specified both on client and server-side <code>hbase-site.xml</code> files. In addition to these properties, there are of course all the <a href="http://hbase.apache.org/book/config.files.html" target="_blank">HBase configuration</a> properties with the most important ones documented <a href="http://hbase.apache.org/book/important_configurations.html" target="_blank">here</a>.<br/>
 <br />
 The table below outlines the full set of Phoenix-specific configuration properties and their defaults. Of these, we'll talk in depth about some of the most important ones below.<br />
 <br />
@@ -24,8 +24,8 @@ increased.</td><td>128</td></tr>
 of the
       bounded round robin backing the client side thread pool executor,
       beyond which an attempt to queue additional work is
-      rejected by throwing an exception. If zero, a SynchronousQueue is used
-      instead of the bounded round robin queue.</td><td>500</td></tr>
+      rejected. If zero, a SynchronousQueue is used
+      instead of the bounded round robin queue. The default value is 5000.</td><td>5000</td></tr>
 <tr><td><small>phoenix.stats.guidepost.width</small></td><td>
 A server-side parameter that specifies the number of bytes between guideposts.
       A smaller amount increases parallelization, but also increases the number of
@@ -61,7 +61,7 @@ An advanced server-side parameter that if true causes the current time on the se
       query results are spooled to disk. Default is 20 mb.</td><td>20971520</td></tr>
 <tr><td><small>phoenix.query.maxSpoolToDiskBytes</small></td><td style="text-align: left;">Threshold
       size in bytes up to which results from parallelly executed
-      query results are spooled to disk above which the query will fail. Default is 1 gb.</td><td>1024000000</td></tr>
+      query results are spooled to disk above which the query will fail. Default is 1 GB.</td><td>1024000000</td></tr>
 <tr><td><small>phoenix.query.maxGlobalMemoryPercentage</small></td><td style="text-align: left;">Percentage of total heap memory (i.e. Runtime.getRuntime().maxMemory()) that all threads may use. Only course grain memory usage is tracked, mainly accounting for memory usage in the intermediate map built during group by aggregation.  When this limit is reached the clients block attempting to get more memory, essentially throttling memory usage. Defaults to 15%</td><td>15</td></tr>
 <tr><td><small>phoenix.query.maxGlobalMemorySize</small></td><td style="text-align: left;">Max size in bytes of total tracked memory usage. By default not specified, however, if present, the lower of this parameter and the phoenix.query.maxGlobalMemoryPercentage will be used
 </td><td>&nbsp;</td></tr>
@@ -153,7 +153,9 @@ Parallelization</h4>
 parameters for <a href="http://phoenix.apache.org/update_statistics.html">statistics collection</a>. Each
 chunk of data between guideposts will be run in parallel in a separate scan to improve query performance.
 The chunk size is determined by the server-side <code>phoenix.stats.guidepost.width</code> or
-<code>phoenix.stats.guidepost.per.region</code> configuration parameters. Note that at a minimum, separate
+<code>phoenix.stats.guidepost.per.region</code> configuration parameters. As the size of the chunks decrease,
+you'll want to increase <code>phoenix.query.queueSize</code> as more work will be queued in that case. Note
+that at a minimum, separate
 scans will be run for each table region. Beyond the statistics collection configuration parameters,
 the client-side <code>phoenix.query.threadPoolSize</code> and <code>phoenix.query.queueSize</code> parameters
 and the server-side <code>hbase.regionserver.handler.count</code> parameter have an impact on performance.</p>

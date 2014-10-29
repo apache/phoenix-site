@@ -125,7 +125,7 @@
 <div class="page-header">
  <h1>Configuration and Tuning</h1>
 </div> 
-<p>Phoenix provides many different knobs and dials to configure and tune the system to run more optimally on your cluster. The configuration is done through a series of Phoenix-specific properties specified for the most part in your client-side <tt>hbase-site.xml</tt> file. In addition to these properties, there are of course all the <a class="externalLink" href="http://hbase.apache.org/book/config.files.html" target="_blank">HBase configuration</a> properties with the most important ones documented <a class="externalLink" href="http://hbase.apache.org/book/important_configurations.html" target="_blank">here</a>. This blog will focus on the Phoenix-specific properties and touch on some important considerations to maximize Phoenix and HBase performance.<br /> <br /> The table below outlines the full set of Phoenix-specific configuration properties and their defaults. Of these, we’ll talk in depth about some of the most important ones below.<br /> <br /> </p> 
+<p>Phoenix provides many different knobs and dials to configure and tune the system to run more optimally on your cluster. The configuration is done through a series of Phoenix-specific properties specified both on client and server-side <tt>hbase-site.xml</tt> files. In addition to these properties, there are of course all the <a class="externalLink" href="http://hbase.apache.org/book/config.files.html" target="_blank">HBase configuration</a> properties with the most important ones documented <a class="externalLink" href="http://hbase.apache.org/book/important_configurations.html" target="_blank">here</a>.<br /> <br /> The table below outlines the full set of Phoenix-specific configuration properties and their defaults. Of these, we’ll talk in depth about some of the most important ones below.<br /> <br /> </p> 
 <table class="bodyTable table table-striped table-hover" border="1"> 
  <tbody> 
   <tr class="a"> 
@@ -150,8 +150,8 @@
   </tr> 
   <tr class="a"> 
    <td><small>phoenix.query.queueSize</small></td> 
-   <td>Max queue depth of the bounded round robin backing the client side thread pool executor, beyond which an attempt to queue additional work is rejected by throwing an exception. If zero, a SynchronousQueue is used instead of the bounded round robin queue.</td> 
-   <td>500</td> 
+   <td>Max queue depth of the bounded round robin backing the client side thread pool executor, beyond which an attempt to queue additional work is rejected. If zero, a SynchronousQueue is used instead of the bounded round robin queue. The default value is 5000.</td> 
+   <td>5000</td> 
   </tr> 
   <tr class="b"> 
    <td><small>phoenix.stats.guidepost.width</small></td> 
@@ -185,7 +185,7 @@
   </tr> 
   <tr class="b"> 
    <td><small>phoenix.query.maxSpoolToDiskBytes</small></td> 
-   <td style="text-align: left;">Threshold size in bytes up to which results from parallelly executed query results are spooled to disk above which the query will fail. Default is 1 gb.</td> 
+   <td style="text-align: left;">Threshold size in bytes up to which results from parallelly executed query results are spooled to disk above which the query will fail. Default is 1 GB.</td> 
    <td>1024000000</td> 
   </tr> 
   <tr class="a"> 
@@ -376,7 +376,7 @@
   <div class="section"> 
    <h4 id="Parallelization"> Parallelization</h4> 
    <p>Phoenix breaks up queries into multiple scans and runs them in parallel through coprocessors to improve performance.&nbsp;Hari Kumar, from Ericsson Labs, did a good job of explaining the performance benefits of parallelization and coprocessors <a class="externalLink" href="http://labs.ericsson.com/blog/hbase-performance-tuners" target="_blank">here</a>.</p> 
-   <p>As of 3.2/4.2, parallelization in Phoenix is driven by the guideposts as determined by the configuration parameters for <a class="externalLink" href="http://phoenix.apache.org/update_statistics.html">statistics collection</a>. Each chunk of data between guideposts will be run in parallel in a separate scan to improve query performance. The chunk size is determined by the server-side <tt>phoenix.stats.guidepost.width</tt> or <tt>phoenix.stats.guidepost.per.region</tt> configuration parameters. Note that at a minimum, separate scans will be run for each table region. Beyond the statistics collection configuration parameters, the client-side <tt>phoenix.query.threadPoolSize</tt> and <tt>phoenix.query.queueSize</tt> parameters and the server-side <tt>hbase.regionserver.handler.count</tt> parameter have an impact on performance.</p> 
+   <p>As of 3.2/4.2, parallelization in Phoenix is driven by the guideposts as determined by the configuration parameters for <a class="externalLink" href="http://phoenix.apache.org/update_statistics.html">statistics collection</a>. Each chunk of data between guideposts will be run in parallel in a separate scan to improve query performance. The chunk size is determined by the server-side <tt>phoenix.stats.guidepost.width</tt> or <tt>phoenix.stats.guidepost.per.region</tt> configuration parameters. As the size of the chunks decrease, you'll want to increase <tt>phoenix.query.queueSize</tt> as more work will be queued in that case. Note that at a minimum, separate scans will be run for each table region. Beyond the statistics collection configuration parameters, the client-side <tt>phoenix.query.threadPoolSize</tt> and <tt>phoenix.query.queueSize</tt> parameters and the server-side <tt>hbase.regionserver.handler.count</tt> parameter have an impact on performance.</p> 
   </div> 
  </div> 
 </div>
