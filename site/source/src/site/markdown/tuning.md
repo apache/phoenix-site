@@ -34,8 +34,8 @@ A server-side parameter that specifies the number of bytes between guideposts.
 <tr><td><small>phoenix.stats.guidepost.per.region</small></td><td>
 A server-side parameter that specifies the number of guideposts per region.
       If set to a value greater than zero, then the guidepost width is determiend by
-      the <small><code>MAX_FILE_SIZE&nbsp;of&nbsp;table&nbsp;/&nbsp;phoenix.stats.guidepost.per.region</code></small>.
-Otherwise, if not set then the <code>phoenix.stats.guidepost.width</code> parameter
+      <small><code>MAX_FILE_SIZE&nbsp;of&nbsp;table&nbsp;/&nbsp;phoenix.stats.guidepost.per.region</code></small>.
+Otherwise, if not set, then the <small><code>phoenix.stats.guidepost.width</code></small> parameter
 is used. No default value.
 </td><td>None</td></tr>
 <tr><td><small>phoenix.stats.updateFrequency</small></td><td>
