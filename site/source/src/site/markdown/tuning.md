@@ -29,7 +29,7 @@ of the
 <tr><td><small>phoenix.stats.guidepost.width</small></td><td>
 A server-side parameter that specifies the number of bytes between guideposts.
       A smaller amount increases parallelization, but also increases the number of
-      chunks which must be merged on the client side. The default value is 10 MB.
+      chunks which must be merged on the client side. The default value is 100 MB.
 </td><td>104857600</td></tr>
 <tr><td><small>phoenix.stats.guidepost.per.region</small></td><td>
 A server-side parameter that specifies the number of guideposts per region.
@@ -129,6 +129,7 @@ overridden at connection
 </td><td>10000</td></tr>
 <tr><td><small>phoenix.index.failure.handling.rebuild.overlap.time</small></td><td style="text-align: left;">Index rebuild job builds an index from when it failed - the time interval(in milliseconds) in order to create a time overlap to prevent missing updates when there exists time clock skew.
 </td><td>300000</td></tr>
+<tr><td><small>phoenix.query.rowKeyOrderSaltedTable</small></td><td style="text-align: left;">Whether or not a non aggregate query returns rows in row key order for salted tables. If this option is turned on, split points may not be specified at table create time, but instead the default splits on each salt bucket must be used. Default is true</td><td>true</td></tr>
 <tr><td><strike><small>phoenix.query.targetConcurrency</small></strike><br/>Obsolete as of 3.2/4.2</td><td style="text-align: left;">Target concurrent
       threads to use for a query. It serves as a soft limit on the number of
       scans into which a query may be split. The value should not exceed the hard limit imposed by<code> phoenix.query.maxConcurrency</code>.</td><td>32</td></tr>
@@ -142,17 +143,18 @@ overridden at connection
       in milliseconds at which the stats for each table will be
 updated. Default is 15 min.</td><td>900000</td></tr>
 <tr><td><strike><small>phoenix.query.maxIntraRegionParallelization</small></strike><br/>Obsolete as of 3.2/4.2</td><td style="text-align: left;">The maximum number of threads that will be spawned to process data within a single region during query execution</td><td>64</td></tr>
-<tr><td><small>phoenix.query.rowKeyOrderSaltedTable</small></td><td style="text-align: left;">Whether or not a non aggregate query returns rows in row key order for salted tables. If this option is turned on, split points may not be specified at table create time, but instead the default splits on each salt bucket must be used. Default is true</td><td>true</td></tr>
 </tbody></table>
 <br />
 <h4>
 Parallelization</h4>
-Phoenix breaks up aggregate queries into multiple scans and runs them in parallel through custom aggregating coprocessors to improve performance.&nbsp;Hari Kumar, from Ericsson Labs, did a good job of explaining the performance benefits of parallelization and coprocessors <a href="http://labs.ericsson.com/blog/hbase-performance-tuners" target="_blank">here</a>.
+<p>Phoenix breaks up queries into multiple scans and runs them in parallel through coprocessors to improve performance.&nbsp;Hari Kumar, from Ericsson Labs, did a good job of explaining the performance benefits of parallelization and coprocessors <a href="http://labs.ericsson.com/blog/hbase-performance-tuners" target="_blank">here</a>.</p>
 
-As of 3.2/4.2, parallelization in Phoenix is driven by the guideposts as determined by the configuration parameters for
-[statistics collection](http://phoenix.apache.org/update_statistics.html). Each chunk of data between guideposts
-will be run in parallel in a separate scan to improve query performance. Note that at a minimum, separate scans will be
-run for each table region. Beyond the statistics collection configuration parameters, the client-side
-<code>phoenix.query.threadPoolSize</code> and <code>phoenix.query.queueSize</code> parameters and the server-side
-<code>hbase.regionserver.handler.count</code> parameter have an impact on performance.
+<p>As of 3.2/4.2, parallelization in Phoenix is driven by the guideposts as determined by the configuration
+parameters for [statistics collection](http://phoenix.apache.org/update_statistics.html). Each chunk of data
+between guideposts will be run in parallel in a separate scan to improve query performance. The chunk size
+is determined by the server-side <code>phoenix.stats.guidepost.width</code> or
+<code>phoenix.stats.guidepost.per.region</code> configuration parameters. Note that at a minimum, separate
+scans will be run for each table region. Beyond the statistics collection configuration parameters,
+the client-side <code>phoenix.query.threadPoolSize</code> and <code>phoenix.query.queueSize</code> parameters
+and the server-side <code>hbase.regionserver.handler.count</code> parameter have an impact on performance.</p>
 
