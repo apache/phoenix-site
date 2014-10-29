@@ -34,7 +34,7 @@ A server-side parameter that specifies the number of bytes between guideposts.
 <tr><td><small>phoenix.stats.guidepost.per.region</small></td><td>
 A server-side parameter that specifies the number of guideposts per region.
       If set to a value greater than zero, then the guidepost width is determiend by
-      the <code>MAX_FILE_SIZE of table / phoenix.stats.guidepost.per.region</code>.
+      the <small><code>table&nbsp;MAX_FILE_SIZE&nbsp;/&nbsp;phoenix.stats.guidepost.per.region</code></small>.
 Otherwise, if not set then the <code>phoenix.stats.guidepost.width</code> parameter
 is used. No default value.
 </td><td>None</td></tr>
@@ -46,7 +46,7 @@ default value is 15 min.
 <tr><td><small>phoenix.stats.minUpdateFrequency</small></td><td>
 A client-side parameter that determines the minimum amount of time in milliseconds that
       must pass before statistics may again be manually collected through another <code>UPDATE
-      STATISTICS</code> call. The default value is <code>phoenix.stats.updateFrequency / 2</code>. 
+      STATISTICS</code> call. The default value is <small><code>phoenix.stats.updateFrequency&nbsp;/&nbsp;2</code></small>. 
 </td><td>450000</td></tr>
 <tr><td><small>phoenix.stats.useCurrentTime</small></td><td>
 An advanced server-side parameter that if true causes the current time on the server-side
