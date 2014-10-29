@@ -313,7 +313,7 @@ MAX_FILESIZE=2000000000,MEMSTORE_FLUSHSIZE=80000000
 "
 
 "Other Grammar","Hint","
-{ scanHint | indexHint | cacheHint | parallelizationHint | joinHint | seekToColumnHint } [,...]
+{ scanHint | indexHint | cacheHint | smallHint | joinHint | seekToColumnHint } [,...]
 ","
 An advanced features that overrides default query processing behavior for decisions such as
 whether to use a range scan versus skip scan and an index versus no index. Note that strict
@@ -323,6 +323,7 @@ parsing is not done on hints. If hints are misspelled or invalid, they are silen
 SKIP_SCAN,NO_INDEX
 NO_CACHE
 INDEX(employee emp_name_idx emp_start_date_idx)
+SMALL
 "
 
 "Other Grammar","Scan Hint","
@@ -377,16 +378,16 @@ USE_INDEX_OVER_DATA_TABLE
 USE_DATA_OVER_INDEX_TABLE
 "
 
-"Other Grammar","Parallelization Hint","
-NO_INTRA_REGION_PARALLELIZATION
+"Other Grammar","Small Hint","
+SMALL
 ","
-Use the NO_INTRA_REGION_PARALLELIZATION hint to prevent the
-spawning of multiple threads to process data within a single region. This
-option is useful when the overall data set being queries is known to be
-very small or highly skewed.
+Use the SMALL hint to reduce the number of RPCs done between the client
+and server when a query is executed. Generally, if the query is a point
+lookup or returns data that is likely in a single data block (64 KB by
+default), performance may improve when using this hint.
 
 ","
-NO_INTRA_REGION_PARALLELIZATION
+SMALL
 "
 
 "Other Grammar","Seek To Column Hint","
