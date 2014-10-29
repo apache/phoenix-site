@@ -34,9 +34,9 @@ A server-side parameter that specifies the number of bytes between guideposts.
 <tr><td><small>phoenix.stats.guidepost.per.region</small></td><td>
 A server-side parameter that specifies the number of guideposts per region.
       If set to a value greater than zero, then the guidepost width is determiend by
-      the MAX_FILE_SIZE of the table divided by this value. Otherwise, if not set
-      then the <code>phoenix.stats.guidepost.width</code> parameter is used. No
-default value.
+      the <code>MAX_FILE_SIZE of table / phoenix.stats.guidepost.per.region<code>.
+Otherwise, if not set then the <code>phoenix.stats.guidepost.width</code> parameter
+is used. No default value.
 </td><td>None</td></tr>
 <tr><td><small>phoenix.stats.updateFrequency</small></td><td>
 A server-side paramater that determines the frequency in milliseconds for which statistics
@@ -46,7 +46,7 @@ default value is 15 min.
 <tr><td><small>phoenix.stats.minUpdateFrequency</small></td><td>
 A client-side parameter that determines the minimum amount of time in milliseconds that
       must pass before statistics may again be manually collected through another <code>UPDATE
-      STATISTICS</code> call. The default value is <code>phoenix.stats.updateFrequency</code>/2. 
+      STATISTICS</code> call. The default value is <code>phoenix.stats.updateFrequency / 2</code>. 
 </td><td>450000</td></tr>
 <tr><td><small>phoenix.stats.useCurrentTime</small></td><td>
 An advanced server-side parameter that if true causes the current time on the server-side
@@ -150,9 +150,9 @@ Parallelization</h4>
 <p>Phoenix breaks up queries into multiple scans and runs them in parallel through coprocessors to improve performance.&nbsp;Hari Kumar, from Ericsson Labs, did a good job of explaining the performance benefits of parallelization and coprocessors <a href="http://labs.ericsson.com/blog/hbase-performance-tuners" target="_blank">here</a>.</p>
 
 <p>As of 3.2/4.2, parallelization in Phoenix is driven by the guideposts as determined by the configuration
-parameters for [statistics collection](http://phoenix.apache.org/update_statistics.html). Each chunk of data
-between guideposts will be run in parallel in a separate scan to improve query performance. The chunk size
-is determined by the server-side <code>phoenix.stats.guidepost.width</code> or
+parameters for <a href="http://phoenix.apache.org/update_statistics.html">statistics collection</a>. Each
+chunk of data between guideposts will be run in parallel in a separate scan to improve query performance.
+The chunk size is determined by the server-side <code>phoenix.stats.guidepost.width</code> or
 <code>phoenix.stats.guidepost.per.region</code> configuration parameters. Note that at a minimum, separate
 scans will be run for each table region. Beyond the statistics collection configuration parameters,
 the client-side <code>phoenix.query.threadPoolSize</code> and <code>phoenix.query.queueSize</code> parameters
