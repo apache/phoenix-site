@@ -543,13 +543,15 @@ ID=1 AND NAME='Hi'
 operand [ compare { operand }
     | [ NOT ] IN ( { constantOperand [,...] } )
     | [ NOT ] LIKE operand
+    | [ NOT ] ILIKE operand
     | [ NOT ] BETWEEN operand AND operand
     | IS [ NOT ] NULL ]
     | NOT expression
 ","
 Boolean value or condition.
 When comparing with LIKE, the wildcards characters are ""_"" (any one character)
-and ""%"" (any characters). To search for the characters ""%"" and
+and ""%"" (any characters). ILIKE is the same, but the search is case insensitive.
+To search for the characters ""%"" and
 ""_"", the characters need to be escaped. The escape character is "" \ "" (backslash).
 Patterns that end with an escape character are invalid and the expression returns NULL.
 BETWEEN does an inclusive comparison for both operands.
@@ -1384,6 +1386,15 @@ Returns a string by applying a regular expression and replacing the matches with
 string. If the replacement string is not specified, it defaults to an empty string.
 ","
 REGEXP_REPLACE('abc123ABC', '[0-9]+', '#') evaluates to 'abc#ABC'
+"
+
+"Functions (String)","REGEXP_SPLIT","
+REGEXP_SPLIT( stringTerm, patternString )
+","
+Returns a VARCHAR array by splitting the stringTerm based on the Java compatible regular
+expression patternString.
+","
+REGEXP_SPLIT('one,two,three', ',') evaluates to ['one','two','three']
 "
 
 "Functions (General)","MD5","

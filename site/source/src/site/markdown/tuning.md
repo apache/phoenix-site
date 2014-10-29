@@ -26,6 +26,36 @@ of the
       beyond which an attempt to queue additional work is
       rejected by throwing an exception. If zero, a SynchronousQueue is used
       instead of the bounded round robin queue.</td><td>500</td></tr>
+<tr><td><small>phoenix.stats.guidepost.width</small></td><td>
+A server-side parameter that specifies the number of bytes between guideposts.
+      A smaller amount increases parallelization, but also increases the number of
+      chunks which must be merged on the client side. The default value is 10 MB.
+</td><td>104857600</td></tr>
+<tr><td><small>phoenix.stats.guidepost.per.region</small></td><td>
+A server-side parameter that specifies the number of guideposts per region.
+      If set to a value greater than zero, then the guidepost width is determiend by
+      the MAX_FILE_SIZE of the table divided by this value. Otherwise, if not set
+      then the <code>phoenix.stats.guidepost.width</code> parameter is used. No
+default value.
+</td><td>None</td></tr>
+<tr><td><small>phoenix.stats.updateFrequency</small></td><td>
+A server-side paramater that determines the frequency in milliseconds for which statistics
+will be refreshed from the statistics table and subsequently used by the client. The
+default value is 15 min.
+</td><td>900000</td></tr>
+<tr><td><small>phoenix.stats.minUpdateFrequency</small></td><td>
+A client-side parameter that determines the minimum amount of time in milliseconds that
+      must pass before statistics may again be manually collected through another <code>UPDATE
+      STATISTICS</code> call. The default value is <code>phoenix.stats.updateFrequency</code>/2. 
+</td><td>450000</td></tr>
+<tr><td><small>phoenix.stats.useCurrentTime</small></td><td>
+An advanced server-side parameter that if true causes the current time on the server-side
+      to be used as the timestamp of rows in the statistics table when background tasks such as
+      compactions or splits occur. If false, then the max timestamp found while traversing the
+      table over which statistics are being collected is used as the timestamp. Unless your
+      client is controlling the timestamps while reading and writing data, this parameter
+      should be left alone. The default value is true.
+</td><td>true</td></tr>
 <tr><td><small>phoenix.query.spoolThresholdBytes</small></td><td style="text-align: left;">Threshold
       size in bytes after which results from parallelly executed
       query results are spooled to disk. Default is 20 mb.</td><td>20971520</td></tr>
@@ -45,13 +75,6 @@ of the
 any one tenant is allowed to consume. After this percentage, an
 <code>InsufficientMemoryException</code> is
       thrown. Default is 100%</td><td>100</td></tr>
-<tr><td><small>phoenix.query.targetConcurrency</small></td><td style="text-align: left;">Target concurrent
-      threads to use for a query. It serves as a soft limit on the number of
-      scans into which a query may be split. The value should not exceed the hard limit imposed by<code> phoenix.query.maxConcurrency</code>.</td><td>32</td></tr>
-<tr><td><small>phoenix.query.maxConcurrency</small></td><td style="text-align: left;">Maximum concurrent
-      threads to use for a query. It servers as a hard limit on the number
-      of scans into which a query may be split. A soft limit is imposed by
-<code>phoenix.query.targetConcurrency</code>.</td><td>64</td></tr>
 <tr><td><small>phoenix.query.dateFormat</small></td><td style="text-align: left;">Default pattern to use
       for conversion of a date to/from a string, whether through the
       <code>TO_CHAR(&lt;date&gt;)</code> or
@@ -62,11 +85,6 @@ any one tenant is allowed to consume. After this percentage, an
       <code>TO_CHAR(&lt;decimal-number&gt;)</code> or
 <code>TO_NUMBER(&lt;decimal-string&gt;)</code> functions, or through
 <code>resultSet.getString(&lt;decimal-column&gt;)</code>. Default is #,##0.###</td><td>#,##0.###</td></tr>
-<tr><td><small>phoenix.query.statsUpdateFrequency</small></td><td style="text-align: left;">The frequency
-      in milliseconds at which the stats for each table will be
-updated. Default is 15 min.</td><td>900000</td></tr>
-<tr><td><small>phoenix.query.maxStatsAge</small></td><td>The maximum age of
-      stats in milliseconds after which they will no longer be used (i.e. the stats were not able to be updated in this amount of time and thus are considered too old). Default is 1 day.</td><td>1</td></tr>
 <tr><td><small>phoenix.mutate.maxSize</small></td><td style="text-align: left;">The maximum number of rows
       that may be batched on the client
       before a commit or rollback must be called.</td><td>500000</td></tr>
@@ -75,8 +93,6 @@ updated. Default is 15 min.</td><td>900000</td></tr>
 overridden at connection
       time by specifying the <code>UpsertBatchSize</code>
       property value. Note that the connection property value does not affect the batch size used by the coprocessor when these statements are executed completely on the server side.</td><td>1000</td></tr>
-<tr><td><small>phoenix.query.maxIntraRegionParallelization</small></td><td style="text-align: left;">The maximum number of threads that will be spawned to process data within a single region during query execution</td><td>64</td></tr>
-<tr><td><small>phoenix.query.rowKeyOrderSaltedTable</small></td><td style="text-align: left;">Whether or not a non aggregate query returns rows in row key order for salted tables. If this option is turned on, split points may not be specified at table create time, but instead the default splits on each salt bucket must be used. Default is true</td><td>true</td></tr>
 <tr><td><small>phoenix.query.maxServerCacheBytes</small></td><td style="text-align: left;">Maximum size (in bytes) of a single sub-query result (usually the filtered result of a table) before compression and conversion to a hash map. Attempting to hash an intermediate sub-query result of a size bigger than this setting will result in a MaxServerCacheSizeExceededException. Default 100MB.</td><td>104857600</td></tr>
 <tr><td><small>phoenix.coprocessor.maxServerCacheTimeToLiveMs</small></td><td style="text-align: left;">Maximum living time (in milliseconds) of server caches. A cache entry expires after this amount of time has passed since last access. Consider adjusting this parameter when a server-side IOException("Could not find hash cache for joinId") happens. Getting warnings like "Earlier hash cache(s) might have expired on servers" might also be a sign that this number should be increased.</td><td>30000</td></tr>
 <tr><td><small>phoenix.query.useIndexes</small></td><td style="text-align: left;">Determines whether or not indexes are considered by the optimizer to satisfy a query. Default is true
@@ -105,8 +121,6 @@ overridden at connection
 </td><td>10240000</td></tr>
 <tr><td><small>phoenix.sequence.cacheSize</small></td><td style="text-align: left;">Number of sequence values to reserve from the server and cache on the client when the next sequence value is allocated. Only used if not defined by the sequence itself. Default is 100
 </td><td>100</td></tr>
-<tr><td><small>phoenix.client.autoUpgradeWhiteList</small></td><td style="text-align: left;">Comma separated list of case sensitive full table names to automatically upgrade from 2.2.x format to 3.0/4.0 format. Use * to upgrade all tables. Only applies on the first connection to a 3.0/4.0 cluster. Not specified by default. For more information, see [here](http://phoenix.apache.org/upgrade_from_2_2.html)
-</td><td>&nbsp;</td></tr>
 <tr><td><small>phoenix.clock.skew.interval</small></td><td style="text-align: left;">Delay interval(in milliseconds) when opening SYSTEM.CATALOG to compensate possible time clock skew when SYSTEM.CATALOG moves among region servers. 
 </td><td>2000</td></tr>
 <tr><td><small>phoenix.index.failure.handling.rebuild</small></td><td style="text-align: left;">Boolean flag which turns on/off auto-rebuild a failed index from when some updates are failed to be updated into the index.
@@ -115,57 +129,30 @@ overridden at connection
 </td><td>10000</td></tr>
 <tr><td><small>phoenix.index.failure.handling.rebuild.overlap.time</small></td><td style="text-align: left;">Index rebuild job builds an index from when it failed - the time interval(in milliseconds) in order to create a time overlap to prevent missing updates when there exists time clock skew.
 </td><td>300000</td></tr>
+<tr><td><strike><small>phoenix.query.targetConcurrency</small></strike><br/>Obsolete as of 3.2/4.2</td><td style="text-align: left;">Target concurrent
+      threads to use for a query. It serves as a soft limit on the number of
+      scans into which a query may be split. The value should not exceed the hard limit imposed by<code> phoenix.query.maxConcurrency</code>.</td><td>32</td></tr>
+<tr><td><strike><small>phoenix.query.maxConcurrency</small></strike><br/>Obsolete as of 3.2/4.2</td><td style="text-align: left;">Maximum concurrent
+      threads to use for a query. It servers as a hard limit on the number
+      of scans into which a query may be split. A soft limit is imposed by
+<code>phoenix.query.targetConcurrency</code>.</td><td>64</td></tr>
+<tr><td><strike><small>phoenix.query.maxStatsAge</small></strike><br/>Obsolete as of 3.2/4.2</td><td>The maximum age of
+      stats in milliseconds after which they will no longer be used (i.e. the stats were not able to be updated in this amount of time and thus are considered too old). Default is 1 day.</td><td>1</td></tr>
+<tr><td><strike><small>phoenix.query.statsUpdateFrequency</small></strike><br/>Obsolete as of 3.2/4.2</td><td style="text-align: left;">The frequency
+      in milliseconds at which the stats for each table will be
+updated. Default is 15 min.</td><td>900000</td></tr>
+<tr><td><strike><small>phoenix.query.maxIntraRegionParallelization</small></strike><br/>Obsolete as of 3.2/4.2</td><td style="text-align: left;">The maximum number of threads that will be spawned to process data within a single region during query execution</td><td>64</td></tr>
+<tr><td><small>phoenix.query.rowKeyOrderSaltedTable</small></td><td style="text-align: left;">Whether or not a non aggregate query returns rows in row key order for salted tables. If this option is turned on, split points may not be specified at table create time, but instead the default splits on each salt bucket must be used. Default is true</td><td>true</td></tr>
 </tbody></table>
 <br />
 <h4>
 Parallelization</h4>
-Phoenix breaks up aggregate queries into multiple scans and runs them in parallel through custom aggregating coprocessors to improve performance.&nbsp;Hari Kumar, from Ericsson Labs, did a good job of explaining the performance benefits of parallelization and coprocessors <a href="http://labs.ericsson.com/blog/hbase-performance-tuners" target="_blank">here</a>. One of the most important factors in getting good query performance with Phoenix is to ensure that table splits are well balanced. This includes having regions of equal size as well as an even distribution across region servers. There are open source tools such as&nbsp;<a href="http://www.sentric.ch/blog/hbase-split-visualisation-introducing-hannibal" target="_blank">Hannibal</a>&nbsp;that can help you monitor this. By having an even distribution of data, every thread spawned by the Phoenix client will have an equal amount of work to process, thus reducing the time it takes to get the results back. <br />
-<br />
-The <code>phoenix.query.targetConcurrency</code> and <code>phoenix.query.maxConcurrency</code> control how a query is broken up into multiple scans on the client side. The idea for parallelization of queries is to align the scan boundaries with region boundaries. If rows are not evenly distributed across regions, using this scheme compensates for regions that have more rows than others, by applying tighter splits and therefore spawning off more scans over the overloaded regions.<br />
-<br />
-The split points for parallelization are computed as follows. Let's suppose:<br />
-<ul>
-<li><code>t</code> is the target concurrency</li>
-<li><code>m</code> is the max concurrency</li>
-<li><code>r</code> is the number of regions we need to scan</li>
-</ul>
-<code>if r &gt;= t</code><br />
-&nbsp;&nbsp; scan using regional boundaries<br />
-<code>else if r/2 &gt; t</code><br />
-&nbsp;&nbsp; split each region in s splits such that: <code>s = max(x) where s * x &lt; m</code><br />
-<code>else</code><br />
-&nbsp;&nbsp; split each region in s splits such that:&nbsp; <code>s = max(x) where s * x &lt; t</code><br />
-<br />
-Depending on the number of cores in your client machine and the size of your cluster, the <code>phoenix.query.threadPoolSize</code>, <code>phoenix.query.queueSize</code>,<code> phoenix.query.maxConcurrency</code>, and <code>phoenix.query.targetConcurrency</code> may all be increased to allow more threads to process a query in parallel. This will allow Phoenix to divide up a query into more scans that may then be executed in parallel, thus reducing latency.<br />
-<br />
-This approach is not without its limitations. The primary issue is that Phoenix does not have sufficient information to divide up a region into equal data sizes. If the query results span many regions of data, this is not a problem, since regions are more or less of equal size. However, if a query accesses only a few regions, this can be an issue. The best Phoenix can do is to divide up the key space between the start and end key evenly. If there's any skew in the data, then some scans are bound to bear the brunt of the work. You can adjust <code>phoenix.query.maxIntraRegionParallelization</code> to a smaller number to decrease the number of threads spawned per region if you find that throughput is suffering.<br />
-<br />
-For example, let's say a row key is comprised of a five digit zip code in California, declared as a CHAR(5). Phoenix only knows that the column has 5 characters. In theory, the byte array could vary from five 0x01 bytes to five 0xff bytes (or what ever is the largest valid UTF-8 encoded single byte character). While in actuality, the range is from&nbsp;90001 to 96162. Since Phoenix doesn't know this, it'll divide up the region based on the theoretical range and all of the work will end up being done by the single thread that has the range encompassing the actual data. The same thing will occur with a DATE column, since the theoretical range is from 1970 to&nbsp;2038, while in actuality the date is probably +/- a year from the current date. Even if Phoenix uses better defaults for the start and end range rather than the theoretical min and max, it would not usually help - there's just too much variability across domains.<br />
-<br />
-One solution to this problem is to maintain statistics for a table to feed into the parallelization process to ensure an even data distribution. This is the solution we're working on, as described in more detail in this <a href="https://issues.apache.org/jira/browse/PHOENIX-180" target="_blank">issue</a>.<br />
-<h4>
-Batching</h4>
-An important HBase configuration property <code>hbase.client.scanner.caching</code> controls scanner caching, that is how many rows are returned from the server in a single round trip when a scan is performed. Although this is less important for aggregate queries, since the Phoenix coprocessors are performing the aggregation instead of returning all the data back to the client, it is important for non aggregate queries. If unset, Phoenix defaults this property to 1000.<br />
-<br />
-On the DML side of the fence, performance may improve by turning the connection auto commit to on for multi-row mutations such as those that can occur with <code>DELETE</code> and <code>UPSERT SELECT</code>. In this case, if possible, the mutation will be performed completely on the server side without returning data back to the client. However, when performing single row mutations, such as <code>UPSERT VALUES</code>, the opposite is true: auto commit should be off and a reasonable number of rows should be batched together for a single commit to reduce RPC traffic.<br />
-<h3>
-Measuring Performance</h3>
-One way to get a feeling for how to configure these properties is to use the performance.py shell script provided in the bin directory of the installation tar.<br />
-<br />
-<b>Usage: </b><code>performance.py &lt;zookeeper&gt; &lt;row count&gt;</code><br />
-<b>Example: </b><code>performance.py localhost 1000000</code><br />
-<br />
-This will create a new table named <code>performance_1000000</code> and upsert 1000000 rows. The schema and data generated is similar to <code>examples/web_stat.sql</code> and <code>examples/web_stat.csv</code>. On the console it will measure the time it takes to:<br />
-<ul>
-<li>upsert these rows</li>
-<li>run queries that perform <code>COUNT</code>, <code>GROUP BY</code>, and <code>WHERE</code> clause filters</li>
-</ul>
-For convenience, an <code>hbase-site.xml</code> file is included in the bin directory and pre-configured to already be on the classpath during script execution.<br />
-<br />
-Here is a screenshot of the performance.py script in action:<br />
-<div class="separator" style="clear: both; text-align: center;">
-<a href="http://1.bp.blogspot.com/-VhinivNOJmI/URWBGLYTiHI/AAAAAAAAAQU/Dp9lbH2CxYE/s1600/performance_script.png" imageanchor="1" style="margin-left: 1em; margin-right: 1em;"><img border="0" height="640" src="http://1.bp.blogspot.com/-VhinivNOJmI/URWBGLYTiHI/AAAAAAAAAQU/Dp9lbH2CxYE/s640/performance_script.png" width="497" /></a></div>
-<h3>
-&nbsp;Conclusion</h3>
-Phoenix has many knobs and dials to tailor the system to your use case. From controlling the level of parallelization, to the size of batches, to the consumption of resource, <i>there's a knob for that</i>. &nbsp;These controls are not without there limitations, however. There's still more work to be done and we'd love to hear your ideas on what you'd like to see made more configurable.<br />
-<br />
+Phoenix breaks up aggregate queries into multiple scans and runs them in parallel through custom aggregating coprocessors to improve performance.&nbsp;Hari Kumar, from Ericsson Labs, did a good job of explaining the performance benefits of parallelization and coprocessors <a href="http://labs.ericsson.com/blog/hbase-performance-tuners" target="_blank">here</a>.
+
+As of 3.2/4.2, parallelization in Phoenix is driven by the guideposts as determined by the configuration parameters for
+[statistics collection](http://phoenix.apache.org/update_statistics.html). Each chunk of data between guideposts
+will be run in parallel in a separate scan to improve query performance. Note that at a minimum, separate scans will be
+run for each table region. Beyond the statistics collection configuration parameters, the client-side
+<code>phoenix.query.threadPoolSize</code> and <code>phoenix.query.queueSize</code> parameters and the server-side
+<code>hbase.regionserver.handler.count</code> parameter have an impact on performance.
+
