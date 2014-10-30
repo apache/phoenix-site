@@ -61,7 +61,7 @@ Secondary indices will be automatically utilized when running join queries. For 
     CREATE INDEX i2Orders ON Orders (CustomerID) INCLUDE (ItemID, Quantity);
     CREATE INDEX iItems ON Items (ItemName) INCLUDE (Price);
 
-<a name="ex1"></a>We can find out each item's total sales value by joining the "Items" table and the "Orders" table and then grouping the joined result with "ItemName" (and also adding some filtering conditions):
+<a name="joining-tables-with-indices-eg1"></a>We can find out each item's total sales value by joining the "Items" table and the "Orders" table and then grouping the joined result with "ItemName" (and also adding some filtering conditions):
 
     SELECT ItemName, sum(Price * Quantity) AS OrderValue
     FROM Items
@@ -88,9 +88,9 @@ The execution plan for this query (by running "EXPLAIN _query_") will be:
 
 In this case, the index table "iItems" is used in place of the data table "Items" since the index table "iItems" is indexed on column "ItemName" and will hence benefit the GROUP-BY clause in this query. Meanwhile, the index table "i2Orders" is favored over the data table "Orders" and another index table "iOrders" because a range scan instead of a full scan can be applied as a result of the WHERE clause.
 
-## Grouped Joins and Derived Tables
+## Grouped Joins and Derived Tables<a name="grouped-joins-and-derived-tables"></a>
 
-Phoenix also supports complex join syntax such as grouped joins (or sub joins) and joins with derived-tables. You can group joins by using parenthesis to prioritize certain joins before other joins are executed. You can also replace any one (or more) of your join tables with a sub-query (derived table), which could be yet another join query.
+Phoenix also supports complex join syntax such as grouped joins (or sub joins) and joins with derived-tables. You can group joins by using parenthesis to prioritize certain joins before other joins are executed. You can also replace any one (or more) of your join tables with a subquery (derived table), which could be yet another join query.
 
 For grouped joins, you can write something like:
 
@@ -102,7 +102,7 @@ For grouped joins, you can write something like:
          ON I.SupplierID = S.SupplierID)
     ON O.ItemID = I.ItemID;
 
-By replacing the sub join with a sub-query (derived table), we get an equivalent query as:
+By replacing the sub join with a subquery (derived table), we get an equivalent query as:
 
     SELECT O.OrderID, J.ItemName, J.SupplierName
     FROM Orders AS O
@@ -113,7 +113,7 @@ By replacing the sub join with a sub-query (derived table), we get an equivalent
          ON I.SupplierID = S.SupplierID) AS J
     ON O.ItemID = J.ItemID;
 
-As an alternative to the [earlier example](#ex1) where we try to find out each item's sales figures, instead of using group-by after joining the two tables, we can join the "Items" table with the grouped result from the "Orders" table:
+As an alternative to the [earlier example](#joining-tables-with-indices-eg1) where we try to find out each item's sales figures, instead of using group-by after joining the two tables, we can join the "Items" table with the grouped result from the "Orders" table:
 
     SELECT ItemName, O.OrderValue
     FROM Items
@@ -124,7 +124,7 @@ As an alternative to the [earlier example](#ex1) where we try to find out each i
          GROUP BY ItemID) AS O
     ON Items.ItemID = O.ItemID;
 
-## Foreign Key to Primary Key Join Optimization
+## Foreign Key to Primary Key Join Optimization<a name="foreign-key-to-primary-key-join-optimization"></a>
 
 Oftentimes a join will occur from a child table to a parent table, mapping the foreign key of the child table to the primary key of the parent. So instead of doing a full scan on the parent table, Phoenix will drive a skip-scan or a range-scan based on the foreign key values it got from the child table result.
 
@@ -141,7 +141,7 @@ For example, we have parent table "Employee" and child table "Patent" defined as
 
     CREATE TABLE Patent (
         PatentID VARCHAR NOT NULL,
-        DeptID VARCHAR NOT NULL,
+        Region VARCHAR NOT NULL,
         LocalID VARCHAR NOT NULL,
         Title VARCHAR NOT NULL,
         Category VARCHAR NOT NULL,
@@ -171,11 +171,11 @@ However, there are times when the foreign key values from the child table accoun
 
 The join functionality is now implemented through hash joins, which means one side of the join operator has to be small enough to fit into memory in order to be broadcast over all servers that have the data of concern from the other side of join. This limitation will be eliminated once [PHOENIX-1179](https://issues.apache.org/jira/browse/PHOENIX-1179) is implemented.
 
-The servers-side caches are used to hold the hashed sub-query results. The size and the living time of the caches are controlled by the following parameters.
+The servers-side caches are used to hold the hashed join-table results. The size and the living time of the caches are controlled by the following parameters. Note that a join-table can be a physical table, a view, a subquery, or a joined result of other join-tables in a multi-join query.
 
 1. phoenix.query.maxServerCacheBytes
-    * Maximum size (in bytes) of a single sub-query result (usually the filtered result of a table) before compression and conversion to a hash map.
-    * Attempting to hash an intermediate sub-query result of a size bigger than this setting will result in a MaxServerCacheSizeExceededException.
+    * Maximum size (in bytes) of a join-table result before compression and conversion to a hash map.
+    * Attempting to hash a join-table result of a size bigger than this setting will result in a MaxServerCacheSizeExceededException.
     * **Default: 104,857,600**
 2. phoenix.query.maxGlobalMemoryPercentage
     * Percentage of total heap memory (i.e. Runtime.getRuntime().maxMemory()) that all threads may use.
@@ -194,7 +194,7 @@ Although changing parameters can sometimes be a solution to getting rid of the e
 
 As mentioned in the previous chapter, it is most crucial to make sure that there will be enough memory for the join query execution. But other than rush to change the configuration immediately, sometimes all you need to do is to know a bit of the interiors and adjust the sequence of the tables that appear in your join query.
 
-Below is a description of the default join order (without the presence of table statistics) and of which side of the query will be executed as a sub-query and put into server cache:
+Below is a description of the default join order (without the presence of table statistics) and of which side of the query will be executed as an inner query and put into server cache:
 
 1. _lhs_ INNER JOIN _rhs_
 

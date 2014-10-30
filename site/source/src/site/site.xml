@@ -80,6 +80,7 @@
             <item href="http:divider" name=""/>
             <item href="secondary_indexing.html" name="Secondary Indexes"/>
             <item href="joins.html" name="Joins"/>
+            <item href="subqueries.html" name="Subqueries"/>
             <item href="views.html" name="Views"/>
             <item href="multi-tenancy.html" name="Multi tenancy"/>
             <item href="sequences.html" name="Sequences"/>
