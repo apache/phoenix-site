@@ -15,7 +15,7 @@ Steven Noels | NG Data | stevenn@apache.org | PMC
 Michael Stack | Cloudera | stack@apache.org | PMC
 James Taylor | Salesforce | jamestaylor@apache.org | PMC
 Jesse Yates | Salesforce | jyates@apache.org | PMC
-Eli Levine | Salesforce | elevine@apache.org | PMC
+Eli Levine | Salesforce | elilevine@apache.org | PMC
 Simon Toens | Salesforce | stoens@apache.org | PMC
 Mujtaba Chohan | Salesforce | mujtaba@apache.org | PMC
 Maryann Xue | Intel | maryannxue@apache.org | PMC
