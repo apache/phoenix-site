@@ -533,21 +533,28 @@ ID=1 OR NAME='Hi'
 "
 
 "Other Grammar","And Condition","
-condition [ { AND condition } [...] ]
+booleanCondition [ { AND booleanCondition } [...] ]
 ","
-Value or condition.
+Condition separated by AND.
+","
+FOO!='bar' AND ID=1
+"
+
+"Other Grammar","Boolean Condition","
+[NOT] condition
+","
+Boolean condition.
 ","
 ID=1 AND NAME='Hi'
 "
 
 "Other Grammar","Condition","
-operand [ compare { operand }
-    | [ NOT ] IN ( { constantOperand [,...] } )
-    | [ NOT ] LIKE operand
-    | [ NOT ] ILIKE operand
-    | [ NOT ] BETWEEN operand AND operand
-    | IS [ NOT ] NULL ]
-    | NOT expression
+operand [ { = | < | > | <= | >= | <> | != } { rhsOperand }
+    | { LIKE | ILIKE } operand
+    | IS [ NOT ] NULL
+    | [ NOT ] { IN ( { select | { constantOperand [,...] } } )
+    | EXISTS ( select )
+    | BETWEEN operand AND operand } ]
 ","
 Boolean value or condition.
 When comparing with LIKE, the wildcards characters are ""_"" (any one character)
@@ -557,15 +564,21 @@ To search for the characters ""%"" and
 Patterns that end with an escape character are invalid and the expression returns NULL.
 BETWEEN does an inclusive comparison for both operands.
 ","
+FOO = 'bar'
 NAME LIKE 'Jo%'
+IN (1, 2, 3)
+NOT EXISTS (SELECT 1 FROM FOO WHERE BAR < 10)
+N BETWEEN 1 and 100
 "
 
-"Other Grammar","Compare","
-<> | <= | >= | = | < | > | !=
+"Other Grammar","RHS Operand","
+operand | { ANY | ALL } ( { operand | select } )
 ","
-Comparison operator. The operator != is the same as <>.
+Right-hand side operand
 ","
-<>
+s.my_col
+ANY(my_col + 1)
+ALL(select foo from bar where bas > 5)
 "
 
 "Other Grammar","Operand","
