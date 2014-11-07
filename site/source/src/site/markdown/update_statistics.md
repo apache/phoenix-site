@@ -12,22 +12,22 @@ command may not be necessary.
 
 For a given table <code>my_table</code>:
 
-    UPDATE STATISTICS <code>my_table</code>
+    UPDATE STATISTICS my_table
 
 The above syntax would collect the statistics for the table my_table and all the index tables, views and
 view index tables associated with the table my_table.
 
 The equivalent of the above syntax is
 
-    UPDATE STATISTICS <code>my_table</code> ALL
+    UPDATE STATISTICS my_table ALL
 
 To collect the statistics on the index table alone
 
-    UPDATE STATISTICS <code>my_table</code> INDEX
+    UPDATE STATISTICS my_table INDEX
 
 To collect the statistics on the table alone
 
-    UPDATE STATISTICS <code>my_table</code> COLUMNS
+    UPDATE STATISTICS my_table COLUMNS
 
 ## Configurations
 
