@@ -1403,12 +1403,14 @@ REGEXP_REPLACE('abc123ABC', '[0-9]+', '#') evaluates to 'abc#ABC'
 "
 
 "Functions (String)","REGEXP_SPLIT","
-REGEXP_SPLIT( stringTerm, patternString )
+REGEXP_SPLIT( stringTerm, patternTerm )
 ","
-Returns a VARCHAR array by splitting the stringTerm based on the Java compatible regular
-expression patternString.
+Splits a string into a VARCHAR ARRAY using a regular expression.
+If characters that have a special meaning in regular expressions are to be used
+as a regular delimiter in the pattern string, they must be escaped with backslashes.
 ","
-REGEXP_SPLIT('one,two,three', ',') evaluates to ['one','two','three']
+REGEXP_SPLIT('ONE,TWO,THREE', ',') evaluates to ARRAY['ONE', 'TWO', 'THREE']
+REGEXP_SPLIT('ONE!#TWO#,!THREE', '[,!#]+') evaluates to ARRAY['ONE', 'TWO', 'THREE']
 "
 
 "Functions (General)","MD5","
