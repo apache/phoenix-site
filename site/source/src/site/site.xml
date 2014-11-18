@@ -66,6 +66,9 @@
             <item href="issues.html" name="Issue Tracking"/>
             <item href="download.html" name="Download" />
             <item href="http:divider" name=""/>
+            <item href="release.html" name="How to release" />
+            <item href="building_website.html" name="How to update website" />
+            <item href="http:divider" name=""/>
             <item href="http://www.apache.org/licenses/" name="License" />
             <item href="http://www.apache.org/foundation/sponsorship.html" name="Sponsorship" />
             <item href="http://www.apache.org/foundation/thanks.html" name="Thanks" />
