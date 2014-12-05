@@ -41,13 +41,16 @@ As expected, you may create a VIEW on another VIEW as well to further filter the
 Note that the previous support for creating a read-only VIEW directly over an HBase table is still supported.
 
 ## Indexes on Views
-In addition, you may create an INDEX over a VIEW, just as with a TABLE. This is particularly useful to improve query performance over newly added columns on a VIEW, since it provides a way of doing point lookups based on these column values.
+In addition, you may create an INDEX over a VIEW, just as with a TABLE. This is particularly useful to improve query performance over newly added columns on a VIEW, since it provides a way of doing point lookups based on these column values. Note that until [PHOENIX-1499](https://issues.apache.org/jira/browse/PHOENIX-1499) gets implemented, an INDEX over a VIEW is only maintained if the updates are made through the VIEW (as opposed to through the underlying TABLE).
 
 ## Limitations
-In our Phoenix 3.0 release, views have the following restrictions:
+Views have the following restrictions:
 
-1. The primary key constraint may not be changed by a VIEW.
-2. A TABLE that has a VIEW may not be dropped, but instead all VIEWs must be dropped first. In the future, we may support the concept of a CASCADE delete.
-2. Single-table only - you may not create a VIEW over multiple, joined tables. This will be supported in a future release.
-3. All columns must be projected into a VIEW (i.e. only the CREATE VIEW ... AS SELECT * syntax is supported). Note, however, you may drop non primary key columns inherited from the base table in a VIEW after it is created through the ALTER VIEW command. Providing a subset of columns and or expressions in the SELECT clause will be supported in a future release.
+1. An INDEX over a VIEW is only maintained if the updates are made through the VIEW. Updates made through the underlying TABLE will not be reflected in the index ([PHOENIX-1499](https://issues.apache.org/jira/browse/PHOENIX-1499)).
+2. The schema of a table may not be changed once it has VIEWs ([PHOENIX-1504](https://issues.apache.org/jira/browse/PHOENIX-1504)).
+3. The primary key constraint of the base TABLE may not be changed by a VIEW. In the future, adding to the primary key constraint may be possible ([PHOENIX-978](https://issues.apache.org/jira/browse/PHOENIX-978)).
+4. A VIEW may be defined over only a single table through a simple SELECT * query. You may not create a VIEW over multiple, joined tables nor over aggregations ([PHOENIX-1505](https://issues.apache.org/jira/browse/PHOENIX-1505), [PHOENIX-1506](https://issues.apache.org/jira/browse/PHOENIX-1506)). 
+5. If a VIEW is derived from another VIEW, the indexes from the base/derived VIEW will not be considered when executing queries ([PHOENIX-1367](https://issues.apache.org/jira/browse/PHOENIX-1367)).
+6. All columns must be projected into a VIEW (i.e. only CREATE VIEW ... AS SELECT * is supported). Note, however, you may drop non primary key columns inherited from the base table in a VIEW after it is created through the ALTER VIEW command. Providing a subset of columns and or expressions in the SELECT clause will be supported in a future release ([PHOENIX-1507](https://issues.apache.org/jira/browse/PHOENIX-1507)).
+7. A TABLE that has a VIEW may not be dropped, but instead all VIEWs must be dropped first. As of the 3.2/4.2 release, [DROP TABLE](http://phoenix.apache.org/language/index.html#drop_table) and [DROP VIEW](http://phoenix.apache.org/language/index.html#drop_view) supports a CASCADE option which will cause all tenant-specific views to be dropped as well.
 

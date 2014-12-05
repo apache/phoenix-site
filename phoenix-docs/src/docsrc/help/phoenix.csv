@@ -94,14 +94,15 @@ CREATE TABLE IF NOT EXISTS ""my_case_sensitive_table""
 "
 
 "Commands","DROP TABLE","
-DROP TABLE [IF EXISTS] tableRef
+DROP TABLE [IF EXISTS] tableRef [CASCADE]
 ","
-Drops a table. When dropping a table, by default the underlying HBase data and index tables are dropped. The phoenix.schema.dropMetaData
+Drops a table. The optional CASCADE keyword causes any views on the table to be dropped as well. When dropping a table, by default the underlying HBase data and index tables are dropped. The phoenix.schema.dropMetaData
 may be used to override this and keep the HBase table for point-in-time queries.
 
 ","
 DROP TABLE my_schema.my_table;
 DROP TABLE IF EXISTS my_table;
+DROP TABLE my_schema.my_table CASCADE;
 "
 
 "Commands","CREATE VIEW","
@@ -125,13 +126,14 @@ CREATE VIEW my_view_on_view
 "
 
 "Commands","DROP VIEW","
-DROP VIEW [IF EXISTS] tableRef
+DROP VIEW [IF EXISTS] tableRef [CASCADE]
 ","
-Drops a view. When dropping a view, the table data is not affected. However, index data for the view will be deleted.
+Drops a view. The optional CASCADE keyword causes any views derived from the view to be dropped as well. When dropping a view, the actual table data is not affected. However, index data for the view will be deleted.
 
 ","
 DROP VIEW my_view
 DROP VIEW IF EXISTS my_schema.my_view
+DROP VIEW IF EXISTS my_schema.my_view CASCADE
 "
 
 "Commands","CREATE SEQUENCE","
