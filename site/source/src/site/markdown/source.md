@@ -8,9 +8,7 @@ https://git-wip-us.apache.org/repos/asf/phoenix.git
 
 The source can be checked out from GIT with this command. See http://git-scm.com/docs/git-clone:
 
-```
-$ git clone https://git-wip-us.apache.org/repos/asf/phoenix.git
-```
+<pre><code>$ git clone https://git-wip-us.apache.org/repos/asf/phoenix.git</code></pre>
 
 <hr/>
 

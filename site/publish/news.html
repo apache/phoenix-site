@@ -8,7 +8,7 @@
 
 	<head>
 		<meta charset="UTF-8" />
-		<title>Bulk CSV Data Loading | Apache Phoenix</title>
+		<title>Apache Phoenix News | Apache Phoenix</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="description" content="" />
 		<meta http-equiv="content-language" content="en" />
@@ -34,7 +34,7 @@
 
 	</head>
 
-	<body class="page-bulk_dataload project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
+	<body class="page-news project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
 
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
@@ -91,7 +91,7 @@
 									<li ><a href="paged.html" title="Paged Queries">Paged Queries</a></li>
 									<li ><a href="dynamic_columns.html" title="Dynamic Columns">Dynamic Columns</a></li>
 									<li ><a href="skip_scan.html" title="Skip Scan">Skip Scan</a></li>
-									<li class="active"><a href="" title="Bulk Loading">Bulk Loading</a></li>
+									<li ><a href="bulk_dataload.html" title="Bulk Loading">Bulk Loading</a></li>
 									<li ><a href="tracing.html" title="Tracing">Tracing</a></li>
 									<li ><a href="update_statistics.html" title="Statistics Collection">Statistics Collection</a></li>
 									<li class="divider"/>
@@ -127,159 +127,17 @@
 		<div class="span12">
 			<div class="body-content">
 <div class="page-header">
- <h1>Bulk CSV Data Loading</h1>
+ <h1>Apache Phoenix News</h1>
 </div> 
-<p>Phoenix provides two methods for loading CSV data into Phoenix tables – a single-threaded client loading tool via the <a href="download.html#Loading-Data">psql</a> command, and a MapReduce-based bulk load tool. The psql tool is typically appropriate for tens of megabytes, while the MapReduce-based loader is typically better for larger load volumes.</p> 
-<p>Use of both loaders is described below.</p> 
+<p><br /></p> 
+<hr /> 
+<p></p> 
 <div class="section"> 
- <h2 id="Sample_data">Sample data</h2> 
- <p>For the following examples, we will assume that we have a CSV file named “data.csv” with the following content:</p> 
- <div class="source"> 
-  <pre>12345,John,Doe
-67890,Mary,Poppins
-</pre> 
- </div> 
- <p>We will use a table with the following structure:</p> 
- <div class="source"> 
-  <pre> CREATE TABLE example (
-    my_pk bigint not null,
-    m.first_name varchar(50),
-    m.last_name varchar(50) 
-    CONSTRAINT pk PRIMARY KEY (my_pk))
-</pre> 
- </div> 
-</div> 
-<div class="section"> 
- <h2 id="Loading_via_PSQL">Loading via PSQL</h2> 
- <p>The psql command is invoked via <tt>psql.py</tt> in the Phoenix bin directory. In order to use it to load CSV data, it is invoked by providing the connection information for your HBase cluster, the name of the table to load data into, and the path to the CSV file or files.</p> 
- <p>To load the example data outlined above into HBase running on the local machine, run the following command:</p> 
- <div class="source"> 
-  <pre>bin/psql.py -t EXAMPLE localhost data.csv
-</pre> 
- </div> 
- <p>The following parameters can be used for loading data with PSQL:</p> 
- <table border="0" class="bodyTable table table-striped table-hover"> 
-  <thead> 
-   <tr class="a"> 
-    <th><i>Parameter</i> </th> 
-    <th><i>Description</i> </th> 
-   </tr> 
-  </thead> 
-  <tbody> 
-   <tr class="b"> 
-    <td>-t </td> 
-    <td>Provide the name of the table in which to load data. By default, the name of the table is taken from the name of the CSV file. This parameter is case-sensitive </td> 
-   </tr> 
-   <tr class="a"> 
-    <td>-h </td> 
-    <td>Overrides the column names to which the CSV data maps and is case sensitive. A special value of in-line indicating that the first line of the CSV file determines the column to which the data maps. </td> 
-   </tr> 
-   <tr class="b"> 
-    <td>-s </td> 
-    <td>Run in strict mode, throwing an error on CSV parsing errors </td> 
-   </tr> 
-   <tr class="a"> 
-    <td>-d </td> 
-    <td>Supply a custom delimiter or delimiters for CSV parsing </td> 
-   </tr> 
-   <tr class="b"> 
-    <td>-q </td> 
-    <td>Supply a custom phrase delimiter, defaults to double quote character </td> 
-   </tr> 
-   <tr class="a"> 
-    <td>-e </td> 
-    <td>Supply a custom escape character, default is a backslash </td> 
-   </tr> 
-   <tr class="b"> 
-    <td>-a </td> 
-    <td>Supply an array delimiter (explained in more detail below) </td> 
-   </tr> 
-  </tbody> 
- </table> 
-</div> 
-<div class="section"> 
- <h2 id="Loading_via_MapReduce">Loading via MapReduce</h2> 
- <p>For higher-throughput loading distributed over the cluster, the MapReduce loader can be used. This loader first converts all data into HFiles, and then provides the created HFiles to HBase after the HFile creation is complete. </p> 
- <p>The MapReduce loader is launched using the <tt>hadoop</tt> command with the Phoenix client jar, as follows:</p> 
- <div class="source"> 
-  <pre>hadoop jar phoenix-3.0.0-incubating-client.jar org.apache.phoenix.mapreduce.CsvBulkLoadTool --table EXAMPLE --input /data/example.csv
-</pre> 
- </div> 
- <p>When using Phoenix 4.0 and above, there is a known HBase issue( “Notice to Mapreduce users of HBase 0.96.1 and above” <a class="externalLink" href="https://hbase.apache.org/book.html">https://hbase.apache.org/book.html</a> ), you should use following command:</p> 
- <div class="source"> 
-  <pre>HADOOP_CLASSPATH=$(hbase mapredcp):/path/to/hbase/conf hadoop jar phoenix-4.0.0-incubating-client.jar org.apache.phoenix.mapreduce.CsvBulkLoadTool --table EXAMPLE --input /data/example.csv
-</pre> 
- </div> 
- <p>OR</p> 
- <div class="source"> 
-  <pre>HADOOP_CLASSPATH=/path/to/hbase-protocol.jar:/path/to/hbase/conf hadoop jar phoenix-4.0.0-incubating-client.jar org.apache.phoenix.mapreduce.CsvBulkLoadTool --table EXAMPLE --input /data/example.csv
-</pre> 
- </div> 
- <p>The input file must be present on HDFS (not the local filesystem where the command is being run). </p> 
- <p>The following parameters can be used with the MapReduce loader.</p> 
- <table border="0" class="bodyTable table table-striped table-hover"> 
-  <thead> 
-   <tr class="a"> 
-    <th><i>Parameter</i> </th> 
-    <th><i>Description</i> </th> 
-   </tr> 
-  </thead> 
-  <tbody> 
-   <tr class="b"> 
-    <td>-i,–input </td> 
-    <td>Input CSV path (mandatory) </td> 
-   </tr> 
-   <tr class="a"> 
-    <td>-t,–table </td> 
-    <td>Phoenix table name (mandatory) </td> 
-   </tr> 
-   <tr class="b"> 
-    <td>-a,–array-delimiter </td> 
-    <td>Array element delimiter (optional) </td> 
-   </tr> 
-   <tr class="a"> 
-    <td>-c,–import-columns </td> 
-    <td>Comma-separated list of columns to be imported </td> 
-   </tr> 
-   <tr class="b"> 
-    <td>-d,–delimiter </td> 
-    <td>Input delimiter, defaults to comma </td> 
-   </tr> 
-   <tr class="a"> 
-    <td>-g,–ignore-errors </td> 
-    <td>Ignore input errors </td> 
-   </tr> 
-   <tr class="b"> 
-    <td>-o,–output </td> 
-    <td>Output path for temporary HFiles (optional) </td> 
-   </tr> 
-   <tr class="a"> 
-    <td>-s,–schema </td> 
-    <td>Phoenix schema name (optional) </td> 
-   </tr> 
-   <tr class="b"> 
-    <td>-z,–zookeeper </td> 
-    <td>Zookeeper quorum to connect to (optional) </td> 
-   </tr> 
-  </tbody> 
- </table> 
  <div class="section"> 
-  <h3 id="Notes_on_the_MapReduce_importer">Notes on the MapReduce importer</h3> 
-  <ol style="list-style-type: decimal"> 
-   <li>You must provide an explicit column family name in your CREATE TABLE statement for your non primary key columns, as the default column family used by Phoenix is treated specially by HBase because it starts with an underscore.</li> 
-   <li>The current bulk loader does not support the migration of index related data yet. So, if you have created your phoenix table with index, please use the <a href="download.html#Loading-Data">psql CSV loader</a>.</li> 
-  </ol> 
+  <h3 id="Phoenix_4.2.2_3.2.2_released_Dec._10_2014">Phoenix 4.2.2, 3.2.2 released (Dec. 10, 2014)</h3> 
+  <p><a class="externalLink" href="https://raw.githubusercontent.com/apache/phoenix/4.2/CHANGES">Release Notes</a></p> 
+  <p>Download the latest binary and source jars from <a href="download.html">download page</a>. Note Phoenix 4.x is compatible with HBase 0.98.1+ while Phoenix 3.x is compatible with HBase 0.94.x only.</p> 
  </div> 
-</div> 
-<div class="section"> 
- <h2 id="Loading_array_data">Loading array data</h2> 
- <p>Both the PSQL loader and MapReduce loader support loading array values with the <tt>-a</tt> flag. Arrays in a CSV file are represented by a field that uses a different delimiter than the main CSV delimiter. For example, the following file would represent an id field and an array of integers:</p> 
- <div class="source"> 
-  <pre>1,2:3:4
-2,3:4,5
-</pre> 
- </div> 
- <p>To load this file, the default delimiter (comma) would be used, and the array delimiter (colon) would be supplied with the parameter <tt>-a ':'</tt>.</p> 
 </div>
 			</div>
 		</div>
@@ -409,8 +267,8 @@
 						<li >
 							<a href="skip_scan.html" title="Skip Scan">Skip Scan</a>
 						</li>
-						<li class="active">
-							<a href="#" title="Bulk Loading">Bulk Loading</a>
+						<li >
+							<a href="bulk_dataload.html" title="Bulk Loading">Bulk Loading</a>
 						</li>
 						<li >
 							<a href="tracing.html" title="Tracing">Tracing</a>

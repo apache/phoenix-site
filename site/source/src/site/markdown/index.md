@@ -1,4 +1,41 @@
-# Overview
+<br/>
+<br/>
+<p align="center">
+<img src="images/phoenix-logo-small.png"/>
+<h4 align="center">High performance relational database layer over HBase for low latency applications</h4> 
+</p>
+<br/>
+
+<table>
+<tr>
+<td width="25%">
+<a href="download.html" title="Download Phoenix latest binary and source release"><img src="images/download.png"/></a>
+<br/><font size="2">Download latest Apache Phoenix binary and source release artifacts</font>
+</td>
+<td width="25%">
+<a href="issues.html" title="Phoenix Issues/JIRAs list"><img src="images/jira.png"/></a>
+<br/><font size="2">Browse through Apache Phoenix JIRAs</font>
+</td>
+<td width="25%"><br/>
+<a href="source.html" title="Sync and build Phoenix source code"><img src="images/scode.png"/></a>
+<br/><font size="2">Sync and build Apache Phoenix from source code</font>
+</td>
+<td width="25%"><br/>
+<img title="Search Phoenix JIRAs, web-site, user/dev. email list, source code and javadocs." src="images/search.png"/>
+<form action="http://search-hadoop.com/?" method="get">
+<input value="Phoenix" name="fc_project" type="hidden"/>
+<input placeholder="Search Phoenix" required="required" style="width:180px" size="18" name="q" id="query" type="search"/>
+</form>
+</td>
+</tr>
+</table><span id="alerts" style="background-color:#ffc; text-align: center;display: block;padding:10px; border-bottom: solid 1px #cc9">
+<strong>News:</strong>
+<a href="news.html">Apache Phoenix 4.2.2, 3.2.2 released</a> (December 10, 2014)
+</span>
+
+<hr/>
+
+## Overview
 
 Apache Phoenix is a relational database layer over HBase delivered as a client-embedded JDBC driver targeting low latency queries over HBase data. Apache Phoenix takes your SQL query, compiles it into a series of HBase scans, and orchestrates the running of those scans to produce regular JDBC result sets. The table metadata is stored in an HBase table and versioned, such that snapshot queries over prior versions will automatically use the correct schema. Direct use of the HBase API, along with coprocessors and custom filters, results in [performance](performance.html) on the order of milliseconds for small queries, or seconds for tens of millions of rows. 
 
@@ -8,14 +45,14 @@ Become the standard means of accessing HBase data through a well-defined, indust
 ## Quick Start
 Tired of reading already and just want to get started? Take a look at our [FAQs](faq.html), listen to the Apache Phoenix talks from [Hadoop Summit 2014](https://www.youtube.com/watch?v=f4Nmh5KM6gI&feature=youtu.be), review the [overview presentation](http://phoenix.apache.org/presentations/OC-HUG-2014-10-4x3.pdf), and jump over to our quick start guide [here](Phoenix-in-15-minutes-or-less.html).
 
-##SQL Support##
+## SQL Support
 To see what's supported, go to our [language reference](language/index.html). It includes all typical SQL query statement clauses, including `SELECT`, `FROM`, `WHERE`, `GROUP BY`, `HAVING`, `ORDER BY`, etc. It also supports a full set of DML commands as well as table creation and versioned incremental alterations through our DDL commands. We try to follow the SQL standards wherever possible.
 
 <a id="connStr"></a>Use JDBC to get a connection to an HBase cluster like this:
 
-        Connection conn = DriverManager.getConnection("jdbc:phoenix:server1,server2:3333");
+<pre><code>Connection conn = DriverManager.getConnection("jdbc:phoenix:server1,server2:3333");</code></pre>
 where the connection string is composed of:
-<code><small>jdbc:phoenix</small></code> [ <code><small>:&lt;zookeeper quorum&gt;</small></code> [ <code><small>:&lt;port number&gt;</small></code> ] [ <code><small>:&lt;root node&gt;</small></code> ] ]
+<pre><code>jdbc:phoenix</code> [ <code>:&lt;zookeeper quorum&gt;</code> [ <code>:&lt;port number&gt;</code> ] [ <code>:&lt;root node&gt;</code> ] ]</pre>
 
 For any omitted part, the relevant property value, hbase.zookeeper.quorum, hbase.zookeeper.property.clientPort, and zookeeper.znode.parent will be used from hbase-site.xml configuration file.
 
@@ -25,7 +62,7 @@ Here's a list of what is currently **not** supported:
 * **Relational operators**. Union, Intersect, Minus.
 * **Miscellaneous built-in functions**. These are easy to add - read this [blog](http://phoenix-hbase.blogspot.com/2013/04/how-to-add-your-own-built-in-function.html) for step by step instructions.
 
-##<a id="schema"></a>Schema##
+##<a id="schema"></a>Schema
 
 Apache Phoenix supports table creation and versioned incremental alterations through DDL commands. The table metadata is stored in an HBase table.
 

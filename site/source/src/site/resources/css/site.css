@@ -51,15 +51,15 @@ margin-bottom: 10px;
 @media (max-width: 479px) {
 	.xtoplogo {
 	height: 23px;
-	width: 183px;
-	background:url(../images/topbar-logo-small.png)
+	width: 97px;
+	background:url(../images/topbar-logo-small-blue.png)
 	}
 }
 
 @media (min-width: 480px) {
 	.xtoplogo {
 	height: 23px;
-	width: 360px;
-	background:url(../images/topbar-logo.png)
+	width: 248px;
+	background:url(../images/topbar-logo-blue.png)
 	}
 }

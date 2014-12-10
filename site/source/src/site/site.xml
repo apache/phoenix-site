@@ -37,7 +37,7 @@
         <column>Using</column>
         <column>Reference</column>
     </bottomNav>
-    <theme>bootswatch-united</theme>
+    <theme>bootswatch-flatly</theme>
     <highlightJs>true</highlightJs>
     <titleTemplate>%2$s | %1$s</titleTemplate>
     <brand>
@@ -47,7 +47,7 @@
     <skinAttribution>false</skinAttribution>
     <breadcrumbs>true</breadcrumbs>
       <bottomDescription quote="false">
-        <![CDATA[<form action="https://www.google.com/search" method="get"><input value="phoenix.apache.org" name="sitesearch" type="hidden"><input placeholder="Search the site&hellip;" required="required" style="width:170px;" size="18" name="q" id="query" type="search"></form>]]>
+        <![CDATA[<form action="http://search-hadoop.com/?" method="get"><input value="Phoenix" name="fc_project" type="hidden"><input placeholder="Search Phoenix&hellip;" required="required" style="width:170px;" size="18" name="q" id="query" type="search"></form>]]>
       </bottomDescription>
     </reflowSkin>
   </custom>
