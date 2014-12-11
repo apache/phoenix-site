@@ -54,6 +54,11 @@ margin-bottom: 10px;
 	width: 97px;
 	background:url(../images/topbar-logo-small-blue.png)
 	}
+
+        .hidetable {
+        visibility: hidden; 
+        display: none;
+        }
 }
 
 @media (min-width: 480px) {
@@ -62,4 +67,9 @@ margin-bottom: 10px;
 	width: 248px;
 	background:url(../images/topbar-logo-blue.png)
 	}
+
+        .showtable {
+        visibility: hidden; 
+        display: none;
+        }
 }

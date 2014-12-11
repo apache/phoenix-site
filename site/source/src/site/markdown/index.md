@@ -6,7 +6,8 @@
 </p>
 <br/>
 
-<table>
+<span >
+<table class="hidetable">
 <tr>
 <td width="25%">
 <a href="download.html" title="Download Phoenix latest binary and source release"><img src="images/download.png"/></a>
@@ -28,7 +29,21 @@
 </form>
 </td>
 </tr>
-</table><span id="alerts" style="background-color:#ffc; text-align: center;display: block;padding:10px; border-bottom: solid 1px #cc9">
+</table>
+<table class="showtable">
+<tr>
+<td><br/>
+<form action="http://search-hadoop.com/?" method="get">
+<img title="Search Phoenix JIRAs, web-site, user/dev. email list, source code and javadocs." src="images/search-small.png"/>
+<input value="Phoenix" name="fc_project" type="hidden"/>
+<input placeholder="Search Phoenix" required="required" style="width:180px" size="18" name="q" id="query" type="search"/>
+</form>
+</td>
+</tr>
+</table>
+</span>
+
+<span id="alerts" style="background-color:#ffc; text-align: center;display: block;padding:10px; border-bottom: solid 1px #cc9">
 <strong>News:</strong>
 <a href="news.html">Apache Phoenix 4.2.2, 3.2.2 released</a> (December 10, 2014)
 </span>
