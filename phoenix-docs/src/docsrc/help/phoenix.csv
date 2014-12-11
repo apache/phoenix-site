@@ -1001,7 +1001,11 @@ TIME
 ","
 The time data type. The format is yyyy-MM-dd hh:mm:ss, with both the date
 and time parts maintained. Mapped to ""java.sql.Time"".
-The binary representation is an 8 byte long (the number of milliseconds from the epoch).
+The binary representation is an 8 byte long (the number of milliseconds from the epoch), making it
+possible (although not necessarily recommended) to store more information within a TIME column
+than what is provided by ""java.sql.Time"". Note that the internal representation is based on
+a number of milliseconds since the epoch (which is based on a time in GMT), while
+""java.sql.Time"" will format times based on the client's local time zone.
 ","
 TIME
 "
@@ -1011,7 +1015,11 @@ DATE
 ","
 The date data type. The format is yyyy-MM-dd hh:mm:ss, with both the date
 and time parts maintained to a millisecond accuracy. Mapped to ""java.sql.Date"".
-The binary representation is an 8 byte long (the number of milliseconds from the epoch).
+The binary representation is an 8 byte long (the number of milliseconds from the epoch), making it
+possible (although not necessarily recommended) to store more information within a DATE column than
+what is provided by ""java.sql.Date"". Note that the internal representation is based on a number
+of milliseconds since the epoch (which is based on a time in GMT), while ""java.sql.Date""
+will format dates based on the client's local time zone.
 ","
 DATE
 "
@@ -1023,7 +1031,10 @@ The timestamp data type. The format is yyyy-MM-dd hh:mm:ss[.nnnnnnnnn].
 Mapped to ""java.sql.Timestamp"" with an internal representation of the
 number of nanos from the epoch. The binary representation is 12 bytes:
 an 8 byte long for the epoch time plus a 4 byte integer for the nanos.
-
+Note that the internal representation is based on a number of milliseconds
+since the epoch (which is based on a time in GMT), while
+""java.sql.Timestamp"" will format timestamps based on the client's local
+time zone.
 ","
 TIMESTAMP
 "
@@ -1502,15 +1513,26 @@ TO_CHAR(myDecimal, '#,##0.###')
 "
 
 "Functions (Time and Date)","TO_DATE","
-TO_DATE( stringTerm [, formatString] )
+TO_DATE( stringTerm [, formatString [, timeZoneIdString]] )
 ","
-Parses a string and returns a date.
+Parses a string and returns a date. Note that the
+returned date is internally represented as the number
+of milliseconds since the java epoch.
 The most important format characters are:
 y year, M month, d day, H hour, m minute, s second.
 The default format string is ""yyyy-MM-dd HH:mm:ss"".
 For details of the format, see ""java.text.SimpleDateFormat"".
+By default, GMT will be used as the time zone when parsing the
+date. However, a time zone id can also be supplied. This is
+a time zone id such as 'GMT+1'. If 'local' is provided as the
+time zone id, the local time zone will be used for parsing.
+The configuration setting ""phoenix.query.dateFormatTimeZone""
+can also be set to a time zone id, which will cause the
+default of GMT to be overridden with the configured
+time zone id.
 ","
 TO_DATE('Sat, 3 Feb 2001 03:05:06 GMT', 'EEE, d MMM yyyy HH:mm:ss z')
+TO_DATE('1970-01-01', 'yyyy-MM-dd', 'GMT+1')
 "
 
 "Functions (Time and Date)","CURRENT_DATE","
