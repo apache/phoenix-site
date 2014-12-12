@@ -1,10 +1,8 @@
 # Apache Phoenix News
 <br/><hr/>
-### Phoenix 4.2.2, 3.2.2 released (Dec. 10, 2014)
-[Release Notes](https://raw.githubusercontent.com/apache/phoenix/4.2/CHANGES)
+### Phoenix 4.2.2 [released](https://blogs.apache.org/phoenix/entry/announcing_phoenix_4_2_2)) (Dec. 10, 2014)
 
-Download the latest binary and source jars from [download page](download.html). Note Phoenix 4.x is compatible with HBase 0.98.1+ while Phoenix 3.x is compatible with HBase 0.94.x only.
+For additional news, see our [blog](https://blogs.apache.org/phoenix/)
 
-
-
+Download the latest binary and source jars from [download page](download.html).
 

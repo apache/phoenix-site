@@ -1,4 +1,14 @@
-#Upgrading from Phoenix 2.2.x
+#Upgrading Phoenix
+
+Phoenix uses a three number versioning schema of the form &lt;major version&gt;.&lt;minor version&gt;.&lt;patch version&gt;. For example, 4.2.1 has a major version of 4, a minor version of 2, and a patch version of 1.
+
+When upgrading to a new minor release (i.e. the major version is the same, but the minor version has changed), sometimes modifications to the system tables are necessary to either fix a bug or provide a new feature. This upgrade will occur automatically the first time a newly upgraded client connects to the newly upgraded server. It is expected that the server-side jar is upgraded first across your entire cluster, before any clients are upgraded. An older client will work with a newer server jar when the minor version is different, but not visa versa. In other words, clients do not need to be upgraded in lock step with the server. However, as of 4.2 and below, it is expected that all clients are upgraded at the same time (i.e. a mix of clients with different versions will not necessarily change). This may be improved in the future to allow a mix of old and new client versions ([PHOENIX-1483](https://issues.apache.org/jira/browse/PHOENIX-1483))
+
+Upgrading to a new patch release may occur in any order: client first or server first, and a mix of clients with different patch release versions is fine.
+
+Upgrading to a new major release may require downtime as well as potentially the running of a migration script. This will be determined on a release by release basis.
+
+##Upgrading from Phoenix 2.2.x to 3.0/4.0
 
 By default, Phoenix 2.2.x tables are not automatically upgraded to Apache Phoenix 3.0/4.0 tables. Since pre-Apache 2.2.x code lines have a different package structure (<code>com.salesforce.phoenix</code>) than the 3.0/4.0 code line (<code>org.apache.phoenix</code>), the two installations may actually coexist. An existing Phoenix table may either remain as a 2.2.x table or be upgraded to 3.0/4.0 table, but not both. In addition, a client JVM may either use the 3.0/4.0 driver or the 2.2.x driver, but not both. Upgrade, however, is a one way street: once a table is upgrade to 3.0/4.0, it stays that way.
 

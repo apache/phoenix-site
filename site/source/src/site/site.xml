@@ -79,7 +79,7 @@
             <item href="Phoenix-in-15-minutes-or-less.html" name="Quick Start"/>
             <item href="building.html" name="Building"/>
             <item href="tuning.html" name="Tuning"/>
-            <item href="upgrade_from_2_2.html" name="Upgrade from 2.2"/>
+            <item href="upgrading.html" name="Upgrading"/>
             <item href="http:divider" name=""/>
             <item href="secondary_indexing.html" name="Secondary Indexes"/>
             <item href="joins.html" name="Joins"/>
