@@ -45,7 +45,7 @@
 
 <span id="alerts" style="background-color:#ffc; text-align: center;display: block;padding:10px; border-bottom: solid 1px #cc9">
 <strong>News:</strong>
-<a href="news.html">Apache Phoenix 4.2.2, 3.2.2 released</a> (December 10, 2014)
+<a href="news.html">Apache Phoenix 4.2.2 released</a> (December 10, 2014)
 </span>
 
 <hr/>
