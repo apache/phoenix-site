@@ -1499,7 +1499,7 @@ REVERSE('Hello')
 "
 
 "Functions (String)","TO_CHAR","
-TO_CHAR( timestampTerm | numberTerm [, formatString] )
+TO_CHAR( { timestampTerm | numberTerm } [, formatString] )
 ","
 Formats a date, time, timestamp, or number as a string.
 The default date format is ""yyyy-MM-dd HH:mm:ss"" and

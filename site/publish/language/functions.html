@@ -1114,15 +1114,15 @@ syntax-end -->
 <h3 id="to_char" class="notranslate">TO_CHAR</h3>
 <!-- railroad-start -->
 <pre name="bnf" style="display: none">
-TO_CHAR( <a href="index.html#term">timestampTerm</a> | <a href="index.html#term">numberTerm</a> [, <a href="index.html#string">formatString</a>] )
+TO_CHAR( { <a href="index.html#term">timestampTerm</a> | <a href="index.html#term">numberTerm</a> } [, <a href="index.html#string">formatString</a>] )
 </pre>
 <div name="railroad">
-<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">TO_CHAR ( <a href="index.html#term">timestampTerm</a></code></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c"><a href="index.html#term">numberTerm</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">, <a href="index.html#string">formatString</a></code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c">)</code></td></tr></table></td><td class="le"></td></tr></table>
+<table class="railroad"><tr class="railroad"><td class="d"><code class="c">TO_CHAR (</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c"><a href="index.html#term">timestampTerm</a></code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="index.html#term">numberTerm</a></code></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">, <a href="index.html#string">formatString</a></code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c">)</code></td></tr></table>
 </div>
 <!-- railroad-end -->
 <!-- syntax-start
 <pre>
-TO_CHAR( <a href="index.html#term">timestampTerm</a> | <a href="index.html#term">numberTerm</a> [, <a href="index.html#string">formatString</a>] )
+TO_CHAR( { <a href="index.html#term">timestampTerm</a> | <a href="index.html#term">numberTerm</a> } [, <a href="index.html#string">formatString</a>] )
 </pre>
 syntax-end -->
 <p>Formats a date, time, timestamp, or number as a string. The default date format is <code>yyyy-MM-dd HH:mm:ss</code> and the default number format is <code>#,##0.###</code>. For details, see <code>java.text.SimpleDateFormat</code> for date/time values and <code>java.text.DecimalFormat</code> for numbers. This method returns a string.</p>
