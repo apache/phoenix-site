@@ -7,7 +7,7 @@ Phoenix provides support for retrieving and writing to Phoenix tables from withi
 
 
 When a Phoenix table is the source for the Map Reduce job, we can provide a SELECT query or pass a table name and specific columns to import data . To retrieve data from the table within the mapper class, we need to have a class that implements [DBWritable](http://hadoop.apache.org/docs/current/api/org/apache/hadoop/mapred/lib/db/DBWritable.html "DBWritable") and pass it as an argument to PhoenixMapReduceUtil.**setInput** method. The custom DBWritable class provides implementation for [readFields(ResultSet rs)](http://hadoop.apache.org/docs/current/api/org/apache/hadoop/mapreduce/lib/db/DBWritable.html#readFields%28java.sql.ResultSet%29 "readFields") that allows us to retrieve columns for each row. This custom DBWritable class will form the input value to the mapper class. 
->Note: The SELECT query must not perform any aggregation as **this** is not supported by our map-reduce integration.
+>Note: The SELECT query must not perform any aggregation or use DISTINCT as these are not supported by our map-reduce integration.
 
 Similarly, when writing to a Phoenix table, we use the PhoenixMapReduceUtil.**setOutput** method to set the output table and the columns. 
 >Note: Phoenix internally builds the UPSERT query for you . 
