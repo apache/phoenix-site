@@ -59,15 +59,16 @@
             <item href="roadmap.html" name="Roadmap"/>
             <item href="performance.html" name="Performance"/>
             <item href="team.html" name="Team"/>
-            <item href="contributing.html" name="Contributing"/>
             <item href="resources.html" name="Resources"/>
             <item href="mailing_list.html" name="Mailing Lists"/>
             <item href="source.html" name="Source Repository"/>
             <item href="issues.html" name="Issue Tracking"/>
             <item href="download.html" name="Download" />
             <item href="http:divider" name=""/>
-            <item href="release.html" name="How to release" />
-            <item href="building_website.html" name="How to update website" />
+            <item href="contributing.html" name="How to Contribute"/>
+            <item href="develop.html" name="How to Develop" />
+            <item href="building_website.html" name="How to Update Website" />
+            <item href="release.html" name="How to Release" />
             <item href="http:divider" name=""/>
             <item href="http://www.apache.org/licenses/" name="License" />
             <item href="http://www.apache.org/foundation/sponsorship.html" name="Sponsorship" />

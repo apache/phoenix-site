@@ -1,4 +1,4 @@
-# Contributing
+# Contributing to Apache Phoenix
 
 ## General process
 
@@ -6,8 +6,9 @@ The general process for contributing code to Phoenix works as follows:
 
 1. Discuss your changes on the dev mailing list
 2. Create a JIRA issue unless there already is one
-3. Prepare a patch containing your changes
-4. Submit the patch
+3. Setup your development environment
+4. Prepare a patch containing your changes
+5. Submit the patch
 
 These steps are explained in greater detail below.
 
@@ -22,6 +23,10 @@ If you're considering adding major new functionality to Phoenix, it's a good ide
 ### Log a JIRA ticket
 
 The first step is to create a ticket on the [Phoenix JIRA](http://issues.apache.org/jira/browse/PHOENIX). 
+
+### Setup development environment
+
+To setup your development, see [these](develop.html) directions.
 
 ### Generate a patch
 
@@ -66,4 +71,3 @@ A patch file can be downloaded from a GitHub pull request by adding ".patch" to 
 When applying a patch contributed from a user, please use the "git am" command if a fully-formatted patch file is available, as this preserves the contributor's contact information. Otherwise, the contributor's name should be added to the commit message.
 
 If a single ticket consists of a patch with multiple commits, the commits can be squashed into a single commit using `git rebase`.
-
