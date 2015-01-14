@@ -269,7 +269,7 @@ UPDATE STATISTICS my_table COLUMNS
 ","
 Sets a built-in Phoenix table property or an HBase table or column descriptor metadata attribute.
 The name is case insensitive. Built-in Phoenix table options include SALT_BUCKETS, DISABLE_WAL,
-IMMUTABLE_ROWS, MULTI_TENANT, and DEFAULT_COLUMN_FAMILY. If the name is a known HColumnDescriptor
+IMMUTABLE_ROWS, MULTI_TENANT, DEFAULT_COLUMN_FAMILY, and STORE_NULLS. If the name is a known HColumnDescriptor
 attribute, then the value is applied to the specified column family or, if omitted, to all column
 families. Otherwise, the HBase metadata attribute value is applied to the HTableDescriptor.
 Note that no validation is performed on the property name or value, so unknown or misspelled
@@ -305,6 +305,9 @@ tenants. For more information, see http://phoenix.incubator.apache.org/multi-ten
 The DEFAULT_COLUMN_FAMILY string option determines the column family used used when none
 is specified. The value is case sensitive. If this option is not present, a column family
 name of '0' is used.
+
+The STORE_NULLS boolean option (available as of Phoenix 4.3) determines whether or not null values should be
+explicitly stored in HBase. This option is generally only useful if a table is configured to store multiple versions in order to facilitate doing flashback queries (i.e. queries to look at the state of a record in the past).
 
 ","
 IMMUTABLE_ROWS=true

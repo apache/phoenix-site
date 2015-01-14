@@ -131,6 +131,7 @@ overridden at connection
 </td><td>300000</td></tr>
 <tr><td><small>phoenix.query.rowKeyOrderSaltedTable</small></td><td style="text-align: left;">Whether or not a non aggregate query returns rows in row key order for salted tables. If this option is turned on, split points may not be specified at table create time, but instead the default splits on each salt bucket must be used. Default is true</td><td>true</td></tr>
 <tr><td><small>phoenix.connection.autoCommit</small></td><td style="text-align: left;">Whether or not a new connection has auto-commit enabled when it is created. Default is false.</td><td>false</td></tr>
+<tr><td><small>phoenix.table.default.store.nulls</small></td><td style="text-align: left;">The default value of the STORE_NULLS flag used for table creation. Default is false. Available starting from Phoenix 4.3.</td><td>false</td></tr>
 <tr><td><strike><small>phoenix.query.targetConcurrency</small></strike><br/>Obsolete as of 3.2/4.2</td><td style="text-align: left;">Target concurrent
       threads to use for a query. It serves as a soft limit on the number of
       scans into which a query may be split. The value should not exceed the hard limit imposed by<code> phoenix.query.maxConcurrency</code>.</td><td>32</td></tr>
