@@ -18,39 +18,36 @@ low-latency, large scale applications. Critical features, such as
 secondary indexing have made Phoenix the API of choice for building
 these HBase applications.
 <br/><br/>
-Devaraj Das<br/>
-Cofounder<br/>
-Hortonworks<br/>
+Devaraj Das, Cofounder
+<br/>
 </td></tr>
 
 <tr><td>
 <img src="images/using/sf.png"/>
 <br/><br/>
-Apache Phoenix is the foundation of our big data stack allowing us to
-run interactive queries against HBase data in a performant manner. In
-our Force.com platform, we rely on Apache Phoenix to run interactive
-queries against big data residing in HBase, leveraging<br/>
+In our Force.com platform, we rely on Apache Phoenix to run
+interactive queries against big data residing in HBase leveraging
 <li> multi-tenant tables for customization and scale out across our
 diverse customer schemas</li>
 <li> aggregation to build roll-up summaries</li>
 <li> secondary indexes to improve performance</li>
 <br/>
-Steven Tamm<br/>
-CTO<br/>
-salesforce.com<br/>
+<blockquote>"Apache Phoenix is the foundation of our big data stack, allowing us
+to run interactive queries against HBase data in a performant manner."</blockquote>
 <br/>
-At Salesforce, Apache Phoenix is the mainstay of our Platform Big Data
-architecture, goto market and and product strategy.<br/><br/>
-
+Steven Tamm, CTO
+<hr/>
 We are looking to launch the first of numerous Big Data products in
-upcoming Spring '15 release - Field Audit Trails.  Field Audit Trails
+upcoming Spring '15 release - Field Audit Trails. Field Audit Trails
 delivers a new archiving service for our customer most critical data
 audit trails allowing our customers to easily query and traverse
-multi-billion record data sets.<br/><br/>
-
-Jonathan Bruce<br/>
-Director of Product Management<br/>
-salesforce.com<br/>
+multi-billion record data sets.
+<br/>
+<blockquote>"At Salesforce, Apache Phoenix is the mainstay of our Platform Big
+Data architecture, goto market and and product strategy."</blockquote>
+<br/>
+Jonathan Bruce, Director of Product Management
+<br/>
 </td></tr>
 
 <tr><td>
@@ -65,14 +62,11 @@ highlighting secondary-indexes support, cause we are expecting both
 query performance and data
 manipulation load balancing for our HBase processing architecture.<br/>
 
-"For us, the most valuable feature are index support and query
-convenience for our HBase data processing."<br/><br/>
+<blockquote>"For us, the most valuable feature are index support and query
+convenience for our HBase data processing."</blockquote><br/>
 
-Fulin Sun<br/>
-Software Enginneer<br/>
-CertusNet<br/>
-
-</td></tr>
+Fulin Sun, Software Enginneer
+<br/></td></tr>
 
 <tr><td>
 <img src="images/using/teoco.png"/>
@@ -89,10 +83,8 @@ while maintaining HBase performance and throughput.
 It's saves the need to handle and manage  lower level operations, and
 allows clean and maintainable code.<br/><br/>
 
-Cahana Ori<br/>
-Director of Research and Development<br/>
-TEOCO<br/>
-</td></tr>
+Cahana Ori, Director of Research and Development
+<br/></td></tr>
 
 <tr><td>
 <img src="images/using/ab.png"/>
@@ -113,12 +105,10 @@ to use Pheonix in this kind of scenario because Pheonix makes it
 possible to do complicated query in HBase, and it supports more and
 more features in traditional DB like oracle, which makes it much more
 easier for our user to migrate there BI query onto HBase</li>
-</ol><br/>
+</ol>
 
-Jaywong<br/>
-Software Engineer<br/>
-Alibaba<br/>
-</td></tr>
+Jaywong, Software Engineer
+<br/></td></tr>
 
 
 </table>
@@ -146,12 +136,10 @@ phoenix schema.</li>
 This is near real time aggregation of tracking data to find trend of
 events with multi-dimensional. It does write aggregated data to hBase
 + Phoenix continuously (at present 12k-15k/s records) and read for
-report generation at the same time.</li></ol><br/>
+report generation at the same time.</li></ol>
 
-Jogendar Singh<br/>
-Engineering Manager, Mobile Platform<br/>
-ebay<br/>
-</td></tr>
+Jogendar Singh, Engineering Manager, Mobile Platform
+<br/></td></tr>
 
 <tr><td>
 <img src="images/using/ss.png"/>
@@ -163,9 +151,7 @@ also allows us to expose data insights outside of the engineering
 organization. Finally, running Phoenix on top of our existing HBase
 infrastructure gives us the ability to scale our ad-hoc query needs.
 <br/><br/>
-Andrey Gusev<br/>
-Tech Lead, Machine Learning Infrastructure<br/>
-Sift Science<br/>
+Andrey Gusev, Tech Lead, Machine Learning Infrastructure
 </td></tr>
 
 <tr><td>
@@ -179,10 +165,8 @@ competence: SQL. NGDATA is happy to both use and contribute to the
 Apache Phoenix project, which proves to be a solid choice backed by a
 great community on a day-to-day basis.<br/><br/>
 
-Steven Noels<br/>
-CTO<br/>
-NGDATA<br/>
-</td></tr>
+Steven Noels, CTO
+<br/></td></tr>
 
 <tr><td>
 <img src="images/using/pn.png"/>
@@ -193,11 +177,8 @@ records.  The salting and secondary indexes have saved considerable
 development time and the SQL interface has been an easy entry point
 for developers.<br/><br/>
 
-Ralph Perko<br/>
-Software Architect/Developer<br/>
-Pacific Northwest National Laboratory<br/>
-
-</td></tr>
+Ralph Perko, Software Architect/Developer
+<br/></td></tr>
 
 <tr><td>
 <img src="images/using/sb.png"/>
@@ -210,13 +191,11 @@ handle those requests with low latency and high throughput. It also
 provides an easy to use SQL interface and helps us build scalable and
 highly available applications quickly and reliably.<br/><br/>
 
-"For us, the most valuable feature is the out of the box server side
-aggregations."<br/><br/>
+<blockquote>"For us, the most valuable feature is the out of the box server side
+aggregations."</blockquote><br/>
 
-Martin Homolka<br/>
-CTO<br/>
-Socialbakers<br/>
-</td></tr>
+Martin Homolka, CTO
+<br/></td></tr>
 
 <tr><td>
 <img src="images/using/dp.png"/>
@@ -226,10 +205,8 @@ At Delta Projects we use Phoenix for storing data as a basis for
 measuring activities and generating reports. We chose Phoenix because
 it provides the scalability of HBase and the expressiveness of SQL.<br/><br/>
 
-Kristoffer Sjögren<br/>
-System Developer<br/>
-Delta Projects<br/>
-</td></tr>
+Kristoffer Sjögren, System Developer
+<br/></td></tr>
 
 </table>
 <!--End Second Column-->
