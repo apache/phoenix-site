@@ -1,0 +1,236 @@
+<br/><img src="images/who_is_using.png"/>
+<br/>
+<br/>
+
+<table>
+<tr>
+<td>
+<!--First Column-->
+<table>
+<tr><td>
+<img src="images/using/hw.png"/>
+<br/><br/>
+Hortonworks supports Apache Phoenix as a feature rich ANSI SQL
+interface for Apache HBase in Hortonworks Data Platform (HDP).  It
+plays a critical role for our customers who want diverse choice for
+data access in Hadoop and want a simple interface to build
+low-latency, large scale applications. Critical features, such as
+secondary indexing have made Phoenix the API of choice for building
+these HBase applications.
+<br/><br/>
+Devaraj Das<br/>
+Cofounder<br/>
+Hortonworks<br/>
+</td></tr>
+
+<tr><td>
+<img src="images/using/sf.png"/>
+<br/><br/>
+Apache Phoenix is the foundation of our big data stack allowing us to
+run interactive queries against HBase data in a performant manner. In
+our Force.com platform, we rely on Apache Phoenix to run interactive
+queries against big data residing in HBase, leveraging<br/>
+- multi-tenant tables for customization and scale out across our
+diverse customer schemas<br/>
+- aggregation to build roll-up summaries<br/>
+- secondary indexes to improve performance<br/>
+<br/>
+Steven Tamm<br/>
+CTO<br/>
+salesforce.com<br/>
+<br/>
+At Salesforce, Apache Phoenix is the mainstay of our Platform Big Data
+architecture, goto market and and product strategy.<br/><br/>
+
+We are looking to launch the first of numerous Big Data products in
+upcoming Spring '15 release - Field Audit Trails.  Field Audit Trails
+delivers a new archiving service for our customer most critical data
+audit trails allowing our customers to easily query and traverse
+multi-billion record data sets.<br/><br/>
+
+Jonathan Bruce<br/>
+Director of Product Management<br/>
+salesforce.com<br/>
+</td></tr>
+
+<tr><td>
+<img src="images/using/cn.png"/>
+<br/><br/>
+
+At CertusNet we utilize HBase for Gigabytes level data storage and
+processing per five minutes.
+We found Phoenix most appropriate for easy-to-use sql layer and JDBC
+query support, even more
+highlighting secondary-indexes support, cause we are expecting both
+query performance and data
+manipulation load balancing for our HBase processing architecture.<br/>
+
+"For us, the most valuable feature are index support and query
+convenience for our HBase data processing."<br/><br/>
+
+Fulin Sun<br/>
+Software Enginneer<br/>
+CertusNet<br/>
+
+</td></tr>
+
+<tr><td>
+<img src="images/using/teoco.png"/>
+<br/><br/>
+
+TEOCO is a leading provider of assurance and analytics solutions to
+communications service providers worldwide.<br/>
+
+At Teoco we use Phoenix  to provide fast access to customers activity
+records. The system is required to manage tens of billions of records
+per day.<br/><br/>
+Phoenix allows us easy and rapid development using it's SQL interface
+while maintaining HBase performance and throughput.
+It's saves the need to handle and manage  lower level operations, and
+allows clean and maintainable code.<br/><br/>
+
+Cahana Ori<br/>
+Director of Research and Development<br/>
+TEOCO<br/>
+</td></tr>
+
+<tr><td>
+<img src="images/using/ab.png"/>
+<br/><br/>
+
+At Alibaba there're two main scenarios of using Pheonix:<br/><br/>
+
+1. Large dataset with relatively small result set, say 10 thousands of
+records or so. We choose to use Pheonix in this kind of scenario
+because it's much more easier for user to use than HBase native api,
+meantime it supports orderby/groupby syntax<br/><br/>
+
+2. Large dataset with large result set, it might be millions of
+records in the result set even after PrimaryKey filter, and often
+along with lots of aggregation/orderby/groupby invocation. We choose
+to use Pheonix in this kind of scenario because Pheonix makes it
+possible to do complicated query in HBase, and it supports more and
+more features in traditional DB like oracle, which makes it much more
+easier for our user to migrate there BI query onto HBase<br/><br/>
+
+Jaywong<br/>
+Software Engineer<br/>
+Alibaba<br/>
+</td></tr>
+
+
+</table>
+<!--End First Column-->
+</td>
+<td>
+<!--Second Column-->
+<table>
+<tr><td>
+<img src="images/using/ebay.png"/>
+<br/><br/>
+We have been exploring Phoenix since July, 2014 and have successfully
+achieved couple of analytics use cases with huge data set.  We were
+able to achieve read/write performance in ms even slicing and dicing
+data in many dimension.<br/><br/>
+
+1.       Path or Flow analysis<br/>
+This use case was very specific and targeted for core mobile native
+apps where we were trying to find user behavior with many dimension
+App, Version, device , OS version, carrier etc. This was offline
+process where we process and aggregate daily data and load once in
+phoenix schema.<br/><br/>
+
+2.       Real Time analytics data trend.<br/>
+This is near real time aggregation of tracking data to find trend of
+events with multi-dimensional. It does write aggregated data to hBase
++ Phoenix continuously (at present 12k-15k/s records) and read for
+report generation at the same time.<br/><br/>
+
+Jogendar Singh<br/>
+Engineering Manager, Mobile Platform<br/>
+ebay<br/>
+</td></tr>
+
+<tr><td>
+<img src="images/using/ss.png"/>
+<br/><br/>
+At Sift Science we use Phoenix to power our OLAP infrastructure. This
+influences our machine learning feature engineering which is critical
+in the model training pipeline. Having a simple SQL-based interface
+also allows us to expose data insights outside of the engineering
+organization. Finally, running Phoenix on top of our existing HBase
+infrastructure gives us the ability to scale our ad-hoc query needs.
+<br/><br/>
+Andrey Gusev<br/>
+Tech Lead, Machine Learning Infrastructure<br/>
+Sift Science<br/>
+</td></tr>
+
+<tr><td>
+<img src="images/using/ng.png"/>
+<br/><br/>
+
+Apache Phoenix allows users of our customer analytics platform Lily to
+easily ingest and manage customer fact data. Our users don't have to
+learn complex or specific APIs for this, but can tap into a familiar
+competence: SQL. NGDATA is happy to both use and contribute to the
+Apache Phoenix project, which proves to be a solid choice backed by a
+great community on a day-to-day basis.<br/><br/>
+
+Steven Noels<br/>
+CTO<br/>
+NGDATA<br/>
+</td></tr>
+
+<tr><td>
+<img src="images/using/pn.png"/>
+<br/><br/>
+
+Apache Phoenix has helped us load and query hundreds of billions of
+records.  The salting and secondary indexes have saved considerable
+development time and the SQL interface has been an easy entry point
+for developers.<br/><br/>
+
+Ralph Perko<br/>
+Software Architect/Developer<br/>
+Pacific Northwest National Laboratory<br/>
+
+</td></tr>
+
+<tr><td>
+<img src="images/using/sb.png"/>
+<br/><br/>
+
+At Socialbakers we use Phoenix for on demand data aggregations.
+Because of the floating time range of our custom reports we aggregate
+hundreds of megabytes per request on the server side. Phoenix can
+handle those requests with low latency and high throughput. It also
+provides an easy to use SQL interface and helps us build scalable and
+highly available applications quickly and reliably.<br/><br/>
+
+"For us, the most valuable feature is the out of the box server side
+aggregations."<br/><br/>
+
+Martin Homolka<br/>
+CTO<br/>
+Socialbakers<br/>
+</td></tr>
+
+<tr><td>
+<img src="images/using/dp.png"/>
+<br/><br/>
+
+At Delta Projects we use Phoenix for storing data as a basis for
+measuring activities and generating reports. We chose Phoenix because
+it provides the scalability of HBase and the expressiveness of SQL.<br/><br/>
+
+Kristoffer Sjögren<br/>
+System Developer<br/>
+Delta Projects<br/>
+</td></tr>
+
+</table>
+<!--End Second Column-->
+</td>
+</tr>
+</table>

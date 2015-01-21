@@ -54,6 +54,10 @@
 
 Apache Phoenix is a relational database layer over HBase delivered as a client-embedded JDBC driver targeting low latency queries over HBase data. Apache Phoenix takes your SQL query, compiles it into a series of HBase scans, and orchestrates the running of those scans to produce regular JDBC result sets. The table metadata is stored in an HBase table and versioned, such that snapshot queries over prior versions will automatically use the correct schema. Direct use of the HBase API, along with coprocessors and custom filters, results in [performance](performance.html) on the order of milliseconds for small queries, or seconds for tens of millions of rows. 
 
+<p align="center">
+<br/>Who is using Apache Phoenix? Read more <a href="who_is_using.html">here...</a><br/>
+<img src="images/using/all.jpeg"/>
+</p>
 ## Mission
 Become the standard means of accessing HBase data through a well-defined, industry standard API.
 

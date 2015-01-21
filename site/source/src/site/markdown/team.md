@@ -26,4 +26,4 @@ Nick Dimiduk | Hortonworks | ndimiduk@apache.org | PMC
 Gabriel Reid | NGDATA | greid@apache.org | PMC
 Rajeshbabu Chintaguntla | Huawei | rajeshbabu@apache.org | Committer
 Ravi Magham | Cornerstone OnDemand | ravimagham@apache.org | Committer
-Samarth Jain | Salesforce | samarthjain@gmail.com | Committer 
+Samarth Jain | Salesforce | samarth@apache.org | Committer 
