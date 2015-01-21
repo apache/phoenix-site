@@ -98,10 +98,10 @@ TEOCO<br/>
 <img src="images/using/ab.png"/>
 <br/><br/>
 
-At Alibaba there're two main scenarios of using Pheonix:<br/><br/>
+At Alibaba there're two main scenarios of using Phoenix:<br/><br/>
 
 1. Large dataset with relatively small result set, say 10 thousands of
-records or so. We choose to use Pheonix in this kind of scenario
+records or so. We choose to use Phoenix in this kind of scenario
 because it's much more easier for user to use than HBase native api,
 meantime it supports orderby/groupby syntax<br/><br/>
 
@@ -131,7 +131,7 @@ Alibaba<br/>
 We have been exploring Phoenix since July, 2014 and have successfully
 achieved couple of analytics use cases with huge data set.  We were
 able to achieve read/write performance in ms even slicing and dicing
-data in many dimension.<br/><br/>
+data in many dimensions.<br/><br/>
 
 1.       Path or Flow analysis<br/>
 This use case was very specific and targeted for core mobile native
