@@ -30,10 +30,10 @@ Apache Phoenix is the foundation of our big data stack allowing us to
 run interactive queries against HBase data in a performant manner. In
 our Force.com platform, we rely on Apache Phoenix to run interactive
 queries against big data residing in HBase, leveraging<br/>
-- multi-tenant tables for customization and scale out across our
-diverse customer schemas<br/>
-- aggregation to build roll-up summaries<br/>
-- secondary indexes to improve performance<br/>
+<li> multi-tenant tables for customization and scale out across our
+diverse customer schemas</li>
+<li> aggregation to build roll-up summaries</li>
+<li> secondary indexes to improve performance</li>
 <br/>
 Steven Tamm<br/>
 CTO<br/>
@@ -100,18 +100,20 @@ TEOCO<br/>
 
 At Alibaba there're two main scenarios of using Phoenix:<br/><br/>
 
-1. Large dataset with relatively small result set, say 10 thousands of
+<ol>
+<li> Large dataset with relatively small result set, say 10 thousands of
 records or so. We choose to use Phoenix in this kind of scenario
 because it's much more easier for user to use than HBase native api,
-meantime it supports orderby/groupby syntax<br/><br/>
+meantime it supports orderby/groupby syntax</li>
 
-2. Large dataset with large result set, it might be millions of
+<li> Large dataset with large result set, it might be millions of
 records in the result set even after PrimaryKey filter, and often
 along with lots of aggregation/orderby/groupby invocation. We choose
 to use Pheonix in this kind of scenario because Pheonix makes it
 possible to do complicated query in HBase, and it supports more and
 more features in traditional DB like oracle, which makes it much more
-easier for our user to migrate there BI query onto HBase<br/><br/>
+easier for our user to migrate there BI query onto HBase</li>
+</ol><br/>
 
 Jaywong<br/>
 Software Engineer<br/>
@@ -133,18 +135,18 @@ achieved couple of analytics use cases with huge data set.  We were
 able to achieve read/write performance in ms even slicing and dicing
 data in many dimensions.<br/><br/>
 
-1.       Path or Flow analysis<br/>
+<ol><li>       Path or Flow analysis<br/>
 This use case was very specific and targeted for core mobile native
 apps where we were trying to find user behavior with many dimension
 App, Version, device , OS version, carrier etc. This was offline
 process where we process and aggregate daily data and load once in
-phoenix schema.<br/><br/>
+phoenix schema.</li>
 
-2.       Real Time analytics data trend.<br/>
+<li>       Real Time analytics data trend.<br/>
 This is near real time aggregation of tracking data to find trend of
 events with multi-dimensional. It does write aggregated data to hBase
 + Phoenix continuously (at present 12k-15k/s records) and read for
-report generation at the same time.<br/><br/>
+report generation at the same time.</li></ol><br/>
 
 Jogendar Singh<br/>
 Engineering Manager, Mobile Platform<br/>

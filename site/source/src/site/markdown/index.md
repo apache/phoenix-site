@@ -45,7 +45,7 @@
 
 <span id="alerts" style="background-color:#ffc; text-align: center;display: block;padding:10px; border-bottom: solid 1px #cc9">
 <strong>News:</strong>
-Recently added: <a href="who_is_using.html">Who is using Apache Phoenix?</a> (Jan 20, 2015)
+Recently added: <a href="news.html">Who is using Apache Phoenix?</a> (Jan 20, 2015)
 </span>
 
 <hr/>
@@ -55,7 +55,7 @@ Recently added: <a href="who_is_using.html">Who is using Apache Phoenix?</a> (Ja
 Apache Phoenix is a relational database layer over HBase delivered as a client-embedded JDBC driver targeting low latency queries over HBase data. Apache Phoenix takes your SQL query, compiles it into a series of HBase scans, and orchestrates the running of those scans to produce regular JDBC result sets. The table metadata is stored in an HBase table and versioned, such that snapshot queries over prior versions will automatically use the correct schema. Direct use of the HBase API, along with coprocessors and custom filters, results in [performance](performance.html) on the order of milliseconds for small queries, or seconds for tens of millions of rows. 
 
 <p align="center">
-<br/>Who is using Apache Phoenix? Read more <a href="news.html">here...</a><br/>
+<br/>Who is using Apache Phoenix? Read more <a href="who_is_using.html">here...</a><br/>
 <img src="images/using/all.jpeg"/>
 </p>
 ## Mission
