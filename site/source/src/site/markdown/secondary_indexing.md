@@ -132,6 +132,15 @@ You will need to add the following parameters to `hbase-site.xml` on the master:
 </property>
 ```
 
+To support local index regions merge on data regions merge you will need to add the following parameter to `hbase-site.xml` in all the region servers and restart. (It’s applicable for Phoenix 4.3+ versions)
+
+```
+<property>
+  <name>hbase.coprocessor.regionserver.classes</name>
+  <value>org.apache.hadoop.hbase.regionserver.LocalIndexMerger</value>
+</property>
+```
+
 ## Tuning
 Out the box, indexing is pretty fast. However, to optimize for your particular environment and workload, there are several properties you can tune.
 
