@@ -56,7 +56,6 @@ diverse customer schemas</li>
 <li> aggregation to build roll-up summaries</li>
 <li> secondary indexes to improve performance</li>
 </ul>
-<br/>
 <blockquote>"Apache Phoenix is the foundation of our big data stack, allowing us
 to run interactive queries against HBase data in a performant manner."</blockquote>
 <br/>
