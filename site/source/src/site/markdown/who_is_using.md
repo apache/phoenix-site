@@ -7,6 +7,28 @@
 <td>
 <!--First Column-->
 <table>
+
+<tr><td>
+<img src="images/using/pubmatic.png"/>
+<br/><br/>
+PubMatic utilizes Phoenix to improve the data analytics capabilities it
+provides to a global roster of leading brands and over 40 of the comScore
+top 100 publishers.
+<br/><br/>
+<ul>
+<li> Utilizing a combination of Phoenix and Hbase in an enterprise data
+warehouse appliance with all the tenets of MPP architecture</li>
+<li> Doing analytics on almost 140 Billion records (15+ TB of data) with near
+real time SLAs</li>
+<li> The analytics platform is able to serve 100K+ queries per day and can
+scale linearly as well as horizontally with the growth of the company</li>
+<li> With deep analytics, the company can make more intelligent decisions,
+and analyze performance and alignment with business objectives</li>
+</ul>
+Sudhir Kulkarni, VP of Data and Analytics
+<br/>
+</td></tr>
+
 <tr><td>
 <img src="images/using/hw.png"/>
 <br/><br/>
@@ -27,10 +49,12 @@ Devaraj Das, Cofounder
 <br/><br/>
 In our Force.com platform, we rely on Apache Phoenix to run
 interactive queries against big data residing in HBase leveraging
+<ul>
 <li> multi-tenant tables for customization and scale out across our
 diverse customer schemas</li>
 <li> aggregation to build roll-up summaries</li>
 <li> secondary indexes to improve performance</li>
+</ul>
 <br/>
 <blockquote>"Apache Phoenix is the foundation of our big data stack, allowing us
 to run interactive queries against HBase data in a performant manner."</blockquote>
@@ -86,6 +110,13 @@ allows clean and maintainable code.<br/><br/>
 Cahana Ori, Director of Research and Development
 <br/></td></tr>
 
+</table>
+<!--End First Column-->
+</td>
+<td>
+<!--Second Column-->
+<table>
+
 <tr><td>
 <img src="images/using/ab.png"/>
 <br/><br/>
@@ -110,13 +141,6 @@ easier for our user to migrate there BI query onto HBase</li>
 Jaywong, Software Engineer
 <br/></td></tr>
 
-
-</table>
-<!--End First Column-->
-</td>
-<td>
-<!--Second Column-->
-<table>
 <tr><td>
 <img src="images/using/ebay.png"/>
 <br/><br/>
