@@ -49,6 +49,7 @@ Devaraj Das, Cofounder
 <br/><br/>
 In our Force.com platform, we rely on Apache Phoenix to run
 interactive queries against big data residing in HBase leveraging
+<br/><br/>
 <ul>
 <li> multi-tenant tables for customization and scale out across our
 diverse customer schemas</li>
