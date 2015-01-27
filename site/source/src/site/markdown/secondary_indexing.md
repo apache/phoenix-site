@@ -3,24 +3,21 @@
 Secondary indexes are an orthogonal way to access data from its primary access path. In HBase, you have a single index that is lexicographically sorted on 
 the primary row key. Access to records in any way other than through the primary row requires scanning over potentially all the rows in the table to test them against your filter. With secondary indexing, the columns you index form an alternate row key to allow point lookups and range scans along this new axis. Phoenix is particularly powerful in that we provide _covered_ indexes - we do not need to go back to the primary table once we have found the index entry. Instead, we bundle the data we care about right in the index rows, saving read-time overhead.
 
-Phoenix supports three types of indexing techniques: immutable, global, and local indexing.
-They are each useful in different scenarios and have their own failure profiles and performance characteristics.
+Phoenix supports two types of indexing techniques: global and local indexing.
+Each are useful in different scenarios and have their own failure profiles and performance characteristics.
 
-## Immutable Indexing
+## Global Indexing
+Global indexing targets _read heavy_, _low write_ uses cases. With global indexes, all the performance penalties for indexes occur at write time. We intercept the data table updates on write ([DELETE](language/index.html#delete), [UPSERT VALUES](language/index.html#upsert_values) and [UPSERT SELECT](language/index.html#upsert_select)), build the index update and then sent any necessary updates to all interested index tables. At read time, Phoenix will select the index table to use that will produce the fastest query time and directly scan it just like any other HBase table. By default, if a column is referenced in a query that isn't part of the index, the index will not be used for that query. The query may be hinted with the [INDEX hint](http://phoenix.apache.org/language/index.html#index_hint) to force a join back to the data table if it's known to have a good selectivity.
 
-Immutable indexing targets use cases that are _write once_, _append only_; this is common in time-series data, where you log once, but read multiple times. In this case, the indexing is managed entirely on the client - either we successfully write all the primary and index data or we return a failure to the client. Since once written, rows are never updated, no incremental index maintenance is required making them perform very well. This reduces the overhead of secondary indexing at write time. However, keep in mind that immutable indexing are only applicable in a limited set of use cases.
+## Local Indexing
+Local indexing targets _write heavy_, _space constrained_ use cases. With local indexes index data and table data are co-reside at same server so no network overhead during writes and reads. Local indexes can be used even when the query isn't fully covered (i.e. Phoenix automatically retrieve the columns not in the index through point gets against the data table). Unlike global indexes, all local indexes of a table are stored in a single, separate shared table. At read time when the local index is used, every region must be examined for the data as the exact region location of index data cannot be predetermined. Thus some overhead occurs at read-time.
 
-One restriction of immutable indexes is that rows from the data table may not be deleted. Instead, the only way to delete rows is to drop the entire data table. This is likely to change once [PHOENIX-619](https://issues.apache.org/jira/browse/PHOENIX-619) is implemented.
+## Write-once/Append-only Data
+For a table in which the data is only written once and never updated in-place, certain optimizations may be made to reduce the write-time overhead for incremental maintenance. This is common with time-series data such as log or event data, where once a row is written, it will never be updated.  To take advantage of these optimizations, declare your table as immutable by adding the <code>IMMUTABLE_ROWS=true</code> property to your DDL statement:
 
-## Mutable Indexing
+    CREATE TABLE my_table (k VARCHAR PRIMARY KEY, v VARCHAR) IMMUTABLE_ROWS=true;
 
-If a column values of the same row changes, you must use mutable indexing to ensure that your index is properly maintained. There are two types of mutable indexes: global and local. From a functional standpoint, these are nearly identical with the difference being in their performance characteristics and tradeoffs.
-
-### Global Indexing
-Global indexing targets _read heavy_, _low write_ uses cases. With global indexes, all the performance penalties for indexes occur at write time. We intercept the data table updates on write ([DELETE](language/index.html#delete), [UPSERT VALUES](language/index.html#upsert_values) and [UPSERT SELECT](language/index.html#upsert_select)), build the index update and then sent any necessary updates to all interested index tables. At read time, Phoenix will select the index table to use that will produce the fastest query time and directly scan it just like any other HBase table. Note, however, if a column is referenced in a query that isn't part of the index, the index will not be used for that query.
-
-### Local Indexing
-Local indexing targets _write heavy_, _space constrained_ use cases. With local indexes index data and table data are co-reside at same server so no network overhead during writes and reads. Local indexes can be used even when the query isn't fully covered i.e. Phoenix automatically retrieve the columns not in the index through point gets against the data table. Unlike global indexes all local indexes data of a table are stored in a separate shared table. At read time when the local index is used, every region must be examined for the data as the exact region location of index data cannot be predetermined which incurs some overhead.
+All indexes on a table declared with <code>IMMUTABLE_ROWS=true</code> are considered immutable (note that by default, tables are considered mutable). For global immutable indexes, the index is managed entirely on the client-side with Puts to the index table being generated as Puts to the data table occur. Local immutable indexes, on the other hand, are managed through coprocessors on the server-side.
 
 ## Examples
 
@@ -30,32 +27,55 @@ Given the schema shown here:
 you'd create a global index on the v1 column like this:
 
     CREATE INDEX my_index ON my_table (v1);
-while the equivalent local index would be created like this:
-
-    CREATE LOCAL INDEX my_index ON my_table (v1);
 A table may contain any number of indexes, but note that your write speed will drop as you add additional indexes.
 
-We can also include columns from the data table in the index apart from the indexed columns. This allows a global index to be used more frequently, as a global index will only be used if all columns referenced in the query are contained by it. This is not the case for local indexes.
+By default, a global index will not be used unless all of the columns referenced in the query are contained in the index.  For example, the following query would not use the index, because v2 is referenced in the query but not included in the index:
 
+    SELECT v2 FROM my_table WHERE v1 = 'foo';
+
+There are three means of getting an index to be used in this case:
+
+1. Create a _covered_ index by including v2 in the index:
+
+    <pre>
     CREATE INDEX my_index ON my_table (v1) INCLUDE (v2);
-In addition, multiple columns may be indexed and their values may be stored in ascending or descending order.
+    </pre>
+This will cause the v2 column value to be copied into the index and kept in synch as it changes. This will obviously increase the size of the index.
+2. Hint the query to force it to use the index:
+
+    <pre>
+    SELECT /*+ INDEX(my_table my_index) */ v2 FROM my_table WHERE v1 = 'foo';
+    </pre>
+This will cause each data row to be retrieved when the index is traversed to find the missing v2 column value. This hint should only be used if you know that the index has good selective (i.e. a small number of table rows have a value of 'foo' in this example), as otherwise you'll get better performance by the default behavior of doing a full table scan.
+3. Create a _local_ index:
+
+    <pre>
+    CREATE LOCAL INDEX my_index ON my_table (v1);
+    </pre>
+Unlike global indexes, local indexes *will* use an index even when all columns referenced in the query are not contained in the index. This is done by default for local indexes because we know that the table and index data coreside on the same region server thus ensuring the lookup is local.
+
+###Index Sort Order
+Multiple columns may be indexed and their values may be stored in ascending or descending order.
 
     CREATE INDEX my_index ON my_table (v2 DESC, v1) INCLUDE (v3);
-Finally, just like with the <code>CREATE TABLE</code> statement, the <code>CREATE INDEX</code> statement may pass through properties to apply to the underlying HBase table, including the ability to salt it:
+
+###Index Table Properties
+Just like with the <code>CREATE TABLE</code> statement, the <code>CREATE INDEX</code> statement may pass through properties to apply to the underlying HBase table, including the ability to salt it:
 
     CREATE INDEX my_index ON my_table (v2 DESC, v1) INCLUDE (v3)
         SALT_BUCKETS=10, DATA_BLOCK_ENCODING='NONE';
 Note that if the primary table is salted, then the index is automatically salted in the same way for global indexes. In addition, the MAX_FILESIZE for the index is adjusted down, relative to the size of the primary versus index table. For more on salting see [here](salted.html). With local indexes, on the other hand, specifying SALT_BUCKETS is not allowed.
 
+###Index Removal
 To drop an index, you'd issue the following statement:
     DROP INDEX my_index ON my_table
 
 If an indexed column is dropped in the data table, the index will automatically be dropped. In addition, if a covered column is dropped in the data table, it will be automatically dropped from the index as well.
 
-To use immutable indexing, supply an <code>IMMUTABLE_ROWS=true</code> property when you create your table like this:
+To take advantage of the performance optimization for immutable indexing, supply an <code>IMMUTABLE_ROWS=true</code> property when you create your table like this:
 
     CREATE TABLE my_table (k VARCHAR PRIMARY KEY, v VARCHAR) IMMUTABLE_ROWS=true;
-In that case, all indexes on the table are immutable indexes and local indexes are not allowed.
+In that case, all indexes on the table are immutable indexes.
 
 If you have an existing table that you'd like to switch from immutable indexing to mutable indexing, use the <code>ALTER TABLE</code> command as show below:
 
