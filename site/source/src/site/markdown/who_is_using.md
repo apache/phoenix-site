@@ -179,7 +179,7 @@ infrastructure gives us the ability to scale our ad-hoc query needs.
 Andrey Gusev, Tech Lead, Machine Learning Infrastructure
 </td></tr>
 
-<tr><td>
+<tr><td><br/>
 <img src="images/using/ng.png"/>
 <br/><br/>
 
