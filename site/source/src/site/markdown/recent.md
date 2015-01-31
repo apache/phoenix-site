@@ -4,6 +4,7 @@ As items are implemented from our road map, they are moved here to track the pro
 
 1. **[Statistics Collection](update_statistics.html)**. Collects the statistics for a table to improve query parallelization. **Available in our 3.2/4.2 release**
 2. **[Join Improvements](joins.html)**. Improve existing hash join implementation.
+    * **[Many-to-many joins](https://issues.apache.org/jira/browse/PHOENIX-1179)**. Support joins where both sides are too large to fit into memory. **Available in our 3.3/4.3 release**
     * **[Optimize foreign key joins](https://issues.apache.org/jira/browse/PHOENIX-852)**. Optimize foreign key joins by leveraging our skip scan filter. **Available in our 3.2/4.2 release**
     * **[Semi/anti joins](https://issues.apache.org/jira/browse/PHOENIX-167)**. Support semi/anti subqueries through the standard [NOT] IN and [NOT] EXISTS keywords. **Available in our 3.2/4.2 release**
 3. **[Subqueries](subqueries.html)** Support independent subqueries and correlated subqueries in the WHERE clause as well as subqueries in the FROM clause. **Available in our 3.2/4.2 release**

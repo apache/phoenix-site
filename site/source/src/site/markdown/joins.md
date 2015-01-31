@@ -124,6 +124,12 @@ As an alternative to the [earlier example](#joining-tables-with-indices-eg1) whe
          GROUP BY ItemID) AS O
     ON Items.ItemID = O.ItemID;
 
+## Hash Join vs. Sort-Merge Join
+
+Basic hash join usually outperforms other types of join algorithms, but it has its limitations too, the most significant of which is the assumption that one of the relations must be small enough to fit into memory. Thus Phoenix now has both hash join and sort-merge join implemented to facilitate fast join operations as well as join between two large tables.
+
+Phoenix currently uses the hash join algorithm whenever possible since it is usually much faster. However we have the hint "USE_SORT_MERGE_JOIN" for forcing the usage of sort-merge join in a query. The choice between these two join algorithms, together with detecting the smaller relation for hash join, will be done automatically in future under the guidance provided by table statistics.
+
 ## Foreign Key to Primary Key Join Optimization<a name="foreign-key-to-primary-key-join-optimization"></a>
 
 Oftentimes a join will occur from a child table to a parent table, mapping the foreign key of the child table to the primary key of the parent. So instead of doing a full scan on the parent table, Phoenix will drive a skip-scan or a range-scan based on the foreign key values it got from the child table result.
@@ -165,17 +171,17 @@ W/O Optimization    |W/ Optimization
 --------------------|---------------
 8.1s                |0.4s
 
-However, there are times when the foreign key values from the child table account for a complete primary key space in the parent table, thus using skip-scans would only be slower not faster. In order to avoid such situations, Phoenix currently does a range-scan by default and only chooses to do a skip-scan when there is a child table filter in the WHERE clause or the ON clause, as in the above example. Table statistics will come to help making smarter choices between the two schemes in future. Yet you can always use hints "SKIP_SCAN_HASH_JOIN" or "RANGE_SCAN_HASH_JOIN" to change the default behavior.
+However, there are times when the foreign key values from the child table account for a complete primary key space in the parent table, thus using skip-scans would only be slower not faster. Yet you can always turn off the optimization by specifying hint "NO_CHILD_PARENT_OPTIMIZATION". Furthermore, table statistics will soon come in to help making smarter choices between the two schemes.
 
 ## Configuration
 
-The join functionality is now implemented through hash joins, which means one side of the join operator has to be small enough to fit into memory in order to be broadcast over all servers that have the data of concern from the other side of join. This limitation will be eliminated once [PHOENIX-1179](https://issues.apache.org/jira/browse/PHOENIX-1179) is implemented.
+As mentioned earlier, if we decide to use the hash join approach for our join queries, the prerequisite is that either of the relations can be small enough to fit into memory in order to be broadcast over all servers that have the data of concern from the other relation. And aside from making sure that the region server heap size is big enough to hold the smaller relation, we might also need to pay a attention to a few configuration parameters that are crucial to running hash joins.
 
-The servers-side caches are used to hold the hashed join-table results. The size and the living time of the caches are controlled by the following parameters. Note that a join-table can be a physical table, a view, a subquery, or a joined result of other join-tables in a multi-join query.
+The servers-side caches are used to hold the hash table built upon the smaller relation. The size and the living time of the caches are controlled by the following parameters. Note that a relation can be a physical table, a view, a subquery, or a joined result of other relations in a multiple-join query.
 
 1. phoenix.query.maxServerCacheBytes
-    * Maximum size (in bytes) of a join-table result before compression and conversion to a hash map.
-    * Attempting to hash a join-table result of a size bigger than this setting will result in a MaxServerCacheSizeExceededException.
+    * Maximum size (in bytes) of the raw results of a relation before being compressed and sent over to the region servers.
+    * Attempting to serializing the raw results of a relation with a size bigger than this setting will result in a MaxServerCacheSizeExceededException.
     * **Default: 104,857,600**
 2. phoenix.query.maxGlobalMemoryPercentage
     * Percentage of total heap memory (i.e. Runtime.getRuntime().maxMemory()) that all threads may use.
@@ -188,25 +194,25 @@ The servers-side caches are used to hold the hashed join-table results. The size
 
 See our [Configuration and Tuning Guide](tuning.html) for more details.
 
-Although changing parameters can sometimes be a solution to getting rid of the exceptions mentioned above, it is highly recommended that you first consider optimizing the join queries according to the information provided in the following chapter.
+Although changing parameters can sometimes be a solution to getting rid of the exceptions mentioned above, it is highly recommended that you first consider optimizing the join queries according to the information provided in the following section.
 
 ## Optimizing Your Query
 
-As mentioned in the previous chapter, it is most crucial to make sure that there will be enough memory for the join query execution. But other than rush to change the configuration immediately, sometimes all you need to do is to know a bit of the interiors and adjust the sequence of the tables that appear in your join query.
+Now that we know if using hash join it is most crucial to make sure that there will be enough memory for the query execution, but other than rush to change the configuration immediately, sometimes all you need to do is to know a bit of the interiors and adjust the sequence of the tables that appear in your join query.
 
-Below is a description of the default join order (without the presence of table statistics) and of which side of the query will be executed as an inner query and put into server cache:
+Below is a description of the default join order (without the presence of table statistics) and of which side of the query will be taken as the "smaller" relation and be put into server cache:
 
 1. _lhs_ INNER JOIN _rhs_
 
-    _rhs_ will be built as hash map in server cache.
+    _rhs_ will be built as hash table in server cache.
 
 2. _lhs_ LEFT OUTER JOIN _rhs_
 
-    _rhs_ will be built as hash map in server cache.
+    _rhs_ will be built as hash table in server cache.
 
 3. _lhs_ RIGHT OUTER JOIN _rhs_
 
-    _lhs_ will be built as hash map in server cache.
+    _lhs_ will be built as hash table in server cache.
 
 The join order is more complicated with multiple-join queries. You can try running "EXPLAIN _join\_query_" to look at the actual execution plan. For multiple-inner-join queries, Phoenix applies star-join optimization by default, which means the leading (left-hand-side) table will be scanned only once joining all right-hand-side tables at the same time. You can turn off this optimization by specifying the hint "NO_STAR_JOIN" in your query if the overall size of all right-hand-side tables would exceed the memory size limit.
 
@@ -240,15 +246,14 @@ The join order will be:
     2. SCAN Orders JOIN HASH[0]; CLOSE HASH[0] --> BUILD HASH[1]
     3. SCAN Items JOIN HASH[1] --> Final Resultset
 
-It is also worth mentioning that not the entire dataset of the table should be counted into the memory consumption. Instead, only those columns used by the query, and of only the records that satisfy the predicates will be built into the server hash map.
+It is also worth mentioning that not the entire dataset of the table should be counted into the memory consumption. Instead, only those columns used by the query, and of only the records that satisfy the predicates will be built into the server hash table.
 
 ## Limitations
 
-In our Phoenix 3.2 and 4.2 releases, joins have the following restrictions:
+In our Phoenix 3.3.0 and 4.3.0 releases, joins have the following restrictions and improvements to be made:
 
-1. FULL OUTER JOIN and CROSS JOIN are not supported.
-2. Equi-joins: Only equality (=) comparison is supported in joining conditions (conditions that specify the connecting rules between the two sides of the join operator). However there is no restriction on other predicates in the ON clause concerning only one side of the join operator.
-3. [PHOENIX-1179](https://issues.apache.org/jira/browse/PHOENIX-1179): Joins between two large tables that can neither fit into memory.
+1. [PHOENIX-1555](https://issues.apache.org/jira/browse/PHOENIX-1555): Fallback to many-to-many join if hash join fails due to insufficient memory.
+2. [PHOENIX-1556](https://issues.apache.org/jira/browse/PHOENIX-1556): Base hash join versus many-to-many decision on how many guideposts will be traversed for RHS table(s).
 
-Continuous efforts are being made to enhance Phoenix with more complete join functionalities. Please refer to our [Roadmap](roadmap.html) for more information.
+Continuous efforts are being made to bring in more performance enhancement for join queries based on table statistics. Please refer to our [Roadmap](roadmap.html) for more information.
 
