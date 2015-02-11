@@ -1,7 +1,18 @@
 # Secondary Indexing
 
-Secondary indexes are an orthogonal way to access data from its primary access path. In HBase, you have a single index that is lexicographically sorted on 
-the primary row key. Access to records in any way other than through the primary row requires scanning over potentially all the rows in the table to test them against your filter. With secondary indexing, the columns you index form an alternate row key to allow point lookups and range scans along this new axis. Phoenix is particularly powerful in that we provide _covered_ indexes - we do not need to go back to the primary table once we have found the index entry. Instead, we bundle the data we care about right in the index rows, saving read-time overhead.
+Secondary indexes are an orthogonal way to access data from its primary access path. In HBase, you have a single
+index that is lexicographically sorted on the primary row key. Access to records in any way other than through
+the primary row requires scanning over potentially all the rows in the table to test them against your filter.
+With secondary indexing, the columns or expressions you index form an alternate row key to allow point lookups
+and range scans along this new axis. Phoenix is particularly powerful in that we provide _covered_ indexes -
+we do not need to go back to the primary table once we have found the index entry. Instead, we bundle the data
+we care about right in the index rows, saving read-time overhead.
+
+## Functional Indexes
+Another useful feature that was introduced in the 4.3 release is functional indexes. Functional indexes  allow you to create
+an index not just on columns, but on an arbitrary expressions. Then when a query uses that expression, the index
+may be used to retrieve the results instead of the data table. For example, you could create an index on <code><small>UPPER(FIRST_NAME||' '||LAST_NAME)</small></code>
+to allow you to do case insensitive searches on the combined first name and last name of a person.
 
 Phoenix supports two types of indexing techniques: global and local indexing.
 Each are useful in different scenarios and have their own failure profiles and performance characteristics.
@@ -53,6 +64,15 @@ This will cause each data row to be retrieved when the index is traversed to fin
     CREATE LOCAL INDEX my_index ON my_table (v1);
     </pre>
 Unlike global indexes, local indexes *will* use an index even when all columns referenced in the query are not contained in the index. This is done by default for local indexes because we know that the table and index data coreside on the same region server thus ensuring the lookup is local.
+
+###Functional Index
+In addition to indexing on just a column, arbitrary expression may be indexed. For example:
+
+    CREATE INDEX upper_name_idx ON employee (UPPER(name)) INCLUDE(name);
+
+With this index in place, when the following query is issued, the index would be used instead of the data table to retrieve the results:
+
+    SELECT id, name FROM employee WHERE UPPER(NAME)='John Doe';
 
 ###Index Sort Order
 Multiple columns may be indexed and their values may be stored in ascending or descending order.
