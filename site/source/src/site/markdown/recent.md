@@ -2,6 +2,8 @@
 
 As items are implemented from our road map, they are moved here to track the progress we've made:
 
+1. **[Functional Indexes](secondary_indexing.html#Functional_Indexes)**. Enables an index to be defined as expressions as opposed to just column names and have the index be used when a query contains this expression.
+2. **[Map-reduce Integration](phoenix_mr.html)**. Support general map-reduce integration to Phoenix by implementing custom input and output formats.
 1. **[Statistics Collection](update_statistics.html)**. Collects the statistics for a table to improve query parallelization. **Available in our 3.2/4.2 release**
 2. **[Join Improvements](joins.html)**. Improve existing hash join implementation.
     * **[Many-to-many joins](https://issues.apache.org/jira/browse/PHOENIX-1179)**. Support joins where both sides are too large to fit into memory. **Available in our 3.3/4.3 release**
