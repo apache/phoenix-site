@@ -8,7 +8,7 @@
 
 	<head>
 		<meta charset="UTF-8" />
-		<title>Phoenix Downloads | Apache Phoenix</title>
+		<title>Installation | Apache Phoenix</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="description" content="" />
 		<meta http-equiv="content-language" content="en" />
@@ -34,7 +34,7 @@
 
 	</head>
 
-	<body class="page-download project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
+	<body class="page-installation project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
 
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
@@ -59,8 +59,8 @@
 									<li ><a href="mailing_list.html" title="Mailing Lists">Mailing Lists</a></li>
 									<li ><a href="source.html" title="Source Repository">Source Repository</a></li>
 									<li ><a href="issues.html" title="Issue Tracking">Issue Tracking</a></li>
-									<li class="active"><a href="" title="Download">Download</a></li>
-									<li ><a href="installation.html" title="Installation">Installation</a></li>
+									<li ><a href="download.html" title="Download">Download</a></li>
+									<li class="active"><a href="" title="Installation">Installation</a></li>
 									<li class="divider"/>
 									<li ><a href="who_is_using.html" title="Who is Using">Who is Using</a></li>
 									<li ><a href="contributing.html" title="How to Contribute">How to Contribute</a></li>
@@ -132,23 +132,70 @@
 			<div class="body-content">
 <div class="section"> 
  <div class="page-header">
-  <h2 id="Phoenix_Downloads">Phoenix Downloads</h2>
+  <h2 id="Installation">Installation</h2>
+ </div> 
+ <p>To install a pre-built phoenix, use these directions:</p> 
+ <ul> 
+  <li>Download and expand the latest phoenix-[version]-bin.tar.</li> 
+  <li>Add the phoenix-[version]-server.jar to the classpath of all HBase region server and master and remove any previous version. An easy way to do this is to copy it into the HBase lib directory (use phoenix-core-[version].jar for Phoenix 3.x)</li> 
+  <li>Restart HBase.</li> 
+  <li>Add the phoenix-[version]-client.jar to the classpath of any Phoenix client.</li> 
+ </ul> 
+ <div class="section"> 
+  <h3 id="Getting_Started">Getting Started</h3> 
+  <p>Wanted to get started quickly? Take a look at our <a href="faq.html">FAQs</a> and take our quick start guide <a href="Phoenix-in-15-minutes-or-less.html">here</a>.</p> 
+  <div class="section"> 
+   <h4 id="Command_Line">Command Line</h4> 
+   <p>A terminal interface to execute SQL from the command line is now bundled with Phoenix. To start it, execute the following from the bin directory:</p> 
+   <div class="source"> 
+    <pre>$ sqlline.py localhost
+</pre> 
+   </div> 
+   <p>To execute SQL scripts from the command line, you can include a SQL file argument like this:</p> 
+   <div class="source"> 
+    <pre>$ sqlline.py localhost ../examples/stock_symbol.sql
+</pre> 
+   </div> 
+   <p><img src="images/sqlline.png" alt="sqlline" /></p> 
+   <p>For more information, see the <a class="externalLink" href="http://www.hydromatic.net/sqlline/manual.html">manual</a>.</p> 
+   <div class="section"> 
+    <h5 id="Loading_Data">Loading Data</h5> 
+    <p>In addition, you can use the bin/psql.py to load CSV data or execute SQL scripts. For example:</p> 
+    <div class="source"> 
+     <pre>    $ psql.py localhost ../examples/web_stat.sql ../examples/web_stat.csv ../examples/web_stat_queries.sql
+</pre> 
+    </div> 
+    <p>Other alternatives include:</p> 
+    <ul> 
+     <li>Using our <a href="bulk_dataload.html">map-reduce based CSV loader</a> for bigger data sets</li> 
+     <li><a href="index.html#Mapping-to-an-Existing-HBase-Table">Mapping an existing HBase table to a Phoenix table</a> and using the <a href="language/index.html#upsert_select">UPSERT SELECT</a> command to populate a new table.</li> 
+     <li>Populating the table through our <a href="language/index.html#upsert_values">UPSERT VALUES</a> command.</li> 
+    </ul> 
+   </div> 
+  </div> 
+  <div class="section"> 
+   <h4 id="SQL_Client">SQL Client</h4> 
+   <p>If you’d rather use a client GUI to interact with Phoenix, download and install <a class="externalLink" href="http://squirrel-sql.sourceforge.net/">SQuirrel</a>. Since Phoenix is a JDBC driver, integration with tools such as this are seamless. Here are the setup steps necessary:</p> 
+   <ol style="list-style-type: decimal"> 
+    <li>Remove prior phoenix-[version]-client.jar from the lib directory of SQuirrel</li> 
+    <li>Start SQuirrel and add new driver to SQuirrel (Drivers -&gt; New Driver)</li> 
+    <li>In the “Extra Class Path” tab, add the path to the phoenix-[version-client.jar.</li> 
+    <li>In Add Driver dialog box, set Name to Phoenix, and set the Example URL to jdbc:phoenix:localhost.</li> 
+    <li>Press List Drivers button and org.apache.phoenix.jdbc.PhoenixDriver should be automatically populated in the Class Name textbox. Press OK to close this dialog.</li> 
+    <li>Switch to Alias tab and create the new Alias (Aliases -&gt; New Aliases)</li> 
+    <li>In the dialog box, Name: <i>any name</i>, Driver: Phoenix, User Name: <i>anything</i>, Password: <i>anything</i></li> 
+    <li>Construct URL as follows: jdbc:phoenix: <i>zookeeper quorum server</i>. For example, to connect to a local HBase use: jdbc:phoenix:localhost</li> 
+    <li>Press Test (which should succeed if everything is setup correctly) and press OK to close.</li> 
+    <li>Now double click on your newly created Phoenix alias and click Connect. Now you are ready to run SQL queries against Phoenix.</li> 
+   </ol> 
+   <p>Through SQuirrel, you can issue SQL statements in the SQL tab (create tables, insert data, run queries), and inspect table metadata in the Object tab (i.e. list tables, their columns, primary keys, and types).</p> 
+   <p><img src="images/squirrel.png" alt="squirrel" /></p> 
+  </div> 
  </div> 
  <div class="section"> 
-  <h3 id="Download_Latest_Phoenix_Binary_and_Source_Releases"><a class="externalLink" href="http://www.apache.org/dyn/closer.cgi/phoenix/"><u>Download Latest Phoenix Binary and Source Releases</u></a></h3> 
-  <p><a href="recent.html">List of New Features</a></p> 
-  <p><a class="externalLink" href="http://www.apache.org/dyn/closer.cgi/incubator/phoenix/">Download Previous Releases</a></p> 
-  <hr /> 
-  <p></p> 
- </div> 
- <div class="section"> 
-  <h3 id="HBase_Compatibility">HBase Compatibility</h3> 
-  <ul> 
-   <li>Phoenix 2.x - HBase 0.94.x</li> 
-   <li>Phoenix 3.x - HBase 0.94.x</li> 
-   <li>Phoenix 4.x - HBase 0.98.1+ 
-    <hr /> See also: <a href="installation.html">Installation Instructions</a></li> 
-  </ul> 
+  <h3 id="Samples">Samples</h3> 
+  <p>The best place to see samples are in our unit tests under src/test/java. The ones in the endToEnd package are tests demonstrating how to use all aspects of the Phoenix JDBC driver. We also have some examples in the examples directory.</p> 
+  <p><a class="externalLink" href="http://githalytics.com/forcedotcom/phoenix.git"><img src="https://cruel-carlota.pagodabox.com/33878dc7c0522eed32d2d54db9c59f78" alt="githalytics.com alpha" /></a></p> 
  </div> 
 </div>
 			</div>
@@ -193,11 +240,11 @@
 						<li >
 							<a href="issues.html" title="Issue Tracking">Issue Tracking</a>
 						</li>
-						<li class="active">
-							<a href="#" title="Download">Download</a>
-						</li>
 						<li >
-							<a href="installation.html" title="Installation">Installation</a>
+							<a href="download.html" title="Download">Download</a>
+						</li>
+						<li class="active">
+							<a href="#" title="Installation">Installation</a>
 						</li>
 						<li >
 							<a href="http:divider" title=""></a>
