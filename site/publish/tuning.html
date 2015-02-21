@@ -222,151 +222,156 @@
    <td>yyyy-MM-dd HH:mm:ss</td> 
   </tr> 
   <tr class="b"> 
+   <td><small>phoenix.query.dateFormatTimeZone</small></td> 
+   <td style="text-align: left;">A timezone id that specifies the default time zone in which date, time, and timestamp literals should be interpreted when interpreting string literals or using the <tt>TO_DATE</tt> function. A time zone id can be a timezone abbreviation such as “PST”, or a full name such as “America/Los_Angeles”, or a custom offset such as “GMT-9:00”. The time zone id “LOCAL” can also be used to interpret all date, time, and timestamp literals as being in the current timezone of the client.</td> 
+   <td>GMT</td> 
+  </tr> 
+  <tr class="a"> 
    <td><small>phoenix.query.numberFormat</small></td> 
    <td style="text-align: left;">Default pattern to use for conversion of a decimal number to/from a string, whether through the <tt>TO_CHAR(&lt;decimal-number&gt;)</tt> or <tt>TO_NUMBER(&lt;decimal-string&gt;)</tt> functions, or through <tt>resultSet.getString(&lt;decimal-column&gt;)</tt>. Default is #,##0.###</td> 
    <td>#,##0.###</td> 
   </tr> 
-  <tr class="a"> 
+  <tr class="b"> 
    <td><small>phoenix.mutate.maxSize</small></td> 
    <td style="text-align: left;">The maximum number of rows that may be batched on the client before a commit or rollback must be called.</td> 
    <td>500000</td> 
   </tr> 
-  <tr class="b"> 
+  <tr class="a"> 
    <td><small>phoenix.mutate.batchSize</small></td> 
    <td style="text-align: left;">The number of rows that are batched together and automatically committed during the execution of an <tt>UPSERT SELECT</tt> or <tt>DELETE</tt> statement. This property may be overridden at connection time by specifying the <tt>UpsertBatchSize</tt> property value. Note that the connection property value does not affect the batch size used by the coprocessor when these statements are executed completely on the server side.</td> 
    <td>1000</td> 
   </tr> 
-  <tr class="a"> 
+  <tr class="b"> 
    <td><small>phoenix.query.maxServerCacheBytes</small></td> 
    <td style="text-align: left;">Maximum size (in bytes) of a single sub-query result (usually the filtered result of a table) before compression and conversion to a hash map. Attempting to hash an intermediate sub-query result of a size bigger than this setting will result in a MaxServerCacheSizeExceededException. Default 100MB.</td> 
    <td>104857600</td> 
   </tr> 
-  <tr class="b"> 
+  <tr class="a"> 
    <td><small>phoenix.coprocessor.maxServerCacheTimeToLiveMs</small></td> 
    <td style="text-align: left;">Maximum living time (in milliseconds) of server caches. A cache entry expires after this amount of time has passed since last access. Consider adjusting this parameter when a server-side IOException(“Could not find hash cache for joinId”) happens. Getting warnings like “Earlier hash cache(s) might have expired on servers” might also be a sign that this number should be increased.</td> 
    <td>30000</td> 
   </tr> 
-  <tr class="a"> 
+  <tr class="b"> 
    <td><small>phoenix.query.useIndexes</small></td> 
    <td style="text-align: left;">Determines whether or not indexes are considered by the optimizer to satisfy a query. Default is true </td> 
    <td>true</td> 
   </tr> 
-  <tr class="b"> 
+  <tr class="a"> 
    <td><small>phoenix.index.mutableBatchSizeThreshold</small></td> 
    <td style="text-align: left;">Number of mutations in a batch beyond which index metadata will be sent as a separate RPC to each region server as opposed to included inline with each mutation. Defaults to 5. </td> 
    <td>5</td> 
   </tr> 
-  <tr class="a"> 
+  <tr class="b"> 
    <td><small>phoenix.schema.dropMetaData</small></td> 
    <td style="text-align: left;">Determines whether or not an HBase table is dropped when the Phoenix table is dropped. Default is true </td> 
    <td>true</td> 
   </tr> 
-  <tr class="b"> 
+  <tr class="a"> 
    <td><small>phoenix.groupby.spillable</small></td> 
    <td style="text-align: left;">Determines whether or not a GROUP BY over a large number of distinct values is allowed to spill to disk on the region server. If false, an InsufficientMemoryException will be thrown instead. Default is true </td> 
    <td>true</td> 
   </tr> 
-  <tr class="a"> 
+  <tr class="b"> 
    <td><small>phoenix.groupby.spillFiles</small></td> 
    <td style="text-align: left;">Number of memory mapped spill files to be used when spilling GROUP BY distinct values to disk. Default is 2 </td> 
    <td>2</td> 
   </tr> 
-  <tr class="b"> 
+  <tr class="a"> 
    <td><small>phoenix.groupby.maxCacheSize</small></td> 
    <td style="text-align: left;">Size in bytes of pages cached during GROUP BY spilling. Default is 100Mb </td> 
    <td>102400000</td> 
   </tr> 
-  <tr class="a"> 
+  <tr class="b"> 
    <td><small>phoenix.groupby.estimatedDistinctValues</small></td> 
    <td style="text-align: left;">Number of estimated distinct values when a GROUP BY is performed. Used to perform initial sizing with growth of 1.5x each time reallocation is required. Default is 1000 </td> 
    <td>1000</td> 
   </tr> 
-  <tr class="b"> 
+  <tr class="a"> 
    <td><small>phoenix.distinct.value.compress.threshold</small></td> 
    <td style="text-align: left;">Size in bytes beyond which aggregate operations which require tracking distinct value counts (such as COUNT DISTINCT) will use Snappy compression. Default is 1Mb </td> 
    <td>1024000</td> 
   </tr> 
-  <tr class="a"> 
+  <tr class="b"> 
    <td><small>phoenix.index.maxDataFileSizePerc</small></td> 
    <td style="text-align: left;">Percentage used to determine the MAX_FILESIZE for the shared index table for views relative to the data table MAX_FILESIZE. The percentage should be estimated based on the anticipated average size of an view index row versus the data row. Default is 50%. </td> 
    <td>50</td> 
   </tr> 
-  <tr class="b"> 
+  <tr class="a"> 
    <td><small>phoenix.coprocessor.maxMetaDataCacheTimeToLiveMs</small></td> 
    <td style="text-align: left;">Time in milliseconds after which the server-side metadata cache for a tenant will expire if not accessed. Default is 30mins </td> 
    <td>180000</td> 
   </tr> 
-  <tr class="a"> 
+  <tr class="b"> 
    <td><small>phoenix.coprocessor.maxMetaDataCacheSize</small></td> 
    <td style="text-align: left;">Max size in bytes of total server-side metadata cache after which evictions will begin to occur based on least recent access time. Default is 20Mb </td> 
    <td>20480000</td> 
   </tr> 
-  <tr class="b"> 
+  <tr class="a"> 
    <td><small>phoenix.client.maxMetaDataCacheSize</small></td> 
    <td style="text-align: left;">Max size in bytes of total client-side metadata cache after which evictions will begin to occur based on least recent access time. Default is 10Mb </td> 
    <td>10240000</td> 
   </tr> 
-  <tr class="a"> 
+  <tr class="b"> 
    <td><small>phoenix.sequence.cacheSize</small></td> 
    <td style="text-align: left;">Number of sequence values to reserve from the server and cache on the client when the next sequence value is allocated. Only used if not defined by the sequence itself. Default is 100 </td> 
    <td>100</td> 
   </tr> 
-  <tr class="b"> 
+  <tr class="a"> 
    <td><small>phoenix.clock.skew.interval</small></td> 
    <td style="text-align: left;">Delay interval(in milliseconds) when opening SYSTEM.CATALOG to compensate possible time clock skew when SYSTEM.CATALOG moves among region servers. </td> 
    <td>2000</td> 
   </tr> 
-  <tr class="a"> 
+  <tr class="b"> 
    <td><small>phoenix.index.failure.handling.rebuild</small></td> 
    <td style="text-align: left;">Boolean flag which turns on/off auto-rebuild a failed index from when some updates are failed to be updated into the index. </td> 
    <td>true</td> 
   </tr> 
-  <tr class="b"> 
+  <tr class="a"> 
    <td><small>phoenix.index.failure.handling.rebuild.interval</small></td> 
    <td style="text-align: left;">Time interval(in milliseconds) for index rebuild backend Job to check if there is an index to be rebuilt </td> 
    <td>10000</td> 
   </tr> 
-  <tr class="a"> 
+  <tr class="b"> 
    <td><small>phoenix.index.failure.handling.rebuild.overlap.time</small></td> 
    <td style="text-align: left;">Index rebuild job builds an index from when it failed - the time interval(in milliseconds) in order to create a time overlap to prevent missing updates when there exists time clock skew. </td> 
    <td>300000</td> 
   </tr> 
-  <tr class="b"> 
+  <tr class="a"> 
    <td><small>phoenix.query.rowKeyOrderSaltedTable</small></td> 
    <td style="text-align: left;">Whether or not a non aggregate query returns rows in row key order for salted tables. If this option is turned on, split points may not be specified at table create time, but instead the default splits on each salt bucket must be used. Default is true</td> 
    <td>true</td> 
   </tr> 
-  <tr class="a"> 
+  <tr class="b"> 
    <td><small>phoenix.connection.autoCommit</small></td> 
    <td style="text-align: left;">Whether or not a new connection has auto-commit enabled when it is created. Default is false.</td> 
    <td>false</td> 
   </tr> 
-  <tr class="b"> 
+  <tr class="a"> 
    <td><small>phoenix.table.default.store.nulls</small></td> 
    <td style="text-align: left;">The default value of the STORE_NULLS flag used for table creation. Default is false. Available starting from Phoenix 4.3.</td> 
    <td>false</td> 
   </tr> 
-  <tr class="a"> 
+  <tr class="b"> 
    <td><small><s>phoenix.query.targetConcurrency</s></small><br />Obsolete as of 3.2/4.2</td> 
    <td style="text-align: left;">Target concurrent threads to use for a query. It serves as a soft limit on the number of scans into which a query may be split. The value should not exceed the hard limit imposed by<tt> phoenix.query.maxConcurrency</tt>.</td> 
    <td>32</td> 
   </tr> 
-  <tr class="b"> 
+  <tr class="a"> 
    <td><small><s>phoenix.query.maxConcurrency</s></small><br />Obsolete as of 3.2/4.2</td> 
    <td style="text-align: left;">Maximum concurrent threads to use for a query. It servers as a hard limit on the number of scans into which a query may be split. A soft limit is imposed by <tt>phoenix.query.targetConcurrency</tt>.</td> 
    <td>64</td> 
   </tr> 
-  <tr class="a"> 
+  <tr class="b"> 
    <td><small><s>phoenix.query.maxStatsAge</s></small><br />Obsolete as of 3.2/4.2</td> 
    <td>The maximum age of stats in milliseconds after which they will no longer be used (i.e. the stats were not able to be updated in this amount of time and thus are considered too old). Default is 1 day.</td> 
    <td>1</td> 
   </tr> 
-  <tr class="b"> 
+  <tr class="a"> 
    <td><small><s>phoenix.query.statsUpdateFrequency</s></small><br />Obsolete as of 3.2/4.2</td> 
    <td style="text-align: left;">The frequency in milliseconds at which the stats for each table will be updated. Default is 15 min.</td> 
    <td>900000</td> 
   </tr> 
-  <tr class="a"> 
+  <tr class="b"> 
    <td><small><s>phoenix.query.maxIntraRegionParallelization</s></small><br />Obsolete as of 3.2/4.2</td> 
    <td style="text-align: left;">The maximum number of threads that will be spawned to process data within a single region during query execution</td> 
    <td>64</td> 
