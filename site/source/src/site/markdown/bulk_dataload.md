@@ -21,7 +21,7 @@ We will use a table with the following structure:
 
 ## Loading via PSQL
 
-The psql command is invoked via `psql.py` in the Phoenix bin directory. In order to use it to load CSV data, it is invoked by providing the connection information for your HBase cluster, the name of the table to load data into, and the path to the CSV file or files.
+The psql command is invoked via `psql.py` in the Phoenix bin directory. In order to use it to load CSV data, it is invoked by providing the connection information for your HBase cluster, the name of the table to load data into, and the path to the CSV file or files. Note that all CSV files to be loaded must have the '.csv' file extension (this is because arbitrary SQL scripts with the '.sql' file extension can also be supplied on the PSQL command line).
 
 To load the example data outlined above into HBase running on the local machine, run the following command:
 
