@@ -55,30 +55,28 @@ b) *stock_stats*
 	 
 ***Job Configuration***
  
-	 final Configuration configuration = HBaseConfiguration.create();
-	 
-	 final Job job = Job.getInstance(configuration, "phoenix-mr-job");
-
-	  // We can either specify a selectQuery or ignore it when we would like to retrieve all columns from the table.
-      final String selectQuery = "SELECT STOCK_NAME,RECORDING_YEAR,RECORDINGS_QUARTER FROM STOCK ";
-   	
-	  // StockWritable is the DBWritable class that enables us to process the Result of the above query.  
-   	  PhoenixMapReduceUtil.setInput(job, StockWritable.class, "STOCK",  selectQuery); 
-   	 
-   	  // Set the target Phoenix table and the columns.
-   	  PhoenixMapReduceUtil.setOutput(job, "STOCK_STATS", "STOCK_NAME,MAX_RECORDING");
-   	 
-   	  // The input key should always be NullWritable and the value is the custom DBWritable class . 
-      job.setMapperClass(StockMapper.class);
-   	  job.setReducerClass(StockReducer.class); 
-   	  job.setOutputFormatClass(PhoenixOutputFormat.class);
-   	  job.setMapOutputKeyClass(Text.class);
-   	  job.setMapOutputValueClass(DoubleWritable.class);
-   	  job.setOutputKeyClass(NullWritable.class);
-      job.setOutputValueClass(StockWritable.class); 
-        
-   	  TableMapReduceUtil.addDependencyJars(job);
-   	  job.waitForCompletion(true);
+	final Configuration configuration = HBaseConfiguration.create();
+	final Job job = Job.getInstance(configuration, "phoenix-mr-job");
+	
+    // We can either specify a selectQuery or ignore it when we would like to retrieve all the columns
+    final String selectQuery = "SELECT STOCK_NAME,RECORDING_YEAR,RECORDINGS_QUARTER FROM STOCK ";
+	
+    // StockWritable is the DBWritable class that enables us to process the Result of the above query
+	PhoenixMapReduceUtil.setInput(job, StockWritable.class, "STOCK",  selectQuery);  
+	
+    // Set the target Phoenix table and the columns
+	PhoenixMapReduceUtil.setOutput(job, "STOCK_STATS", "STOCK_NAME,MAX_RECORDING");
+	
+    job.setMapperClass(StockMapper.class);
+	job.setReducerClass(StockReducer.class); 
+	job.setOutputFormatClass(PhoenixOutputFormat.class);
+	
+	job.setMapOutputKeyClass(Text.class);
+	job.setMapOutputValueClass(DoubleWritable.class);
+	job.setOutputKeyClass(NullWritable.class);
+	job.setOutputValueClass(StockWritable.class); 
+	TableMapReduceUtil.addDependencyJars(job);
+	job.waitForCompletion(true);
  
 
  ***StockWritable***
@@ -138,13 +136,13 @@ b) *stock_stats*
 			double[] recordings = stockWritable.getRecordings();
 			final String stockName = stockWritable.getStockName();
 			double maxPrice = Double.MIN_VALUE;
- 			for(double recording : recordings) {
- 				if(maxPrice < recording) {
- 					maxPrice = recording;
- 				}
- 			}
- 			stock.set(stockName);
- 			price.set(maxPrice);
+			for(double recording : recordings) {
+				if(maxPrice < recording) {
+					maxPrice = recording;
+			  	}
+			}
+			stock.set(stockName);
+			price.set(maxPrice);
 			context.write(stock,price);
 		}
 	 
