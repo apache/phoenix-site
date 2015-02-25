@@ -478,7 +478,7 @@ DECIMAL
 DECIMAL
 </pre>
 syntax-end -->
-<p>Data type with fixed precision and scale. The maximum precision is 38 digits. Mapped to <code>java.math.BigDecimal</code>. The binary representation is binary comparable, variable length format. When used in a row key, it is terminated with a null byte unless it is the last column.</p>
+<p>Data type with fixed precision and scale. A user can specify precision and scale by expression <code>DECIMAL</code>(precision,scale) in a <code>DDL</code> statement, for example, <code>DECIMAL</code>(10,2). The maximum precision is 38 digits. Mapped to <code>java.math.BigDecimal</code>. The binary representation is binary comparable, variable length format. When used in a row key, it is terminated with a null byte unless it is the last column.</p>
 <p>Example:</p>
 <p class="notranslate">DECIMAL</p>
 

@@ -981,8 +981,8 @@ UNSIGNED_DOUBLE
 "Data Types","DECIMAL Type","
 DECIMAL
 ","
-Data type with fixed precision and scale. The maximum precision is 38 digits.
-Mapped to ""java.math.BigDecimal"". The binary representation is binary
+Data type with fixed precision and scale. A user can specify precision and scale by expression DECIMAL(precision,scale) in a DDL statement, for example, DECIMAL(10,2).
+The maximum precision is 38 digits. Mapped to ""java.math.BigDecimal"". The binary representation is binary
 comparable, variable length format. When used in a row key, it is terminated
 with a null byte unless it is the last column.
 ","
