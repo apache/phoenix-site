@@ -186,7 +186,7 @@ ALTER TABLE my_table SET IMMUTABLE_ROWS=true,DISABLE_WAL=true;
 
 "Commands","CREATE INDEX","
 CREATE INDEX [IF NOT EXISTS] indexName
-ON tableRef ( columnRef [ASC | DESC] [,...] )
+ON tableRef ( expression [ASC | DESC] [,...] )
 [ INCLUDE ( columnRef [,...] ) ]
 [indexOptions] [ SPLIT ON ( splitPoint [,...] ) ]
 ","
@@ -197,11 +197,13 @@ If a table has rows that are write-once and append-only, then the table may set 
 in the CREATE TABLE statement or afterwards in an ALTER TABLE statement). This reduces the overhead at write time to maintain the index.
 Otherwise, if this property is not set on the table, then incremental index maintenance will be performed on the server side when
 the data changes.
+As of the 4.3 release, functional indexes are supported which allow arbitrary expressions rather than solely column names to be indexed.
 ","
 CREATE INDEX my_idx ON sales.opportunity(last_updated_date DESC)
 CREATE INDEX my_idx ON log.event(created_date DESC) INCLUDE (name, payload) SALT_BUCKETS=10
 CREATE INDEX IF NOT EXISTS my_comp_idx ON server_metrics ( gc_time DESC, created_date DESC )
     DATA_BLOCK_ENCODING='NONE',VERSIONS=?,MAX_FILESIZE=2000000 split on (?, ?, ?)
+CREATE INDEX my_idx ON sales.opportunity(UPPER(contact_name))
 "
 
 "Commands","DROP INDEX","
@@ -365,7 +367,9 @@ INDEX | NO_INDEX | USE_INDEX_OVER_DATA_TABLE | USE_DATA_OVER_INDEX_TABLE
 ","
 Use the INDEX(<table_name> <index_name>...) to suggest which index to use for a given
 query. Double quotes may be used to surround a table_name and/or index_name to make
-them case sensitive.
+them case sensitive. As of the 4.3 release, this will force an index to be used, even
+if it doesn't contain all referenced columns, by joining back to the data table to
+retrieve any columns not contained by the index.
 
 Use the NO_INDEX hint to force the data table to be used for a query.
 
@@ -424,8 +428,7 @@ NO_STAR_JOIN
 "
 
 "Other Grammar","Column Def","
-columnRef dataType [ [ARRAY] '[' [number] ']' ]
-[[NOT] NULL] [PRIMARY KEY [ASC | DESC] ]
+columnRef dataType [[NOT] NULL] [PRIMARY KEY [ASC | DESC] ]
 ","
 Define a new primary key column. The column name is case insensitive by default and
 case sensitive if double quoted. The sort order of a primary key may be ascending (ASC)
@@ -758,9 +761,25 @@ NULL
 "
 
 "Other Grammar","Data Type","
-charType | varcharType | decimalType | tinyintType | smallintType | integerType | bigintType | floatType | doubleType | timestampType | dateType | timeType | unsignedTimestampType | unsignedDateType | unsignedTimeType | unsignedTinyintType | unsignedSmallintType | unsignedIntType | unsignedLongType | unsignedFloatType | unsignedDoubleType | binaryType | varbinaryType
+{ sqlDataType | hbaseDataType } [ ARRAY [ '[' [ dimensionInt ] ']' ] ]
 ","
-A type name.
+A type name optionally declared as an array. An array is mapped to ""java.sql.Array"".
+Only single dimension arrays are supported and varbinary arrays are not allowed.
+","
+CHAR(15)
+VARCHAR
+DECIMAL(10,2)
+DOUBLE
+DATE
+VARCHAR ARRAY
+CHAR(10) ARRAY [5]
+INTEGER []
+"
+
+"Other Grammar","SQL Data Type","
+charType | varcharType | decimalType | tinyintType | smallintType | integerType | bigintType | floatType | doubleType | timestampType | dateType | timeType | binaryType | varbinaryType
+","
+A standard SQL data type.
 ","
 TINYINT
 CHAR(15)
@@ -771,6 +790,16 @@ DOUBLE
 INTEGER
 BINARY(200)
 DATE
+"
+
+"Other Grammar","HBase Data Type","
+unsignedTimestampType | unsignedDateType | unsignedTimeType | unsignedTinyintType | unsignedSmallintType | unsignedIntType | unsignedLongType | unsignedFloatType | unsignedDoubleType
+","
+A type that maps to a native primitive HBase value serialized through the Bytes.toBytes() utility methods. Only positive values are allowed.
+","
+UNSIGNED_INT
+UNSIGNED_DATE
+UNSIGNED_LONG
 "
 
 "Other Grammar","String","
@@ -979,7 +1008,7 @@ UNSIGNED_DOUBLE
 "
 
 "Data Types","DECIMAL Type","
-DECIMAL
+DECIMAL [ (precisionInt, scaleInt) ]
 ","
 Data type with fixed precision and scale. A user can specify precision and scale by expression DECIMAL(precision,scale) in a DDL statement, for example, DECIMAL(10,2).
 The maximum precision is 38 digits. Mapped to ""java.math.BigDecimal"". The binary representation is binary
@@ -987,6 +1016,7 @@ comparable, variable length format. When used in a row key, it is terminated
 with a null byte unless it is the last column.
 ","
 DECIMAL
+DECIMAL(10,2)
 "
 
 "Data Types","BOOLEAN Type","
@@ -1126,6 +1156,18 @@ Raw variable length byte array.
 Mapped to ""byte[]"".
 ","
 VARBINARY
+"
+
+"Data Types","ARRAY","
+ARRAY [ '[' [ dimensionInt ] ']' ]
+","
+Mapped to ""java.sql.Array"". Every primitive type except for VARBINARY may be declared
+as an ARRAY. Only single dimensional arrays are supported.
+","
+VARCHAR ARRAY
+CHAR(10) ARRAY [5]
+INTEGER []
+INTEGER [100]
 "
 
 "Functions (Aggregate)","AVG","
@@ -1475,6 +1517,18 @@ terms, the result is the time in milliseconds since the epoch.
 This method returns a decimal number.
 ","
 TO_NUMBER('$123.33', '\u00A4###.##')
+"
+
+"Functions (Numeric)","RAND","
+RAND( [seedNumber] )
+","
+Function that produces a random, uniformly distributed double value between 0.0 (inclusive) and
+1.0 (exclusive). If a seed is provided, then the the returned value is identical across each
+invocation for the same row. If a seed is not provided, then the returned value is different for
+each invocation. The seed must be a constant.
+","
+RAND()
+RAND(5)
 "
 
 "Functions (String)","UPPER","
