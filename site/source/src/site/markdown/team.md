@@ -21,10 +21,10 @@ Maryann Xue | Intel | maryannxue@apache.org | PMC
 Michael Stack | Cloudera | stack@apache.org | PMC
 Mujtaba Chohan | Salesforce | mujtaba@apache.org | PMC
 Nick Dimiduk | Hortonworks | ndimiduk@apache.org | PMC
-Rajeshbabu Chintaguntla | Hortonworks | rajeshbabu@apache.org | Committer
+Rajeshbabu Chintaguntla | Hortonworks | rajeshbabu@apache.org | PMC
 Ramkrishna Vasudevan | Intel | ramkrishna@apache.org | PMC
-Ravi Magham | Cornerstone OnDemand | ravimagham@apache.org | Committer
-Samarth Jain | Salesforce | samarth@apache.org | Committer 
+Ravi Magham | Cornerstone OnDemand | ravimagham@apache.org | PMC
+Samarth Jain | Salesforce | samarth@apache.org | PMC 
 Simon Toens | Salesforce | stoens@apache.org | PMC
 Steven Noels | NG Data | stevenn@apache.org | PMC
 Thomas D'Silva | Salesforce | tdsilva@apache.org | Committer 
