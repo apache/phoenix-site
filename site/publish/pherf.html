@@ -8,7 +8,7 @@
 
 	<head>
 		<meta charset="UTF-8" />
-		<title>How to do a release | Apache Phoenix</title>
+		<title>Overview | Apache Phoenix</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="description" content="" />
 		<meta http-equiv="content-language" content="en" />
@@ -34,7 +34,7 @@
 
 	</head>
 
-	<body class="page-release project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
+	<body class="page-pherf project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
 
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
@@ -66,7 +66,7 @@
 									<li ><a href="contributing.html" title="How to Contribute">How to Contribute</a></li>
 									<li ><a href="develop.html" title="How to Develop">How to Develop</a></li>
 									<li ><a href="building_website.html" title="How to Update Website">How to Update Website</a></li>
-									<li class="active"><a href="" title="How to Release">How to Release</a></li>
+									<li ><a href="release.html" title="How to Release">How to Release</a></li>
 									<li class="divider"/>
 									<li ><a href="http://www.apache.org/licenses/" title="License" class="externalLink">License</a></li>
 									<li ><a href="http://www.apache.org/foundation/sponsorship.html" title="Sponsorship" class="externalLink">Sponsorship</a></li>
@@ -97,7 +97,7 @@
 									<li ><a href="bulk_dataload.html" title="Bulk Loading">Bulk Loading</a></li>
 									<li ><a href="tracing.html" title="Tracing">Tracing</a></li>
 									<li ><a href="update_statistics.html" title="Statistics Collection">Statistics Collection</a></li>
-									<li ><a href="pherf.html" title="Performance Testing">Performance Testing</a></li>
+									<li class="active"><a href="" title="Performance Testing">Performance Testing</a></li>
 									<li class="divider"/>
 									<li ><a href="phoenix_on_emr.html" title="Amazon EMR Support">Amazon EMR Support</a></li>
 									<li ><a href="flume.html" title="Apache Flume Plugin">Apache Flume Plugin</a></li>
@@ -131,35 +131,149 @@
 	<div class="row">
 		<div class="span12">
 			<div class="body-content">
-<div class="page-header">
- <h1>How to do a release</h1>
+<p align="center"><br /> <img src="images/logo/pherf.png" alt="" /></p> 
+<div class="section"> 
+ <div class="page-header">
+  <h2 id="Overview">Overview</h2>
+ </div> 
+ <p>Pherf is a standalone tool that can perform performance and functional testing through Phoenix. Pherf can be used both generate highly customized data sets and to measure performance of SQL against that data.</p> 
 </div> 
 <div class="section"> 
- <h2 id="Pre-Reqs">Pre-Reqs</h2> 
+ <h2 id="Build">Build</h2> 
+ <p>Building Pherf is done through Phoenix’s normal build Maven process. Pherf can be built using two profiles.</p> 
+ <ul> 
+  <li>Cluster ( <b>default</b> ) - This profile builds Pherf such that it can run along side an existing cluster. The dependencies are pulled from the HBase classpath.</li> 
+  <li>Standalone - This profile builds all of Pherf’s dependencies into a single standalone jar. The deps will be pulled from the versions specified in Phoenix’s pom.</li> 
+ </ul> 
+ <div class="section"> 
+  <h3 id="Build_all_of_Phoenix._This_includes_Pherfs_default_profile">Build all of Phoenix. This includes Pherf’s default profile</h3> 
+  <p><tt>mvn clean package -DskipTests</tt></p> 
+ </div> 
+ <div class="section"> 
+  <h3 id="Build_Phoenix_with_Pherfs_standalone_profile">Build Phoenix with Pherf’s standalone profile</h3> 
+  <p><tt>mvn clean package -P standalone -DskipTests</tt></p> 
+ </div> 
+</div> 
+<div class="section"> 
+ <h2 id="Installing">Installing</h2> 
+ <p>When Pherf is built using the Maven commands specified above, it will produce a <a class="externalLink" href="https://github.com/apache/phoenix/tree/master/phoenix-pherf">zip</a> file in the module’s target directory.</p> 
  <ol style="list-style-type: decimal"> 
-  <li>Make sure you have setup your user for release signing. Details <a class="externalLink" href="http://www.apache.org/dev/release-signing.html">http://www.apache.org/dev/release-signing.html</a>.</li> 
-  <li>Clone the branch locally from which you want to do a release.</li> 
-  <li>Set version to release and commit. Ex.: mvn versions:set -DnewVersion=4.2.0 -DgenerateBackupPoms=false</li> 
-  <li>Update CHANGES file</li> 
-  <li>Verify all pom.xml files in project have the correct release version (i.e. does not contain SNAPSHOT)</li> 
+  <li>Simply unpack this zip into the desired location.</li> 
+  <li>Edit the env.sh to include the required property values.</li> 
+  <li><tt>./pherf.sh -h</tt></li> 
+  <li>To test on a real cluster: <tt>./pherf.sh -drop all -l -q -z localhost -schemaFile .*user_defined_schema.sql -scenarioFile .*user_defined_scenario.xml</tt></li> 
+  <li>That’s it.</li> 
  </ol> 
 </div> 
 <div class="section"> 
- <h2 id="Command_for_building_binary_and_source_tars">Command for building binary and source tars</h2> 
+ <h2 id="Example_run_commands.">Example run commands.</h2> 
+ <div class="section"> 
+  <h3 id="List_all_scenario_files_available_to_run.">List all scenario files available to run.</h3> 
+  <p>$./pherf.sh -listFiles</p> 
+ </div> 
+ <div class="section"> 
+  <h3 id="Drop_all_existing_tables_load_and_query_data_specified_in_all_scenario_files.">Drop all existing tables, load and query data specified in all scenario files.</h3> 
+  <p>$./pherf.sh -drop all -l -q -z localhost </p> 
+ </div> 
+</div> 
+<div class="section"> 
+ <h2 id="Pherf_arguments:">Pherf arguments:</h2> 
+ <ul> 
+  <li>-h <i>Help</i> <br /></li> 
+  <li>-l <i>Apply schema and load data</i><br /></li> 
+  <li>-q <i>Executes Multi-threaded query sets and write results</i><br /></li> 
+  <li>-z [quorum] <i>Zookeeper quorum</i><br /></li> 
+  <li>-m <i>Enable monitor for statistics</i><br /></li> 
+  <li>-monitorFrequency [frequency in Ms] _Frequency at which the monitor will snopshot stats to log file. <br /></li> 
+  <li>-drop [pattern] <i>Regex drop all tables with schema name as PHERF. Example drop Event tables: -drop .<i>(EVENT).</i> Drop all: -drop .* or -drop all</i><br /></li> 
+  <li>-scenarioFile <i>Regex or file name of a specific scenario file to run.</i> <br /></li> 
+  <li>-schemaFile <i>Regex or file name of a specific schema file to run.</i> <br /></li> 
+  <li>-export Exports query results to CSV files in CSV_EXPORT directory <br /></li> 
+  <li>-diff Compares results with previously exported results <br /></li> 
+  <li>-hint <i>Executes all queries with specified hint. Example SMALL</i> <br /></li> 
+  <li>-rowCountOverride</li> 
+  <li>-rowCountOverride [number of rows] <i>Specify number of rows to be upserted rather than using row count specified in schema</i> &lt;/ br&gt;</li> 
+ </ul> 
+</div> 
+<div class="section"> 
+ <h2 id="Adding_Rules_for_Data_Creation">Adding Rules for Data Creation</h2> 
+ <p>Review <a href="/src/test/resources/scenario/test_scenario.xml">test_scenario.xml</a> for syntax examples.<br /></p> 
+ <ul> 
+  <li>Rules are defined as <tt>&lt;columns /&gt;</tt> and are applied in the order they appear in file.</li> 
+  <li>Rules of the same type override the values of a prior rule of the same type. If <tt>&lt;userDefined&gt;true&lt;/userDefined&gt;</tt> is set, rule will only apply override when type and name match the column name in Phoenix.</li> 
+  <li><tt>&lt;prefix&gt;</tt> tag is set at the column level. It can be used to define a constant string appended to the beginning of CHAR and VARCHAR data type values.</li> 
+  <li><b>Required field</b> Supported Phoenix types: VARCHAR, CHAR, DATE, DECIMAL, INTEGER 
+   <ul> 
+    <li>denoted by the <tt>&lt;type&gt;</tt> tag</li> 
+   </ul></li> 
+  <li>User defined true changes rule matching to use both name and type fields to determine equivalence. 
+   <ul> 
+    <li>Default is false if not specified and equivalence will be determined by type only. <b>An important note here is that you can still override rules without the user defined flag, but they will change the rule globally and not just for a specified column.</b></li> 
+   </ul></li> 
+  <li><b>Required field</b> Supported Data Sequences 
+   <ul> 
+    <li>RANDOM: Random value which can be bound by other fields such as length.</li> 
+    <li>SEQUENTIAL: Monotonically increasing long prepended to random strings. 
+     <ul> 
+      <li>Only supported on VARCHAR and CHAR types</li> 
+     </ul></li> 
+    <li>LIST: Means pick values from predefined list of values</li> 
+   </ul></li> 
+  <li><b>Required field</b> Length defines boundary for random values for CHAR and VARCHAR types. 
+   <ul> 
+    <li>denoted by the <tt>&lt;length&gt;</tt> tag</li> 
+   </ul></li> 
+  <li>Column level Min/Max value defines boundaries for numerical values. For DATES, these values supply a range between which values are generated. At the column level the granularity is a year. At a specific data value level, the granularity is down to the Ms. 
+   <ul> 
+    <li>denoted by the <tt>&lt;minValue&gt;</tt> tag</li> 
+    <li>denoted by the <tt>&lt;maxValue&gt;</tt> tag</li> 
+   </ul></li> 
+  <li>Null chance denotes the probability of generating a null value. From [0-100]. The higher the number, the more likely the value will be null. 
+   <ul> 
+    <li>denoted by <tt>&lt;nullChance&gt;</tt></li> 
+   </ul></li> 
+  <li>Name can either be any text or the actual column name in the Phoenix table. 
+   <ul> 
+    <li>denoted by the <tt>&lt;name&gt;</tt></li> 
+   </ul></li> 
+  <li>Value List is used in conjunction with LIST data sequences. Each entry is a DataValue with a specified value to be used when generating data. 
+   <ul> 
+    <li>Denoted by the <tt>&lt;valueList&gt;&lt;datavalue&gt;&lt;value/&gt;&lt;/datavalue&gt;&lt;/valueList&gt;</tt> tags</li> 
+    <li>If the distribution attribute on the datavalue is set, values will be created according to that probability.</li> 
+    <li>When distribution is used, values must add up to 100%.</li> 
+    <li>If distribution is not used, values will be randomly picked from the list with equal distribution.</li> 
+   </ul></li> 
+ </ul> 
+</div> 
+<div class="section"> 
+ <h2 id="Defining_Scenario">Defining Scenario</h2> 
+ <p>Scenario can have multiple querySets. Consider following example, concurrency of 1-4 means that each query will be executed starting with concurrency level of 1 and reach up to maximum concurrency of 4. Per thread, query would be executed to a minimum of 10 times or 10 seconds (whichever comes first). QuerySet by defult is executed serially but you can change executionType to PARALLEL so queries are executed concurrently. Scenarios are defined in XMLs stored in the resource directory.</p> 
  <div class="source"> 
-  <pre>$ cd dev; ./make_rc.sh
+  <pre>&lt;scenarios&gt;
+    &lt;!--Minimum of executionDurationInMs or numberOfExecutions. Which ever is reached first --&gt;
+    &lt;querySet concurrency=&quot;1-4&quot; executionType=&quot;PARALLEL&quot; executionDurationInMs=&quot;10000&quot; numberOfExecutions=&quot;10&quot;&gt;
+        &lt;query id=&quot;q1&quot; verifyRowCount=&quot;false&quot; statement=&quot;select count(*) from PHERF.TEST_TABLE&quot;/&gt;
+        &lt;query id=&quot;q2&quot; tenantId=&quot;1234567890&quot; ddl=&quot;create view if not exists 
+        myview(mypk varchar not null primary key, mycol varchar)&quot; statement=&quot;upsert select ...&quot;/&gt;
+    &lt;/querySet&gt;
+    &lt;querySet concurrency=&quot;3&quot; executionType=&quot;SERIAL&quot; executionDurationInMs=&quot;20000&quot; numberOfExecutions=&quot;100&quot;&gt;
+        &lt;query id=&quot;q3&quot; verifyRowCount=&quot;false&quot; statement=&quot;select count(*) from PHERF.TEST_TABLE&quot;/&gt;
+        &lt;query id=&quot;q4&quot; statement=&quot;select count(*) from PHERF.TEST_TABLE WHERE TENANT_ID='00D000000000062'&quot;/&gt;
+    &lt;/querySet&gt;
+&lt;/scenario&gt;
+        
 </pre> 
  </div> 
- <p>Follow the instructions. Signed binary and source tars will be generated in <i>release</i> directory. As last part of this script, it will ask if you want to tag branch at this time. If all looks good then svn commit binary and source tars to <a class="externalLink" href="https://dist.apache.org/repos/dist/dev/phoenix">https://dist.apache.org/repos/dist/dev/phoenix</a> </p> 
 </div> 
 <div class="section"> 
- <h2 id="Final_steps">Final steps</h2> 
- <ol style="list-style-type: decimal"> 
-  <li>Initiate vote email. See example <a class="externalLink" href="http://mail-archives.apache.org/mod_mbox/phoenix-dev/201408.mbox/%3cCAAF1JdgVOLLVVuymR6hzo9PxGeKOa_fz2ZAZX4C6R4TCSaiZcg@mail.gmail.com%3e">here</a></li> 
-  <li>Svn commit binary and source tars to <a class="externalLink" href="https://dist.apache.org/repos/dist/dev/phoenix">https://dist.apache.org/repos/dist/dev/phoenix</a></li> 
-  <li>Once voting is successful, copy artifacts to <a class="externalLink" href="https://dist.apache.org/repos/dist/release/phoenix">https://dist.apache.org/repos/dist/release/phoenix</a> and set version back to SNAPSHOT and commit. Ex.: mvn versions:set -DnewVersion=4.3.0-SNAPSHOT -DgenerateBackupPoms=false</li> 
-  <li>Set git tag -a v4.2.0 release_sha -m “Phoenix v4.2.0”</li> 
- </ol> 
+ <h2 id="Results">Results</h2> 
+ <p>Results are written real time in <i>results</i> directory. Open the result that is saved in .jpg format for real time visualization.</p> 
+</div> 
+<div class="section"> 
+ <h2 id="Testing">Testing</h2> 
+ <p>Default quorum is localhost. If you want to override set the system variable.</p> 
+ <p>Run unit tests: <tt>mvn test -DZK_QUORUM=localhost</tt><br /> Run a specific method: <tt>mvn -Dtest=ClassName#methodName test</tt> <br /></p> 
+ <p>More to come…</p> 
 </div>
 			</div>
 		</div>
@@ -224,8 +338,8 @@
 						<li >
 							<a href="building_website.html" title="How to Update Website">How to Update Website</a>
 						</li>
-						<li class="active">
-							<a href="#" title="How to Release">How to Release</a>
+						<li >
+							<a href="release.html" title="How to Release">How to Release</a>
 						</li>
 						<li >
 							<a href="http:divider" title=""></a>
@@ -307,8 +421,8 @@
 						<li >
 							<a href="update_statistics.html" title="Statistics Collection">Statistics Collection</a>
 						</li>
-						<li >
-							<a href="pherf.html" title="Performance Testing">Performance Testing</a>
+						<li class="active">
+							<a href="#" title="Performance Testing">Performance Testing</a>
 						</li>
 						<li >
 							<a href="http:divider" title=""></a>
