@@ -37,7 +37,7 @@ Ok, great! Just follow our [install instructions](download.html#Installation):
 * copy the phoenix jar into the HBase lib directory of every region server
 * restart the region servers
 * add the phoenix client jar to the classpath of your HBase client
-* download and [setup SQuirrel](download.html#SQL-Client) as your SQL client so you can issue adhoc SQL against your HBase cluster
+* download and [setup SQuirrel](installation.html#SQL_Client) as your SQL client so you can issue adhoc SQL against your HBase cluster
 
 *<strong>I don't want to download and setup anything else!</strong>*<br/>
 Ok, fair enough - you can create your own SQL scripts and execute them using our command line tool instead. Let's walk through an example now. In the bin directory of your install location:
