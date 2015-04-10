@@ -28,3 +28,4 @@ Samarth Jain | Salesforce | samarth@apache.org | PMC
 Simon Toens | Salesforce | stoens@apache.org | PMC
 Steven Noels | NG Data | stevenn@apache.org | PMC
 Thomas D'Silva | Salesforce | tdsilva@apache.org | Committer 
+Cody Marcel | Salesforce | codymarcel@apache.org | Committer 
