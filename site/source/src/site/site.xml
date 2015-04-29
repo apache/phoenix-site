@@ -36,6 +36,7 @@
     <bottomNav maxSpan="9" >
         <column>About</column>
         <column>Using</column>
+        <column>Features</column>
         <column>Reference</column>
     </bottomNav>
     <theme>bootswatch-flatly</theme>
