@@ -5,6 +5,7 @@ echo ""
 
 echo "BUILDING LANGUAGE REFERENCE"
 echo "==========================="
+rm -rf /site/publish/language
 cd phoenix-docs
 ./build.sh docs
 echo ""

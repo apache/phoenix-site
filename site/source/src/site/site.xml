@@ -31,6 +31,7 @@
 
   <custom>
     <reflowSkin>
+    <protocolRelativeURLs>true</protocolRelativeURLs>
     <smoothScroll>true</smoothScroll>
     <bottomNav maxSpan="9" >
         <column>About</column>
@@ -83,7 +84,14 @@
             <item href="building.html" name="Building"/>
             <item href="tuning.html" name="Tuning"/>
             <item href="upgrading.html" name="Upgrading"/>
+            <item href="pherf.html" name="Performance Testing"/>
             <item href="http:divider" name=""/>
+            <item href="phoenix_on_emr.html" name="Amazon EMR Support"/>
+            <item href="flume.html" name="Apache Flume Plugin"/>
+            <item href="pig_integration.html" name="Apache Pig Integration"/>
+            <item href="phoenix_mr.html" name="Map Reduce Integration"/>
+        </menu>
+        <menu name="Features">
             <item href="secondary_indexing.html" name="Secondary Indexes"/>
             <item href="joins.html" name="Joins"/>
             <item href="subqueries.html" name="Subqueries"/>
@@ -98,13 +106,7 @@
             <item href="bulk_dataload.html" name="Bulk Loading"/>
             <item href="tracing.html" name="Tracing"/>
             <item href="update_statistics.html" name="Statistics Collection"/>
-            <item href="pherf.html" name="Performance Testing"/>
             <item href="server.html" name="Query Server"/>
-            <item href="http:divider" name=""/>
-            <item href="phoenix_on_emr.html" name="Amazon EMR Support"/>
-            <item href="flume.html" name="Apache Flume Plugin"/>
-            <item href="pig_integration.html" name="Apache Pig Integration"/>
-            <item href="phoenix_mr.html" name="Map Reduce Integration"/>
         </menu>
         <menu name="Reference">
             <item href="language/index.html" name="Grammar"/>
