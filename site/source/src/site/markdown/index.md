@@ -1,7 +1,5 @@
 <br/>
-<p align="right">
-<a href="https://twitter.com/ApachePhoenix" class="twitter-follow-button" data-show-count="false" data-dnt="true">Follow @ApachePhoenix</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
-</p>
+<br/>
 <p align="center">
 <img src="images/phoenix-logo-small.png"/>
 <h4 align="center">High performance relational database layer over HBase for low latency applications</h4> 
@@ -48,7 +46,8 @@
 <span id="alerts" style="background-color:#ffc; text-align: center;display: block;padding:10px; border-bottom: solid 1px #cc9">
 <strong>News:</strong>
 Recently added: <a href="news.html">Who is using Apache Phoenix?</a> (Jan 20, 2015)
-</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+<a href='https://twitter.com/ApachePhoenix'><img title="Follow Apache Phoenix on Twitter" src="images/follow.png"/></a></span>
 
 <hr/>
 
