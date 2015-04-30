@@ -45,7 +45,7 @@
 
 <span id="alerts" style="background-color:#ffc; text-align: center;display: block;padding:10px; border-bottom: solid 1px #cc9">
 <strong>News:</strong>
-Recently added: <a href="news.html">Who is using Apache Phoenix?</a> (Jan 20, 2015)
+Recently added: <a href="news.html">TPC in Apache Phoenix</a> (April 24, 2015)
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
 <a href='https://twitter.com/ApachePhoenix'><img title="Follow Apache Phoenix on Twitter" src="images/follow.png"/></a></span>
 
