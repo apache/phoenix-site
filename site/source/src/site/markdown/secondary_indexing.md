@@ -146,16 +146,24 @@ You will need to add the following parameters to `hbase-site.xml` on each region
   <name>hbase.regionserver.wal.codec</name>
   <value>org.apache.hadoop.hbase.regionserver.wal.IndexedWALEditCodec</value>
 </property>
+```
+
+The above property enables custom WAL edits to be written, ensuring proper writing/replay of the index updates. This codec supports the usual host of WALEdit options, most notably WALEdit compression.
+
+```
 <property>
   <name>hbase.region.server.rpc.scheduler.factory.class</name>
-  <value>org.apache.phoenix.hbase.index.ipc.PhoenixIndexRpcSchedulerFactory</value>
-  <description>Factory to create the Phoenix RPC Scheduler that knows to put index updates into index queues</description>
+  <value>org.apache.hadoop.hbase.ipc.PhoenixRpcSchedulerFactory</value>
+  <description>Factory to create the Phoenix RPC Scheduler that uses separate queues for index and metadata updates</description>
+</property>
+<property>
+  <name>hbase.rpc.controllerfactory.class</name>
+  <value>org.apache.hadoop.hbase.ipc.controller.ServerRpcControllerFactory</value>
+  <description>Factory to create the Phoenix RPC Scheduler that uses separate queues for index and metadata updates</description>
 </property>
 ```
 
-The first property enables custom WAL edits to be written, ensuring proper writing/replay of the index updates. This codec supports the usual host of WALEdit options, most notably WALEdit compression.
-
-The second property prevents deadlocks from occurring during index maintenance for global indexes (HBase 0.98.4+ only) by ensuring index updates are processed with a higher priority than data updates.
+The above properties prevent deadlocks from occurring during index maintenance for global indexes (HBase 0.98.4+ and Phoenix 4.3.1+ only) by ensuring index updates are processed with a higher priority than data updates. It also prevents deadlocks by ensuring metadata rpc calls are processed with a higher priority than data rpc calls.
 
 Local indexing also requires special configurations in the master to ensure data table and local index regions co-location.
 
