@@ -85,3 +85,22 @@ Both the PSQL loader and MapReduce loader support loading array values with the 
     2,3:4,5
 
 To load this file, the default delimiter (comma) would be used, and the array delimiter (colon) would be supplied with the parameter `-a ':'`.
+
+## A note on separator characters
+
+The default separator character for both loaders is a comma (,). A common separator for input files is the tab character, 
+which can tricky to supply on the command line. A common mistake is trying to supply a tab as the separator by typing the following
+
+    -d '\t'
+
+This will not work, as the shell will supply this value as two characters (a backslash and a 't') to Phoenix.
+
+Two ways in which you can supply a special character such as a tab on the command line are as follows:
+
+1. By preceding the string representation of a tab with a dollar sign:
+
+    -d $'\\t'
+
+2. By entering the separator as Ctrl+v, and then pressing the tab key:
+    
+    -d '^v&lt;tab&gt;'
