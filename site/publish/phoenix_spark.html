@@ -8,7 +8,7 @@
 
 	<head>
 		<meta charset="UTF-8" />
-		<title>Overview | Apache Phoenix</title>
+		<title>Apache Spark Integration | Apache Phoenix</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="description" content="" />
 		<meta http-equiv="content-language" content="en" />
@@ -34,7 +34,7 @@
 
 	</head>
 
-	<body class="page-pherf project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
+	<body class="page-phoenix_spark project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
 
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
@@ -82,13 +82,13 @@
 									<li ><a href="building.html" title="Building">Building</a></li>
 									<li ><a href="tuning.html" title="Tuning">Tuning</a></li>
 									<li ><a href="upgrading.html" title="Upgrading">Upgrading</a></li>
-									<li class="active"><a href="" title="Performance Testing">Performance Testing</a></li>
+									<li ><a href="pherf.html" title="Performance Testing">Performance Testing</a></li>
 									<li class="divider"/>
 									<li ><a href="phoenix_on_emr.html" title="Amazon EMR Support">Amazon EMR Support</a></li>
 									<li ><a href="flume.html" title="Apache Flume Plugin">Apache Flume Plugin</a></li>
 									<li ><a href="pig_integration.html" title="Apache Pig Integration">Apache Pig Integration</a></li>
 									<li ><a href="phoenix_mr.html" title="Map Reduce Integration">Map Reduce Integration</a></li>
-									<li ><a href="phoenix_spark.html" title="Phoenix Spark Integration">Phoenix Spark Integration</a></li>
+									<li class="active"><a href="" title="Phoenix Spark Integration">Phoenix Spark Integration</a></li>
 								</ul>
 							</li>
 							<li class="dropdown">
@@ -137,149 +137,158 @@
 	<div class="row">
 		<div class="span12">
 			<div class="body-content">
-<p align="center"><br /> <img src="images/logo/pherf.png" alt="" /></p> 
-<div class="section"> 
- <div class="page-header">
-  <h2 id="Overview">Overview</h2>
- </div> 
- <p>Pherf is a standalone tool that can perform performance and functional testing through Phoenix. Pherf can be used both generate highly customized data sets and to measure performance of SQL against that data.</p> 
+<div class="page-header">
+ <h1>Apache Spark Integration</h1>
 </div> 
+<p>phoenix-spark extends Phoenix’s MapReduce support to allow Spark to load Phoenix tables as RDDs or DataFrames and enables persisting RDDs of Tuples back to Phoenix.</p> 
 <div class="section"> 
- <h2 id="Build">Build</h2> 
- <p>Building Pherf is done through Phoenix’s normal build Maven process. Pherf can be built using two profiles.</p> 
- <ul> 
-  <li>Cluster ( <b>default</b> ) - This profile builds Pherf such that it can run along side an existing cluster. The dependencies are pulled from the HBase classpath.</li> 
-  <li>Standalone - This profile builds all of Pherf’s dependencies into a single standalone jar. The deps will be pulled from the versions specified in Phoenix’s pom.</li> 
- </ul> 
- <div class="section"> 
-  <h3 id="Build_all_of_Phoenix._This_includes_Pherfs_default_profile">Build all of Phoenix. This includes Pherf’s default profile</h3> 
-  <p><tt>mvn clean package -DskipTests</tt></p> 
- </div> 
- <div class="section"> 
-  <h3 id="Build_Phoenix_with_Pherfs_standalone_profile">Build Phoenix with Pherf’s standalone profile</h3> 
-  <p><tt>mvn clean package -P standalone -DskipTests</tt></p> 
- </div> 
-</div> 
-<div class="section"> 
- <h2 id="Installing">Installing</h2> 
- <p>When Pherf is built using the Maven commands specified above, it will produce a <a class="externalLink" href="https://github.com/apache/phoenix/tree/master/phoenix-pherf">zip</a> file in the module’s target directory.</p> 
- <ol style="list-style-type: decimal"> 
-  <li>Simply unpack this zip into the desired location.</li> 
-  <li>Edit the env.sh to include the required property values.</li> 
-  <li><tt>./pherf.sh -h</tt></li> 
-  <li>To test on a real cluster: <tt>./pherf.sh -drop all -l -q -z localhost -schemaFile .*user_defined_schema.sql -scenarioFile .*user_defined_scenario.xml</tt></li> 
-  <li>That’s it.</li> 
- </ol> 
-</div> 
-<div class="section"> 
- <h2 id="Example_run_commands.">Example run commands.</h2> 
- <div class="section"> 
-  <h3 id="List_all_scenario_files_available_to_run.">List all scenario files available to run.</h3> 
-  <p>$./pherf.sh -listFiles</p> 
- </div> 
- <div class="section"> 
-  <h3 id="Drop_all_existing_tables_load_and_query_data_specified_in_all_scenario_files.">Drop all existing tables, load and query data specified in all scenario files.</h3> 
-  <p>$./pherf.sh -drop all -l -q -z localhost </p> 
- </div> 
-</div> 
-<div class="section"> 
- <h2 id="Pherf_arguments:">Pherf arguments:</h2> 
- <ul> 
-  <li>-h <i>Help</i> <br /></li> 
-  <li>-l <i>Apply schema and load data</i><br /></li> 
-  <li>-q <i>Executes Multi-threaded query sets and write results</i><br /></li> 
-  <li>-z [quorum] <i>Zookeeper quorum</i><br /></li> 
-  <li>-m <i>Enable monitor for statistics</i><br /></li> 
-  <li>-monitorFrequency [frequency in Ms] _Frequency at which the monitor will snopshot stats to log file. <br /></li> 
-  <li>-drop [pattern] <i>Regex drop all tables with schema name as PHERF. Example drop Event tables: -drop .<i>(EVENT).</i> Drop all: -drop .* or -drop all</i><br /></li> 
-  <li>-scenarioFile <i>Regex or file name of a specific scenario file to run.</i> <br /></li> 
-  <li>-schemaFile <i>Regex or file name of a specific schema file to run.</i> <br /></li> 
-  <li>-export Exports query results to CSV files in CSV_EXPORT directory <br /></li> 
-  <li>-diff Compares results with previously exported results <br /></li> 
-  <li>-hint <i>Executes all queries with specified hint. Example SMALL</i> <br /></li> 
-  <li>-rowCountOverride</li> 
-  <li>-rowCountOverride [number of rows] <i>Specify number of rows to be upserted rather than using row count specified in schema</i> &lt;/ br&gt;</li> 
- </ul> 
-</div> 
-<div class="section"> 
- <h2 id="Adding_Rules_for_Data_Creation">Adding Rules for Data Creation</h2> 
- <p>Review <a href="/src/test/resources/scenario/test_scenario.xml">test_scenario.xml</a> for syntax examples.<br /></p> 
- <ul> 
-  <li>Rules are defined as <tt>&lt;columns /&gt;</tt> and are applied in the order they appear in file.</li> 
-  <li>Rules of the same type override the values of a prior rule of the same type. If <tt>&lt;userDefined&gt;true&lt;/userDefined&gt;</tt> is set, rule will only apply override when type and name match the column name in Phoenix.</li> 
-  <li><tt>&lt;prefix&gt;</tt> tag is set at the column level. It can be used to define a constant string appended to the beginning of CHAR and VARCHAR data type values.</li> 
-  <li><b>Required field</b> Supported Phoenix types: VARCHAR, CHAR, DATE, DECIMAL, INTEGER 
-   <ul> 
-    <li>denoted by the <tt>&lt;type&gt;</tt> tag</li> 
-   </ul></li> 
-  <li>User defined true changes rule matching to use both name and type fields to determine equivalence. 
-   <ul> 
-    <li>Default is false if not specified and equivalence will be determined by type only. <b>An important note here is that you can still override rules without the user defined flag, but they will change the rule globally and not just for a specified column.</b></li> 
-   </ul></li> 
-  <li><b>Required field</b> Supported Data Sequences 
-   <ul> 
-    <li>RANDOM: Random value which can be bound by other fields such as length.</li> 
-    <li>SEQUENTIAL: Monotonically increasing long prepended to random strings. 
-     <ul> 
-      <li>Only supported on VARCHAR and CHAR types</li> 
-     </ul></li> 
-    <li>LIST: Means pick values from predefined list of values</li> 
-   </ul></li> 
-  <li><b>Required field</b> Length defines boundary for random values for CHAR and VARCHAR types. 
-   <ul> 
-    <li>denoted by the <tt>&lt;length&gt;</tt> tag</li> 
-   </ul></li> 
-  <li>Column level Min/Max value defines boundaries for numerical values. For DATES, these values supply a range between which values are generated. At the column level the granularity is a year. At a specific data value level, the granularity is down to the Ms. 
-   <ul> 
-    <li>denoted by the <tt>&lt;minValue&gt;</tt> tag</li> 
-    <li>denoted by the <tt>&lt;maxValue&gt;</tt> tag</li> 
-   </ul></li> 
-  <li>Null chance denotes the probability of generating a null value. From [0-100]. The higher the number, the more likely the value will be null. 
-   <ul> 
-    <li>denoted by <tt>&lt;nullChance&gt;</tt></li> 
-   </ul></li> 
-  <li>Name can either be any text or the actual column name in the Phoenix table. 
-   <ul> 
-    <li>denoted by the <tt>&lt;name&gt;</tt></li> 
-   </ul></li> 
-  <li>Value List is used in conjunction with LIST data sequences. Each entry is a DataValue with a specified value to be used when generating data. 
-   <ul> 
-    <li>Denoted by the <tt>&lt;valueList&gt;&lt;datavalue&gt;&lt;value/&gt;&lt;/datavalue&gt;&lt;/valueList&gt;</tt> tags</li> 
-    <li>If the distribution attribute on the datavalue is set, values will be created according to that probability.</li> 
-    <li>When distribution is used, values must add up to 100%.</li> 
-    <li>If distribution is not used, values will be randomly picked from the list with equal distribution.</li> 
-   </ul></li> 
- </ul> 
-</div> 
-<div class="section"> 
- <h2 id="Defining_Scenario">Defining Scenario</h2> 
- <p>Scenario can have multiple querySets. Consider following example, concurrency of 1-4 means that each query will be executed starting with concurrency level of 1 and reach up to maximum concurrency of 4. Per thread, query would be executed to a minimum of 10 times or 10 seconds (whichever comes first). QuerySet by defult is executed serially but you can change executionType to PARALLEL so queries are executed concurrently. Scenarios are defined in XMLs stored in the resource directory.</p> 
+ <h2 id="Prerequisites">Prerequisites</h2> 
  <div class="source"> 
-  <pre>&lt;scenarios&gt;
-    &lt;!--Minimum of executionDurationInMs or numberOfExecutions. Which ever is reached first --&gt;
-    &lt;querySet concurrency=&quot;1-4&quot; executionType=&quot;PARALLEL&quot; executionDurationInMs=&quot;10000&quot; numberOfExecutions=&quot;10&quot;&gt;
-        &lt;query id=&quot;q1&quot; verifyRowCount=&quot;false&quot; statement=&quot;select count(*) from PHERF.TEST_TABLE&quot;/&gt;
-        &lt;query id=&quot;q2&quot; tenantId=&quot;1234567890&quot; ddl=&quot;create view if not exists 
-        myview(mypk varchar not null primary key, mycol varchar)&quot; statement=&quot;upsert select ...&quot;/&gt;
-    &lt;/querySet&gt;
-    &lt;querySet concurrency=&quot;3&quot; executionType=&quot;SERIAL&quot; executionDurationInMs=&quot;20000&quot; numberOfExecutions=&quot;100&quot;&gt;
-        &lt;query id=&quot;q3&quot; verifyRowCount=&quot;false&quot; statement=&quot;select count(*) from PHERF.TEST_TABLE&quot;/&gt;
-        &lt;query id=&quot;q4&quot; statement=&quot;select count(*) from PHERF.TEST_TABLE WHERE TENANT_ID='00D000000000062'&quot;/&gt;
-    &lt;/querySet&gt;
-&lt;/scenario&gt;
-        
+  <pre>Phoenix v4.4.0 and above
+Spark 1.3.0
 </pre> 
  </div> 
 </div> 
 <div class="section"> 
- <h2 id="Results">Results</h2> 
- <p>Results are written real time in <i>results</i> directory. Open the result that is saved in .jpg format for real time visualization.</p> 
+ <h2 id="Reading_Phoenix_Tables">Reading Phoenix Tables</h2> 
+ <p>Given a Phoenix table with the following DDL</p> 
+ <div class="source"> 
+  <pre>CREATE TABLE TABLE1 (ID BIGINT NOT NULL PRIMARY KEY, COL1 VARCHAR);
+UPSERT INTO TABLE1 (ID, COL1) VALUES (1, 'test_row_1');
+UPSERT INTO TABLE1 (ID, COL1) VALUES (2, 'test_row_2');
+</pre> 
+ </div> 
+ <div class="section"> 
+  <h3 id="Load_as_a_DataFrame_using_the_Data_Source_API">Load as a DataFrame using the Data Source API</h3> 
+  <div class="source"> 
+   <pre>import org.apache.spark.SparkContext
+import org.apache.spark.sql.SQLContext
+import org.apache.phoenix.spark._
+
+val sc = new SparkContext(&quot;local&quot;, &quot;phoenix-test&quot;)
+val sqlContext = new SQLContext(sc)
+
+val df = sqlContext.load(
+  &quot;org.apache.phoenix.spark&quot;, 
+  Map(&quot;table&quot; -&gt; &quot;TABLE1&quot;, &quot;zkUrl&quot; -&gt; &quot;phoenix-server:2181&quot;)
+)
+
+df
+  .filter(df(&quot;COL1&quot;) === &quot;test_row_1&quot; &amp;&amp; df(&quot;ID&quot;) === 1L)
+  .select(df(&quot;ID&quot;))
+  .show
+</pre> 
+  </div> 
+ </div> 
+ <div class="section"> 
+  <h3 id="Load_as_a_DataFrame_directly_using_a_Configuration_object">Load as a DataFrame directly using a Configuration object</h3> 
+  <div class="source"> 
+   <pre>import org.apache.hadoop.conf.Configuration
+import org.apache.spark.SparkContext
+import org.apache.spark.sql.SQLContext
+import org.apache.phoenix.spark._
+
+val configuration = new Configuration()
+// Can set Phoenix-specific settings, requires 'hbase.zookeeper.quorum'
+
+val sc = new SparkContext(&quot;local&quot;, &quot;phoenix-test&quot;)
+val sqlContext = new SQLContext(sc)
+
+// Load the columns 'ID' and 'COL1' from TABLE1 as a DataFrame
+val df = sqlContext.phoenixTableAsDataFrame(
+  &quot;TABLE1&quot;, Array(&quot;ID&quot;, &quot;COL1&quot;), conf = configuration
+)
+
+df.show
+</pre> 
+  </div> 
+ </div> 
+ <div class="section"> 
+  <h3 id="Load_as_an_RDD_using_a_Zookeeper_URL">Load as an RDD, using a Zookeeper URL</h3> 
+  <div class="source"> 
+   <pre>import org.apache.spark.SparkContext
+import org.apache.spark.sql.SQLContext
+import org.apache.phoenix.spark._
+
+val sc = new SparkContext(&quot;local&quot;, &quot;phoenix-test&quot;)
+
+// Load the columns 'ID' and 'COL1' from TABLE1 as an RDD
+val rdd: RDD[Map[String, AnyRef]] = sc.phoenixTableAsRDD(
+  &quot;TABLE1&quot;, Seq(&quot;ID&quot;, &quot;COL1&quot;), zkUrl = Some(&quot;phoenix-server:2181&quot;)
+)
+
+rdd.count()
+
+val firstId = rdd1.first()(&quot;ID&quot;).asInstanceOf[Long]
+val firstCol = rdd1.first()(&quot;COL1&quot;).asInstanceOf[String]
+</pre> 
+  </div> 
+ </div> 
 </div> 
 <div class="section"> 
- <h2 id="Testing">Testing</h2> 
- <p>Default quorum is localhost. If you want to override set the system variable.</p> 
- <p>Run unit tests: <tt>mvn test -DZK_QUORUM=localhost</tt><br /> Run a specific method: <tt>mvn -Dtest=ClassName#methodName test</tt> <br /></p> 
- <p>More to come…</p> 
+ <h2 id="Saving_RDDs_to_Phoenix">Saving RDDs to Phoenix</h2> 
+ <p><tt>saveToPhoenix</tt> is an implicit method on RDD[Product], or an RDD of Tuples. The data types must correspond to the Java types Phoenix supports (<a class="externalLink" href="http://phoenix.apache.org/language/datatypes.html">http://phoenix.apache.org/language/datatypes.html</a>)</p> 
+ <p>Given a Phoenix table with the following DDL</p> 
+ <div class="source"> 
+  <pre>CREATE TABLE OUTPUT_TEST_TABLE (id BIGINT NOT NULL PRIMARY KEY, col1 VARCHAR, col2 INTEGER);
+</pre> 
+ </div> 
+ <div class="source"> 
+  <pre>import org.apache.spark.SparkContext
+import org.apache.phoenix.spark._
+
+val sc = new SparkContext(&quot;local&quot;, &quot;phoenix-test&quot;)
+val dataSet = List((1L, &quot;1&quot;, 1), (2L, &quot;2&quot;, 2), (3L, &quot;3&quot;, 3))
+
+sc
+  .parallelize(dataSet)
+  .saveToPhoenix(
+    &quot;OUTPUT_TEST_TABLE&quot;,
+    Seq(&quot;ID&quot;,&quot;COL1&quot;,&quot;COL2&quot;),
+    zkUrl = Some(&quot;phoenix-server:2181&quot;)
+  )
+</pre> 
+ </div> 
+</div> 
+<div class="section"> 
+ <h2 id="Saving_DataFrames_to_Phoenix">Saving DataFrames to Phoenix</h2> 
+ <p>The <tt>save</tt> is method on DataFrame allows passing in a data source type. You can use <tt>org.apache.phoenix.spark</tt>, and must also pass in a <tt>table</tt> and <tt>zkUrl</tt> parameter to specify which table and server to persist the DataFrame to. The column names are derived from the DataFrame’s schema field names, and must match the Phoenix column names.</p> 
+ <p>The <tt>save</tt> method also takes a <tt>SaveMode</tt> option, for which only <tt>SaveMode.Overwrite</tt> is supported.</p> 
+ <p>Given two Phoenix tables with the following DDL:</p> 
+ <div class="source"> 
+  <pre>CREATE TABLE INPUT_TABLE (id BIGINT NOT NULL PRIMARY KEY, col1 VARCHAR, col2 INTEGER);
+CREATE TABLE OUTPUT_TABLE (id BIGINT NOT NULL PRIMARY KEY, col1 VARCHAR, col2 INTEGER);
+</pre> 
+ </div> 
+ <div class="source"> 
+  <pre>import org.apache.spark.SparkContext
+import org.apache.spark.sql.SQLContext
+import org.apache.phoenix.spark._
+
+// Load INPUT_TABLE
+val sc = new SparkContext(&quot;local&quot;, &quot;phoenix-test&quot;)
+val sqlContext = new SQLContext(sc)
+val df = sqlContext.load(&quot;org.apache.phoenix.spark&quot;, Map(&quot;table&quot; -&gt; &quot;INPUT_TABLE&quot;,
+  &quot;zkUrl&quot; -&gt; hbaseConnectionString))
+
+// Save to OUTPUT_TABLE
+df.save(&quot;org.apache.phoenix.spark&quot;, SaveMode.Overwrite, Map(&quot;table&quot; -&gt; &quot;OUTPUT_TABLE&quot;, 
+  &quot;zkUrl&quot; -&gt; hbaseConnectionString))
+</pre> 
+ </div> 
+</div> 
+<div class="section"> 
+ <h2 id="Notes">Notes</h2> 
+ <p>The functions <tt>phoenixTableAsDataFrame</tt>, <tt>phoenixTableAsRDD</tt> and <tt>saveToPhoenix</tt> all support optionally specifying a <tt>conf</tt> Hadoop configuration parameter with custom Phoenix client settings, as well as an optional <tt>zkUrl</tt> parameter for the Phoenix connection URL.</p> 
+ <p>If <tt>zkUrl</tt> isn’t specified, it’s assumed that the “hbase.zookeeper.quorum” property has been set in the <tt>conf</tt> parameter. Similarly, if no configuration is passed in, <tt>zkUrl</tt> must be specified.</p> 
+</div> 
+<div class="section"> 
+ <h2 id="Limitations">Limitations</h2> 
+ <ul> 
+  <li>Basic support for column and predicate pushdown using the Data Source API</li> 
+  <li>The Data Source API does not support passing custom Phoenix settings in configuration, you must create the DataFrame or RDD directly if you need fine-grained configuration.</li> 
+  <li>No support for aggregate or distinct functions (<a class="externalLink" href="http://phoenix.apache.org/phoenix_mr.html">http://phoenix.apache.org/phoenix_mr.html</a>)</li> 
+ </ul> 
 </div>
 			</div>
 		</div>
@@ -382,8 +391,8 @@
 						<li >
 							<a href="upgrading.html" title="Upgrading">Upgrading</a>
 						</li>
-						<li class="active">
-							<a href="#" title="Performance Testing">Performance Testing</a>
+						<li >
+							<a href="pherf.html" title="Performance Testing">Performance Testing</a>
 						</li>
 						<li >
 							<a href="http:divider" title=""></a>
@@ -400,8 +409,8 @@
 						<li >
 							<a href="phoenix_mr.html" title="Map Reduce Integration">Map Reduce Integration</a>
 						</li>
-						<li >
-							<a href="phoenix_spark.html" title="Phoenix Spark Integration">Phoenix Spark Integration</a>
+						<li class="active">
+							<a href="#" title="Phoenix Spark Integration">Phoenix Spark Integration</a>
 						</li>
 					</ul>
 				</div>

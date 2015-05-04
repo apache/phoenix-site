@@ -91,6 +91,7 @@
             <item href="flume.html" name="Apache Flume Plugin"/>
             <item href="pig_integration.html" name="Apache Pig Integration"/>
             <item href="phoenix_mr.html" name="Map Reduce Integration"/>
+            <item href="phoenix_spark.html" name="Phoenix Spark Integration"/>
         </menu>
         <menu name="Features">
             <item href="secondary_indexing.html" name="Secondary Indexes"/>
