@@ -1,19 +1,10 @@
 "SECTION","TOPIC","SYNTAX","TEXT","EXAMPLE"
 "Commands","SELECT","
-SELECT [/*+ hint */] [DISTINCT | ALL] selectExpression [,...]
-FROM tableSpec [ { [joinType] JOIN tableSpec ON expression } [...] ]
-[ WHERE expression ]
-[ GROUP BY expression [,...] ] [ HAVING expression ]
+selectStatement [ { UNION ALL selectStatement [...] } ]
 [ ORDER BY order [,...] ] [ LIMIT {bindParameter | number} ]
 ","
-Selects data from a table.
-DISTINCT filters out duplicate results while ALL, the default, includes all results.
-FROM identifies the table being queried. Columns may be dynamically defined in parenthesis
-after the table name and then used in the query. Joins are processed in reverse order through a
-broadcast hash join mechanism. For best performance, order tables from largest to smallest in
-terms of how many rows you expect to be used from each table.
-GROUP BY groups the the result by the given expression(s).
-HAVING filters rows after grouping.
+Selects data from one or more tables.
+UNION ALL combines rows from multiple select statements.
 ORDER BY sorts the result based on the given expressions.
 LIMIT limits the number of rows returned by the query with no limit applied if unspecified or specified
 as null or less than zero. The LIMIT clause is executed after the ORDER BY clause to support top-N type
@@ -21,14 +12,9 @@ queries.
 An optional hint may be used to override decisions made by the query optimizer.
 
 ","
-SELECT * FROM TEST;
-SELECT a.* FROM TEST;
-SELECT DISTINCT NAME FROM TEST;
-SELECT ID, COUNT(1) FROM TEST GROUP BY ID;
-SELECT NAME, SUM(VAL) FROM TEST GROUP BY NAME HAVING COUNT(1) > 2;
-SELECT 'ID' COL, MAX(ID) AS MAX FROM TEST;
 SELECT * FROM TEST LIMIT 1000;
-SELECT d.dept_id,e.dept_id,e.name FROM DEPT d JOIN EMPL e ON e.dept_id = d.dept_id;
+SELECT full_name FROM SALES_PERSON WHERE ranking >= 5.0
+    UNION ALL SELECT reviewer_name FROM CUSTOMER_REVIEW WHERE score >= 8.0
 "
 "Commands","UPSERT VALUES","
 UPSERT INTO tableName [( { columnRef | columnDef } [,...] )] VALUES ( constantTerm [,...] )
@@ -484,6 +470,29 @@ ID AS VALUE
 VALUE + 1 VALUE_PLUS_ONE
 "
 
+"Other Grammar","Select Statement","
+SELECT [/*+ hint */] [DISTINCT | ALL] selectExpression [,...]
+FROM tableSpec [ { [joinType] JOIN tableSpec ON expression } [...] ]
+[ WHERE expression ]
+[ GROUP BY expression [,...] ] [ HAVING expression ]
+","
+Selects data from a table.
+DISTINCT filters out duplicate results while ALL, the default, includes all results.
+FROM identifies the table being queried. Columns may be dynamically defined in parenthesis
+after the table name and then used in the query. Joins are processed in reverse order through a
+broadcast hash join mechanism. For best performance, order tables from largest to smallest in
+terms of how many rows you expect to be used from each table.
+GROUP BY groups the the result by the given expression(s).
+HAVING filters rows after grouping.
+An optional hint may be used to override decisions made by the query optimizer.
+
+","
+SELECT * FROM TEST;
+SELECT DISTINCT NAME FROM TEST;
+SELECT ID, COUNT(1) FROM TEST GROUP BY ID;
+SELECT NAME, SUM(VAL) FROM TEST GROUP BY NAME HAVING COUNT(1) > 2;
+SELECT d.dept_id,e.dept_id,e.name FROM DEPT d JOIN EMPL e ON e.dept_id = d.dept_id;
+"
 "Other Grammar","Split Point","
 value | bindParameter
 
