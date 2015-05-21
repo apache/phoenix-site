@@ -96,11 +96,9 @@ DROP TABLE my_schema.my_table CASCADE;
 "
 
 "Commands","CREATE FUNCTION","
-CREARE FUNCTION funcName
+CREATE FUNCTION funcName
 ([funcArgument[,...]])
-RETURNS dataType
-AS className
-[USINF JAR jarPath]
+RETURNS dataType AS className [USING JAR jarPath]
 ","
 Creates a new function. The function name is uppercased unless they are double quoted in which case they are case sensitive. The function accepts zero or more arguments. The class name and jar path should be in single quotes. The jar path is optional and if not specified then the class name will be loaded from the jars present in directory configured for hbase.dynamic.jars.dir.
 
