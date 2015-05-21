@@ -1474,6 +1474,15 @@ ARRAY_LENGTH(my_array_col)
 ARRAY_LENGTH(ARRAY[1,2,3])
 "
 
+"Functions (Array)","ARRAY_APPEND","
+ARRAY_APPEND( arrayTerm, elementTerm )
+","
+Appends the given element to the end of the array.
+","
+ARRAY_APPEND(my_array_col, my_element_col)
+ARRAY_APPEND(ARRAY[1,2,3], 4) evaluates to ARRAY[1,2,3,4]
+"
+
 "Functions (Array)","ANY","
 ANY( arrayTerm )
 ","

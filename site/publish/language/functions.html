@@ -363,6 +363,8 @@ syntax-end -->
 
     <a href="#array_length" >ARRAY_LENGTH</a><br />
 
+    <a href="#array_append" >ARRAY_APPEND</a><br />
+
     <a href="#any" >ANY</a><br />
 
     <a href="#all" >ALL</a><br />
@@ -378,10 +380,12 @@ syntax-end -->
                 <a href="#array_length" >ARRAY_LENGTH</a><br />
                     </td><td class="index">
             
+                <a href="#array_append" >ARRAY_APPEND</a><br />
+            
                 <a href="#any" >ANY</a><br />
+                    </td><td class="index">
             
                 <a href="#all" >ALL</a><br />
-                    </td><td class="index">
                     </td>
     </tr>
 </table>
@@ -694,6 +698,24 @@ syntax-end -->
 <p>Returns the current length of the array.</p>
 <p>Example:</p>
 <p class="notranslate">ARRAY_LENGTH(my_array_col)<br />ARRAY_LENGTH(ARRAY[1,2,3])</p>
+
+<h3 id="array_append" class="notranslate">ARRAY_APPEND</h3>
+<!-- railroad-start -->
+<pre name="bnf" style="display: none">
+ARRAY_APPEND( <a href="index.html#term">arrayTerm</a>, <a href="index.html#term">elementTerm</a> )
+</pre>
+<div name="railroad">
+<table class="railroad"><tr class="railroad"><td class="d"><code class="c">ARRAY_APPEND ( <a href="index.html#term">arrayTerm</a> , <a href="index.html#term">elementTerm</a> )</code></td></tr></table>
+</div>
+<!-- railroad-end -->
+<!-- syntax-start
+<pre>
+ARRAY_APPEND( <a href="index.html#term">arrayTerm</a>, <a href="index.html#term">elementTerm</a> )
+</pre>
+syntax-end -->
+<p>Appends the given element to the end of the array.</p>
+<p>Example:</p>
+<p class="notranslate">ARRAY_APPEND(my_array_col, my_element_col)<br />ARRAY_APPEND(ARRAY[1,2,3], 4) evaluates to ARRAY[1,2,3,4]</p>
 
 <h3 id="any" class="notranslate">ANY</h3>
 <!-- railroad-start -->
