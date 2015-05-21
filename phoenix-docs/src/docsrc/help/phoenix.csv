@@ -562,11 +562,12 @@ RIGHT
 "
 
 "Other Grammar","Func Argument","
-dataType [CONSTANT [DEFUALTVALUE=string] [MINVALUE=string] [MAXVALUE=string]]
+dataType [CONSTANT] [DEFUALTVALUE=string] [MINVALUE=string] [MAXVALUE=string]
 ","
-The function argument is sql data type and it can be constant and when ever it's constant we can provide default,min and max values in single quotes.
+The function argument is sql data type. It can be constant and also we can provide default,min and max values for the argument in single quotes.
 ","
 VARCHAR
+INTEGER DEFAULTVALUE='100'
 INTEGER CONSTANT DEFAULTVALUE='10' MINVALUE='1' MAXVALUE='15'
 "
 
