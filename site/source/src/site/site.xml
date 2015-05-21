@@ -109,6 +109,7 @@
             <item href="tracing.html" name="Tracing"/>
             <item href="update_statistics.html" name="Statistics Collection"/>
             <item href="server.html" name="Query Server"/>
+            <item href="udf.html" name="User-defined Functions"/>
         </menu>
         <menu name="Reference">
             <item href="language/index.html" name="Grammar"/>

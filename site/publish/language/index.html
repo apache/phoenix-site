@@ -109,6 +109,7 @@
 									<li ><a href="../tracing.html" title="Tracing">Tracing</a></li>
 									<li ><a href="../update_statistics.html" title="Statistics Collection">Statistics Collection</a></li>
 									<li ><a href="../server.html" title="Query Server">Query Server</a></li>
+									<li ><a href="../udf.html" title="User-defined Functions">User-defined Functions</a></li>
 								</ul>
 							</li>
 							<li class="dropdown">
@@ -158,6 +159,10 @@
 
     <a href="#drop_table">DROP TABLE</a><br />
 
+    <a href="#create_function">CREATE FUNCTION</a><br />
+
+    <a href="#drop_function">DROP FUNCTION</a><br />
+
     <a href="#create_view">CREATE VIEW</a><br />
 
     <a href="#drop_view">DROP VIEW</a><br />
@@ -197,6 +202,10 @@ syntax-end -->
                 <a href="#drop_table" >DROP TABLE</a><br />
                     </td><td class="index">
             
+                <a href="#create_function" >CREATE FUNCTION</a><br />
+            
+                <a href="#drop_function" >DROP FUNCTION</a><br />
+            
                 <a href="#create_view" >CREATE VIEW</a><br />
             
                 <a href="#drop_view" >DROP VIEW</a><br />
@@ -204,11 +213,11 @@ syntax-end -->
                 <a href="#create_sequence" >CREATE SEQUENCE</a><br />
             
                 <a href="#drop_sequence" >DROP SEQUENCE</a><br />
+                    </td><td class="index">
             
                 <a href="#alter" >ALTER</a><br />
             
                 <a href="#create_index" >CREATE INDEX</a><br />
-                    </td><td class="index">
             
                 <a href="#drop_index" >DROP INDEX</a><br />
             
@@ -256,6 +265,8 @@ syntax-end -->
 
     <a href="#select_statement" >Select Statement</a><br />
 
+    <a href="#select_statement" >Select Statement</a><br />
+
     <a href="#split_point" >Split Point</a><br />
 
     <a href="#table_spec" >Table Spec</a><br />
@@ -263,6 +274,12 @@ syntax-end -->
     <a href="#aliased_table_ref" >Aliased Table Ref</a><br />
 
     <a href="#join_type" >Join Type</a><br />
+
+    <a href="#func_argument" >Func Argument</a><br />
+
+    <a href="#class_name" >Class Name</a><br />
+
+    <a href="#jar_path" >Jar Path</a><br />
 
     <a href="#order" >Order</a><br />
 
@@ -366,14 +383,22 @@ syntax-end -->
             
                 <a href="#select_statement" >Select Statement</a><br />
             
+                <a href="#select_statement" >Select Statement</a><br />
+            
                 <a href="#split_point" >Split Point</a><br />
             
                 <a href="#table_spec" >Table Spec</a><br />
             
                 <a href="#aliased_table_ref" >Aliased Table Ref</a><br />
-                    </td><td class="index">
             
                 <a href="#join_type" >Join Type</a><br />
+                    </td><td class="index">
+            
+                <a href="#func_argument" >Func Argument</a><br />
+            
+                <a href="#class_name" >Class Name</a><br />
+            
+                <a href="#jar_path" >Jar Path</a><br />
             
                 <a href="#order" >Order</a><br />
             
@@ -568,6 +593,52 @@ syntax-end -->
 <p>Example:</p>
 <p class="notranslate">
 DROP TABLE my_schema.my_table;<br />DROP TABLE IF EXISTS my_table;<br />DROP TABLE my_schema.my_table CASCADE;</p>
+
+<h3 id="create_function" class="notranslate">CREATE FUNCTION</h3>
+<!-- railroad-start -->
+<pre name="bnf" style="display: none">
+CREARE FUNCTION <a href="index.html#name">funcName</a>
+([<a href="index.html#func_argument">funcArgument</a>[,...]])
+RETURNS <a href="index.html#data_type">dataType</a>
+AS <a href="index.html#class_name">className</a>
+[USINF JAR <a href="index.html#jar_path">jarPath</a>]
+</pre>
+<div name="railroad">
+<table class="railroad"><tr class="railroad"><td class="d"><code class="c">CREARE FUNCTION <a href="index.html#name">funcName</a></code></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="d"><code class="c">(</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c"><a href="index.html#func_argument">funcArgument</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">, ...</code></td><td class="le"></td></tr></table></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c">)</code></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="d"><code class="c">RETURNS <a href="index.html#data_type">dataType</a></code></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="d"><code class="c">AS <a href="index.html#class_name">className</a></code></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">USINF JAR <a href="index.html#jar_path">jarPath</a></code></td></tr></table></td><td class="le"></td></tr></table>
+</div>
+<!-- railroad-end -->
+<!-- syntax-start
+<pre>
+CREARE FUNCTION <a href="index.html#name">funcName</a>
+([<a href="index.html#func_argument">funcArgument</a>[,...]])
+RETURNS <a href="index.html#data_type">dataType</a>
+AS <a href="index.html#class_name">className</a>
+[USINF JAR <a href="index.html#jar_path">jarPath</a>]
+</pre>
+syntax-end -->
+<p>Creates a new function. The function name is uppercased unless they are double quoted in which case they are case sensitive. The function accepts zero or more arguments. The class name and jar path should be in single quotes. The jar path is optional and if not specified then the class name will be loaded from the jars present in directory configured for hbase.dynamic.jars.dir.</p>
+<p>Example:</p>
+<p class="notranslate">
+CREATE FUNCTION my_reverse(varchar) returns varchar as &#39;com.mypackage.MyReverseFunction&#39; using jar &#39;hdfs:/localhost:8080/hbase/lib/myjar.jar&#39;<br />CREATE FUNCTION my_reverse(varchar) returns varchar as &#39;com.mypackage.MyReverseFunction&#39;<br />CREATE FUNCTION my_increment(integer, integer constant defaultvalue=&#39;10&#39;) returns integer as &#39;com.mypackage.MyIncrementFunction&#39; using jar &#39;/hbase/lib/myincrement.jar&#39;</p>
+
+<h3 id="drop_function" class="notranslate">DROP FUNCTION</h3>
+<!-- railroad-start -->
+<pre name="bnf" style="display: none">
+DROP FUNCTION [IF EXISTS] <a href="index.html#name">funcName</a>
+</pre>
+<div name="railroad">
+<table class="railroad"><tr class="railroad"><td class="d"><code class="c">DROP FUNCTION</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">IF EXISTS</code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c"><a href="index.html#name">funcName</a></code></td></tr></table>
+</div>
+<!-- railroad-end -->
+<!-- syntax-start
+<pre>
+DROP FUNCTION [IF EXISTS] <a href="index.html#name">funcName</a>
+</pre>
+syntax-end -->
+<p>Drops a function.</p>
+<p>Example:</p>
+<p class="notranslate">
+DROP FUNCTION IF EXISTS my_reverse<br />DROP FUNCTION my_reverse</p>
 
 <h3 id="create_view" class="notranslate">CREATE VIEW</h3>
 <!-- railroad-start -->
@@ -976,6 +1047,22 @@ syntax-end -->
 <p>Example:</p>
 <p class="notranslate">SELECT * FROM TEST;<br />SELECT DISTINCT NAME FROM TEST;<br />SELECT ID, COUNT(1) FROM TEST GROUP BY ID;<br />SELECT NAME, SUM(VAL) FROM TEST GROUP BY NAME HAVING COUNT(1) &gt; 2;<br />SELECT d.dept_id,e.dept_id,e.name FROM DEPT d JOIN EMPL e ON e.dept_id = d.dept_id;</p>
 
+<h3 id="select_statement" class="notranslate">Select Statement</h3>
+<!-- railroad-start -->
+<table class="railroad"><tr class="railroad"><td class="d"><code class="c">SELECT</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">/ * + <a href="index.html#hint">hint</a> * /</code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c">DISTINCT</code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">ALL</code></td><td class="le"></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c"><a href="index.html#select_expression">selectExpression</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">, ...</code></td><td class="le"></td></tr></table></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="d"><code class="c">FROM <a href="index.html#table_spec">tableSpec</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="index.html#join_type">joinType</a></code></td><td class="le"></td></tr></table></td><td class="d"><code class="c">JOIN <a href="index.html#table_spec">tableSpec</a> ON <a href="index.html#expression">expression</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">...</code></td><td class="le"></td></tr></table></td></tr></table></td><td class="le"></td></tr></table></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">WHERE <a href="index.html#expression">expression</a></code></td></tr></table></td><td class="le"></td></tr></table><br /><table class="railroad"><tr class="railroad"><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">GROUP BY <a href="index.html#expression">expression</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c">, ...</code></td><td class="le"></td></tr></table></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">HAVING <a href="index.html#expression">expression</a></code></td></tr></table></td><td class="le"></td></tr></table></td></tr></table>
+<!-- railroad-end -->
+<!-- syntax-start
+<pre>
+SELECT [/*+ <a href="index.html#hint">hint</a> */] [DISTINCT | ALL] <a href="index.html#select_expression">selectExpression</a> [,...]
+FROM <a href="index.html#table_spec">tableSpec</a> [ { [<a href="index.html#join_type">joinType</a>] JOIN <a href="index.html#table_spec">tableSpec</a> ON <a href="index.html#expression">expression</a> } [...] ]
+[ WHERE <a href="index.html#expression">expression</a> ]
+[ GROUP BY <a href="index.html#expression">expression</a> [,...] ] [ HAVING <a href="index.html#expression">expression</a> ]
+</pre>
+syntax-end -->
+<p>Selects data from a table. <code>DISTINCT</code> filters out duplicate results while <code>ALL</code>, the default, includes all results. <code>FROM</code> identifies the table being queried. Columns may be dynamically defined in parenthesis after the table name and then used in the query. Joins are processed in reverse order through a broadcast hash join mechanism. For best performance, order tables from largest to smallest in terms of how many rows you expect to be used from each table. <code>GROUP BY</code> groups the the result by the given expression(s). <code>HAVING</code> filters rows after grouping. An optional hint may be used to override decisions made by the query optimizer.</p>
+<p>Example:</p>
+<p class="notranslate">SELECT * FROM TEST;<br />SELECT DISTINCT NAME FROM TEST;<br />SELECT ID, COUNT(1) FROM TEST GROUP BY ID;<br />SELECT NAME, SUM(VAL) FROM TEST GROUP BY NAME HAVING COUNT(1) &gt; 2;<br />SELECT d.dept_id,e.dept_id,e.name FROM DEPT d JOIN EMPL e ON e.dept_id = d.dept_id;</p>
+
 <h3 id="split_point" class="notranslate">Split Point</h3>
 <!-- railroad-start -->
 <table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><code class="c"><a href="index.html#value">value</a></code></td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><code class="c"><a href="index.html#bind_parameter">bindParameter</a></code></td><td class="le"></td></tr></table>
@@ -1027,6 +1114,45 @@ syntax-end -->
 <p>The type of join</p>
 <p>Example:</p>
 <p class="notranslate">INNER<br />LEFT OUTER<br />RIGHT</p>
+
+<h3 id="func_argument" class="notranslate">Func Argument</h3>
+<!-- railroad-start -->
+<table class="railroad"><tr class="railroad"><td class="d"><code class="c"><a href="index.html#data_type">dataType</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">CONSTANT</code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">DEFUALTVALUE = <a href="index.html#string">string</a></code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">MINVALUE = <a href="index.html#string">string</a></code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">MAXVALUE = <a href="index.html#string">string</a></code></td></tr></table></td><td class="le"></td></tr></table></td></tr></table></td><td class="le"></td></tr></table></td></tr></table>
+<!-- railroad-end -->
+<!-- syntax-start
+<pre>
+<a href="index.html#data_type">dataType</a> [CONSTANT [DEFUALTVALUE=<a href="index.html#string">string</a>] [MINVALUE=<a href="index.html#string">string</a>] [MAXVALUE=<a href="index.html#string">string</a>]]
+</pre>
+syntax-end -->
+<p>The function argument is sql data type and it can be constant and when ever it&#39;s constant we can provide default,min and max values in single quotes.</p>
+<p>Example:</p>
+<p class="notranslate">VARCHAR<br />INTEGER CONSTANT DEFAULTVALUE=&#39;10&#39; MINVALUE=&#39;1&#39; MAXVALUE=&#39;15&#39;</p>
+
+<h3 id="class_name" class="notranslate">Class Name</h3>
+<!-- railroad-start -->
+<code class="c"><a href="index.html#string">String</a></code>
+<!-- railroad-end -->
+<!-- syntax-start
+<pre>
+{<a href="index.html#string">String</a>}
+</pre>
+syntax-end -->
+<p>Canonical class name in single quotes.</p>
+<p>Example:</p>
+<p class="notranslate">&#39;com.mypackage.MyReverseFunction&#39;</p>
+
+<h3 id="jar_path" class="notranslate">Jar Path</h3>
+<!-- railroad-start -->
+<code class="c"><a href="index.html#string">String</a></code>
+<!-- railroad-end -->
+<!-- syntax-start
+<pre>
+{<a href="index.html#string">String</a>}
+</pre>
+syntax-end -->
+<p>Hdfs path of jar in single quotes.</p>
+<p>Example:</p>
+<p class="notranslate">&#39;hdfs://localhost:8080:/hbase/lib/myjar.jar&#39;<br />&#39;/tmp/lib/myjar.jar&#39;</p>
 
 <h3 id="order" class="notranslate">Order</h3>
 <!-- railroad-start -->
@@ -1649,6 +1775,9 @@ syntax-end -->
 						</li>
 						<li >
 							<a href="../server.html" title="Query Server">Query Server</a>
+						</li>
+						<li >
+							<a href="../udf.html" title="User-defined Functions">User-defined Functions</a>
 						</li>
 					</ul>
 				</div>

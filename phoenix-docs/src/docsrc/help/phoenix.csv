@@ -95,6 +95,30 @@ DROP TABLE IF EXISTS my_table;
 DROP TABLE my_schema.my_table CASCADE;
 "
 
+"Commands","CREATE FUNCTION","
+CREARE FUNCTION funcName
+([funcArgument[,...]])
+RETURNS dataType
+AS className
+[USINF JAR jarPath]
+","
+Creates a new function. The function name is uppercased unless they are double quoted in which case they are case sensitive. The function accepts zero or more arguments. The class name and jar path should be in single quotes. The jar path is optional and if not specified then the class name will be loaded from the jars present in directory configured for hbase.dynamic.jars.dir.
+
+","
+CREATE FUNCTION my_reverse(varchar) returns varchar as 'com.mypackage.MyReverseFunction' using jar 'hdfs:/localhost:8080/hbase/lib/myjar.jar'
+CREATE FUNCTION my_reverse(varchar) returns varchar as 'com.mypackage.MyReverseFunction'
+CREATE FUNCTION my_increment(integer, integer constant defaultvalue='10') returns integer as 'com.mypackage.MyIncrementFunction' using jar '/hbase/lib/myincrement.jar'
+"
+
+"Commands","DROP FUNCTION","
+DROP FUNCTION [IF EXISTS] funcName
+","
+Drops a function.
+","
+DROP FUNCTION IF EXISTS my_reverse
+DROP FUNCTION my_reverse
+"
+
 "Commands","CREATE VIEW","
 CREATE VIEW [IF NOT EXISTS] newTableRef
 [ ( columnDef [,...] ) ]
@@ -537,6 +561,32 @@ LEFT OUTER
 RIGHT
 "
 
+"Other Grammar","Func Argument","
+dataType [CONSTANT [DEFUALTVALUE=string] [MINVALUE=string] [MAXVALUE=string]]
+","
+The function argument is sql data type and it can be constant and when ever it's constant we can provide default,min and max values in single quotes.
+","
+VARCHAR
+INTEGER CONSTANT DEFAULTVALUE='10' MINVALUE='1' MAXVALUE='15'
+"
+
+"Other Grammar","Class Name","
+{String}
+","
+Canonical class name in single quotes.
+","
+'com.mypackage.MyReverseFunction'
+"
+
+"Other Grammar","Jar Path","
+{String}
+","
+Hdfs path of jar in single quotes.
+","
+'hdfs://localhost:8080:/hbase/lib/myjar.jar'
+'/tmp/lib/myjar.jar'
+"
+
 "Other Grammar","Order","
 { expression } [ ASC | DESC ] [ NULLS { FIRST | LAST } ]
 ","
@@ -674,7 +724,6 @@ calls are only allowed in the SELECT expressions or UPSERT VALUES expressions.
 NEXT VALUE FOR my_table_id
 CURRENT VALUE FOR my_schema.my_id_generator
 "
-
 "Other Grammar","Cast","
 CAST ( expression AS dataType )
 ","
