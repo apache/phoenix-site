@@ -96,16 +96,18 @@ DROP TABLE my_schema.my_table CASCADE;
 "
 
 "Commands","CREATE FUNCTION","
-CREATE FUNCTION funcName
+CREATE [TEMPORARY] FUNCTION funcName
 ([funcArgument[,...]])
 RETURNS dataType AS className [USING JAR jarPath]
 ","
 Creates a new function. The function name is uppercased unless they are double quoted in which case they are case sensitive. The function accepts zero or more arguments. The class name and jar path should be in single quotes. The jar path is optional and if not specified then the class name will be loaded from the jars present in directory configured for hbase.dynamic.jars.dir.
 
 ","
+
 CREATE FUNCTION my_reverse(varchar) returns varchar as 'com.mypackage.MyReverseFunction' using jar 'hdfs:/localhost:8080/hbase/lib/myjar.jar'
 CREATE FUNCTION my_reverse(varchar) returns varchar as 'com.mypackage.MyReverseFunction'
 CREATE FUNCTION my_increment(integer, integer constant defaultvalue='10') returns integer as 'com.mypackage.MyIncrementFunction' using jar '/hbase/lib/myincrement.jar'
+CREATE TEMPORARY FUNCTION my_reverse(varchar) returns varchar as 'com.mypackage.MyReverseFunction' using jar 'hdfs:/localhost:8080/hbase/lib/myjar.jar'
 "
 
 "Commands","DROP FUNCTION","
