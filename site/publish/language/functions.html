@@ -292,6 +292,22 @@ syntax-end -->
     <a href="#convert_tz" >CONVERT_TZ</a><br />
 
     <a href="#timezone_offset" >TIMEZONE_OFFSET</a><br />
+
+    <a href="#now" >NOW</a><br />
+
+    <a href="#year" >YEAR</a><br />
+
+    <a href="#month" >MONTH</a><br />
+
+    <a href="#week" >WEEK</a><br />
+
+    <a href="#dayofmonth" >DAYOFMONTH</a><br />
+
+    <a href="#hour" >HOUR</a><br />
+
+    <a href="#minute" >MINUTE</a><br />
+
+    <a href="#second" >SECOND</a><br />
 </p>
 syntax-end -->
 <!-- railroad-start -->
@@ -302,14 +318,30 @@ syntax-end -->
                 <a href="#to_date" >TO_DATE</a><br />
             
                 <a href="#current_date" >CURRENT_DATE</a><br />
-                    </td><td class="index">
             
                 <a href="#current_time" >CURRENT_TIME</a><br />
             
                 <a href="#convert_tz" >CONVERT_TZ</a><br />
-                    </td><td class="index">
             
                 <a href="#timezone_offset" >TIMEZONE_OFFSET</a><br />
+                    </td><td class="index">
+            
+                <a href="#now" >NOW</a><br />
+            
+                <a href="#year" >YEAR</a><br />
+            
+                <a href="#month" >MONTH</a><br />
+            
+                <a href="#week" >WEEK</a><br />
+            
+                <a href="#dayofmonth" >DAYOFMONTH</a><br />
+                    </td><td class="index">
+            
+                <a href="#hour" >HOUR</a><br />
+            
+                <a href="#minute" >MINUTE</a><br />
+            
+                <a href="#second" >SECOND</a><br />
                     </td>
     </tr>
 </table>
@@ -1274,6 +1306,150 @@ syntax-end -->
 <p>Returns offset (shift in minutes) of a time zone at particular date/time in minutes.</p>
 <p>Example:</p>
 <p class="notranslate">TIMEZONE_OFFSET(&#39;Indian/Cocos&#39;, myDate)</p>
+
+<h3 id="now" class="notranslate">NOW</h3>
+<!-- railroad-start -->
+<pre name="bnf" style="display: none">
+NOW()
+</pre>
+<div name="railroad">
+<table class="railroad"><tr class="railroad"><td class="d"><code class="c">NOW ( )</code></td></tr></table>
+</div>
+<!-- railroad-end -->
+<!-- syntax-start
+<pre>
+NOW()
+</pre>
+syntax-end -->
+<p>Returns the current date, bound at the start of the execution of a query based on the current time on the region server owning the metadata of the table being queried.</p>
+<p>Example:</p>
+<p class="notranslate">NOW()</p>
+
+<h3 id="year" class="notranslate">YEAR</h3>
+<!-- railroad-start -->
+<pre name="bnf" style="display: none">
+YEAR(<a href="index.html#term">dateTerm</a>|<a href="index.html#term">timeTerm</a>|<a href="index.html#term">timestampTerm</a>)
+</pre>
+<div name="railroad">
+<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">YEAR ( <a href="index.html#term">dateTerm</a></code></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="index.html#term">timeTerm</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c"><a href="index.html#term">timestampTerm</a> )</code></td></tr></table></td><td class="le"></td></tr></table>
+</div>
+<!-- railroad-end -->
+<!-- syntax-start
+<pre>
+YEAR(<a href="index.html#term">dateTerm</a>|<a href="index.html#term">timeTerm</a>|<a href="index.html#term">timestampTerm</a>)
+</pre>
+syntax-end -->
+<p>Returns the year of the specified date.</p>
+<p>Example:</p>
+<p class="notranslate">YEAR(TO_DATE(&#39;2015-6-05&#39;))</p>
+
+<h3 id="month" class="notranslate">MONTH</h3>
+<!-- railroad-start -->
+<pre name="bnf" style="display: none">
+MONTH(<a href="index.html#term">dateTerm</a>|<a href="index.html#term">timeTerm</a>|<a href="index.html#term">timestampTerm</a>)
+</pre>
+<div name="railroad">
+<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">MONTH ( <a href="index.html#term">dateTerm</a></code></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="index.html#term">timeTerm</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c"><a href="index.html#term">timestampTerm</a> )</code></td></tr></table></td><td class="le"></td></tr></table>
+</div>
+<!-- railroad-end -->
+<!-- syntax-start
+<pre>
+MONTH(<a href="index.html#term">dateTerm</a>|<a href="index.html#term">timeTerm</a>|<a href="index.html#term">timestampTerm</a>)
+</pre>
+syntax-end -->
+<p>Returns the month of the specified date.</p>
+<p>Example:</p>
+<p class="notranslate">MONTH(TO_TIMESTAMP(&#39;2015-6-05&#39;))</p>
+
+<h3 id="week" class="notranslate">WEEK</h3>
+<!-- railroad-start -->
+<pre name="bnf" style="display: none">
+WEEK(<a href="index.html#term">dateTerm</a>|<a href="index.html#term">timeTerm</a>|<a href="index.html#term">timestampTerm</a>)
+</pre>
+<div name="railroad">
+<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">WEEK ( <a href="index.html#term">dateTerm</a></code></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="index.html#term">timeTerm</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c"><a href="index.html#term">timestampTerm</a> )</code></td></tr></table></td><td class="le"></td></tr></table>
+</div>
+<!-- railroad-end -->
+<!-- syntax-start
+<pre>
+WEEK(<a href="index.html#term">dateTerm</a>|<a href="index.html#term">timeTerm</a>|<a href="index.html#term">timestampTerm</a>)
+</pre>
+syntax-end -->
+<p>Returns the week of the specified date.</p>
+<p>Example:</p>
+<p class="notranslate">WEEK(TO_TIME(&#39;2010-6-15&#39;))</p>
+
+<h3 id="dayofmonth" class="notranslate">DAYOFMONTH</h3>
+<!-- railroad-start -->
+<pre name="bnf" style="display: none">
+DAYOFMONTH(<a href="index.html#term">dateTerm</a>|<a href="index.html#term">timeTerm</a>|<a href="index.html#term">timestampTerm</a>)
+</pre>
+<div name="railroad">
+<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">DAYOFMONTH ( <a href="index.html#term">dateTerm</a></code></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="index.html#term">timeTerm</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c"><a href="index.html#term">timestampTerm</a> )</code></td></tr></table></td><td class="le"></td></tr></table>
+</div>
+<!-- railroad-end -->
+<!-- syntax-start
+<pre>
+DAYOFMONTH(<a href="index.html#term">dateTerm</a>|<a href="index.html#term">timeTerm</a>|<a href="index.html#term">timestampTerm</a>)
+</pre>
+syntax-end -->
+<p>Returns the day of the month of the specified date.</p>
+<p>Example:</p>
+<p class="notranslate">DAYOFMONTH(TO_DATE(&#39;2004-01-18 10:00:10&#39;))</p>
+
+<h3 id="hour" class="notranslate">HOUR</h3>
+<!-- railroad-start -->
+<pre name="bnf" style="display: none">
+HOUR(<a href="index.html#term">dateTerm</a>|<a href="index.html#term">timeTerm</a>|<a href="index.html#term">timestampTerm</a>)
+</pre>
+<div name="railroad">
+<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">HOUR ( <a href="index.html#term">dateTerm</a></code></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="index.html#term">timeTerm</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c"><a href="index.html#term">timestampTerm</a> )</code></td></tr></table></td><td class="le"></td></tr></table>
+</div>
+<!-- railroad-end -->
+<!-- syntax-start
+<pre>
+HOUR(<a href="index.html#term">dateTerm</a>|<a href="index.html#term">timeTerm</a>|<a href="index.html#term">timestampTerm</a>)
+</pre>
+syntax-end -->
+<p>Returns the hour of the specified date.</p>
+<p>Example:</p>
+<p class="notranslate">HOUR(TO_TIMESTAMP(&#39;2015-6-05&#39;))</p>
+
+<h3 id="minute" class="notranslate">MINUTE</h3>
+<!-- railroad-start -->
+<pre name="bnf" style="display: none">
+MINUTE(<a href="index.html#term">dateTerm</a>|<a href="index.html#term">timeTerm</a>|<a href="index.html#term">timestampTerm</a>)
+</pre>
+<div name="railroad">
+<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">MINUTE ( <a href="index.html#term">dateTerm</a></code></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="index.html#term">timeTerm</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c"><a href="index.html#term">timestampTerm</a> )</code></td></tr></table></td><td class="le"></td></tr></table>
+</div>
+<!-- railroad-end -->
+<!-- syntax-start
+<pre>
+MINUTE(<a href="index.html#term">dateTerm</a>|<a href="index.html#term">timeTerm</a>|<a href="index.html#term">timestampTerm</a>)
+</pre>
+syntax-end -->
+<p>Returns the minute of the specified date.</p>
+<p>Example:</p>
+<p class="notranslate">MINUTE(TO_TIME(&#39;2015-6-05&#39;))</p>
+
+<h3 id="second" class="notranslate">SECOND</h3>
+<!-- railroad-start -->
+<pre name="bnf" style="display: none">
+SECOND(<a href="index.html#term">dateTerm</a>|<a href="index.html#term">timeTerm</a>|<a href="index.html#term">timestampTerm</a>)
+</pre>
+<div name="railroad">
+<table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">SECOND ( <a href="index.html#term">dateTerm</a></code></td></tr></table></td><td class="te"></td></tr><tr class="railroad"><td class="ks"></td><td class="d"><code class="c"><a href="index.html#term">timeTerm</a></code></td><td class="ke"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c"><a href="index.html#term">timestampTerm</a> )</code></td></tr></table></td><td class="le"></td></tr></table>
+</div>
+<!-- railroad-end -->
+<!-- syntax-start
+<pre>
+SECOND(<a href="index.html#term">dateTerm</a>|<a href="index.html#term">timeTerm</a>|<a href="index.html#term">timestampTerm</a>)
+</pre>
+syntax-end -->
+<p>Returns the second of the specified date.</p>
+<p>Example:</p>
+<p class="notranslate">SECOND(TO_DATE(&#39;2015-6-05&#39;))</p>
 
 <!-- [close] { -->
 

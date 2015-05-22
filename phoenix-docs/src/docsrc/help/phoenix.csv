@@ -1699,6 +1699,70 @@ Returns offset (shift in minutes) of a time zone at particular date/time in minu
 TIMEZONE_OFFSET('Indian/Cocos', myDate)
 "
 
+"Functions (Time and Date)","NOW","
+NOW()
+","
+Returns the current date, bound at the start of the execution of a query based on the current time on the region server owning the metadata of the table being queried.
+","
+NOW()
+"
+
+"Functions (Time and Date)","YEAR","
+YEAR(dateTerm|timeTerm|timestampTerm)
+","
+Returns the year of the specified date.
+","
+YEAR(TO_DATE('2015-6-05'))
+"
+
+"Functions (Time and Date)","MONTH","
+MONTH(dateTerm|timeTerm|timestampTerm)
+","
+Returns the month of the specified date.
+","
+MONTH(TO_TIMESTAMP('2015-6-05'))
+"
+
+"Functions (Time and Date)","WEEK","
+WEEK(dateTerm|timeTerm|timestampTerm)
+","
+Returns the week of the specified date.
+","
+WEEK(TO_TIME('2010-6-15'))
+"
+
+"Functions (Time and Date)","DAYOFMONTH","
+DAYOFMONTH(dateTerm|timeTerm|timestampTerm)
+","
+Returns the day of the month of the specified date.
+","
+DAYOFMONTH(TO_DATE('2004-01-18 10:00:10'))
+"
+
+"Functions (Time and Date)","HOUR","
+HOUR(dateTerm|timeTerm|timestampTerm)
+","
+Returns the hour of the specified date.
+","
+HOUR(TO_TIMESTAMP('2015-6-05'))
+"
+
+"Functions (Time and Date)","MINUTE","
+MINUTE(dateTerm|timeTerm|timestampTerm)
+","
+Returns the minute of the specified date.
+","
+MINUTE(TO_TIME('2015-6-05'))
+"
+
+"Functions (Time and Date)","SECOND","
+SECOND(dateTerm|timeTerm|timestampTerm)
+","
+Returns the second of the specified date.
+","
+SECOND(TO_DATE('2015-6-05'))
+"
+
 "Functions (General)","COALESCE","
 COALESCE( firstTerm, secondTerm )
 ","
