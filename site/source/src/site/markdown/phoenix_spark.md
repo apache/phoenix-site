@@ -1,15 +1,31 @@
+# Apache Spark Plugin
 
-#Apache Spark Integration
+The phoenix-spark plugin extends Phoenix's MapReduce support to allow Spark to load Phoenix tables
+as RDDs or DataFrames, and enables persisting them back to Phoenix.
 
-phoenix-spark extends Phoenix's MapReduce support to allow Spark to load Phoenix tables as RDDs or
-DataFrames and enables persisting RDDs of Tuples back to Phoenix.
+#### Prerequisites
 
-## Prerequisites
-	Phoenix v4.4.0 and above
-	Spark 1.3.0
+* Phoenix 4.4.0-SNAPSHOT +
+* Spark 1.3.0 +
 
+#### Spark setup
 
-## Reading Phoenix Tables
+1. Ensure that all requisite Phoenix / HBase platform dependencies are available on the classpath for the Spark executors and drivers
+2. One method is to add the phoenix-4.4.0-SNAPSHOT-client.jar to 'SPARK_CLASSPATH' in spark-env.sh,
+or setting both 'spark.executor.extraClassPath' and 'spark.driver.extraClassPath' in
+spark-defaults.conf
+3. To help your IDE, you may want to add the following 'provided' dependency: 
+
+```
+<dependency>
+  <groupId>org.apache.phoenix</groupId>
+  <artifactId>phoenix-spark</artifactId>
+  <version>${phoenix.version}</version>
+  <scope>provided</scope>
+</dependency>
+```
+
+### Reading Phoenix Tables
 
 Given a Phoenix table with the following DDL
 
@@ -19,7 +35,7 @@ UPSERT INTO TABLE1 (ID, COL1) VALUES (1, 'test_row_1');
 UPSERT INTO TABLE1 (ID, COL1) VALUES (2, 'test_row_2');
 ```
 
-### Load as a DataFrame using the Data Source API
+#### Load as a DataFrame using the Data Source API
 ```scala
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.SQLContext
@@ -39,7 +55,7 @@ df
   .show
 ```
 
-### Load as a DataFrame directly using a Configuration object
+#### Load as a DataFrame directly using a Configuration object
 ```scala
 import org.apache.hadoop.conf.Configuration
 import org.apache.spark.SparkContext
@@ -60,7 +76,7 @@ val df = sqlContext.phoenixTableAsDataFrame(
 df.show
 ```
 
-### Load as an RDD, using a Zookeeper URL
+#### Load as an RDD, using a Zookeeper URL
 ```scala
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.SQLContext
@@ -79,16 +95,19 @@ val firstId = rdd1.first()("ID").asInstanceOf[Long]
 val firstCol = rdd1.first()("COL1").asInstanceOf[String]
 ```
 
-## Saving RDDs to Phoenix 
-
-`saveToPhoenix` is an implicit method on RDD[Product], or an RDD of Tuples. The data types must
-correspond to the Java types Phoenix supports (http://phoenix.apache.org/language/datatypes.html)
+### Saving Phoenix
 
 Given a Phoenix table with the following DDL
 
 ```sql
 CREATE TABLE OUTPUT_TEST_TABLE (id BIGINT NOT NULL PRIMARY KEY, col1 VARCHAR, col2 INTEGER);
 ```
+
+#### Saving RDDs
+
+The `saveToPhoenix` method is an implicit method on RDD[Product], or an RDD of Tuples. The data types must
+correspond to one of [the Java types supported by Phoenix](language/datatypes.html).
+
 
 ```scala
 import org.apache.spark.SparkContext
@@ -106,7 +125,7 @@ sc
   )
 ```
 
-## Saving DataFrames to Phoenix
+#### Saving DataFrames
 
 The `save` is method on DataFrame allows passing in a data source type. You can use
 `org.apache.phoenix.spark`, and must also pass in a `table` and `zkUrl` parameter to
@@ -138,7 +157,7 @@ df.save("org.apache.phoenix.spark", SaveMode.Overwrite, Map("table" -> "OUTPUT_T
   "zkUrl" -> hbaseConnectionString))
 ```
 
-## Notes
+### Notes
 
 The functions `phoenixTableAsDataFrame`, `phoenixTableAsRDD` and `saveToPhoenix` all support
 optionally specifying a `conf` Hadoop configuration parameter with custom Phoenix client settings,
@@ -147,9 +166,10 @@ as well as an optional `zkUrl` parameter for the Phoenix connection URL.
 If `zkUrl` isn't specified, it's assumed that the "hbase.zookeeper.quorum" property has been set
 in the `conf` parameter. Similarly, if no configuration is passed in, `zkUrl` must be specified.
 
-## Limitations
+### Limitations
 
 - Basic support for column and predicate pushdown using the Data Source API
 - The Data Source API does not support passing custom Phoenix settings in configuration, you must
 create the DataFrame or RDD directly if you need fine-grained configuration.
-- No support for aggregate or distinct functions (http://phoenix.apache.org/phoenix_mr.html)
+- No support for aggregate or distinct queries as explained in our [Map Reduce Integration](phoenix_mr.html) documentation.
+
