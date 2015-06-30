@@ -5,16 +5,16 @@ as RDDs or DataFrames, and enables persisting them back to Phoenix.
 
 #### Prerequisites
 
-* Phoenix 4.4.0-SNAPSHOT +
-* Spark 1.3.0 +
+* Phoenix 4.4.0+
+* Spark 1.3.0+
 
 #### Spark setup
 
 1. Ensure that all requisite Phoenix / HBase platform dependencies are available on the classpath for the Spark executors and drivers
-2. One method is to add the phoenix-4.4.0-SNAPSHOT-client.jar to 'SPARK_CLASSPATH' in spark-env.sh,
+2. One method is to add the phoenix-4.4.0-client.jar to 'SPARK_CLASSPATH' in spark-env.sh,
 or setting both 'spark.executor.extraClassPath' and 'spark.driver.extraClassPath' in
 spark-defaults.conf
-3. To help your IDE, you may want to add the following 'provided' dependency: 
+3. To help your IDE, you may want to add the following 'provided' dependency:
 
 ```
 <dependency>
@@ -45,7 +45,7 @@ val sc = new SparkContext("local", "phoenix-test")
 val sqlContext = new SQLContext(sc)
 
 val df = sqlContext.load(
-  "org.apache.phoenix.spark", 
+  "org.apache.phoenix.spark",
   Map("table" -> "TABLE1", "zkUrl" -> "phoenix-server:2181")
 )
 
@@ -153,7 +153,7 @@ val df = sqlContext.load("org.apache.phoenix.spark", Map("table" -> "INPUT_TABLE
   "zkUrl" -> hbaseConnectionString))
 
 // Save to OUTPUT_TABLE
-df.save("org.apache.phoenix.spark", SaveMode.Overwrite, Map("table" -> "OUTPUT_TABLE", 
+df.save("org.apache.phoenix.spark", SaveMode.Overwrite, Map("table" -> "OUTPUT_TABLE",
   "zkUrl" -> hbaseConnectionString))
 ```
 
@@ -173,3 +173,55 @@ in the `conf` parameter. Similarly, if no configuration is passed in, `zkUrl` mu
 create the DataFrame or RDD directly if you need fine-grained configuration.
 - No support for aggregate or distinct queries as explained in our [Map Reduce Integration](phoenix_mr.html) documentation.
 
+***
+
+### PageRank example
+
+This example makes use of the Enron email data set, provided by the
+[Stanford Network Analysis Project](https://snap.stanford.edu/data/email-Enron.html),
+and executes the GraphX implementation of PageRank on it to find interesting entities. It then
+saves the results back to Phoenix.
+
+1. Download and extract the file [enron.csv.gz](https://github.com/jmahonin/spark-graphx-phoenix/blob/master/enron.csv.gz?raw=true)
+
+2. Create the necessary Phoenix schema
+
+    ```sql
+    CREATE TABLE EMAIL_ENRON(MAIL_FROM BIGINT NOT NULL, MAIL_TO BIGINT NOT NULL CONSTRAINT pk PRIMARY KEY(MAIL_FROM, MAIL_TO));
+    CREATE TABLE EMAIL_ENRON_PAGERANK(ID BIGINT NOT NULL, RANK DOUBLE CONSTRAINT pk PRIMARY KEY(ID));
+    ```
+
+3. Load the email data into Phoenix (assuming localhost for Zookeeper Quroum URL)
+
+    ```
+    gunzip /tmp/enron.csv.gz
+    cd /path/to/phoenix/bin
+    ./psql.py -t EMAIL_ENRON localhost /tmp/enron.csv
+    ```
+
+4. In spark-shell, with the phoenix-client in the Spark driver classpath, run the following:
+
+    ```scala
+    import org.apache.spark.graphx._
+    import org.apache.phoenix.spark._
+    val rdd = sc.phoenixTableAsRDD("EMAIL_ENRON", Seq("MAIL_FROM", "MAIL_TO"), zkUrl=Some("localhost"))           // load from phoenix
+    val rawEdges = rdd.map{ e => (e("MAIL_FROM").asInstanceOf[VertexId], e("MAIL_TO").asInstanceOf[VertexId]) }   // map to vertexids
+    val graph = Graph.fromEdgeTuples(rawEdges, 1.0)                                                               // create a graph
+    val pr = graph.pageRank(0.001)                                                                                // run pagerank
+    pr.vertices.saveToPhoenix("EMAIL_ENRON_PAGERANK", Seq("ID", "RANK"), zkUrl = Some("localhost"))               // save to phoenix
+    ```
+
+5. Query the top ranked entities in SQL
+
+    ```sql
+    SELECT * FROM EMAIL_ENRON_PAGERANK ORDER BY RANK DESC LIMIT 5;
+    +------------------------------------------+------------------------------------------+
+    |                    ID                    |                   RANK                   |
+    +------------------------------------------+------------------------------------------+
+    | 5038                                     | 497.2989872977676                        |
+    | 273                                      | 117.18141799210386                       |
+    | 140                                      | 108.63091596789913                       |
+    | 458                                      | 107.2728800448782                        |
+    | 588                                      | 106.11840798585399                       |
+    +------------------------------------------+------------------------------------------+
+    ```

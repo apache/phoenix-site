@@ -24,8 +24,9 @@ Nick Dimiduk | Hortonworks | ndimiduk@apache.org | PMC
 Rajeshbabu Chintaguntla | Hortonworks | rajeshbabu@apache.org | PMC
 Ramkrishna Vasudevan | Intel | ramkrishna@apache.org | PMC
 Ravi Magham | Cornerstone OnDemand | ravimagham@apache.org | PMC
-Samarth Jain | Salesforce | samarth@apache.org | PMC 
+Samarth Jain | Salesforce | samarth@apache.org | PMC
 Simon Toens | Salesforce | stoens@apache.org | PMC
 Steven Noels | NG Data | stevenn@apache.org | PMC
-Thomas D'Silva | Salesforce | tdsilva@apache.org | Committer 
-Cody Marcel | Salesforce | codymarcel@apache.org | Committer 
+Thomas D'Silva | Salesforce | tdsilva@apache.org | Committer
+Cody Marcel | Salesforce | codymarcel@apache.org | Committer
+Josh Mahonin | Interset | jmahonin@apache.org | Committer

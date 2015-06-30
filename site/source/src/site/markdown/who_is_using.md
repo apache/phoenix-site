@@ -110,6 +110,24 @@ allows clean and maintainable code.<br/><br/>
 Cahana Ori, Director of Research and Development
 <br/></td></tr>
 
+<tr><td>
+<img src="images/using/interset.png"/>
+<br/><br/>
+
+Interset lives at the intersection of analytics and cybersecurity,
+providing a cyberattack threat detection solution that uses behavioral
+analytics, machine learning and big data to protect critical data.<br/><br/>
+
+Phoenix allows us to perform the dynamic and ad-hoc queries to build machine
+learning models that represent normal activity, in order to detect abnormal,
+anomalous and risky behaviors. With behavioral models and input features that vary
+across datasets, the expressiveness of Phoenix's SQL interface becomes a critical,
+enabling and accelerative technology that allows us to build threat detection models
+to keep up with customer and market demand.<br/><br/>
+
+Stephan Jou, CTO
+<br/></td></tr>
+
 </table>
 <!--End First Column-->
 </td>
