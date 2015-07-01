@@ -1,6 +1,9 @@
 # Apache Phoenix News
-<br/><hr/>
-#### [Upcoming Webcast on Apache Phoenix](http://www.oreilly.com/pub/e/3443) (June 25, 2015)
+<br/>
+<hr/>
+#### [Blog on Spark Integration in Apache Phoenix](https://blogs.apache.org/phoenix/entry/spark_integration_in_apache_phoenix) (June 29, 2015)
+<hr/>
+#### [O'Reilly Webcast on Apache Phoenix](http://www.oreilly.com/pub/e/3443) (June 25, 2015)
 <hr/>
 #### [TPC in Apache Phoenix](https://blogs.apache.org/phoenix/entry/tpc_in_apache_phoenix) (Apr 24, 2015)
 <hr/>
