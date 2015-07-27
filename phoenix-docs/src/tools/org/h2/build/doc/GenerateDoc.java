@@ -79,6 +79,7 @@ public class GenerateDoc {
         map("functionsAggregate", help + "= 'Functions (Aggregate)' ORDER BY ID", false);
         map("functionsNumeric", help + "= 'Functions (Numeric)' ORDER BY ID", false);
         map("functionsArray", help + "= 'Functions (Array)' ORDER BY ID", false);
+        map("functionsMath", help + "= 'Functions (Math)' ORDER BY ID", false);
         map("functionsString", help + "= 'Functions (String)' ORDER BY ID", false);
         map("functionsTimeDate", help + "= 'Functions (Time and Date)' ORDER BY ID", false);
         map("functionsGeneral", help + "= 'Functions (General)' ORDER BY ID", false);

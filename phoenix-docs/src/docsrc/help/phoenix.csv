@@ -1772,5 +1772,83 @@ to guarantee that a column in an UPSERT SELECT command will evaluate to a non nu
 COALESCE(last_update_date, CURRENT_DATE())
 "
 
+"Functions (Math)","SIGN","
+SIGN(numericTerm)
+","
+Returns the signum function of the given numeric expression as an INTEGER. The return value is -1 if the given numeric expression is negative; 0 if the given numeric expression is zero; and 1 if the given numeric expression is positive.
+","
+SIGN(number)
+SIGN(1.1)
+SIGN(-1)
+"
 
+"Functions (Math)","ABS","
+ABS(numericTerm)
+","
+Returns the absolute value of the given numeric expression maintaining the same type.
+","
+ABS(number)
+ABS(1.1)
+ABS(-1)
+"
+
+"Functions (Math)","SQRT","
+SQRT(numericTerm)
+","
+Returns the correctly rounded square root of the given non-negative numeric expression as a DOUBLE.
+","
+SQRT(number)
+SQRT(1.1)
+"
+
+"Functions (Math)","CBRT","
+CBRT(numericTerm)
+","
+Returns the cube root of the given numeric expression as a DOUBLE.
+","
+CBRT(number)
+CBRT(1.1)
+CBRT(-1)
+"
+
+"Functions (Math)","EXP","
+EXP(numericTerm)
+","
+Returns Euler's number e raised to the power of the given numeric value as a DOUBLE.
+","
+EXP(number)
+EXP(1.1)
+EXP(-1)
+"
+
+"Functions (Math)","POWER","
+POWER(numericTerm, numericTerm)
+","
+Returns the value of the first argument raised to the power of the second argument as a DOUBLE.
+","
+POWER(number, number)
+POWER(3, 2)
+POWER(2, 3)
+"
+
+"Functions (Math)","LN","
+LN(numericTerm)
+","
+Returns the natural logarithm (base e) of the given positive expression as a DOUBLE.
+","
+LN(number)
+LN(3)
+LN(2)
+"
+
+"Functions (Math)","LOG","
+LOG(numericTerm[, numericTerm])
+","
+Returns the logarithm of the first argument computed at the base of the second argument
+as a DOUBLE. If omitted, a base of 10 will be used for the second argument.
+","
+LOG(3, 2)
+LOG(2, 3)
+LOG(2)
+"
 
