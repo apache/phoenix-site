@@ -398,6 +398,14 @@ syntax-end -->
 
     <a href="#array_append" >ARRAY_APPEND</a><br />
 
+    <a href="#array_prepend" >ARRAY_PREPEND</a><br />
+
+    <a href="#array_cat" >ARRAY_CAT</a><br />
+
+    <a href="#array_fill" >ARRAY_FILL</a><br />
+
+    <a href="#array_to_string" >ARRAY_TO_STRING</a><br />
+
     <a href="#any" >ANY</a><br />
 
     <a href="#all" >ALL</a><br />
@@ -411,12 +419,20 @@ syntax-end -->
                 <a href="#array_elem" >ARRAY_ELEM</a><br />
             
                 <a href="#array_length" >ARRAY_LENGTH</a><br />
-                    </td><td class="index">
             
                 <a href="#array_append" >ARRAY_APPEND</a><br />
+                    </td><td class="index">
+            
+                <a href="#array_prepend" >ARRAY_PREPEND</a><br />
+            
+                <a href="#array_cat" >ARRAY_CAT</a><br />
+            
+                <a href="#array_fill" >ARRAY_FILL</a><br />
+                    </td><td class="index">
+            
+                <a href="#array_to_string" >ARRAY_TO_STRING</a><br />
             
                 <a href="#any" >ANY</a><br />
-                    </td><td class="index">
             
                 <a href="#all" >ALL</a><br />
                     </td>
@@ -797,6 +813,78 @@ syntax-end -->
 <p>Appends the given element to the end of the array.</p>
 <p>Example:</p>
 <p class="notranslate">ARRAY_APPEND(my_array_col, my_element_col)<br />ARRAY_APPEND(ARRAY[1,2,3], 4) evaluates to ARRAY[1,2,3,4]</p>
+
+<h3 id="array_prepend" class="notranslate">ARRAY_PREPEND</h3>
+<!-- railroad-start -->
+<pre name="bnf" style="display: none">
+ARRAY_PREPEND(<a href="index.html#term">elementTerm</a>, <a href="index.html#term">arrayTerm</a>)
+</pre>
+<div name="railroad">
+<table class="railroad"><tr class="railroad"><td class="d"><code class="c">ARRAY_PREPEND ( <a href="index.html#term">elementTerm</a> , <a href="index.html#term">arrayTerm</a> )</code></td></tr></table>
+</div>
+<!-- railroad-end -->
+<!-- syntax-start
+<pre>
+ARRAY_PREPEND(<a href="index.html#term">elementTerm</a>, <a href="index.html#term">arrayTerm</a>)
+</pre>
+syntax-end -->
+<p>Appends the given element to the beginning of the array.</p>
+<p>Example:</p>
+<p class="notranslate">ARRAY_PREPEND(my_element_col, my_array_col)<br />ARRAY_PREPEND(0, ARRAY[1,2,3]) evaluates to ARRAY[0,1,2,3]</p>
+
+<h3 id="array_cat" class="notranslate">ARRAY_CAT</h3>
+<!-- railroad-start -->
+<pre name="bnf" style="display: none">
+ARRAY_CAT(<a href="index.html#term">arrayTerm</a>, <a href="index.html#term">arrayTerm</a>)
+</pre>
+<div name="railroad">
+<table class="railroad"><tr class="railroad"><td class="d"><code class="c">ARRAY_CAT ( <a href="index.html#term">arrayTerm</a> , <a href="index.html#term">arrayTerm</a> )</code></td></tr></table>
+</div>
+<!-- railroad-end -->
+<!-- syntax-start
+<pre>
+ARRAY_CAT(<a href="index.html#term">arrayTerm</a>, <a href="index.html#term">arrayTerm</a>)
+</pre>
+syntax-end -->
+<p>Concatenates the input arrays and returns the result.</p>
+<p>Example:</p>
+<p class="notranslate">ARRAY_CAT(my_array_col1, my_array_col2)<br />ARRAY_CAT(ARRAY[1,2], ARRAY[3,4]) evaluates to ARRAY[1,2,3,4]</p>
+
+<h3 id="array_fill" class="notranslate">ARRAY_FILL</h3>
+<!-- railroad-start -->
+<pre name="bnf" style="display: none">
+ARRAY_FILL(<a href="index.html#term">arrayTerm</a>, <a href="index.html#numeric">lengthNumeric</a>)
+</pre>
+<div name="railroad">
+<table class="railroad"><tr class="railroad"><td class="d"><code class="c">ARRAY_FILL ( <a href="index.html#term">arrayTerm</a> , <a href="index.html#numeric">lengthNumeric</a> )</code></td></tr></table>
+</div>
+<!-- railroad-end -->
+<!-- syntax-start
+<pre>
+ARRAY_FILL(<a href="index.html#term">arrayTerm</a>, <a href="index.html#numeric">lengthNumeric</a>)
+</pre>
+syntax-end -->
+<p>Returns an array initialized with supplied value and length.</p>
+<p>Example:</p>
+<p class="notranslate">ARRAY_FILL(my_element_col, my_length_col)<br />ARRAY_FILL(1, 3) evaluates to ARRAY[1,1,1]</p>
+
+<h3 id="array_to_string" class="notranslate">ARRAY_TO_STRING</h3>
+<!-- railroad-start -->
+<pre name="bnf" style="display: none">
+ARRAY_TO_STRING(<a href="index.html#term">arrayTerm</a>, <a href="index.html#string">delimiterString</a> [, <a href="index.html#string">nullString</a>])
+</pre>
+<div name="railroad">
+<table class="railroad"><tr class="railroad"><td class="d"><code class="c">ARRAY_TO_STRING ( <a href="index.html#term">arrayTerm</a> , <a href="index.html#string">delimiterString</a></code></td><td class="d"><table class="railroad"><tr class="railroad"><td class="ts"></td><td class="d">&nbsp;</td><td class="te"></td></tr><tr class="railroad"><td class="ls"></td><td class="d"><table class="railroad"><tr class="railroad"><td class="d"><code class="c">, <a href="index.html#string">nullString</a></code></td></tr></table></td><td class="le"></td></tr></table></td><td class="d"><code class="c">)</code></td></tr></table>
+</div>
+<!-- railroad-end -->
+<!-- syntax-start
+<pre>
+ARRAY_TO_STRING(<a href="index.html#term">arrayTerm</a>, <a href="index.html#string">delimiterString</a> [, <a href="index.html#string">nullString</a>])
+</pre>
+syntax-end -->
+<p>Concatenates array elements using supplied delimiter and optional null string and returns the resulting string. If the nullString parameter is omitted or <code>NULL</code>, any null elements in the array are simply skipped and not represented in the output string.</p>
+<p>Example:</p>
+<p class="notranslate">ARRAY_TO_STRING(my_array_col, my_delimiter_col, my_null_string_col)<br />ARRAY_TO_STRING(ARRAY[&#39;a&#39;,&#39;b&#39;,&#39;c&#39;], &#39;,&#39;) evaluates to &#39;a,b,c&#39;<br />ARRAY_TO_STRING(ARRAY[&#39;a&#39;,&#39;b&#39;,null,&#39;c&#39;], &#39;,&#39;) evaluates to &#39;a,b,c&#39;<br />ARRAY_TO_STRING(ARRAY[&#39;a&#39;,&#39;b&#39;,null,&#39;c&#39;], &#39;,&#39;, &#39;NULL&#39;) evaluates to &#39;a,b,NULL,c&#39;</p>
 
 <h3 id="any" class="notranslate">ANY</h3>
 <!-- railroad-start -->

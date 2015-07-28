@@ -1483,6 +1483,44 @@ ARRAY_APPEND(my_array_col, my_element_col)
 ARRAY_APPEND(ARRAY[1,2,3], 4) evaluates to ARRAY[1,2,3,4]
 "
 
+"Functions (Array)","ARRAY_PREPEND","
+ARRAY_PREPEND(elementTerm, arrayTerm)
+","
+Appends the given element to the beginning of the array.
+","
+ARRAY_PREPEND(my_element_col, my_array_col)
+ARRAY_PREPEND(0, ARRAY[1,2,3]) evaluates to ARRAY[0,1,2,3]
+"
+
+"Functions (Array)","ARRAY_CAT","
+ARRAY_CAT(arrayTerm, arrayTerm)
+","
+Concatenates the input arrays and returns the result.
+","
+ARRAY_CAT(my_array_col1, my_array_col2)
+ARRAY_CAT(ARRAY[1,2], ARRAY[3,4]) evaluates to ARRAY[1,2,3,4]
+"
+
+"Functions (Array)","ARRAY_FILL","
+ARRAY_FILL(arrayTerm, lengthNumeric)
+","
+Returns an array initialized with supplied value and length.
+","
+ARRAY_FILL(my_element_col, my_length_col)
+ARRAY_FILL(1, 3) evaluates to ARRAY[1,1,1]
+"
+
+"Functions (Array)","ARRAY_TO_STRING","
+ARRAY_TO_STRING(arrayTerm, delimiterString [, nullString])
+","
+Concatenates array elements using supplied delimiter and optional null string and returns the resulting string. If the nullString parameter is omitted or NULL, any null elements in the array are simply skipped and not represented in the output string.
+","
+ARRAY_TO_STRING(my_array_col, my_delimiter_col, my_null_string_col)
+ARRAY_TO_STRING(ARRAY['a','b','c'], ',') evaluates to 'a,b,c'
+ARRAY_TO_STRING(ARRAY['a','b',null,'c'], ',') evaluates to 'a,b,c'
+ARRAY_TO_STRING(ARRAY['a','b',null,'c'], ',', 'NULL') evaluates to 'a,b,NULL,c'
+"
+
 "Functions (Array)","ANY","
 ANY( arrayTerm )
 ","
