@@ -85,6 +85,7 @@
             <item href="building.html" name="Building"/>
             <item href="tuning.html" name="Tuning"/>
             <item href="upgrading.html" name="Upgrading"/>
+            <item href="release_notes.html" name="Release Notes"/>
             <item href="pherf.html" name="Performance Testing"/>
             <item href="http:divider" name=""/>
             <item href="phoenix_spark.html" name="Apache Spark Integration"/>

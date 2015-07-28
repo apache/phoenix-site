@@ -16,14 +16,22 @@ version has changed), sometimes modifications to the system tables are necessary
 fix a bug or provide a new feature. This upgrade will occur automatically the first time a
 newly upgraded client connects to the newly upgraded server. It is **required** that the
 server-side jar be upgraded first across your entire cluster, before any clients are
-upgraded. An older client will work with a newer server jar when the minor version is
-different, but not visa versa. In other words, clients do not need to be upgraded in lock
-step with the server.
+upgraded. An older client (two minor versions back) will work with a newer server jar when
+the minor version is different, but not visa versa. In other words, clients do not need to
+be upgraded in lock step with the server. However, as the server version moves forward,
+the client version should move forward as well. This allows Phoenix to evolve its client/server
+protocol while still providing clients sufficient time to upgrade their clients.
 
-As of the 4.3 release, a mix of clients on different
-minor release versions is supported (note that prior releases required all clients to be
-upgraded at the same time). Another improvement as of the 4.3 release is that an upgrade
-may be done directly from one minor version to any other higher minor version (prior releases required an upgrade to each minor version in between).
+As of the 4.3 release, a mix of clients on different minor release versions is supported as well
+(note that prior releases required all clients to be upgraded at the same time). Another improvement
+as of the 4.3 release is that an upgrade may be done directly from one minor version to another
+higher minor version (prior releases required an upgrade to each minor version in between).
 
 ##Major Release
-Upgrading to a new major release may require downtime as well as potentially the running of a migration script. Additionally, all clients and servers may need to be upgraded at the same time. This will be determined on a release by release basis.
+Upgrading to a new major release may require downtime as well as potentially the running of a migration
+script. Additionally, all clients and servers may need to be upgraded at the same time. This will be
+determined on a release by release basis.
+
+
+##Release Notes
+Specific details on issues and their fixes that may impact you may be found [here](release_notes.html).

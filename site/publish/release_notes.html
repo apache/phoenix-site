@@ -8,7 +8,7 @@
 
 	<head>
 		<meta charset="UTF-8" />
-		<title>Phoenix Downloads | Apache Phoenix</title>
+		<title>Release Notes | Apache Phoenix</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="description" content="" />
 		<meta http-equiv="content-language" content="en" />
@@ -34,7 +34,7 @@
 
 	</head>
 
-	<body class="page-download project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
+	<body class="page-release_notes project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
 
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
@@ -59,7 +59,7 @@
 									<li ><a href="mailing_list.html" title="Mailing Lists">Mailing Lists</a></li>
 									<li ><a href="source.html" title="Source Repository">Source Repository</a></li>
 									<li ><a href="issues.html" title="Issue Tracking">Issue Tracking</a></li>
-									<li class="active"><a href="" title="Download">Download</a></li>
+									<li ><a href="download.html" title="Download">Download</a></li>
 									<li ><a href="installation.html" title="Installation">Installation</a></li>
 									<li class="divider"/>
 									<li ><a href="who_is_using.html" title="Who is Using">Who is Using</a></li>
@@ -82,7 +82,7 @@
 									<li ><a href="building.html" title="Building">Building</a></li>
 									<li ><a href="tuning.html" title="Tuning">Tuning</a></li>
 									<li ><a href="upgrading.html" title="Upgrading">Upgrading</a></li>
-									<li ><a href="release_notes.html" title="Release Notes">Release Notes</a></li>
+									<li class="active"><a href="" title="Release Notes">Release Notes</a></li>
 									<li ><a href="pherf.html" title="Performance Testing">Performance Testing</a></li>
 									<li class="divider"/>
 									<li ><a href="phoenix_spark.html" title="Apache Spark Integration">Apache Spark Integration</a></li>
@@ -140,33 +140,40 @@
 		<div class="span12">
 			<div class="body-content">
 <div class="page-header">
- <h1>Phoenix Downloads</h1>
+ <h1>Release Notes</h1>
 </div> 
+<p>Release notes provide details on issues and their fixes which may have an impact on prior Phoenix behavior. For some issues an upgrade may be required to be performed for a fix to take affect. See below for directions specific to a particular release.</p> 
 <div class="section"> 
  <div class="section"> 
-  <h3 id="Download_Latest_Phoenix_Binary_and_Source_Releases"><a class="externalLink" href="http://www.apache.org/dyn/closer.cgi/phoenix/"><u>Download Latest Phoenix Binary and Source Releases</u></a></h3> 
- </div> 
- <div class="section"> 
-  <h3 id="See_Latest_Release_Notes"><a href="release_notes.html"><u>See Latest Release Notes</u></a></h3> 
-  <div class="section"> 
-   <h4 id="List_of_New_Features"><a href="recent.html">List of New Features</a></h4> 
-  </div> 
-  <div class="section"> 
-   <h4 id="Download_Previous_Releases"><a class="externalLink" href="http://www.apache.org/dyn/closer.cgi/incubator/phoenix/">Download Previous Releases</a> 
-    <hr /></h4> 
-  </div> 
- </div> 
- <div class="section"> 
-  <h3 id="HBase_Compatibility">HBase Compatibility</h3> 
+  <h3 id="Phoenix-4.5.0_Release_Notes"><u>Phoenix-4.5.0 Release Notes</u></h3> 
+  <p>Both <a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-2067">PHOENIX-2067</a> and <a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-2120">PHOENIX-2120</a> cause rows to not be ordered correctly for the following types of columns:</p> 
   <ul> 
-   <li>Phoenix 2.x - HBase 0.94.x</li> 
-   <li>Phoenix 3.x - HBase 0.94.x</li> 
-   <li> <p>Phoenix 4.x - HBase 0.98.1+ </p> 
-    <hr /><p></p> 
-    <div class="section"> 
-     <h4 id="See_also:_Installation_Instructions">See also: <a href="installation.html">Installation Instructions</a></h4> 
-    </div></li> 
+   <li>VARCHAR DESC columns</li> 
+   <li>DECIMAL DESC columns</li> 
+   <li>ARRAY DESC columns</li> 
+   <li>Nullable DESC columns which are indexed (impacts the index, but not the data table)</li> 
+   <li>BINARY columns included in the primary key constraint</li> 
   </ul> 
+  <p>To get an idea if any of your tables are impacted, you may run the following command:</p> 
+  <div class="source"> 
+   <pre>./psql.py -u my_host_name
+</pre> 
+  </div> 
+  <p>This will look through all tables you’ve defined and indicate if any upgrades are necessary.</p> 
+  <p>To upgrade the tables, run the same command, but list the tables you’d like upgraded like this:</p> 
+  <div class="source"> 
+   <pre>./psql.py -u my_host_name table1 table2 table3
+</pre> 
+  </div> 
+  <p>This will first make a snapshot of your table and then upgrade it. If any problems occur during the upgrade process, the snapshot of your original table will be restored.</p> 
+  <p>For the case of BINARY columns, no update is required if you’ve always provided all of the bytes making up that column value (i.e. you have not relied on Phoenix to auto-pad the column up to the fixed length). In this case, you should bypass the upgrade by running the following command:</p> 
+  <div class="source"> 
+   <pre>./psql.py -u -b my_host_name table1
+</pre> 
+  </div> 
+  <p>This is important, because the PHOENIX-2120 was caused by BINARY columns being incorrectly padded with a space characters instead of a zero byte characters. The upgrade will replace trailing space characters with zero byte characters which may be invalid if the space characters are legitimate/intentional characters. Unfortunately, Phoenix has no way to know if this is the case.</p> 
+  <p>Upgrading your tables is important, as without this, Phoenix will need to reorder rows it retrieves back from the server when otherwise not necessary. This will have a large negative impact on performance until the upgrade is performed.</p> 
+  <p><b>Future releases of Phoenix may require that affected tables be upgraded prior to moving to the new release.</b></p> 
  </div> 
 </div>
 			</div>
@@ -211,8 +218,8 @@
 						<li >
 							<a href="issues.html" title="Issue Tracking">Issue Tracking</a>
 						</li>
-						<li class="active">
-							<a href="#" title="Download">Download</a>
+						<li >
+							<a href="download.html" title="Download">Download</a>
 						</li>
 						<li >
 							<a href="installation.html" title="Installation">Installation</a>
@@ -270,8 +277,8 @@
 						<li >
 							<a href="upgrading.html" title="Upgrading">Upgrading</a>
 						</li>
-						<li >
-							<a href="release_notes.html" title="Release Notes">Release Notes</a>
+						<li class="active">
+							<a href="#" title="Release Notes">Release Notes</a>
 						</li>
 						<li >
 							<a href="pherf.html" title="Performance Testing">Performance Testing</a>
