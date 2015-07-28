@@ -21,13 +21,18 @@ To get an idea if any of your tables are impacted, you may run the following com
     ./psql.py -u my_host_name
 
 This will look through all tables you've defined and indicate if any upgrades are necessary.
+Ensure your client-side <code>phoenix.query.timeoutMs</code> property and server-side
+<code>hbase.regionserver.lease.period</code> are set high enough for the command to complete.
+
 
 To upgrade the tables, run the same command, but list the tables you'd like upgraded like this:
 
     ./psql.py -u my_host_name table1 table2 table3
 
 This will first make a snapshot of your table and then upgrade it. If any problems occur
-during the upgrade process, the snapshot of your original table will be restored.
+during the upgrade process, the snapshot of your original table will be restored. Again, make
+sure your timeouts are set high enough, as the tables being upgraded need to be rewritten
+in order to fix them.
 
 For the case of BINARY columns, no update is required if you've always provided all of
 the bytes making up that column value (i.e. you have not relied on Phoenix to auto-pad the
