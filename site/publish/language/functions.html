@@ -218,6 +218,8 @@ syntax-end -->
 
     <a href="#substr" >SUBSTR</a><br />
 
+    <a href="#instr" >INSTR</a><br />
+
     <a href="#trim" >TRIM</a><br />
 
     <a href="#ltrim" >LTRIM</a><br />
@@ -250,14 +252,16 @@ syntax-end -->
             
                 <a href="#substr" >SUBSTR</a><br />
             
+                <a href="#instr" >INSTR</a><br />
+            
                 <a href="#trim" >TRIM</a><br />
             
                 <a href="#ltrim" >LTRIM</a><br />
             
                 <a href="#rtrim" >RTRIM</a><br />
+                    </td><td class="index">
             
                 <a href="#lpad" >LPAD</a><br />
-                    </td><td class="index">
             
                 <a href="#length" >LENGTH</a><br />
             
@@ -266,9 +270,9 @@ syntax-end -->
                 <a href="#regexp_replace" >REGEXP_REPLACE</a><br />
             
                 <a href="#regexp_split" >REGEXP_SPLIT</a><br />
+                    </td><td class="index">
             
                 <a href="#upper" >UPPER</a><br />
-                    </td><td class="index">
             
                 <a href="#lower" >LOWER</a><br />
             
@@ -1281,6 +1285,24 @@ syntax-end -->
 <p>Returns a substring of a string starting at the one-based position. If zero is used, the position is zero-based. If the start index is negative, then the start index is relative to the end of the string. The length is optional and if not supplied, the rest of the string will be returned.</p>
 <p>Example:</p>
 <p class="notranslate">SUBSTR(&#39;[Hello]&#39;, 2, 5)<br />SUBSTR(&#39;Hello World&#39;, -5)</p>
+
+<h3 id="instr" class="notranslate">INSTR</h3>
+<!-- railroad-start -->
+<pre name="bnf" style="display: none">
+INSTR( <a href="index.html#term">stringTerm</a>, <a href="index.html#term">stringTerm</a> )
+</pre>
+<div name="railroad">
+<table class="railroad"><tr class="railroad"><td class="d"><code class="c">INSTR ( <a href="index.html#term">stringTerm</a> , <a href="index.html#term">stringTerm</a> )</code></td></tr></table>
+</div>
+<!-- railroad-end -->
+<!-- syntax-start
+<pre>
+INSTR( <a href="index.html#term">stringTerm</a>, <a href="index.html#term">stringTerm</a> )
+</pre>
+syntax-end -->
+<p>Returns the one-based position of the initial occurrence of the second argument in the first argument. If the second argument is not contained in the first argument, then zero is returned.</p>
+<p>Example:</p>
+<p class="notranslate">INSTR(&#39;Hello World&#39;, &#39;World&#39;)<br />INSTR(&#39;Simon says&#39;, &#39;mon&#39;)<br />INSTR(&#39;Peace on earth&#39;, &#39;war&#39;)</p>
 
 <h3 id="trim" class="notranslate">TRIM</h3>
 <!-- railroad-start -->

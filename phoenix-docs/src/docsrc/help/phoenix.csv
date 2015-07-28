@@ -1423,6 +1423,18 @@ SUBSTR('[Hello]', 2, 5)
 SUBSTR('Hello World', -5)
 "
 
+"Functions (String)","INSTR","
+INSTR( stringTerm, stringTerm )
+","
+Returns the one-based position of the initial occurrence of the second
+argument in the first argument. If the second argument is not contained
+in the first argument, then zero is returned.
+","
+INSTR('Hello World', 'World')
+INSTR('Simon says', 'mon')
+INSTR('Peace on earth', 'war')
+"
+
 "Functions (String)","TRIM","
 TRIM( stringTerm )
 ","
