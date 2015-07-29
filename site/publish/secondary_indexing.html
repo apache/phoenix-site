@@ -166,6 +166,15 @@
  <p>All indexes on a table declared with <tt>IMMUTABLE_ROWS=true</tt> are considered immutable (note that by default, tables are considered mutable). For global immutable indexes, the index is maintained entirely on the client-side with the index table being generated as change to the data table occur. Local immutable indexes, on the other hand, are maintained on the server-side. Note that no safeguards are in-place to enforce that a table declared as immutable doesn’t actually mutate data (as that would negate the performance gain achieved). If that was to occur, the index would no longer be in sync with the table.</p> 
 </div> 
 <div class="section"> 
+ <h2 id="MR_Index_Build">Map Reduce Index Build</h2> 
+ <p>As of the 4.4.0 release it is possible to use a map reduce job to create an index asynchronously by including the <tt>ASYNC</tt> keyword in the index creation DDL statement:</p> 
+ <div class="source"> 
+  <pre>CREATE INDEX async_index ON my_table (v) ASYNC;
+</pre> 
+ </div> 
+ <p>The map reduce job that populates the index table must be kicked off separately.</p> 
+</div> 
+<div class="section"> 
  <h2 id="Examples">Examples</h2> 
  <p>Given the schema shown here:</p> 
  <div class="source"> 
@@ -210,12 +219,14 @@ CREATE LOCAL INDEX my_index ON my_table (v1);
   <div class="source"> 
    <pre>CREATE INDEX upper_name_idx ON employee (UPPER(name)) INCLUDE(name);
 </pre> 
-  </div> 
-  <p>With this index in place, when the following query is issued, the index would be used instead of the data table to retrieve the results:</p> 
+  </div>
+<div class="section"> 
+  <h3 id="MR_Index">Map Reduce Index Build</h3> 
+  <p>The IndexTool class is called to create a map reduce job that populates the index. It can be triggered via the HBase command line binary. For example:</p> 
   <div class="source"> 
-   <pre>SELECT id, name FROM employee WHERE UPPER(NAME)='John Doe';
+   <pre>${HBASE_HOME}/bin/hbase org.apache.phoenix.mapreduce.index.IndexTool -dt DATA_TABLE -it ASYNC_IDX  -op ASYNC_IDX_HFILES
 </pre> 
-  </div> 
+  </div>  
  </div> 
  <div class="section"> 
   <h3 id="Index_Sort_Order">Index Sort Order</h3> 

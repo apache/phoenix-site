@@ -155,10 +155,17 @@ WHERE eventType = 'OOM' AND lastGCTime &lt; eventTime - 1
  <pre>CREATE TABLE EventLog (
     eventId BIGINT NOT NULL,
     eventTime TIME NOT NULL,
-    eventType CHAR(3) NOT NULL
+    eventType CHAR(3)
     CONSTRAINT pk PRIMARY KEY (eventId, eventTime))
 </pre>
 </div>
+<p>To upsert a row with dynamic columns:</p> 
+<div class="source"> 
+ <pre>UPSERT INTO EventLog (eventId, eventTime, eventType, lastGCTime TIME, usedMemory BIGINT, maxMemory BIGINT)
+      VALUES(1, CURRENT_TIME(), 'abc', CURRENT_TIME(), 512, 1024);
+</pre>
+</div>
+
 			</div>
 		</div>
 	</div>
