@@ -403,7 +403,7 @@ CREATE LOCAL INDEX my_index ON my_table (v1);
  </ol> 
  <h1>Performance</h1> 
  <p>We track secondary index performance via our <a class="externalLink" href="http://phoenix-bin.github.io/client/performance/latest.htm">performance framework</a>. This is a generic test of performance based on defaults - your results will vary based on hardware specs as well as you individual configuration.</p> 
- <p>That said, we have seen secondary indexing (both immutable and mutable) go as quickly as &lt; 2x the regular write path on a small, (3 node) desktop-based cluster. This is actually a phenomenal as we have to write to multiple tables as well as build the index update.</p> 
+ <p>That said, we have seen secondary indexing (both immutable and mutable) go as quickly as &lt; 2x the regular write path on a small, (3 node) desktop-based cluster. This is actually pretty reasonable as we have to write to multiple tables as well as build the index update.</p> 
  <h1>Resources</h1> 
  <p>There have been several presentations given on how secondary indexing works in Phoenix that have a more in-depth look at how indexing works (with pretty pictures!):</p> 
  <ul> 
