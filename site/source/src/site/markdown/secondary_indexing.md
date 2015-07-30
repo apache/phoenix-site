@@ -33,13 +33,13 @@ All indexes on a table declared with <code>IMMUTABLE_ROWS=true</code> are consid
 ## Asynchronous Index Population
 As of the 4.5.0 release it is possible to use a map reduce job to initially populate an index asynchronously by including the ASYNC keyword in the index creation DDL statement:
 
-    CREATE INDEX async_index ON my_table (v) ASYNC;
+    CREATE INDEX async_index ON my_schema.my_table (v) ASYNC;
 
 The map reduce job that populates the index table must be kicked off separately through the HBase command line like this:
 
-    ${HBASE_HOME}/bin/hbase org.apache.phoenix.mapreduce.index.IndexTool -dt MY_TABLE -it ASYNC_IDX  -op ASYNC_IDX_HFILES
+    ${HBASE_HOME}/bin/hbase org.apache.phoenix.mapreduce.index.IndexTool --schema MY_SCHEMA --data-table MY_TABLE --index-table ASYNC_IDX  --output-path ASYNC_IDX_HFILES
 
-Only when the map reduce job is complete will the index be activated and start to be used in queries.
+Only when the map reduce job is complete will the index be activated and start to be used in queries. The output-path option is used to specify a HDFS directory that is used for writing HFiles to.
 
 ## Examples
 

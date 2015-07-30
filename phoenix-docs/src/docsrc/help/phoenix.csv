@@ -68,7 +68,7 @@ Column families that exist in the HBase table but are not listed are ignored.
 At create time, to improve query performance, an empty key value is added to the first column family of any existing rows or the default column family if no column families are explicitly defined. Upserts will also add this empty key value. This improves query performance by having a key value column we can guarantee always being there and thus minimizing the amount of data that must be projected and subsequently returned back to the client. HBase table and column configuration options may be passed through as key/value pairs to configure the HBase table as desired. Note that when using the IF NOT EXISTS clause, if a table already exists, then no change will be made to it. Additionally, no validation is done to check whether the existing table metadata matches the proposed table metadata. so it's better to use DROP TABLE followed by CREATE TABLE is the table metadata may be changing.
 
 ","
-CREATE TABLE my_schema.my_table ( id BIGINT not null primary key, date DATE not null)
+CREATE TABLE my_schema.my_table ( id BIGINT not null primary key, date)
 CREATE TABLE my_table ( id INTEGER not null primary key desc, date DATE not null,
     m.db_utilization DECIMAL, i.db_utilization)
     m.DATA_BLOCK_ENCODING='DIFF'
@@ -202,6 +202,7 @@ ALTER TABLE my_table SET IMMUTABLE_ROWS=true,DISABLE_WAL=true;
 CREATE INDEX [IF NOT EXISTS] indexName
 ON tableRef ( expression [ASC | DESC] [,...] )
 [ INCLUDE ( columnRef [,...] ) ]
+[ ASYNC ]
 [indexOptions] [ SPLIT ON ( splitPoint [,...] ) ]
 ","
 Creates a new secondary index on a table or view. The index will be automatically kept in sync with the table as the data changes.
@@ -212,6 +213,7 @@ in the CREATE TABLE statement or afterwards in an ALTER TABLE statement). This r
 Otherwise, if this property is not set on the table, then incremental index maintenance will be performed on the server side when
 the data changes.
 As of the 4.3 release, functional indexes are supported which allow arbitrary expressions rather than solely column names to be indexed.
+As of the 4.4.0 release, you can specify the ASYNC keyword to create the index using a map reduce job.
 ","
 CREATE INDEX my_idx ON sales.opportunity(last_updated_date DESC)
 CREATE INDEX my_idx ON log.event(created_date DESC) INCLUDE (name, payload) SALT_BUCKETS=10

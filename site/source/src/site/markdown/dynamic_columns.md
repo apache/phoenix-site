@@ -13,5 +13,10 @@ Where you may have defined only a subset of your event columns at create time, s
     CREATE TABLE EventLog (
         eventId BIGINT NOT NULL,
         eventTime TIME NOT NULL,
-        eventType CHAR(3) NOT NULL
+        eventType CHAR(3) 
         CONSTRAINT pk PRIMARY KEY (eventId, eventTime))
+
+To upsert a row with dynamic columns:
+
+   UPSERT INTO EventLog (eventId, eventTime, eventType, lastGCTime TIME, usedMemory BIGINT, maxMemory BIGINT)
+      VALUES(1, CURRENT_TIME(), 'abc', CURRENT_TIME(), 512, 1024);
