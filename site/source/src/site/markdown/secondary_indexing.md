@@ -30,6 +30,17 @@ For a table in which the data is only written once and never updated in-place, c
 
 All indexes on a table declared with <code>IMMUTABLE_ROWS=true</code> are considered immutable (note that by default, tables are considered mutable). For global immutable indexes, the index is maintained entirely on the client-side with the index table being generated as change to the data table occur. Local immutable indexes, on the other hand, are maintained on the server-side. Note that no safeguards are in-place to enforce that a table declared as immutable doesn't actually mutate data (as that would negate the performance gain achieved). If that was to occur, the index would no longer be in sync with the table.
 
+## Asynchronous Index Population
+As of the 4.5.0 release it is possible to use a map reduce job to initially populate an index asynchronously by including the ASYNC keyword in the index creation DDL statement:
+
+    CREATE INDEX async_index ON my_table (v) ASYNC;
+
+The map reduce job that populates the index table must be kicked off separately through the HBase command line like this:
+
+    ${HBASE_HOME}/bin/hbase org.apache.phoenix.mapreduce.index.IndexTool -dt MY_TABLE -it ASYNC_IDX  -op ASYNC_IDX_HFILES
+
+Only when the map reduce job is complete will the index be activated and start to be used in queries.
+
 ## Examples
 
 Given the schema shown here:
@@ -38,6 +49,19 @@ Given the schema shown here:
 you'd create a global index on the v1 column like this:
 
     CREATE INDEX my_index ON my_table (v1);
+
+In addition to indexing on just a column, arbitrary expression may be indexed. For example:
+
+    CREATE INDEX upper_v1_idx ON my_table (UPPER(v1)) INCLUDE(v2);
+
+With this index in place, when the following query is issued, the index would be used instead of the data table to retrieve the results:
+
+    SELECT v2, v1 FROM my_table WHERE UPPER(v1)='John Doe';
+
+Multiple columns may be indexed and their values may be stored in ascending or descending order.
+
+    CREATE INDEX my_index ON my_table (v2 DESC, v1) INCLUDE (v3);
+
 A table may contain any number of indexes, but note that your write speed will drop as you add additional indexes.
 
 By default, a global index will not be used unless all of the columns referenced in the query are contained in the index.  For example, the following query would not use the index, because v2 is referenced in the query but not included in the index:
@@ -64,20 +88,6 @@ This will cause each data row to be retrieved when the index is traversed to fin
     CREATE LOCAL INDEX my_index ON my_table (v1);
     </pre>
 Unlike global indexes, local indexes *will* use an index even when all columns referenced in the query are not contained in the index. This is done by default for local indexes because we know that the table and index data coreside on the same region server thus ensuring the lookup is local.
-
-###Functional Index
-In addition to indexing on just a column, arbitrary expression may be indexed. For example:
-
-    CREATE INDEX upper_name_idx ON employee (UPPER(name)) INCLUDE(name);
-
-With this index in place, when the following query is issued, the index would be used instead of the data table to retrieve the results:
-
-    SELECT id, name FROM employee WHERE UPPER(NAME)='John Doe';
-
-###Index Sort Order
-Multiple columns may be indexed and their values may be stored in ascending or descending order.
-
-    CREATE INDEX my_index ON my_table (v2 DESC, v1) INCLUDE (v3);
 
 ###Index Table Properties
 Just like with the <code>CREATE TABLE</code> statement, the <code>CREATE INDEX</code> statement may pass through properties to apply to the underlying HBase table, including the ability to salt it:
