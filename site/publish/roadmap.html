@@ -144,8 +144,10 @@
 </div> 
 <p>Our roadmap is driven by our user community. Below, in prioritized order, is the current plan for Phoenix:</p> 
 <ol style="list-style-type: decimal"> 
- <li><b><a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-400">Transaction Support</a></b>. Support transactions by integrating with an open source solution like <a class="externalLink" href="https://github.com/continuuity/tephra">Tephra</a>, <a class="externalLink" href="https://github.com/XiaoMi/themis">Themis</a>, or some other similar option.</li> 
- <li><b><a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-1121">Monitoring and Management Improvements</a></b>. Though we support <a href="tracing.html">tracing</a> now, there’s more work to do to round out our monitoring and management capabilities.</li> 
+ <li><b><a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-1674">Transaction Support</a></b>. Support transactions by integrating with <a class="externalLink" href="https://github.com/continuuity/tephra">Tephra</a>. <b>See our <a class="externalLink" href="https://git-wip-us.apache.org/repos/asf?p=phoenix.git;a=shortlog;h=refs/heads/txn">txn branch</a> to try this and track our progress.</b></li> 
+ <li><b><a class="externalLink" href="https://calcite.incubator.apache.org/">Apache Calcite</a> Adapter</b>. Create a Phoenix adapter for Calcite to increase the breadth of our SQL support, plug into a rich cost-based optimizer framework, and enable potential interop with other adapters. <b>See our <a class="externalLink" href="https://git-wip-us.apache.org/repos/asf?p=phoenix.git;a=shortlog;h=refs/heads/calcite">calcite branch</a> to try this and track our progress.</b></li> 
+ <li><b><a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-628">JSON Support</a></b>. Support a JSON data type and implement the standard operators and built-in functions similar to Postgres. <b>See our <a class="externalLink" href="https://git-wip-us.apache.org/repos/asf?p=phoenix.git;a=shortlog;h=refs/heads/json">json branch</a> to try this and track our progress.</b></li> 
+ <li><b><a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-1121">Monitoring and Management Improvements</a></b>. Though we support <a href="tracing.html">tracing</a> now, there’s more work to do to better <i>operationalize</i> Phoenix.</li> 
  <li><b><a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-1177">Cost-based Query Optimization</a></b>. Enhance existing <a href="update_statistics.html">statistics collection</a> by enabling further query optmizations based on the size and cardinality of the data. 
   <ul> 
    <li><b><a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-1178">Generate histograms</a></b> to drive query optimization decisions such as secondary index usage and join ordering based on cardinalities to produce the most efficient query plan.</li> 
@@ -156,7 +158,8 @@
    <li><b><a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-150">Inlined parent/child joins</a></b>. Optimize parent/child joins by storing child rows inside of a parent row, forming the column qualifier through a known prefix plus the child row primary key.</li> 
   </ul></li> 
  <li><b><a href="subqueries.html">Subquery</a> Enhancement</b>, which includes support for <b><a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-1388">correlated subqueries in the HAVING clause</a></b> and <b><a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-1392">using subqueries as expressions</a></b>.</li> 
- <li><b>Type Enhancements</b>. Additional work includes support for <a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-476">DEFAULT declaration</a> when creating a table, and for <a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-477">STRUCT</a> and <a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-628">JSON</a> data types.</li> 
+ <li><b><a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-476">DEFAULT declaration</a></b>. When creating a table, we should allow a DEFAULT declaration in our CREATE TABLE statement.</li> 
+ <li><b><a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-477">STRUCT type</a></b>. Allow declarations of multiple fields of different data types that would be packed into a single cell to reduce the per column storage overhead.</li> 
  <li><b><a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-154">OLAP Extensions</a></b>. Support the <tt>WINDOW</tt>, <tt>PARTITION OVER</tt>, <tt>RANK</tt>, and other SQL-92 extensions.</li> 
  <li><b><a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-590">Multi-version Row Queries</a></b>. Expose the time dimension of rows through a built-in function to allow aggregation and trending over multiple row versions.</li> 
  <li><b><a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-153">Table Sampling</a></b>. Support the <tt>TABLESAMPLE</tt> clause by implementing a filter that uses the guideposts established by stats gathering to only return n rows per region.</li> 
@@ -167,12 +170,7 @@
    <li><b><a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-684">Support Cell-level security</a></b>. Surface cell-level security now that HBase supports it.</li> 
   </ul></li> 
  <li><b>Schema Evolution</b>. Phoenix supports adding and removing columns through the <a href="language/index.html#alter">ALTER TABLE</a> DDL command, but changing the data type of, or renaming, an existing column is not yet supported.</li> 
- <li><b>Third Party Integration</b>. There are a number of open source projects with which interop with Phoenix could be added or improved: 
-  <ul> 
-   <li><b><a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-763">Apache Sqoop integration</a></b>. Enable Sqoop to import Phoenix-compliant HBase tables from relational databases.</li> 
-   <li><b>Apache Crunch integration</b>. Enable Apache Phoenix to easily be used as a more performant alternative in Apache Crunch to their HBase integration.</li> 
-   <li><b>Apache BigTop example</b>. Add an example usage of Apache Phoenix with other Big Data tools as a conical example in Apache BigTop.</li> 
-  </ul></li> 
+ <li><b><a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-763">Apache Sqoop integration</a></b>. Enable Sqoop to import Phoenix-compliant HBase tables from relational databases.</li> 
 </ol>
 			</div>
 		</div>

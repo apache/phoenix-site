@@ -1,6 +1,8 @@
 # Apache Phoenix News
 <br/>
 <hr/>
+#### [Announcing Phoenix 4.5 released](https://blogs.apache.org/phoenix/entry/announcing_phoenix_4_5_released) (July 29, 2015)
+<hr/>
 #### [Blog on Spark Integration in Apache Phoenix](https://blogs.apache.org/phoenix/entry/spark_integration_in_apache_phoenix) (June 29, 2015)
 <hr/>
 #### [O'Reilly Webcast on Apache Phoenix](http://www.oreilly.com/pub/e/3443) (June 25, 2015)
