@@ -57,6 +57,7 @@
 
         <menu name="About">
             <item href="index.html" name="Overview"/>
+            <item href="who_is_using.html" name="Who is Using"/>
             <item href="recent.html" name="New Features"/>
             <item href="roadmap.html" name="Roadmap"/>
             <item href="performance.html" name="Performance"/>
@@ -68,7 +69,6 @@
             <item href="download.html" name="Download" />
             <item href="installation.html" name="Installation" />
             <item href="http:divider" name=""/>
-            <item href="who_is_using.html" name="Who is Using"/>
             <item href="contributing.html" name="How to Contribute"/>
             <item href="develop.html" name="How to Develop" />
             <item href="building_website.html" name="How to Update Website" />
