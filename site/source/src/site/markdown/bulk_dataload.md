@@ -70,12 +70,11 @@ The following parameters can be used with the MapReduce loader.
 |-o,--output                 |Output path for temporary HFiles (optional)    |
 |-s,--schema                 |Phoenix schema name (optional)                 |
 |-z,--zookeeper              |Zookeeper quorum to connect to (optional)      |
+|-it,--index-table           |Index table name to load (optional)
 
 
 ### Notes on the MapReduce importer
-1. You must provide an explicit column family name in your CREATE TABLE statement for your non primary key columns, as the default column family used by Phoenix is treated specially by HBase because it starts with an underscore.
-2. The current bulk loader does not support the migration of index related data yet. So, if you have created your phoenix table with index, please use the [psql CSV loader](download.html#Loading-Data). 
-
+The current MR-based bulk loader will run one MR job to load your data table and one MR per index table to populate your indexes. Use the -it option to only load one of your index tables.
 
 ## Loading array data
 
