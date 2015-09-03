@@ -9,42 +9,6 @@
 <table>
 
 <tr><td>
-<img src="images/using/pubmatic.png"/>
-<br/><br/>
-PubMatic utilizes Phoenix to improve the data analytics capabilities it
-provides to a global roster of leading brands and over 40 of the comScore
-top 100 publishers.
-<br/><br/>
-<ul>
-<li> Utilizing a combination of Phoenix and Hbase in an enterprise data
-warehouse appliance with all the tenets of MPP architecture</li>
-<li> Doing analytics on almost 140 Billion records (15+ TB of data) with near
-real time SLAs</li>
-<li> The analytics platform is able to serve 100K+ queries per day and can
-scale linearly as well as horizontally with the growth of the company</li>
-<li> With deep analytics, the company can make more intelligent decisions,
-and analyze performance and alignment with business objectives</li>
-</ul>
-Sudhir Kulkarni, VP of Data and Analytics
-<br/>
-</td></tr>
-
-<tr><td>
-<img src="images/using/hw.png"/>
-<br/><br/>
-Hortonworks supports Apache Phoenix as a feature rich ANSI SQL
-interface for Apache HBase in Hortonworks Data Platform (HDP).  It
-plays a critical role for our customers who want diverse choice for
-data access in Hadoop and want a simple interface to build
-low-latency, large scale applications. Critical features, such as
-secondary indexing have made Phoenix the API of choice for building
-these HBase applications.
-<br/><br/>
-Devaraj Das, Cofounder
-<br/>
-</td></tr>
-
-<tr><td>
 <img src="images/using/sf.png"/>
 <br/><br/>
 In our Force.com platform, we rely on Apache Phoenix to run
@@ -60,17 +24,20 @@ diverse customer schemas</li>
 to run interactive queries against HBase data in a performant manner."</blockquote>
 <br/>
 Steven Tamm, CTO
-<hr/>
-We are looking to launch the first of numerous Big Data products in
-upcoming Spring '15 release - Field Audit Trails. Field Audit Trails
-delivers a new archiving service for our customer most critical data
-audit trails allowing our customers to easily query and traverse
-multi-billion record data sets.
-<br/>
-<blockquote>"At Salesforce, Apache Phoenix is the mainstay of our Platform Big
-Data architecture, goto market and and product strategy."</blockquote>
-<br/>
-Jonathan Bruce, Director of Product Management
+</td></tr>
+
+<tr><td>
+<img src="images/using/hw.png"/>
+<br/><br/>
+Hortonworks supports Apache Phoenix as a feature rich ANSI SQL
+interface for Apache HBase in Hortonworks Data Platform (HDP).  It
+plays a critical role for our customers who want diverse choice for
+data access in Hadoop and want a simple interface to build
+low-latency, large scale applications. Critical features, such as
+secondary indexing have made Phoenix the API of choice for building
+these HBase applications.
+<br/><br/>
+Devaraj Das, Cofounder
 <br/>
 </td></tr>
 
@@ -128,12 +95,46 @@ to keep up with customer and market demand.<br/><br/>
 Stephan Jou, CTO
 <br/></td></tr>
 
+<tr><td>
+<img src="images/using/pubmatic.png"/>
+<br/><br/>
+PubMatic utilizes Phoenix to improve the data analytics capabilities it
+provides to a global roster of leading brands and over 40 of the comScore
+top 100 publishers.
+<br/><br/>
+<ul>
+<li> Utilizing a combination of Phoenix and Hbase in an enterprise data
+warehouse appliance with all the tenets of MPP architecture</li>
+<li> Doing analytics on almost 140 Billion records (15+ TB of data) with near
+real time SLAs</li>
+<li> The analytics platform is able to serve 100K+ queries per day and can
+scale linearly as well as horizontally with the growth of the company</li>
+<li> With deep analytics, the company can make more intelligent decisions,
+and analyze performance and alignment with business objectives</li>
+</ul>
+Sudhir Kulkarni, VP of Data and Analytics
+<br/>
+</td></tr>
+
 </table>
 <!--End First Column-->
 </td>
 <td>
 <!--Second Column-->
 <table>
+
+<tr><td>
+<img src="images/using/ss.png"/>
+<br/><br/>
+At Sift Science we use Phoenix to power our OLAP infrastructure. This
+influences our machine learning feature engineering which is critical
+in the model training pipeline. Having a simple SQL-based interface
+also allows us to expose data insights outside of the engineering
+organization. Finally, running Phoenix on top of our existing HBase
+infrastructure gives us the ability to scale our ad-hoc query needs.
+<br/><br/>
+Andrey Gusev, Tech Lead, Machine Learning Infrastructure
+</td></tr>
 
 <tr><td>
 <img src="images/using/ab.png"/>
@@ -182,19 +183,6 @@ report generation at the same time.</li></ol>
 
 Jogendar Singh, Engineering Manager, Mobile Platform
 <br/></td></tr>
-
-<tr><td>
-<img src="images/using/ss.png"/>
-<br/><br/>
-At Sift Science we use Phoenix to power our OLAP infrastructure. This
-influences our machine learning feature engineering which is critical
-in the model training pipeline. Having a simple SQL-based interface
-also allows us to expose data insights outside of the engineering
-organization. Finally, running Phoenix on top of our existing HBase
-infrastructure gives us the ability to scale our ad-hoc query needs.
-<br/><br/>
-Andrey Gusev, Tech Lead, Machine Learning Infrastructure
-</td></tr>
 
 <tr><td><br/>
 <img src="images/using/ng.png"/>
