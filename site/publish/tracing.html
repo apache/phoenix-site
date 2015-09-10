@@ -274,6 +274,7 @@ Connection conn = DriverManager.getConnection(&quot;jdbc:phoenix:localhost&quot;
       <b>tags.count</b> SMALLINT,
       <b>annotations.count</b> SMALLINT,
       CONSTRAINT pk PRIMARY KEY (<b>trace_id, parent_id, span_id</b>)
+      )
 </pre> 
  </div> 
  <p>The tracing table also contains a number of dynamic columns for each trace, identified by a unique trace-id (id of the request), parent-id (id of the parent span) and individual span-id (id of the individual segment), may have multiple tags and annotations about what happened during the trace. Once you have the number of tags and annotations, you can retrieve them the table with a request like:</p> 
@@ -288,6 +289,48 @@ Connection conn = DriverManager.getConnection(&quot;jdbc:phoenix:localhost&quot;
  <p>where columns is either <tt>annotations.aX</tt> or <tt>tags.tX</tt> where <tt>X</tt> is the index of the dynamic column to lookup.</p> 
  <p>For more usage, look at our generic <a class="externalLink" href="https://github.com/apache/phoenix/blob/master/phoenix-core/src/main/java/org/apache/phoenix/trace/TraceReader.java">TraceReader</a> which can programatically read a number of traces from the tracing results table.</p> 
  <p>Custom annotations can also be passed into Phoenix to be added to traces. Phoenix looks for connection properties whose names start with <tt>phoenix.annotation.</tt> and adds these as annotations to client-side traces. e.g. A connection property <tt>phoenix.annotation.myannotation=abc</tt> will result in annotations with key <tt>myannotation</tt> and value <tt>abc</tt> to be added to traces. Use this feature to link traces to other request identifiers in your system, such as user or session ids.</p> 
+</div> 
+<div class="section"> 
+ <h2 id="Phoenix_Tracing_Web_Application">Phoenix Tracing Web Application</h2> 
+ <div class="section"> 
+  <div class="section"> 
+   <h4 id="How_to_start_the_tracing_web_application">How to start the tracing web application</h4> 
+   <ol style="list-style-type: decimal"> 
+    <li> <p>Enable tracing for Apache Phoenix as above</p></li> 
+    <li> <p>Start the web app <tt> ./bin/traceserver.py start </tt></p></li> 
+    <li> <p>Open following address on a web browser <a class="externalLink" href="http://localhost:8864/webapp/">http://localhost:8864/webapp/</a></p></li> 
+    <li> <p>Stop trace web app <tt> ./bin/traceserver.py stop </tt></p></li> 
+   </ol> 
+  </div> 
+  <div class="section"> 
+   <h4 id="Changing_the_web_app_port_number">Changing the web app port number</h4> 
+   <p>Execute the command below <tt> -Dphoenix.traceserver.http.port=8887 </tt></p> 
+  </div> 
+ </div> 
+ <div class="section"> 
+  <h3 id="Feature_List">Feature List</h3> 
+  <p>The tracing web app for Apache Phoenix contains features list, dependency tree, trace count, trace distribution and timeline. <img src="images/trace-dashboard.png" alt="trace-web-app-dashboard" /></p> 
+  <div class="section"> 
+   <h4 id="List">List</h4> 
+   <p>The most recent traces are listed down. The limiting value entered on the textbox is used to determine the trace count displayed. With each trace, there is a link to view either the dependency tree or the timeline. <img src="images/trace-list.png" alt="trace-list" /></p> 
+  </div> 
+  <div class="section"> 
+   <h4 id="Dependency_Tree">Dependency Tree</h4> 
+   <p>The dependency tree views the traces belonging to a trace id in a tree view. The trace id is the input to the system. The parent child relationship of the traces can be viewed clearly. The tooltip gives the host name, parent id, span id,start time,end time, description and duration. Each node is collapsible and expandable. The SQL Query is viewed for each drawing of the tree. Clear is used to clear the tree from view. <img src="images/trace-dependency-tree.png" alt="trace-dependency-tree" /></p> 
+  </div> 
+  <div class="section"> 
+   <h4 id="Trace_Count">Trace Count</h4> 
+   <p>The trace list is categorized by the description. The trace count chart can be viewed as pie charts, line charts, bar charts and area charts. The chart changing option is collapible and could be hidden. <img src="images/trace-count.png" alt="trace-count-chart" /></p> 
+  </div> 
+  <div class="section"> 
+   <h4 id="Trace_Distribution">Trace Distribution</h4> 
+   <p>The trace distribution chart shows the traces across phoenix hosts on which they are running. The charts used are pie charts, line charts, bar charts and area charts. The chart changing option is collapsible and could be hidden.</p> 
+  </div> 
+  <div class="section"> 
+   <h4 id="Timeline">Timeline</h4> 
+   <p>The traces can be viewed along the time axis for a given trace id. Traces can be added or cleared from the timeline. There should be a minimum of two traces starting at two different times for the system to draw its timeline. This feature helps the user to easily compare execution times between traces and within the same trace. <img src="images/trace-time-line.png" alt="trace-time-line" /></p> 
+  </div> 
+ </div> 
 </div>
 			</div>
 		</div>

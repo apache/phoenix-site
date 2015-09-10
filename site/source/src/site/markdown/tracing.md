@@ -140,6 +140,7 @@ The tracing table is initialized via the ddl:
       <b>tags.count</b> SMALLINT,
       <b>annotations.count</b> SMALLINT,
       CONSTRAINT pk PRIMARY KEY (<b>trace_id, parent_id, span_id</b>)
+      )
 </pre>
 
 The tracing table also contains a number of dynamic columns for each trace, identified by a unique trace-id (id of the request), parent-id (id of the parent span) and individual span-id (id of the individual segment), may have multiple tags and annotations about what happened during the trace. Once you have the number of tags and annotations, you can retrieve them the table with a request like:
@@ -156,3 +157,64 @@ where columns is either <code>annotations.aX</code> or <code>tags.tX</code> wher
 For more usage, look at our generic [TraceReader](https://github.com/apache/phoenix/blob/master/phoenix-core/src/main/java/org/apache/phoenix/trace/TraceReader.java) which can programatically read a number of traces from the tracing results table.
 
 Custom annotations can also be passed into Phoenix to be added to traces. Phoenix looks for connection properties whose names start with `phoenix.annotation.` and adds these as annotations to client-side traces. e.g. A connection property `phoenix.annotation.myannotation=abc` will result in annotations with key `myannotation` and value `abc` to be added to traces. Use this feature to link traces to other request identifiers in your system, such as user or session ids.
+
+## Phoenix Tracing Web Application
+
+#### How to start the tracing web application
+
+1. Enable tracing for Apache Phoenix as above
+
+2. Start the web app
+```
+./bin/traceserver.py start
+```
+
+3. Open following address on a web browser [http://localhost:8864/webapp/](http://localhost:8864/webapp/)
+
+4. Stop trace web app
+```
+./bin/traceserver.py stop
+```
+
+#### Changing the web app port number
+ Execute the command below
+```
+ -Dphoenix.traceserver.http.port=8887
+```
+### Feature List
+The tracing web app for Apache Phoenix contains features list, dependency tree, trace count, trace distribution and timeline.
+
+![trace-web-app-dashboard](images/trace-dashboard.png)
+
+
+#### List
+
+The most recent traces are listed down. The limiting value entered on the textbox is used to determine the trace count displayed. With each trace, there is a link to view either the dependency tree or the timeline.
+
+![trace-list](images/trace-list.png)
+
+
+#### Dependency Tree
+
+The dependency tree views the traces belonging to a trace id in a tree view. The trace id is the input to the system. The parent child relationship of the traces can be viewed clearly. The tooltip gives the host name, parent id, span id,start time,end time, description and duration. Each node is collapsible and expandable. The SQL Query is viewed for each drawing of the tree. Clear is  used to clear the tree from view.
+
+![trace-dependency-tree](images/trace-dependency-tree.png)
+
+
+#### Trace Count
+
+The trace list is categorized by the description. The trace count chart can be viewed as pie charts, line charts, bar charts and area charts. The chart changing option is collapible and could be hidden.
+
+![trace-count-chart](images/trace-count.png)
+
+
+#### Trace Distribution
+
+The trace distribution chart shows the traces across phoenix hosts on which they are running. The charts used are pie charts, line charts, bar charts and area charts. The chart changing option is collapsible and could be hidden.
+
+
+#### Timeline
+
+The traces can be viewed along the time axis for a given trace id. Traces can be added or cleared from the timeline. There should be a minimum of two traces starting at two different times for the system to draw its timeline. This feature helps the user to easily compare execution times between traces and within the same trace.
+
+![trace-time-line](images/trace-time-line.png)
