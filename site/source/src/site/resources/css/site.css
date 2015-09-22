@@ -47,6 +47,9 @@ margin-top: 20px;
 margin-bottom: 10px;
 }
 
+.dropdown-backdrop{
+    position: static;
+}
 
 @media (max-width: 479px) {
 	.xtoplogo {
