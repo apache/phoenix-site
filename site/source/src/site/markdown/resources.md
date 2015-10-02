@@ -3,6 +3,7 @@ Below are some prior presentations that have been done on Apache Phoenix. Anothe
 
 | Title | Resources | Where | When |
 |-------|-----------|-------|------|
+| Lightning Talk for Apache Phoenix | [Slides](http://phoenix.apache.org/presentations/HPTS.pdf) | HPTS | 2015 |
 | Tuning Phoenix and HBase for OLTP | [Slides](http://phoenix.apache.org/presentations/TuningForOLTP.pdf) | Tuning Presentation | 2015 |
 | Apache Phoenix: The Evolution of a Relational Database Layer over HBase | [Slides](http://www.slideshare.net/Hadoop_Summit/the-evolution-of-a-relational-database-layer-over-hbase), [Video](https://www.youtube.com/watch?v=XGa0SyJMH94) | Hadoop Summit | 2015 |
 | Apache Phoenix: The Evolution of a Relational Database Layer over HBase | [Slides](http://phoenix.apache.org/presentations/HBaseCon2015-16x9.pdf) | HBaseCon | 2015 |
