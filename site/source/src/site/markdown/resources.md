@@ -1,4 +1,4 @@
-#Resources
+#Presentations
 Below are some prior presentations that have been done on Apache Phoenix. Another good source of information is the Apache Phoenix [blog](https://blogs.apache.org/phoenix/).
 
 | Title | Resources | Where | When |
