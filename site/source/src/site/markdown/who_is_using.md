@@ -123,6 +123,39 @@ Sudhir Kulkarni, VP of Data and Analytics
 <!--Second Column-->
 <table>
 
+<tr><td><br/>
+<img src="images/using/homeaway.png"/>
+<br/><br/>
+
+Apache Phoenix enables easy integration with 
+HBase for systems that rely on JDBC/SQL. 
+HomeAway, the world leader in Vacation 
+Rentals, leverages Phoenix as a SQL abstraction 
+for HBase's powerful columnar storage 
+to generate statistics for vacation rental owners 
+on HomeAway's Owner Dashboard.  These 
+statistics help HomeAway vacation rental owners 
+gain key insights about the performance 
+of their vacation rental, how well it is doing 
+against 'the market', and how well it is doing 
+historically.<br/><br/> 
+
+From a pool of billions 
+of records that go back 2 years, HomeAway is 
+able to serve up customer-facing webpages 
+from HBase, using Phoenix, in less than a 
+second for the majority of our vacation rental 
+owners.  With Phoenix and HBase, HomeAway is 
+able to share the same insight it has 
+internally on the vacation rental market to 
+its owners empowering them with the 
+necessary data to make the right decisions 
+maximizing their return on their vacation 
+rental investment.<br/><br/>
+
+René X. Parra, Principal Architect
+<br/></td></tr>
+
 <tr><td>
 <img src="images/using/ss.png"/>
 <br/><br/>
@@ -237,40 +270,6 @@ it provides the scalability of HBase and the expressiveness of SQL.<br/><br/>
 
 Kristoffer Sjögren, System Developer
 <br/></td></tr>
-
-<tr><td><br/>
-<img src="images/using/homeaway.png"/>
-<br/><br/>
-
-Apache Phoenix enables easy integration with 
-HBase for systems that rely on JDBC/SQL. 
-HomeAway, the world leader in Vacation 
-Rentals, leverages Phoenix as a SQL abstraction 
-for HBase's powerful columnar storage 
-to generate statistics for vacation rental owners 
-on HomeAway's Owner Dashboard.  These 
-statistics help HomeAway vacation rental owners 
-gain key insights about the performance 
-of their vacation rental, how well it is doing 
-against 'the market', and how well it is doing 
-historically.<br/><br/> 
-
-From a pool of billions 
-of records that go back 2 years, HomeAway is 
-able to serve up customer-facing webpages 
-from HBase, using Phoenix, in less than a 
-second for the majority of our vacation rental 
-owners.  With Phoenix and HBase, HomeAway is 
-able to share the same insight it has 
-internally on the vacation rental market to 
-its owners empowering them with the 
-necessary data to make the right decisions 
-maximizing their return on their vacation 
-rental investment.<br/><br/>
-
-René X. Parra, Principal Architect
-<br/></td></tr>
-
 
 </table>
 <!--End Second Column-->
