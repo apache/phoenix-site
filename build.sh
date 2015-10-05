@@ -1,6 +1,5 @@
 #!/bin/sh
 echo "Generate Phoenix Website"
-echo "Pre-req: On source repo run $ mvn install -DskipTests"
 echo ""
 
 echo "BUILDING LANGUAGE REFERENCE"

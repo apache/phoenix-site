@@ -57,7 +57,7 @@ Apache Phoenix is a relational database layer over HBase delivered as a client-e
 
 <p align="center">
 <br/>Who is using Apache Phoenix? Read more <a href="who_is_using.html">here...</a><br/>
-<img src="images/using/all.jpeg"/>
+<img src="images/using/all.png"/>
 </p>
 ## Mission
 Become the standard means of accessing HBase data through a well-defined, industry standard API.
