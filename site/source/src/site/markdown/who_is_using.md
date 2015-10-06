@@ -7,6 +7,7 @@
 <td>
 <!--First Column-->
 <table>
+<tr></tr>
 
 <tr><td>
 <img src="images/using/sf.png"/>
@@ -116,12 +117,24 @@ Sudhir Kulkarni, VP of Data and Analytics
 <br/>
 </td></tr>
 
+<tr><td>
+<img src="images/using/dp.png"/>
+<br/><br/>
+
+At Delta Projects we use Phoenix for storing data as a basis for
+measuring activities and generating reports. We chose Phoenix because
+it provides the scalability of HBase and the expressiveness of SQL.<br/><br/>
+
+Kristoffer Sjögren, System Developer
+<br/></td></tr>
+
 </table>
 <!--End First Column-->
 </td>
 <td>
 <!--Second Column-->
 <table>
+<tr></tr>
 
 <tr><td><br/>
 <img src="images/using/homeaway.png"/>
@@ -258,17 +271,6 @@ highly available applications quickly and reliably.<br/><br/>
 aggregations."</blockquote><br/>
 
 Martin Homolka, CTO
-<br/></td></tr>
-
-<tr><td>
-<img src="images/using/dp.png"/>
-<br/><br/>
-
-At Delta Projects we use Phoenix for storing data as a basis for
-measuring activities and generating reports. We chose Phoenix because
-it provides the scalability of HBase and the expressiveness of SQL.<br/><br/>
-
-Kristoffer Sjögren, System Developer
 <br/></td></tr>
 
 </table>
