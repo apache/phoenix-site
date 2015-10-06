@@ -136,6 +136,8 @@ Kristoffer Sjögren, System Developer
 <table>
 <tr></tr>
 
+<tr style="display: none;"><td></td></tr>
+
 <tr><td><br/>
 <img src="images/using/homeaway.png"/>
 <br/><br/>
