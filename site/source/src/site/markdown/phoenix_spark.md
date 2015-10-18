@@ -6,7 +6,21 @@ as RDDs or DataFrames, and enables persisting them back to Phoenix.
 #### Prerequisites
 
 * Phoenix 4.4.0+
-* Spark 1.3.0+
+* Spark 1.3.1+
+
+#### Why not JDBC?
+
+Although Spark supports connecting directly to JDBC databases, it's only able to parallelize
+queries by partioning on a numeric column. It also requires a known lower bound, upper bound
+and partition count in order to create split queries.
+
+In contrast, the phoenix-spark integration is able to leverage the underlying splits provided by 
+Phoenix in order to retrieve and save data across multiple workers. All that's required is a
+database URL and a table name. Optional SELECT columns can be given, as well as pushdown predicates
+for efficient filtering.
+
+The choice of which method to use to access Phoenix comes down to each specific use case.
+
 
 #### Spark setup
 
