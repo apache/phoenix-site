@@ -1,49 +1,60 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title>Data Types</title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="1265.21">
-  <style type="text/css">
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; color: #0000ee}
-    p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times}
-    p.p5 {margin: 0.0px 0.0px 12.0px 0.0px; font: 12.0px Times}
-    span.s1 {text-decoration: underline}
-    td.td1 {width: 212.0px; margin: 0.5px 0.5px 0.5px 0.5px; padding: 1.0px 1.0px 1.0px 1.0px}
-    td.td2 {width: 66.0px; margin: 0.5px 0.5px 0.5px 0.5px; padding: 1.0px 1.0px 1.0px 1.0px}
-  </style>
-</head>
-<body>
-<table cellspacing="0" cellpadding="0">
-  <tbody>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head><meta http-equiv="Content-Type" content="text/html;charset=utf-8" /><title>
+Data Types
+</title><link rel="stylesheet" type="text/css" href="stylesheet.css" />
+<!-- [search] { -->
+<script type="text/javascript" src="navigation.js"></script>
+</head><body>
+<table class="content"><tr class="content"><td class="content"><div class="contentDiv">
+<!-- } -->
+<h2 id="dataTypes">Index</h2>
+<!-- syntax-start
+<p class="notranslate">
+<c:forEach var="item" items="dataTypes">
+    <a href="#${item.link}" >${item.topic}</a><br />
+</c:forEach>
+</p>
+syntax-end -->
+<!-- railroad-start -->
+<table class="notranslate index">
     <tr>
-      <td valign="middle" class="td1">
-        <h2 style="margin: 0.0px 0.0px 14.9px 0.0px; font: 18.0px Times"><b>Index</b></h2>
-        <table cellspacing="0" cellpadding="0">
-          <tbody>
-            <tr>
-              <td valign="middle" class="td2">
-                <p class="p2"><span class="s1">${item.topic}</span></p>
-              </td>
-              <td valign="middle" class="td2">
-                <p class="p2"><span class="s1">${item.topic}</span></p>
-              </td>
-              <td valign="middle" class="td2">
-                <p class="p2"><span class="s1">${item.topic}</span></p>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <h3 style="margin: 0.0px 0.0px 14.0px 0.0px; font: 14.0px Times"><b>${item.topic}</b></h3>
-        <p class="p4">${item.railroad}</p>
-        <p class="p5">${item.text}</p>
-        <p class="p5">Example:</p>
-        <p class="p5">${item.example}</p>
-      </td>
+        <td class="index">
+            <c:forEach var="item" items="dataTypes-0">
+                <a href="#${item.link}" >${item.topic}</a><br />
+            </c:forEach>
+        </td><td class="index">
+            <c:forEach var="item" items="dataTypes-1">
+                <a href="#${item.link}" >${item.topic}</a><br />
+            </c:forEach>
+        </td><td class="index">
+            <c:forEach var="item" items="dataTypes-2">
+                <a href="#${item.link}" >${item.topic}</a><br />
+            </c:forEach>
+        </td>
     </tr>
-  </tbody>
 </table>
-</body>
-</html>
+<!-- railroad-end -->
+
+<c:forEach var="item" items="dataTypes">
+<h3 id="${item.link}" class="notranslate">${item.topic}</h3>
+<!-- railroad-start -->
+<pre name="bnf" style="display: none">
+${item.syntax}
+</pre>
+<div name="railroad">
+${item.railroad}
+</div>
+<!-- railroad-end -->
+<!-- syntax-start
+<pre>
+${item.syntax}
+</pre>
+syntax-end -->
+<p>${item.text}</p>
+<p>Example:</p>
+<p class="notranslate">${item.example}</p>
+</c:forEach>
+
+<!-- [close] { --></div></td></tr></table><!-- } --></body></html>
+
