@@ -8,7 +8,7 @@
 
 	<head>
 		<meta charset="UTF-8" />
-		<title>Apache Spark Plugin | Apache Phoenix</title>
+		<title>Row timestamp | Apache Phoenix</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="description" content="" />
 		<meta http-equiv="content-language" content="en" />
@@ -34,7 +34,7 @@
 
 	</head>
 
-	<body class="page-phoenix_spark project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
+	<body class="page-rowtimestamp project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
 
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
@@ -85,7 +85,7 @@
 									<li ><a href="release_notes.html" title="Release Notes">Release Notes</a></li>
 									<li ><a href="pherf.html" title="Performance Testing">Performance Testing</a></li>
 									<li class="divider"/>
-									<li class="active"><a href="" title="Apache Spark Integration">Apache Spark Integration</a></li>
+									<li ><a href="phoenix_spark.html" title="Apache Spark Integration">Apache Spark Integration</a></li>
 									<li ><a href="pig_integration.html" title="Apache Pig Integration">Apache Pig Integration</a></li>
 									<li ><a href="phoenix_mr.html" title="Map Reduce Integration">Map Reduce Integration</a></li>
 									<li ><a href="flume.html" title="Apache Flume Plugin">Apache Flume Plugin</a></li>
@@ -111,7 +111,7 @@
 									<li ><a href="dynamic_columns.html" title="Dynamic Columns">Dynamic Columns</a></li>
 									<li ><a href="skip_scan.html" title="Skip Scan">Skip Scan</a></li>
 									<li ><a href="salted.html" title="Salted Tables">Salted Tables</a></li>
-									<li ><a href="rowtimestamp.html" title="Row Timestamp Column">Row Timestamp Column</a></li>
+									<li class="active"><a href="" title="Row Timestamp Column">Row Timestamp Column</a></li>
 								</ul>
 							</li>
 							<li class="dropdown">
@@ -141,233 +141,24 @@
 		<div class="span12">
 			<div class="body-content">
 <div class="page-header">
- <h1>Apache Spark Plugin</h1>
+ <h1>Row timestamp</h1>
 </div> 
-<p>The phoenix-spark plugin extends Phoenix’s MapReduce support to allow Spark to load Phoenix tables as RDDs or DataFrames, and enables persisting them back to Phoenix.</p> 
-<div class="section"> 
- <div class="section"> 
-  <div class="section"> 
-   <h4 id="Prerequisites">Prerequisites</h4> 
-   <ul> 
-    <li>Phoenix 4.4.0+</li> 
-    <li>Spark 1.3.1+</li> 
-   </ul> 
-  </div> 
-  <div class="section"> 
-   <h4 id="Why_not_JDBC">Why not JDBC?</h4> 
-   <p>Although Spark supports connecting directly to JDBC databases, it’s only able to parallelize queries by partioning on a numeric column. It also requires a known lower bound, upper bound and partition count in order to create split queries.</p> 
-   <p>In contrast, the phoenix-spark integration is able to leverage the underlying splits provided by Phoenix in order to retrieve and save data across multiple workers. All that’s required is a database URL and a table name. Optional SELECT columns can be given, as well as pushdown predicates for efficient filtering.</p> 
-   <p>The choice of which method to use to access Phoenix comes down to each specific use case.</p> 
-  </div> 
-  <div class="section"> 
-   <h4 id="Spark_setup">Spark setup</h4> 
-   <ol style="list-style-type: decimal"> 
-    <li>Ensure that all requisite Phoenix / HBase platform dependencies are available on the classpath for the Spark executors and drivers</li> 
-    <li>One method is to add the phoenix-4.4.0-client.jar to ‘SPARK_CLASSPATH’ in spark-env.sh, or setting both ‘spark.executor.extraClassPath’ and ‘spark.driver.extraClassPath’ in spark-defaults.conf</li> 
-    <li>To help your IDE, you may want to add the following ‘provided’ dependency:</li> 
-   </ol> 
-   <div class="source"> 
-    <pre>&lt;dependency&gt;
-  &lt;groupId&gt;org.apache.phoenix&lt;/groupId&gt;
-  &lt;artifactId&gt;phoenix-spark&lt;/artifactId&gt;
-  &lt;version&gt;${phoenix.version}&lt;/version&gt;
-  &lt;scope&gt;provided&lt;/scope&gt;
-&lt;/dependency&gt;
-</pre> 
-   </div> 
-  </div> 
- </div> 
- <div class="section"> 
-  <h3 id="Reading_Phoenix_Tables">Reading Phoenix Tables</h3> 
-  <p>Given a Phoenix table with the following DDL</p> 
-  <div class="source"> 
-   <pre>CREATE TABLE TABLE1 (ID BIGINT NOT NULL PRIMARY KEY, COL1 VARCHAR);
-UPSERT INTO TABLE1 (ID, COL1) VALUES (1, 'test_row_1');
-UPSERT INTO TABLE1 (ID, COL1) VALUES (2, 'test_row_2');
-</pre> 
-  </div> 
-  <div class="section"> 
-   <h4 id="Load_as_a_DataFrame_using_the_Data_Source_API">Load as a DataFrame using the Data Source API</h4> 
-   <div class="source"> 
-    <pre>import org.apache.spark.SparkContext
-import org.apache.spark.sql.SQLContext
-import org.apache.phoenix.spark._
-
-val sc = new SparkContext(&quot;local&quot;, &quot;phoenix-test&quot;)
-val sqlContext = new SQLContext(sc)
-
-val df = sqlContext.load(
-  &quot;org.apache.phoenix.spark&quot;,
-  Map(&quot;table&quot; -&gt; &quot;TABLE1&quot;, &quot;zkUrl&quot; -&gt; &quot;phoenix-server:2181&quot;)
-)
-
-df
-  .filter(df(&quot;COL1&quot;) === &quot;test_row_1&quot; &amp;&amp; df(&quot;ID&quot;) === 1L)
-  .select(df(&quot;ID&quot;))
-  .show
-</pre> 
-   </div> 
-  </div> 
-  <div class="section"> 
-   <h4 id="Load_as_a_DataFrame_directly_using_a_Configuration_object">Load as a DataFrame directly using a Configuration object</h4> 
-   <div class="source"> 
-    <pre>import org.apache.hadoop.conf.Configuration
-import org.apache.spark.SparkContext
-import org.apache.spark.sql.SQLContext
-import org.apache.phoenix.spark._
-
-val configuration = new Configuration()
-// Can set Phoenix-specific settings, requires 'hbase.zookeeper.quorum'
-
-val sc = new SparkContext(&quot;local&quot;, &quot;phoenix-test&quot;)
-val sqlContext = new SQLContext(sc)
-
-// Load the columns 'ID' and 'COL1' from TABLE1 as a DataFrame
-val df = sqlContext.phoenixTableAsDataFrame(
-  &quot;TABLE1&quot;, Array(&quot;ID&quot;, &quot;COL1&quot;), conf = configuration
-)
-
-df.show
-</pre> 
-   </div> 
-  </div> 
-  <div class="section"> 
-   <h4 id="Load_as_an_RDD_using_a_Zookeeper_URL">Load as an RDD, using a Zookeeper URL</h4> 
-   <div class="source"> 
-    <pre>import org.apache.spark.SparkContext
-import org.apache.spark.sql.SQLContext
-import org.apache.phoenix.spark._
-
-val sc = new SparkContext(&quot;local&quot;, &quot;phoenix-test&quot;)
-
-// Load the columns 'ID' and 'COL1' from TABLE1 as an RDD
-val rdd: RDD[Map[String, AnyRef]] = sc.phoenixTableAsRDD(
-  &quot;TABLE1&quot;, Seq(&quot;ID&quot;, &quot;COL1&quot;), zkUrl = Some(&quot;phoenix-server:2181&quot;)
-)
-
-rdd.count()
-
-val firstId = rdd1.first()(&quot;ID&quot;).asInstanceOf[Long]
-val firstCol = rdd1.first()(&quot;COL1&quot;).asInstanceOf[String]
-</pre> 
-   </div> 
-  </div> 
- </div> 
- <div class="section"> 
-  <h3 id="Saving_Phoenix">Saving Phoenix</h3> 
-  <p>Given a Phoenix table with the following DDL</p> 
-  <div class="source"> 
-   <pre>CREATE TABLE OUTPUT_TEST_TABLE (id BIGINT NOT NULL PRIMARY KEY, col1 VARCHAR, col2 INTEGER);
-</pre> 
-  </div> 
-  <div class="section"> 
-   <h4 id="Saving_RDDs">Saving RDDs</h4> 
-   <p>The <tt>saveToPhoenix</tt> method is an implicit method on RDD[Product], or an RDD of Tuples. The data types must correspond to one of <a href="language/datatypes.html">the Java types supported by Phoenix</a>.</p> 
-   <div class="source"> 
-    <pre>import org.apache.spark.SparkContext
-import org.apache.phoenix.spark._
-
-val sc = new SparkContext(&quot;local&quot;, &quot;phoenix-test&quot;)
-val dataSet = List((1L, &quot;1&quot;, 1), (2L, &quot;2&quot;, 2), (3L, &quot;3&quot;, 3))
-
-sc
-  .parallelize(dataSet)
-  .saveToPhoenix(
-    &quot;OUTPUT_TEST_TABLE&quot;,
-    Seq(&quot;ID&quot;,&quot;COL1&quot;,&quot;COL2&quot;),
-    zkUrl = Some(&quot;phoenix-server:2181&quot;)
-  )
-</pre> 
-   </div> 
-  </div> 
-  <div class="section"> 
-   <h4 id="Saving_DataFrames">Saving DataFrames</h4> 
-   <p>The <tt>save</tt> is method on DataFrame allows passing in a data source type. You can use <tt>org.apache.phoenix.spark</tt>, and must also pass in a <tt>table</tt> and <tt>zkUrl</tt> parameter to specify which table and server to persist the DataFrame to. The column names are derived from the DataFrame’s schema field names, and must match the Phoenix column names.</p> 
-   <p>The <tt>save</tt> method also takes a <tt>SaveMode</tt> option, for which only <tt>SaveMode.Overwrite</tt> is supported.</p> 
-   <p>Given two Phoenix tables with the following DDL:</p> 
-   <div class="source"> 
-    <pre>CREATE TABLE INPUT_TABLE (id BIGINT NOT NULL PRIMARY KEY, col1 VARCHAR, col2 INTEGER);
-CREATE TABLE OUTPUT_TABLE (id BIGINT NOT NULL PRIMARY KEY, col1 VARCHAR, col2 INTEGER);
-</pre> 
-   </div> 
-   <div class="source"> 
-    <pre>import org.apache.spark.SparkContext
-import org.apache.spark.sql.SQLContext
-import org.apache.phoenix.spark._
-
-// Load INPUT_TABLE
-val sc = new SparkContext(&quot;local&quot;, &quot;phoenix-test&quot;)
-val sqlContext = new SQLContext(sc)
-val df = sqlContext.load(&quot;org.apache.phoenix.spark&quot;, Map(&quot;table&quot; -&gt; &quot;INPUT_TABLE&quot;,
-  &quot;zkUrl&quot; -&gt; hbaseConnectionString))
-
-// Save to OUTPUT_TABLE
-df.save(&quot;org.apache.phoenix.spark&quot;, SaveMode.Overwrite, Map(&quot;table&quot; -&gt; &quot;OUTPUT_TABLE&quot;,
-  &quot;zkUrl&quot; -&gt; hbaseConnectionString))
-</pre> 
-   </div> 
-  </div> 
- </div> 
- <div class="section"> 
-  <h3 id="Notes">Notes</h3> 
-  <p>The functions <tt>phoenixTableAsDataFrame</tt>, <tt>phoenixTableAsRDD</tt> and <tt>saveToPhoenix</tt> all support optionally specifying a <tt>conf</tt> Hadoop configuration parameter with custom Phoenix client settings, as well as an optional <tt>zkUrl</tt> parameter for the Phoenix connection URL.</p> 
-  <p>If <tt>zkUrl</tt> isn’t specified, it’s assumed that the “hbase.zookeeper.quorum” property has been set in the <tt>conf</tt> parameter. Similarly, if no configuration is passed in, <tt>zkUrl</tt> must be specified.</p> 
- </div> 
- <div class="section"> 
-  <h3 id="Limitations">Limitations</h3> 
-  <ul> 
-   <li>Basic support for column and predicate pushdown using the Data Source API</li> 
-   <li>The Data Source API does not support passing custom Phoenix settings in configuration, you must create the DataFrame or RDD directly if you need fine-grained configuration.</li> 
-   <li>No support for aggregate or distinct queries as explained in our <a href="phoenix_mr.html">Map Reduce Integration</a> documentation.</li> 
-  </ul> 
-  <hr /> 
- </div> 
- <div class="section"> 
-  <h3 id="PageRank_example">PageRank example</h3> 
-  <p>This example makes use of the Enron email data set, provided by the <a class="externalLink" href="https://snap.stanford.edu/data/email-Enron.html">Stanford Network Analysis Project</a>, and executes the GraphX implementation of PageRank on it to find interesting entities. It then saves the results back to Phoenix.</p> 
-  <ol style="list-style-type: decimal"> 
-   <li> <p>Download and extract the file <a class="externalLink" href="https://github.com/jmahonin/spark-graphx-phoenix/blob/master/enron.csv.gz?raw=true">enron.csv.gz</a></p></li> 
-   <li> <p>Create the necessary Phoenix schema</p> 
-    <div class="source"> 
-     <pre>CREATE TABLE EMAIL_ENRON(MAIL_FROM BIGINT NOT NULL, MAIL_TO BIGINT NOT NULL CONSTRAINT pk PRIMARY KEY(MAIL_FROM, MAIL_TO));
-CREATE TABLE EMAIL_ENRON_PAGERANK(ID BIGINT NOT NULL, RANK DOUBLE CONSTRAINT pk PRIMARY KEY(ID));
-</pre> 
-    </div></li> 
-   <li> <p>Load the email data into Phoenix (assuming localhost for Zookeeper Quroum URL)</p> 
-    <div class="source"> 
-     <pre>gunzip /tmp/enron.csv.gz
-cd /path/to/phoenix/bin
-./psql.py -t EMAIL_ENRON localhost /tmp/enron.csv
-</pre> 
-    </div></li> 
-   <li> <p>In spark-shell, with the phoenix-client in the Spark driver classpath, run the following:</p> 
-    <div class="source"> 
-     <pre>import org.apache.spark.graphx._
-import org.apache.phoenix.spark._
-val rdd = sc.phoenixTableAsRDD(&quot;EMAIL_ENRON&quot;, Seq(&quot;MAIL_FROM&quot;, &quot;MAIL_TO&quot;), zkUrl=Some(&quot;localhost&quot;))           // load from phoenix
-val rawEdges = rdd.map{ e =&gt; (e(&quot;MAIL_FROM&quot;).asInstanceOf[VertexId], e(&quot;MAIL_TO&quot;).asInstanceOf[VertexId]) }   // map to vertexids
-val graph = Graph.fromEdgeTuples(rawEdges, 1.0)                                                               // create a graph
-val pr = graph.pageRank(0.001)                                                                                // run pagerank
-pr.vertices.saveToPhoenix(&quot;EMAIL_ENRON_PAGERANK&quot;, Seq(&quot;ID&quot;, &quot;RANK&quot;), zkUrl = Some(&quot;localhost&quot;))               // save to phoenix
-</pre> 
-    </div></li> 
-   <li> <p>Query the top ranked entities in SQL</p> 
-    <div class="source"> 
-     <pre>SELECT * FROM EMAIL_ENRON_PAGERANK ORDER BY RANK DESC LIMIT 5;
-+------------------------------------------+------------------------------------------+
-|                    ID                    |                   RANK                   |
-+------------------------------------------+------------------------------------------+
-| 5038                                     | 497.2989872977676                        |
-| 273                                      | 117.18141799210386                       |
-| 140                                      | 108.63091596789913                       |
-| 458                                      | 107.2728800448782                        |
-| 588                                      | 106.11840798585399                       |
-+------------------------------------------+------------------------------------------+
-</pre> 
-    </div></li> 
-  </ol> 
- </div> 
-</div>
+<p>Phoenix v 4.6 now provides a way of mapping HBase’s native row timestamp to a Phoenix column. This helps take advantage of various optimizations that HBase provides for time ranges on the store files as well as various query optimization capabilities built within Phoenix.</p> 
+<p>For a column to be designated as ROW_TIMESTAMP, certain constraints need to be followed: </p> 
+<ul> 
+ <li> Only a primary key column of type TIME, DATE, TIMESTAMP, BIGINT, UNSIGNED_LONG can be designated as ROW_TIMESTAMP. </li> 
+ <li> Only one primary key column can be designated as ROW_TIMESTAMP. </li> 
+ <li> The value of the column cannot be null (since it is directly mapped to HBase row timestamp). This also means a column can be declared as ROW_TIMESTAMP only when creating the table. </li> 
+ <li> Value of a ROW_TIMESTAMP column cannot be negative. This means for a DATE/TIME/TIMESTAMP, the corresponding epoch time in milliseconds cannot be less than zero. </li> 
+</ul> 
+<p>When upserting rows for a table with row timestamp column, using UPSERT VALUES or UPSERT SELECT, one could explicitly provide the value for the row timestamp column or let Phoenix automatically set it. When not specified, Phoenix sets the value of the row timestamp column to be the server side time. The value of the column also ends up being the timestamp of the corresponding row in HBase.</p> 
+<p><b>Sample schema:</b></p> 
+<p>CREATE TABLE DESTINATION_METRICS_TABLE (CREATED_DATE NOT NULL DATE, METRIC_ID NOT NULL CHAR(15), METRIC_VALUE LONG CONSTRAINT PK PRIMARY KEY(CREATED_DATE <b>ROW_TIMESTAMP</b>, METRIC_ID)) SALT_BUCKETS = 8;</p> 
+<p>UPSERT INTO DESTINATION_METRICS_TABLE VALUES (?, ?, ?) - this sets the value of CREATED_DATE to the value specified in corresponding bind param.</p> 
+<p>UPSERT INTO DESTINATION_METRICS_TABLE (METRIC_ID, METRIC_VALUE) VALUES (?, ?) - this sets the value of CREATED_DATE to the server side time.</p> 
+<p>UPSERT INTO DESTINATION_METRICS_TABLE (CREATED_DATE, METRICS_ID, METRIC_VALUE) SELECT DATE, METRICS_ID, METRIC_VALUE FROM SOURCE_METRICS_TABLE - this sets the value of the CREATED_DATE to the DATE selected from the SOURCE_METRICS_TABLE</p> 
+<p>UPSERT INTO DESTINATION_METRICS_TABLE (METRICS_ID, METRIC_VALUE) SELECT METRICS_ID, METRIC_VALUE FROM SOURCE_METRICS_TABLE - this sets the value of the created_date in destination table to the server timestamp.</p> 
+<p>When querying by filtering on the row timestamp column, apart from doing the regular optimizations that Phoenix does for row key columns, Phoenix is also able to appropriately set the min and max time ranges on the scans. With the help of this time range information, HBase on the server side is able to entirely skip those store files which do not have fall in the time range. This greatly improves performance especially when querying the tail-end of the data.</p>
 			</div>
 		</div>
 	</div>
@@ -478,8 +269,8 @@ pr.vertices.saveToPhoenix(&quot;EMAIL_ENRON_PAGERANK&quot;, Seq(&quot;ID&quot;, 
 						<li >
 							<a href="http:divider" title=""></a>
 						</li>
-						<li class="active">
-							<a href="#" title="Apache Spark Integration">Apache Spark Integration</a>
+						<li >
+							<a href="phoenix_spark.html" title="Apache Spark Integration">Apache Spark Integration</a>
 						</li>
 						<li >
 							<a href="pig_integration.html" title="Apache Pig Integration">Apache Pig Integration</a>
@@ -546,8 +337,8 @@ pr.vertices.saveToPhoenix(&quot;EMAIL_ENRON_PAGERANK&quot;, Seq(&quot;ID&quot;, 
 						<li >
 							<a href="salted.html" title="Salted Tables">Salted Tables</a>
 						</li>
-						<li >
-							<a href="rowtimestamp.html" title="Row Timestamp Column">Row Timestamp Column</a>
+						<li class="active">
+							<a href="#" title="Row Timestamp Column">Row Timestamp Column</a>
 						</li>
 					</ul>
 				</div>

@@ -257,14 +257,15 @@ EXPLAIN SELECT entity_id FROM CORE.CUSTOM_ENTITY_DATA WHERE organization_id='00D
 "
 
 "Other Grammar","Constraint","
-CONSTRAINT constraintName PRIMARY KEY (columnName [ASC | DESC] [,...])
+CONSTRAINT constraintName PRIMARY KEY (columnName [ASC | DESC] [ROW_TIMESTAMP] [,...])
 ","
 Defines a multi-part primary key constraint. Each column may be declared to be
-sorted in ascending or descending ordering. The default is ascending.
-
+sorted in ascending or descending ordering. The default is ascending. One primary
+key column can also be designated as ROW_TIMESTAMP provided it is of one of the types: BIGINT, UNSIGNED_LONG, DATE, TIME and TIMESTAMP.
 ","
 CONSTRAINT my_pk PRIMARY KEY (host,created_date)
 CONSTRAINT my_pk PRIMARY KEY (host ASC,created_date DESC)
+CONSTRAINT my_pk PRIMARY KEY (host ASC,created_date DESC ROW_TIMESTAMP)
 "
 
 "Commands","UPDATE STATISTICS","
@@ -444,16 +445,23 @@ NO_STAR_JOIN
 "
 
 "Other Grammar","Column Def","
-columnRef dataType [[NOT] NULL] [PRIMARY KEY [ASC | DESC] ]
+columnRef dataType [[NOT] NULL] [PRIMARY KEY [ASC | DESC] [ROW_TIMESTAMP]]
 ","
 Define a new primary key column. The column name is case insensitive by default and
 case sensitive if double quoted. The sort order of a primary key may be ascending (ASC)
-or descending. The default is ascending.
+or descending. The default is ascending. Additionally, if the column is the only column
+that forms the primary key, then it can be designated as ROW_TIMESTAMP column provided its data type is
+one of these: BIGINT, UNSIGNED_LONG, DATE, TIME and TIMESTAMP.
 
 ","
 id char(15) not null primary key
 key integer null
 m.response_time bigint
+
+created_date date not null primary key row_timestamp
+key integer null
+m.response_time bigint
+
 "
 
 "Other Grammar","Table Ref","
