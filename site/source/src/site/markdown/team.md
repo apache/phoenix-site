@@ -14,7 +14,7 @@ Eli Levine | Salesforce | elilevine@apache.org | PMC
 Enis Soztutar | Hortonworks | enis@apache.org | PMC
 Gabriel Reid | NGDATA | greid@apache.org | PMC
 James Taylor | Salesforce | jamestaylor@apache.org | PMC
-Jeffrey Zhong | Hortonworks | jeffreyz@apache.org | PMC
+Jeffrey Zhong | Elementum | jeffreyz@apache.org | PMC
 Jesse Yates | Salesforce | jyates@apache.org | PMC
 Lars Hofhansl | Salesforce | larsh@apache.org | PMC
 Maryann Xue | Intel | maryannxue@apache.org | PMC
@@ -23,10 +23,12 @@ Mujtaba Chohan | Salesforce | mujtaba@apache.org | PMC
 Nick Dimiduk | Hortonworks | ndimiduk@apache.org | PMC
 Rajeshbabu Chintaguntla | Hortonworks | rajeshbabu@apache.org | PMC
 Ramkrishna Vasudevan | Intel | ramkrishna@apache.org | PMC
-Ravi Magham | Cornerstone OnDemand | ravimagham@apache.org | PMC
+Ravi Magham | Bazaarvoice | ravimagham@apache.org | PMC
 Samarth Jain | Salesforce | samarth@apache.org | PMC
 Simon Toens | Salesforce | stoens@apache.org | PMC
-Steven Noels | NG Data | stevenn@apache.org | PMC
-Thomas D'Silva | Salesforce | tdsilva@apache.org | Committer
+Steven Noels | NGDATA | stevenn@apache.org | PMC
 Cody Marcel | Salesforce | codymarcel@apache.org | Committer
+Dumindu Buddhika | University of Moratuwa | duminduk@apache.org | Committer
+Jan Fernando | Salesforce | jfernando@apache.org | Committer
 Josh Mahonin | Interset | jmahonin@apache.org | Committer
+Thomas D'Silva | Salesforce | tdsilva@apache.org | Committer
