@@ -20,7 +20,7 @@ Lars Hofhansl | Salesforce | larsh@apache.org | PMC
 Maryann Xue | Intel | maryannxue@apache.org | PMC
 Michael Stack | Cloudera | stack@apache.org | PMC
 Mujtaba Chohan | Salesforce | mujtaba@apache.org | PMC
-Nick Dimiduk | Hortonworks | ndimiduk@apache.org | PMC
+Nick Dimiduk | unaffiliated | ndimiduk@apache.org | PMC
 Rajeshbabu Chintaguntla | Hortonworks | rajeshbabu@apache.org | PMC
 Ramkrishna Vasudevan | Intel | ramkrishna@apache.org | PMC
 Ravi Magham | Bazaarvoice | ravimagham@apache.org | PMC
