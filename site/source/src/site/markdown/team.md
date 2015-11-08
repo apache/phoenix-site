@@ -9,7 +9,7 @@ Name| Company| Email| Role
 ----|--------|------|-----
 Andrew Purtell | Salesforce | apurtell@apache.org | PMC
 Anoop Sam John | Intel | anoopsamjohn@apache.org | PMC
-Deveraj Das | Hortonworks | ddas@apache.org | PMC
+Devaraj Das | Hortonworks | ddas@apache.org | PMC
 Eli Levine | Salesforce | elilevine@apache.org | PMC
 Enis Soztutar | Hortonworks | enis@apache.org | PMC
 Gabriel Reid | NGDATA | greid@apache.org | PMC
