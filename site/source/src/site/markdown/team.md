@@ -28,7 +28,7 @@ Ravi Magham | Bazaarvoice | ravimagham@apache.org | PMC
 Samarth Jain | Salesforce | samarth@apache.org | PMC
 Simon Toens | Salesforce | stoens@apache.org | PMC
 Steven Noels | NGDATA | stevenn@apache.org | PMC
+Thomas D'Silva | Salesforce | tdsilva@apache.org | PMC
 Cody Marcel | Salesforce | codymarcel@apache.org | Committer
 Dumindu Buddhika | University of Moratuwa | duminduk@apache.org | Committer
 Jan Fernando | Salesforce | jfernando@apache.org | Committer
-Thomas D'Silva | Salesforce | tdsilva@apache.org | Committer
