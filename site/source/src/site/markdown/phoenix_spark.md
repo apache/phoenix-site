@@ -6,7 +6,7 @@ as RDDs or DataFrames, and enables persisting them back to Phoenix.
 #### Prerequisites
 
 * Phoenix 4.4.0+
-* Spark 1.3.1+
+* Spark 1.3.1+ (prebuilt with Hadoop 2.4 recommended)
 
 #### Why not JDBC?
 
@@ -24,11 +24,11 @@ The choice of which method to use to access Phoenix comes down to each specific 
 
 #### Spark setup
 
-1. Ensure that all requisite Phoenix / HBase platform dependencies are available on the classpath for the Spark executors and drivers
-2. One method is to add the phoenix-4.4.0-client.jar to 'SPARK_CLASSPATH' in spark-env.sh,
-or setting both 'spark.executor.extraClassPath' and 'spark.driver.extraClassPath' in
-spark-defaults.conf
-3. To help your IDE, you may want to add the following 'provided' dependency:
+1. To ensure that all requisite Phoenix / HBase platform dependencies are available on the classpath 
+for the Spark executors and drivers, set both '_spark.executor.extraClassPath_' and 
+'_spark.driver.extraClassPath_' in spark-defaults.conf to include the 'phoenix-_`<version>`_-client-**spark**.jar'
+Note that for Phoenix versions `<` 4.7.0, you must use the 'phoenix-_`<version>`_-client.jar'
+2. Add the following dependency to your build:
 
 ```
 <dependency>
@@ -157,7 +157,7 @@ CREATE TABLE OUTPUT_TABLE (id BIGINT NOT NULL PRIMARY KEY, col1 VARCHAR, col2 IN
 
 ```scala
 import org.apache.spark.SparkContext
-import org.apache.spark.sql.SQLContext
+import org.apache.phoenix.spark.sql._
 import org.apache.phoenix.spark._
 
 // Load INPUT_TABLE
@@ -170,6 +170,38 @@ val df = sqlContext.load("org.apache.phoenix.spark", Map("table" -> "INPUT_TABLE
 df.save("org.apache.phoenix.spark", SaveMode.Overwrite, Map("table" -> "OUTPUT_TABLE",
   "zkUrl" -> hbaseConnectionString))
 ```
+
+### PySpark
+
+With Spark's DataFrame support, you can also use `pyspark` to read and write from Phoenix tables.
+
+#### Load a DataFrame
+
+Given a table _TABLE1_ and a Zookeeper url of `localhost:2181` you can load the table as a
+DataFrame using the following Python code in `pyspark`
+
+```python
+df = sqlContext.read \
+  .format("org.apache.phoenix.spark") \
+  .option("table", "TABLE1") \
+  .option("zkUrl", "localhost:2181") \
+  .load()
+```
+
+#### Save a DataFrame
+
+Given the same table and Zookeeper URLs above, you can save a DataFrame to a Phoenix table
+using the following code
+
+```python
+df.write \
+  .format("org.apache.phoenix.spark") \
+  .mode("overwrite") \
+  .option("table", "TABLE1") \
+  .option("zkUrl", "localhost:2181") \
+  .save()
+```
+
 
 ### Notes
 
