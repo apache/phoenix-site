@@ -11,6 +11,7 @@
 * [How do I connect with HBase running on Hadoop-2?](#How_do_I_connect_with_HBase_running_on_Hadoop-2)
 * [Can phoenix work on tables with arbitrary timestamp as flexible as HBase API?](#Can_phoenix_work_on_tables_with_arbitrary_timestamp_as_flexible_as_HBase_API)
 * [Why isn't my query doing a RANGE SCAN?](#Why_isnt_my_query_doing_a_RANGE_SCAN)
+* [Should I pool Phoenix JDBC Connections?](#Should_I_pool_Phoenix_JDBC_Connections)
 
 
 ### I want to get started. Is there a Phoenix _Hello World_?
@@ -277,3 +278,10 @@ FULL SCAN means that all rows of the table will be scanned over (potentially wit
 SKIP SCAN means that either a subset or all rows in your table will be scanned over, however it will skip large groups of rows depending on the conditions in your filter. See [this](http://phoenix-hbase.blogspot.com/2013/05/demystifying-skip-scan-in-phoenix.html) blog for more detail. We don't do a SKIP SCAN if you have no filter on the leading primary key columns, but you can force a SKIP SCAN by using the /*+ SKIP_SCAN */ hint. Under some conditions, namely when the cardinality of your leading primary key columns is low, it will be more efficient than a FULL SCAN.
 
 
+### Should I pool Phoenix JDBC Connections?
+
+No, it is not necessary to pool Phoenix JDBC Connections.
+
+Phoenix's Connection objects are different from most other JDBC Connections due to the underlying HBase connection. The Phoenix Connection object is designed to be a thin object that is inexpensive to create. If Phoenix Connections are reused, it is possible that the underlying HBase connection is not always left in a healthy state by the previous user. It is better to create new Phoenix Connections to ensure that you avoid any potential issues.
+
+Implementing pooling for Phoenix could be done simply by creating a delegate Connection that instantiates a new Phoenix connection when retrieved from the pool and then closes the connection when returning it to the pool (see [PHOENIX-2388](https://issues.apache.org/jira/browse/PHOENIX-2388)).
