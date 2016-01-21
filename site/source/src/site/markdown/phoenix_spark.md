@@ -157,7 +157,7 @@ CREATE TABLE OUTPUT_TABLE (id BIGINT NOT NULL PRIMARY KEY, col1 VARCHAR, col2 IN
 
 ```scala
 import org.apache.spark.SparkContext
-import org.apache.phoenix.spark.sql._
+import org.apache.spark.sql._
 import org.apache.phoenix.spark._
 
 // Load INPUT_TABLE
