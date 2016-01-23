@@ -95,6 +95,7 @@
             <item href="phoenix_on_emr.html" name="Amazon EMR Support"/>
         </menu>
         <menu name="Features">
+            <item href="transactions.html" name="Transactions"/>
             <item href="secondary_indexing.html" name="Secondary Indexes"/>
             <item href="udf.html" name="User-defined Functions"/>
             <item href="bulk_dataload.html" name="Bulk Loading"/>

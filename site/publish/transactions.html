@@ -8,7 +8,7 @@
 
 	<head>
 		<meta charset="UTF-8" />
-		<title>New Features | Apache Phoenix</title>
+		<title>Transactions (beta) | Apache Phoenix</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="description" content="" />
 		<meta http-equiv="content-language" content="en" />
@@ -34,7 +34,7 @@
 
 	</head>
 
-	<body class="page-recent project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
+	<body class="page-transactions project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
 
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
@@ -52,7 +52,7 @@
 								<ul class="dropdown-menu">
 									<li ><a href="index.html" title="Overview">Overview</a></li>
 									<li ><a href="who_is_using.html" title="Who is Using">Who is Using</a></li>
-									<li class="active"><a href="" title="New Features">New Features</a></li>
+									<li ><a href="recent.html" title="New Features">New Features</a></li>
 									<li ><a href="roadmap.html" title="Roadmap">Roadmap</a></li>
 									<li ><a href="performance.html" title="Performance">Performance</a></li>
 									<li ><a href="team.html" title="Team">Team</a></li>
@@ -95,7 +95,7 @@
 							<li class="dropdown">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Features <b class="caret"></b></a>
 								<ul class="dropdown-menu">
-									<li ><a href="transactions.html" title="Transactions">Transactions</a></li>
+									<li class="active"><a href="" title="Transactions">Transactions</a></li>
 									<li ><a href="secondary_indexing.html" title="Secondary Indexes">Secondary Indexes</a></li>
 									<li ><a href="udf.html" title="User-defined Functions">User-defined Functions</a></li>
 									<li ><a href="bulk_dataload.html" title="Bulk Loading">Bulk Loading</a></li>
@@ -142,42 +142,53 @@
 		<div class="span12">
 			<div class="body-content">
 <div class="page-header">
- <h1>New Features</h1>
+ <h1>Transactions (beta)</h1>
 </div> 
-<p>As items are implemented from our road map, they are moved here to track the progress we’ve made:</p> 
+<p>Above and beyond the row-level transactional semantics of HBase, Phoenix adds cross row and cross table transaction support with full ACID semantics by integrating with a transaction library named <a class="externalLink" href="http://tephra.io/">Tephra</a>.</p> 
+<p>Setting up a system to use transactions in Phoenix requires two steps:</p> 
 <ol style="list-style-type: decimal"> 
- <li><b><a href="secondary_indexing.html#Asynchronous_Index_Population">Asynchronous Index Population</a></b>. Enables an index to be created asynchronously using a map reduce job. <b>Available in our 4.5 release</b></li> 
- <li><b><a href="udf.html">User Defined Functions</a></b>. Allows users to create and deploy their own custom or domain-specific user-defined functions to the cluster. <b>Available in our 4.4 release</b></li> 
- <li><b><a href="secondary_indexing.html#Functional_Indexes">Functional Indexes</a></b>. Enables an index to be defined as expressions as opposed to just column names and have the index be used when a query contains this expression. <b>Available in our 4.3 release</b></li> 
- <li><b><a href="phoenix_mr.html">Map-reduce Integration</a></b>. Support general map-reduce integration to Phoenix by implementing custom input and output formats. <b>Available in our 3.3/4.3 release</b></li> 
- <li><b><a href="update_statistics.html">Statistics Collection</a></b>. Collects the statistics for a table to improve query parallelization. <b>Available in our 3.2/4.2 release</b></li> 
- <li><b><a href="joins.html">Join Improvements</a></b>. Improve existing hash join implementation. 
-  <ul> 
-   <li><b><a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-1179">Many-to-many joins</a></b>. Support joins where both sides are too large to fit into memory. <b>Available in our 3.3/4.3 release</b></li> 
-   <li><b><a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-852">Optimize foreign key joins</a></b>. Optimize foreign key joins by leveraging our skip scan filter. <b>Available in our 3.2/4.2 release</b></li> 
-   <li><b><a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-167">Semi/anti joins</a></b>. Support semi/anti subqueries through the standard [NOT] IN and [NOT] EXISTS keywords. <b>Available in our 3.2/4.2 release</b></li> 
-  </ul></li> 
- <li><b><a href="subqueries.html">Subqueries</a></b> Support independent subqueries and correlated subqueries in the WHERE clause as well as subqueries in the FROM clause. <b>Available in our 3.2/4.2 release</b></li> 
- <li><b><a href="tracing.html">Tracing</a></b>. Allows visibility into the various steps of an <tt>UPSERT</tt> or <tt>SELECT</tt> statement along with how long each step took across all the machines in your cluster. <b>Available in our 4.1 release</b></li> 
- <li><b><a href="secondary_indexing.html#Local_Indexing">Local Indexing</a></b>. A new, complementary indexing stragegry for <i>write heavy</i>, <i>space constrained</i> use cases. With local indexes, index and table data co-reside on same server so no network overhead occurs during writes. Local indexes can be used even when the query isn’t fully covered (i.e. Phoenix automatically retrieve the columns not in the index through point gets against the data table). <b>Available in our 4.1 release</b></li> 
- <li><b><a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-136">Derived Tables</a></b>. Allows a <tt>SELECT</tt> clause to be used in the FROM clause to define a <i>derived</i> table (including join queries). <b>Available in our 3.1/4.1 release</b></li> 
- <li><b><a href="pig_integration.html#Pig_Loader">Apache Pig Loader</a></b> . Support for a Pig loader to leverage the performance of Phoenix when processing data through Pig. <b>Available in our 3.1/4.1 release</b></li> 
- <li><b><a href="views.html">Views</a></b>. Allows the creation of multiple tables using the same physical HBase table. <b>Available in our 3.0/4.0 release</b></li> 
- <li><b><a href="multi-tenancy.html">Multi-tenancy</a></b>. Allows independent views to be created by different tenants on a per-connection basis that all share the same physical HBase table. <b>Available in our 3.0/4.0 release</b></li> 
- <li><b><a href="sequences.html">Sequences</a></b>. Support for CREATE/DROP SEQUENCE, NEXT VALUE FOR, and CURRENT VALUE FOR has been implemented. <b>Available in our 3.0/4.0 release</b></li> 
- <li><b><a href="array_type.html">ARRAY Type</a></b>. Support for the standard JDBC ARRAY type. <b>Available in our 3.0/4.0 release</b></li> 
- <li><b><a href="secondary_indexing.html">Secondary Indexes</a></b>. Allows users to create indexes over mutable or immutable data.</li> 
- <li><b><a href="paged.html">Paged Queries</a></b>. Paged queries through row value constructors, a standard SQL construct to efficiently locate the row at or after a composite key value. Enables a query-more capability to efficiently step through your data and optimizes IN list of composite key values to be point gets.</li> 
- <li><b><a href="bulk_dataload.html">CSV Bulk Loader</a></b>. Bulk load CSV files into HBase either through map-reduce or a client-side script.</li> 
- <li><b>Aggregation Enhancements</b>. <tt>COUNT DISTINCT</tt>, <tt>PERCENTILE</tt>, and <tt>STDDEV</tt> are now supported.</li> 
- <li><b>Type Additions</b>. The <tt>FLOAT</tt>, <tt>DOUBLE</tt>, <tt>TINYINT</tt>, and <tt>SMALLINT</tt> are now supported.</li> 
- <li><b>IN/OR/LIKE Optimizations</b>. When an IN (or the equivalent OR) and a LIKE appears in a query using the leading row key columns, compile it into a skip scanning filter to more efficiently retrieve the query results.</li> 
- <li><b>Support ASC/DESC declaration of primary key columns</b>. Allow a primary key column to be declared as ascending (the default) or descending such that the row key order can match the desired sort order (thus preventing an extra sort).</li> 
- <li><b>Salting Row Key</b>. To prevent hot spotting on writes, the row key may be <i>“salted”</i> by inserting a leading byte into the row key which is a mod over N buckets of the hash of the entire row key. This ensures even distribution of writes when the row key is a monotonically increasing value (often a timestamp representing the current time).</li> 
- <li><b>TopN Queries</b>. Support a query that returns the top N rows, through support for ORDER BY when used in conjunction with TopN.</li> 
- <li><b>Dynamic Columns</b>. For some use cases, it’s difficult to model a schema up front. You may have columns that you’d like to specify only at query time. This is possible in HBase, in that every row (and column family) contains a map of values with keys that can be specified at run time. So, we’d like to support that.</li> 
- <li><b>Apache Bigtop Inclusion</b>. See <a class="externalLink" href="http://issues.apache.org/jira/browse/BIGTOP-993">BIGTOP-993</a> for more information.</li> 
-</ol>
+ <li> <p>Enabling them through a new configuration option:</p> 
+  <div> 
+   <pre>
+&lt;property&gt;
+  &lt;name&gt;phoenix.transactions.enabled&lt;/name&gt;
+  &lt;value&gt;true&lt;/value&gt;
+&lt;/property&gt;
+</pre>
+  </div></li> 
+ <li> <p>Starting an additional component, the transaction manager:</p> 
+  <div> 
+   <pre>
+./bin/tephra-env.sh
+./bin/tephra
+</pre>
+  </div></li> 
+</ol> 
+<p>The transaction manager would typically be configured to run on one or more of the master nodes in your HBase cluster.</p> 
+<p>Once this setup is done, transactions may then be enabled on a table by table basis by using the <tt>TRANSACTIONAL=true</tt> property when you create your table:</p> 
+<div class="source"> 
+ <pre>CREATE TABLE my_table (k BIGINT PRIMARY KEY, v VARCHAR) TRANSACTIONAL=true;
+</pre>
+</div> 
+<p>An existing table may also be altered to be transactional, <b>but be careful because you cannot switch a transactional table back to being non transactional</b>:</p> 
+<div class="source"> 
+ <pre>ALTER TABLE my_other_table SET TRANSACTIONAL=true;
+</pre>
+</div> 
+<p>Indexes added to a transactional table are transactional as well with regard to their incremental maintenance. For example, the following index added to my_table will be kept transactional consistent with its data table as mutations are made:</p> 
+<div class="source"> 
+ <pre>CREATE INDEX  my_table (k BIGINT PRIMARY KEY, v VARCHAR) TRANSACTIONAL=true;
+</pre>
+</div> 
+<p>A transaction is started implicitly through the execution of a statement on a transactional table and then finished through either a commit or rollback. Once started, the statements will not see any data committed by other transactions until the transaction is complete. They will, however, see their own uncommitted data. For example:</p> 
+<div class="source"> 
+ <pre>SELECT * FROM my_table; -- This will start a transaction
+UPSERT INTO my_table VALUES (1,'A');
+SELECT count(*) FROM my_table WHERE k=1; -- Will see uncommitted row
+DELETE FROM my_other_table WHERE k=2;
+COMMIT; -- Other transactions will now see your updates and you will see theirs
+</pre>
+</div>
 			</div>
 		</div>
 	</div>
@@ -199,8 +210,8 @@
 						<li >
 							<a href="who_is_using.html" title="Who is Using">Who is Using</a>
 						</li>
-						<li class="active">
-							<a href="#" title="New Features">New Features</a>
+						<li >
+							<a href="recent.html" title="New Features">New Features</a>
 						</li>
 						<li >
 							<a href="roadmap.html" title="Roadmap">Roadmap</a>
@@ -308,8 +319,8 @@
 				<div class="span2 bottom-nav">
 					<ul class="nav nav-list">
 						<li class="nav-header">Features</li>
-						<li >
-							<a href="transactions.html" title="Transactions">Transactions</a>
+						<li class="active">
+							<a href="#" title="Transactions">Transactions</a>
 						</li>
 						<li >
 							<a href="secondary_indexing.html" title="Secondary Indexes">Secondary Indexes</a>
