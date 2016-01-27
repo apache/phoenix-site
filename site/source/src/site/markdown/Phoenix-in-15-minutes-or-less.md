@@ -34,22 +34,27 @@ Didn't make it to the last HBase Meetup did you? SQL is just a way of expressing
 Ok, great! Just follow our [install instructions](download.html#Installation):
 
 * [download](download.html) and expand our installation tar
-* copy the phoenix jar into the HBase lib directory of every region server
+* copy the phoenix server jar that is compatible with your HBase installation into the lib directory of every region server
 * restart the region servers
 * add the phoenix client jar to the classpath of your HBase client
 * download and [setup SQuirrel](installation.html#SQL_Client) as your SQL client so you can issue adhoc SQL against your HBase cluster
 
 *<strong>I don't want to download and setup anything else!</strong>*<br/>
-Ok, fair enough - you can create your own SQL scripts and execute them using our command line tool instead. Let's walk through an example now. In the bin directory of your install location:
+Ok, fair enough - you can create your own SQL scripts and execute them using our command line tool instead. Let's walk through an example now. Begin by navigating to the `bin/` directory of your Phoenix install location.
 
-* Create us_population.sql file
-<pre><code>CREATE TABLE IF NOT EXISTS us_population (
+* First, let's create a `us_population.sql` file, containing a table definition:
+
+```
+CREATE TABLE IF NOT EXISTS us_population (
       state CHAR(2) NOT NULL,
       city VARCHAR NOT NULL,
       population BIGINT
-      CONSTRAINT my_pk PRIMARY KEY (state, city));</code></pre>
-* Create us_population.csv file
-<pre><code>NY,New York,8143197
+      CONSTRAINT my_pk PRIMARY KEY (state, city));
+```
+* Now let's create a `us_population.csv` file containing some data to put in that table:
+
+```
+NY,New York,8143197
 CA,Los Angeles,3844829
 IL,Chicago,2842518
 TX,Houston,2016582
@@ -59,18 +64,22 @@ TX,San Antonio,1256509
 CA,San Diego,1255540
 TX,Dallas,1213825
 CA,San Jose,912332
-</code></pre>
+```
 
-* Create us_population_queries.sql file
-<pre><code>SELECT state as "State",count(city) as "City Count",sum(population) as "Population Sum"
+* And finally, let's create a `us_population_queries.sql` file containing a query we'd like to run on that data.
+
+```
+SELECT state as "State",count(city) as "City Count",sum(population) as "Population Sum"
 FROM us_population
 GROUP BY state
 ORDER BY sum(population) DESC;
-</code></pre>
+```
 
 * Execute the following command from a command terminal
-<pre><code>./psql.py &lt;your_zookeeper_quorum&gt; us_population.sql us_population.csv us_population_queries.sql
-</code></pre>
+
+```
+./psql.py <your_zookeeper_quorum> us_population.sql us_population.csv us_population_queries.sql
+```
 
 Congratulations! You've just created your first Phoenix table, inserted data into it, and executed an aggregate query with just a few lines of code in 15 minutes or less! 
 
