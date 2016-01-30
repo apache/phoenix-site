@@ -45,15 +45,15 @@ For higher-throughput loading distributed over the cluster, the MapReduce loader
 
 The MapReduce loader is launched using the `hadoop` command with the Phoenix client jar, as follows:
 
-    hadoop jar phoenix-3.0.0-incubating-client.jar org.apache.phoenix.mapreduce.CsvBulkLoadTool --table EXAMPLE --input /data/example.csv
+    hadoop jar phoenix-<version>-client.jar org.apache.phoenix.mapreduce.CsvBulkLoadTool --table EXAMPLE --input /data/example.csv
 
 When using Phoenix 4.0 and above, there is a known HBase issue( "Notice to Mapreduce users of HBase 0.96.1 and above" https://hbase.apache.org/book.html ), you should use following command:
 
-    HADOOP_CLASSPATH=$(hbase mapredcp):/path/to/hbase/conf hadoop jar phoenix-4.0.0-incubating-client.jar org.apache.phoenix.mapreduce.CsvBulkLoadTool --table EXAMPLE --input /data/example.csv
+    HADOOP_CLASSPATH=$(hbase mapredcp):/path/to/hbase/conf hadoop jar phoenix-<version>-client.jar org.apache.phoenix.mapreduce.CsvBulkLoadTool --table EXAMPLE --input /data/example.csv
 
 OR
 
-    HADOOP_CLASSPATH=/path/to/hbase-protocol.jar:/path/to/hbase/conf hadoop jar phoenix-4.0.0-incubating-client.jar org.apache.phoenix.mapreduce.CsvBulkLoadTool --table EXAMPLE --input /data/example.csv
+    HADOOP_CLASSPATH=/path/to/hbase-protocol.jar:/path/to/hbase/conf hadoop jar phoenix-<version>-client.jar org.apache.phoenix.mapreduce.CsvBulkLoadTool --table EXAMPLE --input /data/example.csv
 
 The input file must be present on HDFS (not the local filesystem where the command is being run). 
 
@@ -76,7 +76,21 @@ The following parameters can be used with the MapReduce loader.
 ### Notes on the MapReduce importer
 The current MR-based bulk loader will run one MR job to load your data table and one MR per index table to populate your indexes. Use the -it option to only load one of your index tables.
 
-## Loading array data
+#### Permissions issues when uploading HFiles
+
+There can be issues due to file permissions on the created HFiles in the final stage of a bulk load, when the created HFiles are handed over to HBase. HBase needs to be able to move the created HFiles, which means that it needs to have write access to the directories where the files have been written. If this is not the case, the uploading of HFiles will hang for a very long time before finally failing.
+
+There are two main workarounds for this issue: running the bulk load process as the `hbase` user, or creating the output files with as readable for all users.
+
+The first option can be done by simply starting the hadoop command with `sudo -u hbase`, i.e. 
+
+    sudo -u hbase hadoop jar phoenix-<version>-client.jar org.apache.phoenix.mapreduce.CsvBulkLoadTool --table EXAMPLE --input /data/example.csv
+
+Creating the output files as readable by all can be done by setting the `fs.permissions.umask-mode` configuration setting to "000". This can be set in the hadoop configuration on the machine being used to submit the job, or can be set for the job only during submission on the command line as follows:
+
+    hadoop jar phoenix-<version>-client.jar org.apache.phoenix.mapreduce.CsvBulkLoadTool -Dfs.permissions.umask-mode=000 --table EXAMPLE --input /data/example.csv
+
+#### Loading array data
 
 Both the PSQL loader and MapReduce loader support loading array values with the `-a` flag. Arrays in a CSV file are represented by a field that uses a different delimiter than the main CSV delimiter. For example, the following file would represent an id field and an array of integers:
 
@@ -85,7 +99,7 @@ Both the PSQL loader and MapReduce loader support loading array values with the 
 
 To load this file, the default delimiter (comma) would be used, and the array delimiter (colon) would be supplied with the parameter `-a ':'`.
 
-## A note on separator characters
+#### A note on separator characters
 
 The default separator character for both loaders is a comma (,). A common separator for input files is the tab character, 
 which can tricky to supply on the command line. A common mistake is trying to supply a tab as the separator by typing the following
