@@ -78,7 +78,6 @@ For any omitted part, the relevant property value, hbase.zookeeper.quorum, hbase
 
 Here's a list of what is currently **not** supported:
 
-* **Full Transaction Support**. Although we allow client-side batching and rollback as described [here](#transactions), we do not provide transaction semantics above and beyond what HBase gives you out-of-the-box.
 * **Relational operators**. Union, Intersect, Minus.
 * **Miscellaneous built-in functions**. These are easy to add - read this [blog](http://phoenix-hbase.blogspot.com/2013/04/how-to-add-your-own-built-in-function.html) for step by step instructions.
 
@@ -112,9 +111,14 @@ The other caveat is that the way the bytes were serialized in HBase must match t
 Our composite row keys are formed by simply concatenating the values together, with a zero byte character used as a separator after a variable length type. For more information on our type system, see the [Data Type](language/datatypes.html).
 
 ##<a id="transactions"></a>Transactions##
-The DML commands of Apache Phoenix, [UPSERT VALUES](language/index.html#upsert_values), [UPSERT SELECT](language/index.html#upsert_select) and [DELETE](language/index.html#delete), batch pending changes to HBase tables on the client side. The changes are sent to the server when the transaction is committed and discarded when the transaction is rolled back. The only transaction isolation level we support is TRANSACTION_READ_COMMITTED. This includes not being able to see your own uncommitted data as well. Phoenix does not providing any additional transactional semantics beyond what HBase supports when a batch of mutations is submitted to the server. If auto commit is turned on for a connection, then Phoenix will, whenever possible, execute the entire DML command through a coprocessor on the server-side, so performance will improve.
+The DML commands of Apache Phoenix, [UPSERT VALUES](language/index.html#upsert_values), [UPSERT SELECT](language/index.html#upsert_select) and [DELETE](language/index.html#delete), batch pending changes to HBase tables on the client side. The changes are sent to the server when the transaction is committed and discarded when the transaction is rolled back. 
 
-Most commonly, an application will let HBase manage timestamps. However, under some circumstances, an application needs to control the timestamps itself. In this case, a long-valued "CurrentSCN" property may be specified at connection time to control timestamps for any DDL, DML, or query. This capability may be used to run snapshot queries against prior row values, since Phoenix uses the value of this connection property as the max timestamp of scans.
+If the "phoenix.transactions.enabled" property is enabled then the transaction isolation level is TRANSACTION_SERIALIZABLE which allows a transaction to see its own uncommitted data.
+Otherwise the  transaction isolation level is TRANSACTION_READ_COMMITTED which means a client cannot see its own uncommitted data. 
+
+If auto commit is turned on for a connection, then Phoenix will, whenever possible, execute the entire DML command through a coprocessor on the server-side, so performance will improve.
+
+Most commonly, an application will let HBase manage timestamps. However, under some circumstances, an application needs to control the timestamps itself. In this case, a long-valued "CurrentSCN" property may be specified at connection time to control timestamps for any DDL, DML, or query. This capability may be used to run snapshot queries against prior row values, since Phoenix uses the value of this connection property as the max timestamp of scans. However the SCN feature is not supported with transactions. 
 
 ## Metadata ##
 The catalog of tables, their columns, primary keys, and types may be retrieved via the java.sql metadata interfaces: `DatabaseMetaData`, `ParameterMetaData`, and `ResultSetMetaData`. For retrieving schemas, tables, and columns through the DatabaseMetaData interface, the schema pattern, table pattern, and column pattern are specified as in a LIKE expression (i.e. % and _ are wildcards escaped through the \ character). The table catalog argument to the metadata APIs deviates from a more standard relational database model, and instead is used to specify a column family name (in particular to see all columns in a given column family).
