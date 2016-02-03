@@ -176,7 +176,7 @@
      </tr> 
     </tbody> 
    </table> 
-   <p><span id="alerts" style="background-color:#ffc; text-align: center;display: block;padding:10px; border-bottom: solid 1px #cc9"> <b><a href="news.html">News</a>:</b> Recently added: <a class="externalLink" href="https://blogs.apache.org/phoenix/entry/announcing_phoenix_4_5_released">Announcing Apache Phoenix 4.5 released</a> (July 29, 2015) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a class="externalLink" href="https://twitter.com/ApachePhoenix"><img src="images/follow.png" title="Follow Apache Phoenix on Twitter" alt="" /></a></span></p> 
+   <p><span id="alerts" style="background-color:#ffc; text-align: center;display: block;padding:10px; border-bottom: solid 1px #cc9"> <b><a href="news.html">News</a>:</b> Recently added: <a class="externalLink" href="http://phoenix.apache.org/transactions.html">News: Announcing transaction support in 4.7.0 release</a> (Feb 3, 2016) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a class="externalLink" href="https://twitter.com/ApachePhoenix"><img src="images/follow.png" title="Follow Apache Phoenix on Twitter" alt="" /></a></span></p> 
    <hr /> 
   </div> 
  </div> 
@@ -215,6 +215,18 @@
  </ul> 
 </div> 
 <div class="section"> 
+ <h2 id="transactions">Transactions<a name="Transactions"></a></h2> 
+ <p>To enable full ACID transactions, a beta feature available in the 4.7.0 release, set the <tt>phoenix.transactions.enabled</tt> property to true. In this case, you’ll also need to run the transaction manager that’s included in the distribution. Once enabled, a table may optionally be declared as transactional (see <a href="transactions.html">here</a> for directions). Commits over transactional tables will have an all-or-none behavior - either all data will be committed (including any updates to secondary indexes) or none of it will (and an exception will be thrown). Both cross table and cross row transactions are supported. In addition, transactional tables will see their own uncommitted data when querying. An optimistic concurrency model is used to detect row level conflicts with first commit wins semantics. The later commit would produce an exception indicating that a conflict was detected. A transaction is started implicitly when a transactional table is referenced in a statement, at which point you will not see updates from other connections until either a commit or rollback occurs.</p> 
+ <p>Non transactional tables have no guarantees above and beyond the HBase guarantee of row level atomicity (see <a class="externalLink" href="https://hbase.apache.org/acid-semantics.html">here</a>). In addition, non transactional tables will not see their updates until after a commit has occurred. The DML commands of Apache Phoenix, UPSERT VALUES, UPSERT SELECT and DELETE, batch pending changes to HBase tables on the client side. The changes are sent to the server when the transaction is committed and discarded when the transaction is rolled back. If auto commit is turned on for a connection, then Phoenix will, whenever possible, execute the entire DML command through a coprocessor on the server-side, so performance will improve.</p> 
+ <div class="section"> 
+  <div class="section"> 
+   <h4 id="Timestamps">Timestamps</h4> 
+   <p>Most commonly, an application will let HBase manage timestamps. However, under some circumstances, an application needs to control the timestamps itself. In this case, a long-valued “CurrentSCN” property may be specified at connection time to control timestamps for any DDL, DML, or query. This capability may be used to run snapshot queries against prior row values, since Phoenix uses the value of this connection property as the max timestamp of scans.</p> 
+   <p>Timestamps may not be controlled for transactional tables. Instead, the transaction manager assigns timestamps which become the HBase cell timestamps after a commit. Timestamps still correspond to wall clock time, however they are multiplied by 1,000,000 to ensure enough granularity for uniqueness across the cluster.</p> 
+  </div> 
+ </div> 
+</div> 
+<div class="section"> 
  <h2 id="schema">Schema<a name="Schema"></a></h2> 
  <p>Apache Phoenix supports table creation and versioned incremental alterations through DDL commands. The table metadata is stored in an HBase table.</p> 
  <p>A Phoenix table is created through the <a href="language/index.html#create">CREATE TABLE</a> DDL command and can either be:</p> 
@@ -247,13 +259,6 @@
    <p>Our composite row keys are formed by simply concatenating the values together, with a zero byte character used as a separator after a variable length type. For more information on our type system, see the <a href="language/datatypes.html">Data Type</a>.</p> 
   </div> 
  </div> 
-</div> 
-<div class="section"> 
- <h2 id="transactions">Transactions<a name="Transactions"></a></h2> 
- <p>The DML commands of Apache Phoenix, <a href="language/index.html#upsert_values">UPSERT VALUES</a>, <a href="language/index.html#upsert_select">UPSERT SELECT</a> and <a href="language/index.html#delete">DELETE</a>, batch pending changes to HBase tables on the client side. The changes are sent to the server when the transaction is committed and discarded when the transaction is rolled back. </p> 
- <p>If the “phoenix.transactions.enabled” property is enabled then the transaction isolation level is TRANSACTION_SERIALIZABLE which allows a transaction to see its own uncommitted data. Otherwise the transaction isolation level is TRANSACTION_READ_COMMITTED which means a client cannot see its own uncommitted data. </p> 
- <p>If auto commit is turned on for a connection, then Phoenix will, whenever possible, execute the entire DML command through a coprocessor on the server-side, so performance will improve.</p> 
- <p>Most commonly, an application will let HBase manage timestamps. However, under some circumstances, an application needs to control the timestamps itself. In this case, a long-valued “CurrentSCN” property may be specified at connection time to control timestamps for any DDL, DML, or query. This capability may be used to run snapshot queries against prior row values, since Phoenix uses the value of this connection property as the max timestamp of scans. However the SCN feature is not supported with transactions. </p> 
 </div> 
 <div class="section"> 
  <h2 id="Metadata">Metadata</h2> 
