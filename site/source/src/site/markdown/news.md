@@ -1,7 +1,7 @@
 # Apache Phoenix News
 <br/>
 <hr/>
-#### [Announcing transaction support in 4.7.0 release](http://phoenix.apache.org/transactions.html) (Feb 3, 2016)
+#### [Announcing transaction support in 4.7.0 release](http://phoenix.apache.org/transactions.html)
 <hr/>
 #### [Announcing time series optimization in Phoenix 4.6 released](https://blogs.apache.org/phoenix/entry/new_optimization_for_time_series) (Oct 23, 2015)
 <hr/>
