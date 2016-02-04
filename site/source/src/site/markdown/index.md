@@ -45,7 +45,7 @@
 
 <span id="alerts" style="background-color:#ffc; text-align: center;display: block;padding:10px; border-bottom: solid 1px #cc9">
 <strong><a href="news.html">News</a>:</strong>
-Recently added: <a href="http://phoenix.apache.org/transactions.html">News: Announcing transaction support in 4.7.0 release</a> (Feb 3, 2016)
+Recently added: Announcing [transaction support](transactions.html) in 4.7.0 release 
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
 <a href='https://twitter.com/ApachePhoenix'><img title="Follow Apache Phoenix on Twitter" src="images/follow.png"/></a></span>
 

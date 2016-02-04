@@ -3,9 +3,7 @@
 <hr/>
 #### [Announcing transaction support in 4.7.0 release](http://phoenix.apache.org/transactions.html) (Feb 3, 2016)
 <hr/>
-<hr/>
 #### [Announcing time series optimization in Phoenix 4.6 released](https://blogs.apache.org/phoenix/entry/new_optimization_for_time_series) (Oct 23, 2015)
-<hr/>
 <hr/>
 #### [Announcing Phoenix 4.5 released](https://blogs.apache.org/phoenix/entry/announcing_phoenix_4_5_released) (July 29, 2015)
 <hr/>
