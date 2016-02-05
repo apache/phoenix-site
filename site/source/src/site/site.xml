@@ -92,7 +92,6 @@
             <item href="pig_integration.html" name="Apache Pig Integration"/>
             <item href="phoenix_mr.html" name="Map Reduce Integration"/>
             <item href="flume.html" name="Apache Flume Plugin"/>
-            <item href="phoenix_on_emr.html" name="Amazon EMR Support"/>
         </menu>
         <menu name="Features">
             <item href="transactions.html" name="Transactions"/>
