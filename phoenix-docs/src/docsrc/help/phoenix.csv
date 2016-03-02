@@ -284,15 +284,16 @@ UPDATE STATISTICS my_table COLUMNS
 "
 
 "Other Grammar","Options","
-{ [familyName .] name= {value | bindParameter}} [,...]
+{ [familyName .] name= value } [,...]
 ","
 Sets a built-in Phoenix table property or an HBase table or column descriptor metadata attribute.
 The name is case insensitive. Built-in Phoenix table options include SALT_BUCKETS, DISABLE_WAL,
-IMMUTABLE_ROWS, MULTI_TENANT, DEFAULT_COLUMN_FAMILY, and STORE_NULLS. If the name is a known HColumnDescriptor
-attribute, then the value is applied to the specified column family or, if omitted, to all column
-families. Otherwise, the HBase metadata attribute value is applied to the HTableDescriptor.
-Note that no validation is performed on the property name or value, so unknown or misspelled
-options will end up as adhoc metadata attributes values on the HBase table.
+IMMUTABLE_ROWS, MULTI_TENANT, DEFAULT_COLUMN_FAMILY, STORE_NULLS, TRANSACTIONAL, and UPDATE_CACHE_FREQUENCY.
+If the name is a known HColumnDescriptor attribute, then the value is applied to the specified
+column family or, if omitted, to all column families. Otherwise, the HBase metadata attribute
+value is applied to the HTableDescriptor. Note that no validation is performed on the property
+name or value, so unknown or misspelled options will end up as adhoc metadata attributes values
+on the HBase table.
 
 The SALT_BUCKETS numeric property causes an extra byte to be transparently
 prepended to every row key to ensure an evenly distributed read and write load across all
@@ -311,11 +312,12 @@ failure. This option is useful when updating a table which is not the source-of-
 the lose of data acceptable.
 
 The IMMUTABLE_ROWS boolean option when true declares that your table has rows which are write-once,
-append-only (i.e. the same row is never updated or deleted). With this option set, indexes added to
+append-only (i.e. the same row is never updated). With this option set, indexes added to
 the table are managed completely on the client-side, with no need to perform incremental index
-maintenance., thus improving performance. Deletes are not allowed (beyond dropping the entire table)
-and updates are expected to never update an existing row (failure to follow this will result in
-invalid indexes). For more information, see http://phoenix.incubator.apache.org/secondary_indexing.html
+maintenance, thus improving performance. Deletes of rows in immutable tables are allowed with some
+restrictions if there are indexes on the table. Namely, the WHERE clause may not filter on columns
+not contained by every index. Upserts are expected to never update an existing row (failure to follow
+this will result in invalid indexes). For more information, see http://phoenix.incubator.apache.org/secondary_indexing.html
 
 The MULTI_TENANT boolean option when true enables views to be created over the table across different
 tenants. This option is useful to share the same physical HBase table across many different
@@ -326,7 +328,22 @@ is specified. The value is case sensitive. If this option is not present, a colu
 name of '0' is used.
 
 The STORE_NULLS boolean option (available as of Phoenix 4.3) determines whether or not null values should be
-explicitly stored in HBase. This option is generally only useful if a table is configured to store multiple versions in order to facilitate doing flashback queries (i.e. queries to look at the state of a record in the past).
+explicitly stored in HBase. This option is generally only useful if a table is configured to store multiple
+versions in order to facilitate doing flashback queries (i.e. queries to look at the state of a record in the past).
+
+The TRANSACTIONAL option (available as of Phoenix 4.7) determines whether a table (and its
+secondary indexes) are tranactional. The default value is FALSE, but may be overriden with the
+phoenix.table.istransactional.default property. A table may be altered to become transactional,
+but it cannot be transitioned back to be non transactional. For more information on transactions, see
+http://phoenix.apache.org/transactions.html
+
+The UPDATE_CACHE_FREQUENCY option (available as of Phoenix 4.7) determines how often the server
+will be checked for meta data updates (for example, the addition or removal of a table column or
+the updates of table statistics). Possible values are ALWAYS (the default), NEVER, and a millisecond
+numeric value. An ALWAYS value will cause the client to check with the server each time a statement
+is executed that references a table (or once per commit for an UPSERT VALUES statement).  A millisecond
+value indicates how long the client will hold on to its cached version of the metadata before checking
+back with the server for updates.
 
 ","
 IMMUTABLE_ROWS=true
@@ -334,10 +351,11 @@ DEFAULT_COLUMN_FAMILY='a'
 SALT_BUCKETS=10
 DATA_BLOCK_ENCODING='NONE',a.VERSIONS=10
 MAX_FILESIZE=2000000000,MEMSTORE_FLUSHSIZE=80000000
+UPDATE_CACHE_FREQUENCY=300000
 "
 
 "Other Grammar","Hint","
-{ scanHint | indexHint | cacheHint | smallHint | joinHint | seekToColumnHint } [,...]
+{ scanHint | indexHint | cacheHint | smallHint | joinHint | seekToColumnHint | serialHint } [,...]
 ","
 An advanced features that overrides default query processing behavior for decisions such as
 whether to use a range scan versus skip scan and an index versus no index. Note that strict
@@ -442,6 +460,16 @@ filtered when joined against one or more of the other joined tables.
 
 ","
 NO_STAR_JOIN
+"
+
+"Other Grammar","Serial Hint","
+SERIAL
+","
+Use the SERIAL hint to force a query to be executed serially as opposed to being
+parallelized along the guideposts and region boundaries.
+
+","
+SERIAL
 "
 
 "Other Grammar","Column Def","
@@ -722,10 +750,11 @@ ARRAY[col1,col2,col3+1,?]
 "
 
 "Other Grammar","Sequence","
-{NEXT | CURRENT} VALUE FOR sequenceRef
+{NEXT | CURRENT} { VALUE | {number VALUES} } FOR sequenceRef
 ","
 Gets the CURRENT or NEXT value for a sequence, a monotonically incrementing BIGINT
 value. Each call to NEXT VALUE FOR increments the sequence value and returns the current value.
+The NEXT <n> VALUES syntax may be used to reserve <n> consecutive sequence values.
 A sequence is only increment once for a given statement, so multiple references to
 the same sequence by NEXT VALUE FOR produce the same value. Use CURRENT VALUE FOR to
 access the last sequence allocated with NEXT VALUE FOR for cluster connection of your
@@ -733,6 +762,7 @@ client. If no NEXT VALUE FOR had been previously called, an error will occur. Th
 calls are only allowed in the SELECT expressions or UPSERT VALUES expressions.
 ","
 NEXT VALUE FOR my_table_id
+NEXT 5 VALUES FOR my_table_id
 CURRENT VALUE FOR my_schema.my_id_generator
 "
 "Other Grammar","Cast","
