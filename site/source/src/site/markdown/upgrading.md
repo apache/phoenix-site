@@ -1,5 +1,8 @@
-#Upgrading Phoenix
+#Backward Compatibility
+Phoenix maintains backward compatibility across at least two minor releases to allow for **no downtime** through server-side rolling
+restarts upon upgrading. See below for details.
 
+##Versioning Convention
 Phoenix uses a standard three number versioning schema of the form:
 
     <major version> . <minor version> . <patch version>
