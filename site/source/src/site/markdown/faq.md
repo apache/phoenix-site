@@ -249,10 +249,10 @@ Hadoop-2 profile exists in Phoenix pom.xml.
 
 
 ### Can phoenix work on tables with arbitrary timestamp as flexible as HBase API?
-By default, Phoenix let's HBase manage the timestamps and just shows you the latest values for everything. However, Phoenix also allows arbitrary timestamps to be supplied by the user. To do that you'd specify a "CurrentSCN" (or PhoenixRuntime.CURRENT_SCN_ATTRIB if you want to use our constant) at connection time, like this:
+By default, Phoenix let's HBase manage the timestamps and just shows you the latest values for everything. However, Phoenix also allows arbitrary timestamps to be supplied by the user. To do that you'd specify a "CurrentSCN" at connection time, like this:
 
     Properties props = new Properties();
-    props.setProperty(PhoenixRuntime.CURRENT_SCN_ATTRIB, Long.toString(ts));
+    props.setProperty("CurrentSCN", Long.toString(ts));
     Connection conn = DriverManager.connect(myUrl, props);
 
     conn.createStatement().execute("UPSERT INTO myTable VALUES ('a')");
