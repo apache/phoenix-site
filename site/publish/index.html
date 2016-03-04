@@ -209,10 +209,10 @@
  <p>For any omitted parts, the relevant property value, hbase.zookeeper.quorum, hbase.zookeeper.property.clientPort, and zookeeper.znode.parent will be used from hbase-site.xml configuration file. The optional <tt>principal</tt> and <tt>keytab file</tt> may be used to connect to a Kerberos secured cluster. If only <tt>principal</tt> is specified, then this defines the user name with each distinct user having their own dedicated HBase connection (HConnection). This provides a means of having multiple, different connections each with different configuration properties on the same JVM.</p> 
  <p>For example, the following connection string might be used for longer running queries, where the <tt>longRunningProps</tt> specifies Phoenix and HBase configuration properties with longer timeouts: </p> 
  <div> 
-  <pre><tt>Connection conn = DriverManager.getConnection(“jdbc:phoenix:server1,server2:3333:longRunning”, longRunningProps);</tt></pre> 
+  <pre><tt>Connection conn = DriverManager.getConnection(“jdbc:phoenix:my_server:longRunning”, longRunningProps);</tt></pre> 
  </div> while the following connection string might be used for shorter running queries: 
  <div> 
-  <pre><tt>Connection conn = DriverManager.getConnection(&quot;jdbc:phoenix:server1,server2:3333:shortRunning&quot;, shortRunningProps);</tt></pre> 
+  <pre><tt>Connection conn = DriverManager.getConnection(&quot;jdbc:phoenix:my_server:shortRunning&quot;, shortRunningProps);</tt></pre> 
  </div> 
  <div class="section"> 
   <div class="section"> 

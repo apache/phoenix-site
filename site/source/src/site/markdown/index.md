@@ -83,10 +83,10 @@ user having their own dedicated HBase connection (HConnection). This provides a 
 configuration properties on the same JVM.
 
 For example, the following connection string might be used for longer running queries, where the <code>longRunningProps</code> specifies Phoenix and HBase configuration properties with longer timeouts:
-<pre><code>Connection conn = DriverManager.getConnection("jdbc:phoenix:server1,server2:3333:longRunning", longRunningProps);</code></pre>
+<pre><code>Connection conn = DriverManager.getConnection("jdbc:phoenix:my_server:longRunning", longRunningProps);</code></pre>
 while the following connection string might be used for shorter running queries:
 
-<pre><code>Connection conn = DriverManager.getConnection("jdbc:phoenix:server1,server2:3333:shortRunning", shortRunningProps);</code></pre>
+<pre><code>Connection conn = DriverManager.getConnection("jdbc:phoenix:my_server:shortRunning", shortRunningProps);</code></pre>
 
 
 ####Not Supported
