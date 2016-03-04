@@ -32,3 +32,4 @@ Thomas D'Silva | Salesforce | tdsilva@apache.org | PMC
 Cody Marcel | Salesforce | codymarcel@apache.org | Committer
 Dumindu Buddhika | University of Moratuwa | duminduk@apache.org | Committer
 Jan Fernando | Salesforce | jfernando@apache.org | Committer
+Ankit Singhal | Hortonworks | ankit@apache.org | Committer
