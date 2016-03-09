@@ -8,7 +8,7 @@
 
 	<head>
 		<meta charset="UTF-8" />
-		<title>Building Phoenix Project | Apache Phoenix</title>
+		<title>Metrics | Apache Phoenix</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="description" content="" />
 		<meta http-equiv="content-language" content="en" />
@@ -34,7 +34,7 @@
 
 	</head>
 
-	<body class="page-building project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
+	<body class="page-metrics project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
 
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
@@ -79,7 +79,7 @@
 								<ul class="dropdown-menu">
 									<li ><a href="faq.html" title="F.A.Q.">F.A.Q.</a></li>
 									<li ><a href="Phoenix-in-15-minutes-or-less.html" title="Quick Start">Quick Start</a></li>
-									<li class="active"><a href="" title="Building">Building</a></li>
+									<li ><a href="building.html" title="Building">Building</a></li>
 									<li ><a href="tuning.html" title="Tuning">Tuning</a></li>
 									<li ><a href="upgrading.html" title="Backward Compatibility">Backward Compatibility</a></li>
 									<li ><a href="release_notes.html" title="Release Notes">Release Notes</a></li>
@@ -112,7 +112,7 @@
 									<li ><a href="skip_scan.html" title="Skip Scan">Skip Scan</a></li>
 									<li ><a href="salted.html" title="Salted Tables">Salted Tables</a></li>
 									<li ><a href="rowtimestamp.html" title="Row Timestamp Column">Row Timestamp Column</a></li>
-									<li ><a href="metrics.html" title="Metrics">Metrics</a></li>
+									<li class="active"><a href="" title="Metrics">Metrics</a></li>
 								</ul>
 							</li>
 							<li class="dropdown">
@@ -142,69 +142,115 @@
 		<div class="span12">
 			<div class="body-content">
 <div class="page-header">
- <h1>Building Phoenix Project</h1>
+ <h1>Metrics</h1>
 </div> 
-<p>Phoenix is a fully mavenized project. Download <a href="source.html">source</a> and build simply by doing:</p> 
-<div class="source"> 
- <pre>$ mvn package
-</pre> 
-</div> 
-<p>builds, runs fast unit tests and package Phoenix and put the resulting jars (phoenix-[version].jar and phoenix-[version]-client.jar) in the generated phoenix-core/target/ and phoenix-assembly/target/ directories respectively.</p> 
-<p>To build, but skip running the fast unit tests, you can do:</p> 
-<div class="source"> 
- <pre> $ mvn package -DskipTests
-</pre> 
-</div> 
-<p>To build against hadoop2, you can do:</p> 
-<div class="source"> 
- <pre> $ mvn package -DskipTests -Dhadoop.profile=2
-</pre> 
-</div> 
-<p>To run all tests including long running integration tests</p> 
-<div class="source"> 
- <pre> $ mvn install
-</pre> 
-</div> 
-<p>To only build the generated parser (i.e. <tt>PhoenixSQLLexer</tt> and <tt>PhoenixSQLParser</tt>), you can do:</p> 
-<div class="source"> 
- <pre> $ mvn install -DskipTests
- $ mvn process-sources
-</pre> 
-</div> 
-<p>To build an Eclipse project, install the m2e plugin and do an File-&gt;Import…-&gt;Import Existing Maven Projects selecting the root directory of Phoenix.</p> 
+<p>Phoenix surfaces various metrics that provide an insight into what is going on within the Phoenix client as it is executing various SQL statements. These metrics are collected within the client JVM in two ways:</p> 
+<ul> 
+ <li>Request level metrics - collected at an individual SQL statement level</li> 
+ <li>Global metrics - collected at the client JVM level</li> 
+</ul> 
+<p>Request level metrics are helpful for figuring out at a more granular level about the amount of work done by every SQL statement executed by Phoenix. These metrics can be classified into three categories:</p> 
 <div class="section"> 
- <h2 id="Maven">Maven</h2> 
- <p>Phoenix is also hosted at Apache Maven Repository. You can add it to your mavenized project by adding the following to your pom:</p> 
- <div class="source"> 
-  <pre> &lt;repositories&gt;
-   ...
-    &lt;repository&gt;
-      &lt;id&gt;apache release&lt;/id&gt;
-      &lt;url&gt;https://repository.apache.org/content/repositories/releases/&lt;/url&gt;
-    &lt;/repository&gt;
-    ...
-  &lt;/repositories&gt;
-  
-  &lt;dependencies&gt;
-    ...
-    &lt;dependency&gt;
-        &lt;groupId&gt;org.apache.phoenix&lt;/groupId&gt;
-        &lt;artifactId&gt;phoenix-core&lt;/artifactId&gt;
-        &lt;version&gt;[version]&lt;/version&gt;
-    &lt;/dependency&gt;
-    ...
-  &lt;/dependencies&gt;
+ <div class="section"> 
+  <div class="section"> 
+   <h4 id="Mutation_Metrics">Mutation Metrics</h4> 
+   <ul> 
+    <li>MUTATION_BATCH_SIZE - Batch sizes of mutations</li> 
+    <li>MUTATION_BYTES - Size of mutations in bytes</li> 
+    <li>MUTATION_COMMIT_TIME - Time it took to commit mutations</li> 
+   </ul> 
+  </div> 
+  <div class="section"> 
+   <h4 id="Scan_Task_Metrics">Scan Task Metrics</h4> 
+   <ul> 
+    <li>NUM_PARALLEL_SCANS - Number of scans executed in parallel</li> 
+    <li>SCAN_BYTES - Number of bytes read by scans</li> 
+    <li>MEMORY_CHUNK_BYTES - Number of bytes allocated by the memory manager</li> 
+    <li>MEMORY_WAIT_TIME - Time in milliseconds threads needed to wait for memory to be allocated through memory manager</li> 
+    <li>SPOOL_FILE_SIZE - Size of spool files created in bytes</li> 
+    <li>SPOOL_FILE_COUNTER - Number of spool files created</li> 
+    <li>CACHE_REFRESH_SPLITS_COUNTER - Number of times Phoenix’s metadata cache was refreshed because of splits</li> 
+    <li>TASK_QUEUE_WAIT_TIME - Time in milliseconds tasks had to wait in the queue of the thread pool executor</li> 
+    <li>TASK_END_TO_END_TIME - Time in milliseconds spent by tasks from creation to completion</li> 
+    <li>TASK_EXECUTION_TIME - Time in milliseconds tasks took to execute</li> 
+    <li>TASK_EXECUTED_COUNTER - Counter for number of tasks submitted to the thread pool executor</li> 
+    <li>TASK_REJECTED_COUNTER - Counter for number of tasks that were rejected by the thread pool executor</li> 
+   </ul> 
+  </div> 
+  <div class="section"> 
+   <h4 id="Overall_Query_Metrics">Overall Query Metrics</h4> 
+   <ul> 
+    <li>QUERY_TIMEOUT_COUNTER - Number of times query timed out</li> 
+    <li>QUERY_FAILED_COUNTER - Number of times query failed</li> 
+    <li>WALL_CLOCK_TIME_MS - Wall clock time elapsed for the overall query execution</li> 
+    <li>RESULT_SET_TIME_MS - Wall clock time elapsed for reading all records using resultSet.next()</li> 
+   </ul> 
+   <p>Below are a few examples of how SQL statement level metrics could be used: - Log and report query execution details which could be later used for analysis. - Report top SQL queries by duration. Metric to use: WALL_CLOCK_TIME_MS - Check if the query is failing because it is timing out. Metric to use: QUERY_TIMEOUT_COUNTER &gt; 0. - Monitor the amount of bytes being written to or read from HBase for a SQL statement. Metrics to use: MUTATION_BYTES and SCAN_BYTES - Check if the query is doing too much work or needs to be tuned. Possible metrics to use: TASK_EXECUTED_COUNTER, TASK_QUEUE_WAIT_TIME, WALL_CLOCK_TIME_MS - Check if a successful query is facing thread starvation i.e. number of threads in the thread pool possibly needs to be increased. This is symptomized by a relatively large difference between TASK_EXECUTION_TIME and TASK_END_TO_END_TIME.</p> 
+   <p>Request level metrics can be turned on/off for every Phoenix JDBC connection. Below is an example of how you can do that:</p> 
+   <div class="source"> 
+    <pre>    Properties props = new Properties();
+    props.setProperty(QueryServices.COLLECT_REQUEST_LEVEL_METRICS, “true”);
+    try (Connection conn = DriverManager.getConnection(getUrl(), props)) {
+        .....
+    }
 </pre> 
+   </div> 
+   <p>A typical pattern for how one could get hold of read metrics for queries:</p> 
+   <div class="source"> 
+    <pre>Map&lt;String, Map&lt;String, Long&gt;&gt; overAllQueryMetrics = null;
+    Map&lt;String, Map&lt;String, Long&gt;&gt; requestReadMetrics = null;
+    try (ResultSet rs = stmt.executeQuery()) {
+          while(rs.next()) {
+              .....
+          }
+          overAllQueryMetrics = PhoenixRuntime.getOverAllReadRequestMetrics(rs);
+          requestReadMetrics = PhoenixRuntime.getRequestReadMetrics(rs);
+          // log or report metrics as needed
+          PhoenixRuntime.resetMetrics(rs);
+    }
+</pre> 
+   </div> 
+   <p>One could also get hold of write related metrics (collected per table) for DML statements by doing something like this:</p> 
+   <div class="source"> 
+    <pre>Map&lt;String, Map&lt;String, Long&gt;&gt; mutationWriteMetrics = null;
+    Map&lt;String, Map&lt;String, Long&gt;&gt; mutationReadMetrics = null;
+    try (Connection conn = DriverManager.getConnection(url)) {
+          conn.createStatement.executeUpdate(dml1);
+          ....
+          conn.createStatement.executeUpdate(dml2);
+          ...
+          conn.createStatement.executeUpdate(dml3);
+          ...
+          conn.commit();
+          mutationWriteMetrics = PhoenixRuntime.getWriteMetricsForMutationsSinceLastReset(conn);
+          mutationReadMetrics = PhoenixRuntime.getReadMetricsForMutationsSinceLastReset(conn);
+          PhoenixRuntime.resetMetrics(rs);
+    }
+</pre> 
+   </div> 
+   <p>Global Metrics on the other hand are collected at the Phoenix client’s JVM level. These metrics could be used for building out a trend and seeing what is going on within Phoenix from client’s perspective over time. Other than the metrics reported above for request level metrics, the global metrics also includes the following counters: </p> 
+   <ul>
+     - MUTATION_SQL_COUNTER - Counter for number of mutation sql statements - SELECT_SQL_COUNTER - Counter for number of sql queries - OPEN_PHOENIX_CONNECTIONS_COUNTER - Number of open phoenix connections 
+   </ul> 
+   <p>Collection of global client metrics can be turned on/off (on by default) by setting the attribute phoenix.query.global.metrics.enabled to true/false in the client side hbase-site.xml. Below is a code snippet of how one can Phoenix’s global metrics by using a scheduled job that runs periodically:</p> 
+   <div class="source"> 
+    <pre>    ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
+    service.submit(new Runnable() {
+
+        @Override
+        public void run() {
+            Collection&lt;GlobalMetric&gt; metrics = PhoenixRuntime.getGlobalPhoenixClientMetrics();
+            for (GlobalMetric m : metrics) {
+                ... // log or report for trending purposes
+            }
+
+        }
+    });
+</pre> 
+   </div> 
+   <p>Global metrics could be helpful in monitoring and tuning various aspects of the execution environment. For example: an increase in the metric TASK_REJECTED_COUNTER is probably a symptom of too much work being submitted or the fact that the phoenix thread pool queue depth or number of threads or both need to be increased. Similarly, a spike in TASK_EXECUTION_TIME for a time frame could be symptomatic of several things including overloaded region servers, a network glitch, client or region servers undergoing garbage collection, etc. </p> 
+  </div> 
  </div> 
- <p>Note: [version] can be replaced by 3.1.0, 4.1.0, 3.0.0-incubating, 4.0.0-incubating, etc.</p> 
-</div> 
-<div class="section"> 
- <h2 id="Branches">Branches</h2> 
- <p>Phoenix 3.0 is running against hbase0.94+, Phoenix 4.0 is running against hbase0.98.1+ and Phoenix master branch is running against hbase trunk branch.</p> 
- <hr /> 
- <p>See also: </p> 
- <p><a href="building_website.html">Building Project Web Site</a></p> 
- <p><a href="release.html">How to do a release</a></p> 
 </div>
 			</div>
 		</div>
@@ -298,8 +344,8 @@
 						<li >
 							<a href="Phoenix-in-15-minutes-or-less.html" title="Quick Start">Quick Start</a>
 						</li>
-						<li class="active">
-							<a href="#" title="Building">Building</a>
+						<li >
+							<a href="building.html" title="Building">Building</a>
 						</li>
 						<li >
 							<a href="tuning.html" title="Tuning">Tuning</a>
@@ -387,8 +433,8 @@
 						<li >
 							<a href="rowtimestamp.html" title="Row Timestamp Column">Row Timestamp Column</a>
 						</li>
-						<li >
-							<a href="metrics.html" title="Metrics">Metrics</a>
+						<li class="active">
+							<a href="#" title="Metrics">Metrics</a>
 						</li>
 					</ul>
 				</div>
