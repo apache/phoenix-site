@@ -2,13 +2,5 @@
 
 ### [<u>Download Latest Phoenix Binary and Source Releases</u>](http://www.apache.org/dyn/closer.lua/phoenix/)
 
-### [<u>See Latest Release Notes</u>](release_notes.html)
-
-#### [List of New Features](recent.html)
-
-### HBase Compatibility
-* Phoenix 2.x - HBase 0.94.x
-* Phoenix 3.x - HBase 0.94.x
-* Phoenix 4.x - HBase 0.98.1+
-<hr/>
-#### See also: [Installation Instructions](installation.html)
+See our installation instructions [here](installation.html), our release notes [here](release_notes.html),
+and a list of new features [here](recent.html)

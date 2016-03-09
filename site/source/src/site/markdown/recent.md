@@ -2,7 +2,8 @@
 
 As items are implemented from our road map, they are moved here to track the progress we've made:
 
-1. **[Transaction Support](https://issues.apache.org/jira/browse/PHOENIX-1674)**. Supports transactions by integrating with [Tephra](https://github.com/continuuity/tephra). **Available in our 4.7  release**
+1. **[Transaction Support](transactions.html)**. Supports transactions by integrating with [Tephra](https://github.com/continuuity/tephra). **Available in our 4.7  release**
+1. **[Time series Optimization](rowtimestamp.html)**. Optimizes queries against time series data as explained in more detail [here](https://blogs.apache.org/phoenix/entry/new_optimization_for_time_series). **Available in our 4.6  release**
 1. **[Asynchronous Index Population](secondary_indexing.html#Asynchronous_Index_Population)**. Enables an index to be created asynchronously using a map reduce job. **Available in our 4.5 release**
 2. **[User Defined Functions](udf.html)**. Allows users to create and deploy their own custom or domain-specific user-defined functions to the cluster. **Available in our 4.4 release**
 1. **[Functional Indexes](secondary_indexing.html#Functional_Indexes)**. Enables an index to be defined as expressions as opposed to just column names and have the index be used when a query contains this expression. **Available in our 4.3 release**

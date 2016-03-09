@@ -7,21 +7,21 @@ the JVM.
 ## Overview
 
 Phoenix 4.4 introduces a stand-alone server that exposes Phoenix to "thin"
-clients. It is based on the [Avatica][avatica] component of
-[Apache Calcite][calcite]. The query server is comprised of a Java server that
+clients. It is based on the [Avatica](https://calcite.apache.org/avatica) component of
+[Apache Calcite](https://calcite.apache.org). The query server is comprised of a Java server that
 manages Phoenix Connections on the clients' behalf. The client implementation
-is currently a JDBC driver with minimal dependencies. The transport mechanism
-is currently JSON encoded requests over HTTP transport. There's also a sqlline
-script that uses the thin client.
+is currently a JDBC driver with minimal dependencies. Two transport mechanisms
+are current supported: JSON and Protocol Buffers (available as of Phoenix 4.7
+as the default). There's also a sqlline script that uses the thin client.
 
-Avatica is relatively early in its life-cycle. The RPC API has not yet
-solidified, so <b><em>there is no promise of backward compatibility at this
-time</em></b>. Future versions of Avatica should include additional encoding
-and transport mechanisms. Client implementations for non-Java languages are
-anticipated as well.
+Avatica is still relatively early in its life-cycle. With the introduction of the
+Protobuf transport, Avatica is moving towards backwards compatibility with the
+provided thin JDBC driver. There are no such backwards compatibility guarantees
+for the JSON API.
 
-To repeat, <big><b><em>there is no promise of backward compatibility at this
-time</em></b></big>.
+To repeat, there is no guarantee of backwards compatibility with the JSON transport;
+however, compatibility with the Protobuf transport is stabilizing (although, not
+tested thoroughly enough to be stated as "guaranteed").
 
 ## Installation
 
@@ -54,7 +54,7 @@ classpath are all that is required to launch the server.
 
 Phoenix provides two mechanisms for interacting with the query server. A JDBC
 driver is provided in the standalone
-`phoenix-<version>-query-server-thin-client.jar`. Its connection The script
+`phoenix-<version>-thin-client.jar`. The script
 `bin/sqlline-thin.py` is available for the command line.
 
 The JDBC connection string is composed as follows:
@@ -78,7 +78,21 @@ The first optional argument is a connection URL, as described previously. When
 not provided, `scheme` defaults to `http`, `host` to `localhost`, and `port` to
 `8765`.
 
+    bin/sqlline-thin.py http://localhost:8765
+
 The second optional parameter is a sql file from which to read commands.
+
+## Wire API documentation
+
+The API itself is documented in the Apache Calcite project as it is the Avatica
+API -- there is no wire API defined in Phoenix itself.
+
+[JSON API](http://calcite.apache.org/avatica/docs/json_reference.html)
+
+[Protocol Buffer API](http://calcite.apache.org/avatica/docs/protobuf_reference.html)
+
+For more information in building clients in other languages that work with
+Avatica, please feel free to reach out to the [Apache Calcite dev mailing list](mailto:dev@calcite.apache.org).
 
 ## Configuration
 
@@ -109,6 +123,11 @@ configuration.
       <td><small>phoenix.queryserver.metafactory.class</small></td>
       <td style="text-align: left;">The Avatica Meta.Factory class to instantiate.</td>
       <td>org.apache.phoenix.queryserver.server.PhoenixMetaFactoryImpl</td>
+    </tr>
+    <tr>
+      <td><small>phoenix.queryserver.serialization</small></td>
+      <td style="text-align: left;">The transport/serialization format, either PROTOBUF or JSON.</td>
+      <td>PROTOBUF</td>
     </tr>
     <tr><td colspan="3">&nbsp;</td></tr>
     <tr>
@@ -222,7 +241,3 @@ configuration.
     </tr>
   </tbody>
 </table>
-
-[avatica]: https://github.com/apache/incubator-calcite/blob/master/doc/avatica.md
-[calcite]: http://calcite.incubator.apache.org/
-

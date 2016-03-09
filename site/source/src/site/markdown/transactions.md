@@ -1,5 +1,5 @@
 # Transactions (beta)
-Above and beyond the row-level transactional semantics of HBase, Phoenix adds cross row and cross table transaction support with full [ACID](https://en.wikipedia.org/wiki/ACID) semantics by integrating with a transaction library named [Tephra](http://tephra.io/). Tephra provides snapshot isolation of concurrent transactions by implementing multi-versioned concurrency control.
+Above and beyond the row-level transactional semantics of HBase, Phoenix adds cross row and cross table transaction support with full [ACID](https://en.wikipedia.org/wiki/ACID) semantics by integrating with [Tephra](http://tephra.io/), now an Apache incubator project. Tephra provides snapshot isolation of concurrent transactions by implementing multi-versioned concurrency control.
 
 Setting up a system to use transactions in Phoenix requires two steps:
 

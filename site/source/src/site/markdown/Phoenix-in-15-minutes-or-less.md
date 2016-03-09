@@ -89,8 +89,3 @@ Ok, ok - tough crowd. Check out our <code>bin/performance.py</code> script to cr
 *<strong>Why is it called Phoenix anyway? Did some other project crash and burn and this is the next generation?</strong>*<br/>
 I'm sorry, but we're out of time and space, so we'll have to answer that next time!
 
-Thanks for your time,<br/>
-James Taylor<br/>
-http://phoenix-hbase.blogspot.com/
-<br/>
-@JamesPlusPlus<br/>
