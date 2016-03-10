@@ -4,150 +4,207 @@ Secondary indexes are an orthogonal way to access data from its primary access p
 index that is lexicographically sorted on the primary row key. Access to records in any way other than through
 the primary row requires scanning over potentially all the rows in the table to test them against your filter.
 With secondary indexing, the columns or expressions you index form an alternate row key to allow point lookups
-and range scans along this new axis. Phoenix is particularly powerful in that we provide _covered_ indexes -
+and range scans along this new axis.
+
+## Covered Indexes
+Phoenix is particularly powerful in that we provide _covered_ indexes -
 we do not need to go back to the primary table once we have found the index entry. Instead, we bundle the data
 we care about right in the index rows, saving read-time overhead.
 
+For example, the following would create an index on the <code>v1</code> and <code>v2</code> columns and
+include the <code>v3</code> column in the index as well to prevent having to get it from the data table:
+
+    CREATE INDEX my_index ON my_table (v1,v2) INCLUDE(v3)
+
 ## Functional Indexes
-Another useful feature that was introduced in the 4.3 release is functional indexes. Functional indexes  allow you to create
+Functional indexes (available in 4.3 and above) allow you to create
 an index not just on columns, but on an arbitrary expressions. Then when a query uses that expression, the index
 may be used to retrieve the results instead of the data table. For example, you could create an index on <code><small>UPPER(FIRST_NAME||' '||LAST_NAME)</small></code>
 to allow you to do case insensitive searches on the combined first name and last name of a person.
 
-Phoenix supports two types of indexing techniques: global and local indexing.
-Each are useful in different scenarios and have their own failure profiles and performance characteristics.
+For example, the following would create this functional index:
 
-## Global Indexing
-Global indexing targets _read heavy_, _low write_ uses cases. With global indexes, all the performance penalties for indexes occur at write time. We intercept the data table updates on write ([DELETE](language/index.html#delete), [UPSERT VALUES](language/index.html#upsert_values) and [UPSERT SELECT](language/index.html#upsert_select)), build the index update and then sent any necessary updates to all interested index tables. At read time, Phoenix will select the index table to use that will produce the fastest query time and directly scan it just like any other HBase table. By default, unless hinted, an index will not be used for a query that references a column that isn't part of the index.
-
-## Local Indexing
-Local indexing targets _write heavy_, _space constrained_ use cases. Just like with global indexes, Phoenix will automatically select whether or not to use a local index at query-time. With local indexes, index data and table data co-reside on same server preventing any network overhead during writes. Local indexes can be used even when the query isn't fully covered (i.e. Phoenix automatically retrieve the columns not in the index through point gets against the data table). Unlike global indexes, all local indexes of a table are stored in a single, separate shared table. At read time when the local index is used, every region must be examined for the data as the exact region location of index data cannot be predetermined. Thus some overhead occurs at read-time.
-
-## Append-only Data
-For a table in which the data is only written once and never updated in-place, certain optimizations may be made to reduce the write-time overhead for incremental maintenance. This is common with time-series data such as log or event data, where once a row is written, it will never be updated.  To take advantage of these optimizations, declare your table as immutable by adding the <code>IMMUTABLE_ROWS=true</code> property to your DDL statement:
-
-    CREATE TABLE my_table (k VARCHAR PRIMARY KEY, v VARCHAR) IMMUTABLE_ROWS=true;
-
-All indexes on a table declared with <code>IMMUTABLE_ROWS=true</code> are considered immutable (note that by default, tables are considered mutable). For global immutable indexes, the index is maintained entirely on the client-side with the index table being generated as change to the data table occur. Local immutable indexes, on the other hand, are maintained on the server-side. Note that no safeguards are in-place to enforce that a table declared as immutable doesn't actually mutate data (as that would negate the performance gain achieved). If that was to occur, the index would no longer be in sync with the table.
-
-## Asynchronous Index Population
-As of the 4.5.0 release it is possible to use a map reduce job to initially populate an index asynchronously by including the ASYNC keyword in the index creation DDL statement:
-
-    CREATE INDEX async_index ON my_schema.my_table (v) ASYNC;
-
-The map reduce job that populates the index table must be kicked off separately through the HBase command line like this:
-
-    ${HBASE_HOME}/bin/hbase org.apache.phoenix.mapreduce.index.IndexTool --schema MY_SCHEMA --data-table MY_TABLE --index-table ASYNC_IDX  --output-path ASYNC_IDX_HFILES
-
-Only when the map reduce job is complete will the index be activated and start to be used in queries. The output-path option is used to specify a HDFS directory that is used for writing HFiles to.
-
-## Examples
-
-Given the schema shown here:
-
-    CREATE TABLE my_table (k VARCHAR PRIMARY KEY, v1 VARCHAR, v2 BIGINT);
-you'd create a global index on the v1 column like this:
-
-    CREATE INDEX my_index ON my_table (v1);
-
-In addition to indexing on just a column, arbitrary expression may be indexed. For example:
-
-    CREATE INDEX upper_v1_idx ON my_table (UPPER(v1)) INCLUDE(v2);
+    CREATE INDEX UPPER_NAME_IDX ON EMP (UPPER(FIRST_NAME||' '||LAST_NAME))
 
 With this index in place, when the following query is issued, the index would be used instead of the data table to retrieve the results:
 
-    SELECT v2, v1 FROM my_table WHERE UPPER(v1)='John Doe';
+    SELECT EMP_ID FROM EMP WHERE UPPER(FIRST_NAME||' '||LAST_NAME)='JOHN DOE'
 
-Multiple columns may be indexed and their values may be stored in ascending or descending order.
+Phoenix supports two types of indexing techniques: global and local indexing.
+Each are useful in different scenarios and have their own failure profiles and performance characteristics.
 
-    CREATE INDEX my_index ON my_table (v2 DESC, v1) INCLUDE (v3);
+## Global Indexes
+Global indexing targets _read heavy_ uses cases. With global indexes, all the performance penalties for indexes occur at write time. We intercept the data table updates on write ([DELETE](language/index.html#delete), [UPSERT VALUES](language/index.html#upsert_values) and [UPSERT SELECT](language/index.html#upsert_select)), build the index update and then sent any necessary updates to all interested index tables. At read time, Phoenix will select the index table to use that will produce the fastest query time and directly scan it just like any other HBase table. By default, unless hinted, an index will not be used for a query that references a column that isn't part of the index.
 
-A table may contain any number of indexes, but note that your write speed will drop as you add additional indexes.
+## Local Indexes
+Local indexing targets _write heavy_, _space constrained_ use cases. Just like with global indexes, Phoenix will automatically select whether or not to use a local index at query-time. With local indexes, index data and table data co-reside on same server preventing any network overhead during writes. Local indexes can be used even when the query isn't fully covered (i.e. Phoenix automatically retrieve the columns not in the index through point gets against the data table). Unlike global indexes, all local indexes of a table are stored in a single, separate shared table. At read time when the local index is used, every region must be examined for the data as the exact region location of index data cannot be predetermined. Thus some overhead occurs at read-time.
 
-By default, a global index will not be used unless all of the columns referenced in the query are contained in the index.  For example, the following query would not use the index, because v2 is referenced in the query but not included in the index:
+## Index Population
+By default, when an index is created, it is populated synchronously during the CREATE INDEX call. This may not be feasible depending on the current size of the data table. As of 4.5, initially population of an index may be done asynchronously by including the ASYNC keyword in the index creation DDL statement:
 
-    SELECT v2 FROM my_table WHERE v1 = 'foo';
+    CREATE INDEX async_index ON my_schema.my_table (v) ASYNC
+
+The map reduce job that populates the index table must be kicked off separately through the HBase command line like this:
+
+    ${HBASE_HOME}/bin/hbase org.apache.phoenix.mapreduce.index.IndexTool
+      --schema MY_SCHEMA --data-table MY_TABLE --index-table ASYNC_IDX
+      --output-path ASYNC_IDX_HFILES
+
+Only when the map reduce job is complete will the index be activated and start to be used in queries. The job is relilient to the client being exited. The output-path option is used to specify a HDFS directory that is used for writing HFiles to.
+
+## Index Usage
+Indexes are automatically used by Phoenix to service a query when it's determined more efficient to do so. However, a global index will not be used unless all of the columns referenced in the query are contained in the index.  For example, the following query would not use the index, because v2 is referenced in the query but not included in the index:
+
+    SELECT v2 FROM my_table WHERE v1 = 'foo'
 
 There are three means of getting an index to be used in this case:
 
 1. Create a _covered_ index by including v2 in the index:
 
     <pre>
-    CREATE INDEX my_index ON my_table (v1) INCLUDE (v2);
+    CREATE INDEX my_index ON my_table (v1) INCLUDE (v2)
     </pre>
 This will cause the v2 column value to be copied into the index and kept in synch as it changes. This will obviously increase the size of the index.
 2. Hint the query to force it to use the index:
 
     <pre>
-    SELECT /*+ INDEX(my_table my_index) */ v2 FROM my_table WHERE v1 = 'foo';
+    SELECT /*+ INDEX(my_table my_index) */ v2 FROM my_table WHERE v1 = 'foo'
     </pre>
 This will cause each data row to be retrieved when the index is traversed to find the missing v2 column value. This hint should only be used if you know that the index has good selective (i.e. a small number of table rows have a value of 'foo' in this example), as otherwise you'll get better performance by the default behavior of doing a full table scan.
 3. Create a _local_ index:
 
     <pre>
-    CREATE LOCAL INDEX my_index ON my_table (v1);
+    CREATE LOCAL INDEX my_index ON my_table (v1)
     </pre>
 Unlike global indexes, local indexes *will* use an index even when all columns referenced in the query are not contained in the index. This is done by default for local indexes because we know that the table and index data coreside on the same region server thus ensuring the lookup is local.
 
-###Index Table Properties
-Just like with the <code>CREATE TABLE</code> statement, the <code>CREATE INDEX</code> statement may pass through properties to apply to the underlying HBase table, including the ability to salt it:
-
-    CREATE INDEX my_index ON my_table (v2 DESC, v1) INCLUDE (v3)
-        SALT_BUCKETS=10, DATA_BLOCK_ENCODING='NONE';
-Note that if the primary table is salted, then the index is automatically salted in the same way for global indexes. In addition, the MAX_FILESIZE for the index is adjusted down, relative to the size of the primary versus index table. For more on salting see [here](salted.html). With local indexes, on the other hand, specifying SALT_BUCKETS is not allowed.
-
-###Index Removal
+##Index Removal
 To drop an index, you'd issue the following statement:
+
     DROP INDEX my_index ON my_table
 
 If an indexed column is dropped in the data table, the index will automatically be dropped. In addition, if a covered column is dropped in the data table, it will be automatically dropped from the index as well.
 
-To take advantage of the performance optimization for immutable indexing, supply an <code>IMMUTABLE_ROWS=true</code> property when you create your table like this:
+##Index Properties
+Just like with the <code>CREATE TABLE</code> statement, the <code>CREATE INDEX</code> statement may pass through properties to apply to the underlying HBase table, including the ability to salt it:
 
-    CREATE TABLE my_table (k VARCHAR PRIMARY KEY, v VARCHAR) IMMUTABLE_ROWS=true;
-In that case, all indexes on the table are immutable indexes.
+    CREATE INDEX my_index ON my_table (v2 DESC, v1) INCLUDE (v3)
+        SALT_BUCKETS=10, DATA_BLOCK_ENCODING='NONE'
+Note that if the primary table is salted, then the index is automatically salted in the same way for global indexes. In addition, the MAX_FILESIZE for the index is adjusted down, relative to the size of the primary versus index table. For more on salting see [here](salted.html). With local indexes, on the other hand, specifying SALT_BUCKETS is not allowed.
+
+## Consistency Guarantees
+On successful return to the client after a commit, all data is guaranteed to be written to all interested indexes and the
+primary table. In other words, index updates are synchronous with the same strong consistency guarantees provided by HBase.
+
+However, since indexes are stored in separate tables than the data table, depending on the properties of the table and the
+type of index, the consistency between your table and index varies in the event that a commit fails due to a server-side
+crash. This is an important design consideration driven by your requirements and use case.
+
+Outlined below are the different options with various levels of consistency guarantees.
+
+### Transactional Tables
+By declaring your table as [transactional](transactions.html), you achieve the highest level of consistency guarantee
+between your table and index. In this case, your commit of your table mutations and related index updates are atomic
+with strong [ACID](https://en.wikipedia.org/wiki/ACID) guarantees. If the commit fails, then none of your data (table
+or index) is updated, thus ensuring that your table and index are always in sync.
+
+Why not just always declare your tables as transactional? This may be fine, especially if your
+table is declared as immutable, since the transactional overhead is very small in this case. However, if your data
+is mutable, make sure that the overhead associated with the conflict detection that occurs with transactional tables
+and the operational overhead of running the transaction manager is acceptable. Additionally, transactional tables
+with secondary indexes potentially lowers your availability of being able to write to your data table, as both the
+data table and its secondary index tables must be availalbe as otherwise the write will fail.
+
+### Immutable Tables
+For a table in which the data is only written once and never updated in-place, certain optimizations may be made to reduce the write-time overhead for incremental maintenance. This is common with time-series data such as log or event data, where once a row is written, it will never be updated.  To take advantage of these optimizations, declare your table as immutable by adding the <code>IMMUTABLE_ROWS=true</code> property to your DDL statement:
+
+    CREATE TABLE my_table (k VARCHAR PRIMARY KEY, v VARCHAR) IMMUTABLE_ROWS=true
+
+All indexes on a table declared with <code>IMMUTABLE_ROWS=true</code> are considered immutable (note that by default, tables are considered mutable). For global immutable indexes, the index is maintained entirely on the client-side with the index table being generated as changes to the data table occur. Local immutable indexes, on the other hand, are maintained on the server-side. Note that no safeguards are in-place to enforce that a table declared as immutable doesn't actually mutate data (as that would negate the performance gain achieved). If that was to occur, the index would no longer be in sync with the table.
 
 If you have an existing table that you'd like to switch from immutable indexing to mutable indexing, use the <code>ALTER TABLE</code> command as show below:
 
-    ALTER TABLE my_table SET IMMUTABLE_ROWS=false;
+    ALTER TABLE my_table SET IMMUTABLE_ROWS=false
 
-For the complete syntax, see our [Language Reference Guide](language/index.html).
+Index on non transactional, immutable tables have no mechanism in place to automatically deal with a commit failure. Maintaining
+consistency between the table and index is left to the client to handle. Because the updates are idempotent, the simplest
+solution is for the client to continue retrying the batch of mutations until they succeed.
 
-## Data Guarantees and Failure Management
-
-On successful return to the client, all data is guaranteed to be written to all interested indexes and the primary table. For each individual data row, updates are an all-or-nothing, with a small gap of being behind. From the perspective of a single client, it either thinks all-or-none of the update worked.
-
-We maintain index update durability by adding the index updates to the Write-Ahead-Log (WAL) entry of the primary table row. Only after the WAL entry is successfully synced to disk do we attempt to make the index/primary table updates. We write the index updates in parallel by default, leading to very high throughput. If the server crashes while we are writing the index updates, we replay the all the index updates to the index tables in the WAL recovery process and rely on the idempotence of the updates to ensure correctness. Therefore, index tables are only every a single edit ahead of the primary table.
+### Mutable Tables
+For non transactional mutable tables, we maintain index update durability by adding the index updates to the Write-Ahead-Log (WAL) entry of the primary table row.
+Only after the WAL entry is successfully synced to disk do we attempt to make the index/primary table updates. We write the
+index updates in parallel by default, leading to very high throughput. If the server crashes while we are writing the index
+updates, we replay the all the index updates to the index tables in the WAL recovery process and rely on the idempotence of
+the updates to ensure correctness. Therefore, indexes on non transactional mutable tables are only ever a single batch of
+edits behind the primary table.
 
 It's important to note several points:
 
- * We _do not provide full transactions_ so you could see the index table out of sync with the primary table.
- * As noted above, this is ok as we are only a very small bit ahead and out of sync for very short periods
- * Each data row and its index row(s) are guaranteed to to be written or lost - we never see partial updates
-* All data is first written to index tables before the primary table
+ * For non transactional tables, you could see the index table out of sync with the primary table.
+ * As noted above, this is ok as we are only a very small bit behind and out of sync for very short periods
+ * Each data row and its index row(s) are guaranteed to to be written or lost - we never see partial updates as this is part of the atomicity guarantees of HBase.
+* Data is first written to the table followed by the index tables (the reverse is true if the WAL is disabled).
 
-### Singular Write Path
+#### Singular Write Path
 
-There is a single write path that guarantees the failure properties. All writes to the HRegion get intercepted by our coprocessor. We then build the index updates based on the pending update (or updates, in the case of the batch). These update are then appended to the WAL entry for the original update.
+There is a single write path that guarantees the failure properties. All writes to the HRegion get intercepted by our
+coprocessor. We then build the index updates based on the pending update (or updates, in the case of the batch).
+These update are then appended to the WAL entry for the original update.
 
-If we get any failure up to this point, we return the failure to the client and no data is persisted or made visible to the client. 
+If we get any failure up to this point, we return the failure to the client and no data is persisted or made visible
+to the client. 
 
 Once the WAL is written, we ensure that the index and primary table data will become visible, even in the case of a failure.
 
-* If the server does _not_ crash, we just insert the index updates to their respective tables.
 * If the server _does_ crash, we then replay the index updates with the usual WAL replay mechanism
-** If any of the index updates fails, we then fail the server, ensuring we get the WAL replay of the updates later.
+* If the server does _not_ crash, we just insert the index updates to their respective tables.
+    * If the index updates fail, the various means of maintaining consistency are outlined below.
+    * If the Phoenix system catalog table cannot be reached when a failure occurs, we force the server to be immediately aborted and failing this, call System.exit on the JVM, forcing the server to die. By killing the server, we ensure that the WAL will be replayed on recovery, replaying the index updates to their appropriate tables. This ensures that a secondary index is not continued to be used when it's in a know, invalid state.
 
-### Failure Policy
+#### Disallow table writes until mutable index is consistent
+The highest level of maintaining consistency between your non transactional table and index is to declare that writes to the
+data table should be temporarily disallowed in the event of a failure to update the index. In this consistency
+mode, the table and index will be held at the timestamp before the failure occurred, with writes to the data
+table being disallowed until the index is back online and in-sync with the data table. The index will
+remain active and continue to be used by queries as usual.
 
-In the event that the region server handling the data updates cannot write to the region server handling the index updates, the index will be automatically disabled temporally and will no longer be considered for use in queries (as it will no longer be in sync with the data table). There is a backend job will soon rebuild the index from where it failed before as soon as all regions of the underlying index table are online. A user can turn off this auto rebuild index behavior by setting configuration “phoenix.index.failure.handling.rebuild” to false in hbase-site.xml on each region server.
+The following server-side configurations control this behavior:
 
-If we cannot disable the index, then the server will be immediately aborted. If the abort fails, we call System.exit on the JVM, forcing the server to die. By killing the server, we ensure that the WAL will be replayed on recovery, replaying the index updates to their appropriate tables.
+* <code>phoenix.index.failure.block.write</code> must be true to enable a writes to the data table to fail
+in the event of a commit failure until the index can be caught up with the data table.
+* <code>phoenix.index.failure.handling.rebuild</code> must be true (the default) to enable a mutable index to
+be rebuilt in the background in the event of a commit failure.
 
+#### Disable mutable indexes on write failure until consistency restored
+The default behavior with mutable indexes is to mark the index as disabled if a write to them fails at commit time,
+partially rebuild them in the background, and then mark them as active again once consistency is restored. In this
+consistency mode, writes to the data table will not be blocked while the secondary index is being rebuilt. However,
+the secondary index will not be used by queries while the rebuild is happening.
+
+The following server-side configurations control this behavior:
+
+* <code>phoenix.index.failure.handling.rebuild</code> must be true (the default) to enable a mutable index to
+be rebuilt in the background in the event of a commit failure.
+* <code>phoenix.index.failure.handling.rebuild.interval</code> controls the millisecond frequency at which the server
+checks whether or not a mutable index needs to be partially rebuilt to catch up with updates to the data
+table. The default is 10000 or 10 seconds.
+* <code>phoenix.index.failure.handling.rebuild.overlap.time</code> controls how many milliseconds to go back from the timestamp
+at which the failure occurred to go back when a partial rebuild is performed. The default is 1.
+
+#### Disable mutable index on write failure with manual rebuild required
+This is the lowest level of consistency for mutable secondary indexes. In this case, when a write to a secondary
+index fails, the index will be marked as disabled with a manual
+[rebuild of the index](http://phoenix.apache.org/language/index.html#alter_index) required to enable it to be used
+once again by queries.
+
+The following server-side configurations controls this behavior:
+
+* <code>phoenix.index.failure.handling.rebuild</code> must be set to false to disable a mutable index from being
+ rebuilt in the background in the event of a commit failure.
 
 ## Setup
 
-Mutable indexing requires special configuration options on the region server and master to run - Phoenix ensures that they are setup correctly when you enable mutable indexing on the table; if the correct properties are not set, you will not be able to use secondary indexing. After adding these settings to your hbase-site.xml, you'll need to do a rolling restart of your cluster.
+Non transactional, mutable indexing requires special configuration options on the region server and master to run - Phoenix ensures that they are setup correctly when you enable mutable indexing on the table; if the correct properties are not set, you will not be able to use secondary indexing. After adding these settings to your hbase-site.xml, you'll need to do a rolling restart of your cluster.
 
 You will need to add the following parameters to `hbase-site.xml` on each region server:
 
@@ -245,12 +302,12 @@ All the following parameters must be set in `hbase-site.xml` - they are true for
     * **Default: 30**
 
 
-# Performance
+## Performance
 We track secondary index performance via our [performance framework](http://phoenix-bin.github.io/client/performance/latest.htm). This is a generic test of performance based on defaults - your results will vary based on hardware specs as well as you individual configuration.
 
 That said, we have seen secondary indexing (both immutable and mutable) go as quickly as < 2x the regular write path on a small, (3 node) desktop-based cluster. This is actually pretty reasonable as we have to write to multiple tables as well as build the index update.
 
-# Resources
+## Resources
 There have been several presentations given on how secondary indexing works in Phoenix that have a more in-depth look at how indexing works (with pretty pictures!):
  
 * [San Francisco HBase Meetup](http://files.meetup.com/1350427/PhoenixIndexing-SF-HUG_09-26-13.pptx) - Sept. 26, 2013
