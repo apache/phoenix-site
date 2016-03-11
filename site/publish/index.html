@@ -147,7 +147,7 @@
 <div class="section"> 
  <div class="section"> 
   <div class="section"> 
-   <h4 align="center" id="High_performance_relational_database_layer_over_HBase_for_low_latency_applications">High performance relational database layer over HBase for low latency applications</h4> 
+   <h4 align="center" id="OLTP_and_operational_analytics_for_Hadoop">OLTP and operational analytics for Hadoop</h4> 
    <p></p> 
    <br /> 
    <p><span> </span></p> 
@@ -178,7 +178,6 @@
     </tbody> 
    </table> 
    <p><span id="alerts" style="background-color:#ffc; text-align: center;display: block;padding:10px; border-bottom: solid 1px #cc9"> <b><a href="news.html">News</a>:</b> Announcing <a href="transactions.html">transaction support</a> in 4.7.0 release &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a class="externalLink" href="https://twitter.com/ApachePhoenix"><img src="images/follow.png" title="Follow Apache Phoenix on Twitter" alt="" /></a></span></p> 
-   <hr /> 
   </div> 
  </div> 
 </div> 
@@ -186,12 +185,17 @@
  <div class="page-header">
   <h2 id="Overview">Overview</h2>
  </div> 
- <p>Apache Phoenix is a relational database layer over HBase supporting full ACID transactions and delivered as a client-embedded JDBC driver that targets low latency queries over HBase data. Apache Phoenix takes your SQL query, compiles it into a series of HBase scans, and orchestrates the running of those scans to produce regular JDBC result sets. The table metadata is stored in an HBase table and versioned, such that snapshot queries over prior versions will automatically use the correct schema. Direct use of the HBase API, along with coprocessors and custom filters, results in <a href="performance.html">performance</a> on the order of milliseconds for small queries, or seconds for tens of millions of rows. </p> 
+ <p>Apache Phoenix enables OLTP and operational analytics in Hadoop for low latency applications by combining the best of both worlds:</p> 
+ <ul> 
+  <li>the power of standard SQL and JDBC APIs with full ACID transaction capabilities and</li> 
+  <li>the flexibility of late-bound, schema-on-read capabilities from the NoSQL world by leveraging HBase as its backing store</li> 
+ </ul> 
+ <p>Apache Phoenix is fully integrated with other Hadoop products such as Spark, Hive, Pig, Flume, and Map Reduce.</p> 
  <p align="center"> <br />Who is using Apache Phoenix? Read more <a href="who_is_using.html">here...</a><br /> <img src="images/using/all.png" alt="" /> </p> 
 </div> 
 <div class="section"> 
  <h2 id="Mission">Mission</h2> 
- <p>Become the standard means of accessing HBase data through a well-defined, industry standard API.</p> 
+ <p>Become the trusted data platform for OLTP and operational analytics for Hadoop through well-defined, industry standard APIs.</p> 
 </div> 
 <div class="section"> 
  <h2 id="Quick_Start">Quick Start</h2> 
@@ -199,31 +203,30 @@
 </div> 
 <div class="section"> 
  <h2 id="SQL_Support">SQL Support</h2> 
- <p>To see what’s supported, go to our <a href="language/index.html">language reference</a>. It includes all typical SQL query statement clauses, including <tt>SELECT</tt>, <tt>FROM</tt>, <tt>WHERE</tt>, <tt>GROUP BY</tt>, <tt>HAVING</tt>, <tt>ORDER BY</tt>, etc. It also supports a full set of DML commands as well as table creation and versioned incremental alterations through our DDL commands. We try to follow the SQL standards wherever possible.</p> 
- <p><a name="connStr" id="connStr"></a>Use JDBC to get a connection to an HBase cluster like this:</p> 
- <div> 
-  <pre><tt>Connection conn = DriverManager.getConnection(&quot;jdbc:phoenix:server1,server2:3333&quot;,props);</tt></pre> 
- </div> 
- <p>where <tt>props</tt> are optional properties which may include Phoenix and HBase configuration properties, and the connection string which is composed of: </p> 
- <div> 
-  <pre><tt>jdbc:phoenix</tt> [ <tt>:&lt;zookeeper quorum&gt;</tt> [ <tt>:&lt;port number&gt;</tt> ] [ <tt>:&lt;root node&gt;</tt> ] [ <tt>:&lt;principal&gt;</tt> ] [ <tt>:&lt;keytab file&gt;</tt> ] ] </pre> 
- </div> 
- <p>For any omitted parts, the relevant property value, hbase.zookeeper.quorum, hbase.zookeeper.property.clientPort, and zookeeper.znode.parent will be used from hbase-site.xml configuration file. The optional <tt>principal</tt> and <tt>keytab file</tt> may be used to connect to a Kerberos secured cluster. If only <tt>principal</tt> is specified, then this defines the user name with each distinct user having their own dedicated HBase connection (HConnection). This provides a means of having multiple, different connections each with different configuration properties on the same JVM.</p> 
- <p>For example, the following connection string might be used for longer running queries, where the <tt>longRunningProps</tt> specifies Phoenix and HBase configuration properties with longer timeouts: </p> 
- <div> 
-  <pre><tt>Connection conn = DriverManager.getConnection(“jdbc:phoenix:my_server:longRunning”, longRunningProps);</tt></pre> 
- </div> while the following connection string might be used for shorter running queries: 
- <div> 
-  <pre><tt>Connection conn = DriverManager.getConnection(&quot;jdbc:phoenix:my_server:shortRunning&quot;, shortRunningProps);</tt></pre> 
- </div> 
+ <p>Apache Phoenix takes your SQL query, compiles it into a series of HBase scans, and orchestrates the running of those scans to produce regular JDBC result sets. Direct use of the HBase API, along with coprocessors and custom filters, results in <a href="performance.html">performance</a> on the order of milliseconds for small queries, or seconds for tens of millions of rows.</p> 
+ <p>To see a complete list of what is supported, go to our <a href="language/index.html">language reference</a>. All standard SQL query constructs are supported, including <tt>SELECT</tt>, <tt>FROM</tt>, <tt>WHERE</tt>, <tt>GROUP BY</tt>, <tt>HAVING</tt>, <tt>ORDER BY</tt>, etc. It also supports a full set of DML commands as well as table creation and versioned incremental alterations through our DDL commands.</p> 
+ <p>Here’s a list of what is currently <b>not</b> supported:</p> 
+ <ul> 
+  <li><b>Relational operators</b>. Intersect, Minus.</li> 
+  <li><b>Miscellaneous built-in functions</b>. These are easy to add - read this <a class="externalLink" href="http://phoenix-hbase.blogspot.com/2013/04/how-to-add-your-own-built-in-function.html">blog</a> for step by step instructions.</li> 
+ </ul> 
  <div class="section"> 
-  <div class="section"> 
-   <h4 id="Not_Supported">Not Supported</h4> 
-   <p>Here’s a list of what is currently <b>not</b> supported:</p> 
-   <ul> 
-    <li><b>Relational operators</b>. Intersect, Minus.</li> 
-    <li><b>Miscellaneous built-in functions</b>. These are easy to add - read this <a class="externalLink" href="http://phoenix-hbase.blogspot.com/2013/04/how-to-add-your-own-built-in-function.html">blog</a> for step by step instructions.</li> 
-   </ul> 
+  <h3 id="connStr">Connection<a name="Connection"></a></h3> 
+  <p>Use JDBC to get a connection to an HBase cluster like this:</p> 
+  <div> 
+   <pre><tt>Connection conn = DriverManager.getConnection(&quot;jdbc:phoenix:server1,server2:3333&quot;,props);</tt></pre> 
+  </div> 
+  <p>where <tt>props</tt> are optional properties which may include Phoenix and HBase configuration properties, and the connection string which is composed of: </p> 
+  <div> 
+   <pre><tt>jdbc:phoenix</tt> [ <tt>:&lt;zookeeper quorum&gt;</tt> [ <tt>:&lt;port number&gt;</tt> ] [ <tt>:&lt;root node&gt;</tt> ] [ <tt>:&lt;principal&gt;</tt> ] [ <tt>:&lt;keytab file&gt;</tt> ] ] </pre> 
+  </div> 
+  <p>For any omitted parts, the relevant property value, hbase.zookeeper.quorum, hbase.zookeeper.property.clientPort, and zookeeper.znode.parent will be used from hbase-site.xml configuration file. The optional <tt>principal</tt> and <tt>keytab file</tt> may be used to connect to a Kerberos secured cluster. If only <tt>principal</tt> is specified, then this defines the user name with each distinct user having their own dedicated HBase connection (HConnection). This provides a means of having multiple, different connections each with different configuration properties on the same JVM.</p> 
+  <p>For example, the following connection string might be used for longer running queries, where the <tt>longRunningProps</tt> specifies Phoenix and HBase configuration properties with longer timeouts: </p> 
+  <div> 
+   <pre><tt>Connection conn = DriverManager.getConnection(“jdbc:phoenix:my_server:longRunning”, longRunningProps);</tt></pre> 
+  </div> while the following connection string might be used for shorter running queries: 
+  <div> 
+   <pre><tt>Connection conn = DriverManager.getConnection(&quot;jdbc:phoenix:my_server:shortRunning&quot;, shortRunningProps);</tt></pre> 
   </div> 
  </div> 
 </div> 
@@ -241,7 +244,7 @@
 </div> 
 <div class="section"> 
  <h2 id="schema">Schema<a name="Schema"></a></h2> 
- <p>Apache Phoenix supports table creation and versioned incremental alterations through DDL commands. The table metadata is stored in an HBase table.</p> 
+ <p>Apache Phoenix supports table creation and versioned incremental alterations through DDL commands. The table metadata is stored in an HBase table and versioned, such that snapshot queries over prior versions will automatically use the correct schema. </p> 
  <p>A Phoenix table is created through the <a href="language/index.html#create">CREATE TABLE</a> command and can either be:</p> 
  <ol style="list-style-type: decimal"> 
   <li><b>built from scratch</b>, in which case the HBase table and column families will be created automatically.</li> 

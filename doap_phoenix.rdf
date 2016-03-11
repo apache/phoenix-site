@@ -27,8 +27,8 @@
     <name>Apache Phoenix</name>
     <homepage rdf:resource="http://phoenix.apache.org" />
     <asfext:pmc rdf:resource="http://phoenix.apache.org" />
-    <shortdesc>Apache Phoenix is a relational database layer on top of Apache HBase.</shortdesc>
-    <description>Apache Phoenix is a relational database layer on top of Apache HBase. It is accessed as a JDBC driver and enables querying, updating, and managing HBase tables through standard SQL. Instead of using map-reduce, Apache Phoenix compiles your SQL query into a series of HBase scans and orchestrates the running of those scans to produce regular JDBC result sets. Direct use of the HBase API, along with coprocessors and custom filters, results in performance on the order of milliseconds for small queries, or seconds for tens of millions of rows.</description>
+    <shortdesc>Apache Phoenix enables OLTP and SQL-based operational analytics for Hadoop</shortdesc>
+    <description>Apache Phoenix enables OLTP and operational analytics for Hadoop by providing a relational database layer leveraging Apache HBase as its backing store. It includes integration with Spark, Pig, Flume, Map Reduce, and other products in the Hadoop ecosystem. It is accessed as a JDBC driver and enables querying, updating, and managing HBase tables through standard SQL.</description>
     <bug-database rdf:resource="http://issues.apache.org/jira/browse/PHOENIX" />
     <mailing-list rdf:resource="http://phoenix.apache.org/mailing_list.html" />
     <download-page rdf:resource="http://phoenix.apache.org/download.html" />
@@ -38,37 +38,23 @@
     <category rdf:resource="http://projects.apache.org/category/database" />
     <release>
       <Version>
-        <name>Apache Phoenix 3.3.1</name>
-        <created>2015-04-07</created>
-        <revision>3.3.1</revision>
+        <name>Apache Phoenix 4.7.0 HBase 0.98</name>
+        <created>2016-03-08</created>
+        <revision>4.7.0-HBase-0.98</revision>
       </Version>
     </release>
     <release>
       <Version>
-        <name>Apache Phoenix 4.3.1</name>
-        <created>2015-04-07</created>
-        <revision>4.3.1</revision>
+        <name>Apache Phoenix 4.7.0 HBase 1.0</name>
+        <created>2016-03-08</created>
+        <revision>4.7.0-HBase-1.0</revision>
       </Version>
     </release>
     <release>
       <Version>
-        <name>Apache Phoenix 4.4.0 HBase 0.98</name>
-        <created>2015-05-18</created>
-        <revision>4.4.0-HBase-0.98</revision>
-      </Version>
-    </release>
-    <release>
-      <Version>
-        <name>Apache Phoenix 4.4.0 HBase 1.0</name>
-        <created>2015-05-18</created>
-        <revision>4.4.0-HBase-1.0</revision>
-      </Version>
-    </release>
-    <release>
-      <Version>
-        <name>Apache Phoenix 4.4.0 HBase 1.1</name>
-        <created>2015-05-29</created>
-        <revision>4.4.0-HBase-1.1</revision>
+        <name>Apache Phoenix 4.7.0 HBase 1.1</name>
+        <created>2016-03-08</created>
+        <revision>4.7.0-HBase-1.1</revision>
       </Version>
     </release>
     <repository>

@@ -2,7 +2,7 @@
 <br/>
 <p align="center">
 <img src="images/phoenix-logo-small.png"/>
-<h4 align="center">High performance relational database layer over HBase for low latency applications</h4> 
+<h4 align="center">OLTP and operational analytics for Hadoop</h4> 
 </p>
 <br/>
 
@@ -48,27 +48,36 @@
 Announcing [transaction support](transactions.html) in 4.7.0 release 
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
 <a href='https://twitter.com/ApachePhoenix'><img title="Follow Apache Phoenix on Twitter" src="images/follow.png"/></a></span>
-
-<hr/>
-
 ## Overview
+Apache Phoenix enables OLTP and operational analytics in Hadoop for low latency applications by combining the best of both worlds:
 
-Apache Phoenix is a relational database layer over HBase supporting full ACID transactions and delivered as a client-embedded JDBC driver that targets low latency queries over HBase data. Apache Phoenix takes your SQL query, compiles it into a series of HBase scans, and orchestrates the running of those scans to produce regular JDBC result sets. The table metadata is stored in an HBase table and versioned, such that snapshot queries over prior versions will automatically use the correct schema. Direct use of the HBase API, along with coprocessors and custom filters, results in [performance](performance.html) on the order of milliseconds for small queries, or seconds for tens of millions of rows. 
+* the power of standard SQL and JDBC APIs with full ACID transaction capabilities and
+* the flexibility of late-bound, schema-on-read capabilities from the NoSQL world by leveraging HBase as its backing store
+
+Apache Phoenix is fully integrated with other Hadoop products such as Spark, Hive, Pig, Flume, and Map Reduce.
 
 <p align="center">
 <br/>Who is using Apache Phoenix? Read more <a href="who_is_using.html">here...</a><br/>
 <img src="images/using/all.png"/>
 </p>
 ## Mission
-Become the standard means of accessing HBase data through a well-defined, industry standard API.
+Become the trusted data platform for OLTP and operational analytics for Hadoop through well-defined, industry standard APIs.
 
 ## Quick Start
 Tired of reading already and just want to get started? Take a look at our [FAQs](faq.html), listen to the Apache Phoenix talk from [Hadoop Summit 2015](https://www.youtube.com/watch?v=XGa0SyJMH94), review the [overview presentation](http://phoenix.apache.org/presentations/OC-HUG-2014-10-4x3.pdf), and jump over to our quick start guide [here](Phoenix-in-15-minutes-or-less.html).
 
 ## SQL Support
-To see what's supported, go to our [language reference](language/index.html). It includes all typical SQL query statement clauses, including `SELECT`, `FROM`, `WHERE`, `GROUP BY`, `HAVING`, `ORDER BY`, etc. It also supports a full set of DML commands as well as table creation and versioned incremental alterations through our DDL commands. We try to follow the SQL standards wherever possible.
+Apache Phoenix takes your SQL query, compiles it into a series of HBase scans, and orchestrates the running of those scans to produce regular JDBC result sets. Direct use of the HBase API, along with coprocessors and custom filters, results in [performance](performance.html) on the order of milliseconds for small queries, or seconds for tens of millions of rows.
 
-<a id="connStr"></a>Use JDBC to get a connection to an HBase cluster like this:
+To see a complete list of what is supported, go to our [language reference](language/index.html). All standard SQL query constructs are supported, including `SELECT`, `FROM`, `WHERE`, `GROUP BY`, `HAVING`, `ORDER BY`, etc. It also supports a full set of DML commands as well as table creation and versioned incremental alterations through our DDL commands.
+
+Here's a list of what is currently **not** supported:
+
+* **Relational operators**. Intersect, Minus.
+* **Miscellaneous built-in functions**. These are easy to add - read this [blog](http://phoenix-hbase.blogspot.com/2013/04/how-to-add-your-own-built-in-function.html) for step by step instructions.
+
+###<a id="connStr"></a>Connection
+Use JDBC to get a connection to an HBase cluster like this:
 
 <pre><code>Connection conn = DriverManager.getConnection("jdbc:phoenix:server1,server2:3333",props);</code></pre>
 where <code>props</code> are optional properties which may include Phoenix and HBase configuration properties, and
@@ -89,13 +98,7 @@ while the following connection string might be used for shorter running queries:
 <pre><code>Connection conn = DriverManager.getConnection("jdbc:phoenix:my_server:shortRunning", shortRunningProps);</code></pre>
 
 
-####Not Supported
-Here's a list of what is currently **not** supported:
-
-* **Relational operators**. Intersect, Minus.
-* **Miscellaneous built-in functions**. These are easy to add - read this [blog](http://phoenix-hbase.blogspot.com/2013/04/how-to-add-your-own-built-in-function.html) for step by step instructions.
-
-##<a id="transactions"></a>Transactions##
+##<a id="transactions"></a>Transactions
 To enable full ACID transactions, a beta feature available in the 4.7.0 release, set the <code>phoenix.transactions.enabled</code> property to true. In this case, you'll also need to run the transaction manager that's included in the distribution. Once enabled, a table may optionally be declared as transactional (see [here](transactions.html) for directions). Commits over transactional tables will have an all-or-none behavior - either all data will be committed (including any updates to secondary indexes) or none of it will (and an exception will be thrown). Both cross table and cross row transactions are supported. In addition, transactional tables will see their own uncommitted data when querying. An optimistic concurrency model is used to detect row level conflicts with first commit wins semantics. The later commit would produce an exception indicating that a conflict was detected. A transaction is started implicitly when a transactional table is referenced in a statement, at which point you will not see updates from other connections until either a commit or rollback occurs.
 
 Non transactional tables have no guarantees above and beyond the HBase guarantee of row level atomicity (see [here](https://hbase.apache.org/acid-semantics.html)). In addition, non transactional tables will not see their updates until after a commit has occurred. The DML commands of Apache Phoenix, UPSERT VALUES, UPSERT SELECT and DELETE, batch pending changes to HBase tables on the client side. The changes are sent to the server when the transaction is committed and discarded when the transaction is rolled back. If auto commit is turned on for a connection, then Phoenix will, whenever possible, execute the entire DML command through a coprocessor on the server-side, so performance will improve.
@@ -109,8 +112,7 @@ queries against prior row values, since Phoenix uses the value of this connectio
 Timestamps may not be controlled for transactional tables. Instead, the transaction manager assigns timestamps which become the HBase cell timestamps after a commit. Timestamps still correspond to wall clock time, however they are multiplied by 1,000,000 to ensure enough granularity for uniqueness across the cluster.
 
 ##<a id="schema"></a>Schema
-
-Apache Phoenix supports table creation and versioned incremental alterations through DDL commands. The table metadata is stored in an HBase table.
+Apache Phoenix supports table creation and versioned incremental alterations through DDL commands. The table metadata is stored in an HBase table and versioned, such that snapshot queries over prior versions will automatically use the correct schema. 
 
 A Phoenix table is created through the [CREATE TABLE](language/index.html#create) command and can either be:
 
