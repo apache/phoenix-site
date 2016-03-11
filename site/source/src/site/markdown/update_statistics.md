@@ -1,12 +1,26 @@
 # Statistics Collection
 
-The UPDATE STATISTICS command updates the statistics collected on a table, to improve query performance.
-This command collects a set of keys per region per column family that are equal byte distanced from each other.
-These collected keys are called *guideposts* and they act as *hints/guides* to improve the parallelization of
-queries on a given target region.
+The UPDATE STATISTICS command updates the statistics collected on a table, to improve
+query performance. This command collects a set of keys per region per column family that
+are equal byte distanced from each other. These collected keys are called *guideposts*
+and they act as *hints/guides* to improve the parallelization of queries on a given
+target region.
 
-Statistics are also automatically collected during major compactions and region splits so manually running this
-command may not be necessary.
+Statistics are also automatically collected during major compactions and region splits so
+manually running this command may not be necessary.
+
+##Parallelization
+Phoenix breaks up queries into multiple scans and runs them in parallel to improve performance.
+parallelization in Phoenix is driven by the statistics related configuration parameters. 
+Each chunk of data between guideposts will be run in parallel in a separate scan to improve
+query performance. The chunk size is determined by the server-side
+<code>phoenix.stats.guidepost.width</code> or <code>phoenix.stats.guidepost.per.region</code>
+parameters. As the size of the chunks decrease, you'll want to increase
+<code>phoenix.query.queueSize</code> as more work will be queued in that case. Note
+that at a minimum, separate scans will be run for each table region. Beyond the statistics
+collection configuration parameters, the client-side <code>phoenix.query.threadPoolSize</code>
+and <code>phoenix.query.queueSize</code> parameters and the server-side
+<code>hbase.regionserver.handler.count</code> parameter have an impact on performance.
 
 ## Examples
 
@@ -14,8 +28,8 @@ For a given table <code>my_table</code>:
 
     UPDATE STATISTICS my_table
 
-The above syntax would collect the statistics for the table my_table and all the index tables, views and
-view index tables associated with the table my_table.
+The above syntax would collect the statistics for the table my_table and all the index tables,
+views and view index tables associated with the table my_table.
 
 The equivalent of the above syntax is
 
@@ -29,7 +43,7 @@ To collect the statistics on the table alone
 
     UPDATE STATISTICS my_table COLUMNS
 
-## Configurations
+## Configuration
 
 The configuration parameters controlling statistics collection include:
 

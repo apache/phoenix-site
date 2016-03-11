@@ -54,7 +54,6 @@
     </reflowSkin>
   </custom>
     <body>
-
         <menu name="About">
             <item href="index.html" name="Overview"/>
             <item href="who_is_using.html" name="Who is Using"/>
@@ -75,9 +74,6 @@
             <item href="release.html" name="How to Release" />
             <item href="http:divider" name=""/>
             <item href="http://www.apache.org/licenses/" name="License" />
-            <item href="http://www.apache.org/foundation/sponsorship.html" name="Sponsorship" />
-            <item href="http://www.apache.org/foundation/thanks.html" name="Thanks" />
-            <item href="http://www.apache.org/security/" name="Security" />
         </menu>
         <menu name="Using">
             <item href="faq.html" name="F.A.Q."/>
@@ -95,29 +91,33 @@
         </menu>
         <menu name="Features">
             <item href="transactions.html" name="Transactions"/>
-            <item href="secondary_indexing.html" name="Secondary Indexes"/>
             <item href="udf.html" name="User-defined Functions"/>
+            <item href="http:divider" name=""/>
+            <item href="secondary_indexing.html" name="Secondary Indexes"/>
+            <item href="update_statistics.html" name="Statistics Collection"/>
+            <item href="rowtimestamp.html" name="Row Timestamp Column"/>
+            <item href="salted.html" name="Salted Tables"/>
+            <item href="skip_scan.html" name="Skip Scan"/>
+            <item href="http:divider" name=""/>
+            <item href="views.html" name="Views"/>
+            <item href="multi-tenancy.html" name="Multi tenancy"/>
+            <item href="dynamic_columns.html" name="Dynamic Columns"/>
+            <item href="http:divider" name=""/>
             <item href="bulk_dataload.html" name="Bulk Loading"/>
             <item href="server.html" name="Query Server"/>
             <item href="tracing.html" name="Tracing"/>
-            <item href="array_type.html" name="ARRAY type"/>
-            <item href="sequences.html" name="Sequences"/>
-            <item href="update_statistics.html" name="Statistics Collection"/>
-            <item href="joins.html" name="Joins"/>
-            <item href="subqueries.html" name="Subqueries"/>
-            <item href="views.html" name="Views"/>
-            <item href="multi-tenancy.html" name="Multi tenancy"/>
-            <item href="paged.html" name="Paged Queries"/>
-            <item href="dynamic_columns.html" name="Dynamic Columns"/>
-            <item href="skip_scan.html" name="Skip Scan"/>
-            <item href="salted.html" name="Salted Tables"/>
-            <item href="rowtimestamp.html" name="Row Timestamp Column"/>
             <item href="metrics.html" name="Metrics"/>
         </menu>
         <menu name="Reference">
             <item href="language/index.html" name="Grammar"/>
             <item href="language/functions.html" name="Functions"/>
             <item href="language/datatypes.html" name="Datatypes"/>
+            <item href="array_type.html" name="ARRAY type"/>
+            <item href="http:divider" name=""/>
+            <item href="paged.html" name="Row Value Constructors"/>
+            <item href="sequences.html" name="Sequences"/>
+            <item href="joins.html" name="Joins"/>
+            <item href="subqueries.html" name="Subqueries"/>
         </menu>
 
     </body>

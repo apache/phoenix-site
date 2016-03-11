@@ -69,9 +69,6 @@
 									<li ><a href="release.html" title="How to Release">How to Release</a></li>
 									<li class="divider"/>
 									<li ><a href="http://www.apache.org/licenses/" title="License" class="externalLink">License</a></li>
-									<li ><a href="http://www.apache.org/foundation/sponsorship.html" title="Sponsorship" class="externalLink">Sponsorship</a></li>
-									<li ><a href="http://www.apache.org/foundation/thanks.html" title="Thanks" class="externalLink">Thanks</a></li>
-									<li ><a href="http://www.apache.org/security/" title="Security" class="externalLink">Security</a></li>
 								</ul>
 							</li>
 							<li class="dropdown">
@@ -95,23 +92,21 @@
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Features <b class="caret"></b></a>
 								<ul class="dropdown-menu">
 									<li ><a href="transactions.html" title="Transactions">Transactions</a></li>
-									<li ><a href="secondary_indexing.html" title="Secondary Indexes">Secondary Indexes</a></li>
 									<li ><a href="udf.html" title="User-defined Functions">User-defined Functions</a></li>
+									<li class="divider"/>
+									<li ><a href="secondary_indexing.html" title="Secondary Indexes">Secondary Indexes</a></li>
+									<li class="active"><a href="" title="Statistics Collection">Statistics Collection</a></li>
+									<li ><a href="rowtimestamp.html" title="Row Timestamp Column">Row Timestamp Column</a></li>
+									<li ><a href="salted.html" title="Salted Tables">Salted Tables</a></li>
+									<li ><a href="skip_scan.html" title="Skip Scan">Skip Scan</a></li>
+									<li class="divider"/>
+									<li ><a href="views.html" title="Views">Views</a></li>
+									<li ><a href="multi-tenancy.html" title="Multi tenancy">Multi tenancy</a></li>
+									<li ><a href="dynamic_columns.html" title="Dynamic Columns">Dynamic Columns</a></li>
+									<li class="divider"/>
 									<li ><a href="bulk_dataload.html" title="Bulk Loading">Bulk Loading</a></li>
 									<li ><a href="server.html" title="Query Server">Query Server</a></li>
 									<li ><a href="tracing.html" title="Tracing">Tracing</a></li>
-									<li ><a href="array_type.html" title="ARRAY type">ARRAY type</a></li>
-									<li ><a href="sequences.html" title="Sequences">Sequences</a></li>
-									<li class="active"><a href="" title="Statistics Collection">Statistics Collection</a></li>
-									<li ><a href="joins.html" title="Joins">Joins</a></li>
-									<li ><a href="subqueries.html" title="Subqueries">Subqueries</a></li>
-									<li ><a href="views.html" title="Views">Views</a></li>
-									<li ><a href="multi-tenancy.html" title="Multi tenancy">Multi tenancy</a></li>
-									<li ><a href="paged.html" title="Paged Queries">Paged Queries</a></li>
-									<li ><a href="dynamic_columns.html" title="Dynamic Columns">Dynamic Columns</a></li>
-									<li ><a href="skip_scan.html" title="Skip Scan">Skip Scan</a></li>
-									<li ><a href="salted.html" title="Salted Tables">Salted Tables</a></li>
-									<li ><a href="rowtimestamp.html" title="Row Timestamp Column">Row Timestamp Column</a></li>
 									<li ><a href="metrics.html" title="Metrics">Metrics</a></li>
 								</ul>
 							</li>
@@ -121,6 +116,12 @@
 									<li ><a href="language/index.html" title="Grammar">Grammar</a></li>
 									<li ><a href="language/functions.html" title="Functions">Functions</a></li>
 									<li ><a href="language/datatypes.html" title="Datatypes">Datatypes</a></li>
+									<li ><a href="array_type.html" title="ARRAY type">ARRAY type</a></li>
+									<li class="divider"/>
+									<li ><a href="paged.html" title="Row Value Constructors">Row Value Constructors</a></li>
+									<li ><a href="sequences.html" title="Sequences">Sequences</a></li>
+									<li ><a href="joins.html" title="Joins">Joins</a></li>
+									<li ><a href="subqueries.html" title="Subqueries">Subqueries</a></li>
 								</ul>
 							</li>
 						</ul>
@@ -147,6 +148,10 @@
 <p>The UPDATE STATISTICS command updates the statistics collected on a table, to improve query performance. This command collects a set of keys per region per column family that are equal byte distanced from each other. These collected keys are called <i>guideposts</i> and they act as <i>hints/guides</i> to improve the parallelization of queries on a given target region.</p> 
 <p>Statistics are also automatically collected during major compactions and region splits so manually running this command may not be necessary.</p> 
 <div class="section"> 
+ <h2 id="Parallelization">Parallelization</h2> 
+ <p>Phoenix breaks up queries into multiple scans and runs them in parallel to improve performance. parallelization in Phoenix is driven by the statistics related configuration parameters. Each chunk of data between guideposts will be run in parallel in a separate scan to improve query performance. The chunk size is determined by the server-side <tt>phoenix.stats.guidepost.width</tt> or <tt>phoenix.stats.guidepost.per.region</tt> parameters. As the size of the chunks decrease, you’ll want to increase <tt>phoenix.query.queueSize</tt> as more work will be queued in that case. Note that at a minimum, separate scans will be run for each table region. Beyond the statistics collection configuration parameters, the client-side <tt>phoenix.query.threadPoolSize</tt> and <tt>phoenix.query.queueSize</tt> parameters and the server-side <tt>hbase.regionserver.handler.count</tt> parameter have an impact on performance.</p> 
+</div> 
+<div class="section"> 
  <h2 id="Examples">Examples</h2> 
  <p>For a given table <tt>my_table</tt>:</p> 
  <div class="source"> 
@@ -171,7 +176,7 @@
  </div> 
 </div> 
 <div class="section"> 
- <h2 id="Configurations">Configurations</h2> 
+ <h2 id="Configuration">Configuration</h2> 
  <p>The configuration parameters controlling statistics collection include:</p> 
  <ol style="list-style-type: decimal"> 
   <li><tt>phoenix.stats.guidepost.width</tt> 
@@ -273,15 +278,6 @@
 						<li >
 							<a href="http://www.apache.org/licenses/" title="License" class="externalLink">License</a>
 						</li>
-						<li >
-							<a href="http://www.apache.org/foundation/sponsorship.html" title="Sponsorship" class="externalLink">Sponsorship</a>
-						</li>
-						<li >
-							<a href="http://www.apache.org/foundation/thanks.html" title="Thanks" class="externalLink">Thanks</a>
-						</li>
-						<li >
-							<a href="http://www.apache.org/security/" title="Security" class="externalLink">Security</a>
-						</li>
 					</ul>
 				</div>
 				<div class="span2 bottom-nav">
@@ -332,10 +328,40 @@
 							<a href="transactions.html" title="Transactions">Transactions</a>
 						</li>
 						<li >
-							<a href="secondary_indexing.html" title="Secondary Indexes">Secondary Indexes</a>
+							<a href="udf.html" title="User-defined Functions">User-defined Functions</a>
 						</li>
 						<li >
-							<a href="udf.html" title="User-defined Functions">User-defined Functions</a>
+							<a href="http:divider" title=""></a>
+						</li>
+						<li >
+							<a href="secondary_indexing.html" title="Secondary Indexes">Secondary Indexes</a>
+						</li>
+						<li class="active">
+							<a href="#" title="Statistics Collection">Statistics Collection</a>
+						</li>
+						<li >
+							<a href="rowtimestamp.html" title="Row Timestamp Column">Row Timestamp Column</a>
+						</li>
+						<li >
+							<a href="salted.html" title="Salted Tables">Salted Tables</a>
+						</li>
+						<li >
+							<a href="skip_scan.html" title="Skip Scan">Skip Scan</a>
+						</li>
+						<li >
+							<a href="http:divider" title=""></a>
+						</li>
+						<li >
+							<a href="views.html" title="Views">Views</a>
+						</li>
+						<li >
+							<a href="multi-tenancy.html" title="Multi tenancy">Multi tenancy</a>
+						</li>
+						<li >
+							<a href="dynamic_columns.html" title="Dynamic Columns">Dynamic Columns</a>
+						</li>
+						<li >
+							<a href="http:divider" title=""></a>
 						</li>
 						<li >
 							<a href="bulk_dataload.html" title="Bulk Loading">Bulk Loading</a>
@@ -345,42 +371,6 @@
 						</li>
 						<li >
 							<a href="tracing.html" title="Tracing">Tracing</a>
-						</li>
-						<li >
-							<a href="array_type.html" title="ARRAY type">ARRAY type</a>
-						</li>
-						<li >
-							<a href="sequences.html" title="Sequences">Sequences</a>
-						</li>
-						<li class="active">
-							<a href="#" title="Statistics Collection">Statistics Collection</a>
-						</li>
-						<li >
-							<a href="joins.html" title="Joins">Joins</a>
-						</li>
-						<li >
-							<a href="subqueries.html" title="Subqueries">Subqueries</a>
-						</li>
-						<li >
-							<a href="views.html" title="Views">Views</a>
-						</li>
-						<li >
-							<a href="multi-tenancy.html" title="Multi tenancy">Multi tenancy</a>
-						</li>
-						<li >
-							<a href="paged.html" title="Paged Queries">Paged Queries</a>
-						</li>
-						<li >
-							<a href="dynamic_columns.html" title="Dynamic Columns">Dynamic Columns</a>
-						</li>
-						<li >
-							<a href="skip_scan.html" title="Skip Scan">Skip Scan</a>
-						</li>
-						<li >
-							<a href="salted.html" title="Salted Tables">Salted Tables</a>
-						</li>
-						<li >
-							<a href="rowtimestamp.html" title="Row Timestamp Column">Row Timestamp Column</a>
 						</li>
 						<li >
 							<a href="metrics.html" title="Metrics">Metrics</a>
@@ -398,6 +388,24 @@
 						</li>
 						<li >
 							<a href="language/datatypes.html" title="Datatypes">Datatypes</a>
+						</li>
+						<li >
+							<a href="array_type.html" title="ARRAY type">ARRAY type</a>
+						</li>
+						<li >
+							<a href="http:divider" title=""></a>
+						</li>
+						<li >
+							<a href="paged.html" title="Row Value Constructors">Row Value Constructors</a>
+						</li>
+						<li >
+							<a href="sequences.html" title="Sequences">Sequences</a>
+						</li>
+						<li >
+							<a href="joins.html" title="Joins">Joins</a>
+						</li>
+						<li >
+							<a href="subqueries.html" title="Subqueries">Subqueries</a>
 						</li>
 					</ul>
 				</div>

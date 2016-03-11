@@ -1,55 +1,54 @@
 # Configuration and Tuning
 
 Phoenix provides many different knobs and dials to configure and tune the system to run more optimally on your cluster. The configuration is done through a series of Phoenix-specific properties specified both on client and server-side <code>hbase-site.xml</code> files. In addition to these properties, there are of course all the <a href="http://hbase.apache.org/book/config.files.html" target="_blank">HBase configuration</a> properties with the most important ones documented <a href="http://hbase.apache.org/book/important_configurations.html" target="_blank">here</a>.<br/>
-<br />
-The table below outlines the full set of Phoenix-specific configuration properties and their defaults. Of these, we'll talk in depth about some of the most important ones below.<br />
-<br />
+<br/>
+The table below outlines the full set of Phoenix-specific configuration properties and their defaults.<br/>
+<br/>
 <table border="1">
     <tbody>
 <tr><td><b>Property</b></td><td><b>Description</b></td><td><b>Default
 </b></td></tr>
-<tr><td><small>phoenix.query.timeoutMs</small></td><td style="text-align: left;">Number of milliseconds
-    after which a query will timeout on the client. Default is 10 min.</td><td>600000
+<tr><td><small>data.tx.snapshot.dir</small></td><td style="text-align: left;">Server-side property specifying the HDFS directory used to store snapshots of the transaction state. No default value.</td><td>None</td></tr>
+<tr><td><small>data.tx.timeout</small></td><td style="text-align: left;">Server-side property specifying the timeout in seconds for a transaction to complete. Default is 30 seconds.</td><td>30</td></tr>
+<tr><td><small>phoenix.query.timeoutMs</small></td><td style="text-align: left;">Client-side property specifying the number of milliseconds after which a query will timeout on the client. Default is 10 min.</td><td>600000
 </td></tr>
-<tr><td><small>phoenix.query.keepAliveMs</small></td><td style="text-align: left;">When the number of
-      threads is greater than the core in the client side thread pool
-      executor, this is the maximum time in milliseconds that excess idle
-      threads will wait for a new tasks before
-terminating. Default is 60 sec.</td><td>60000</td></tr>
+<tr><td><small>phoenix.query.keepAliveMs</small></td><td style="text-align: left;"> Maximum time in
+milliseconds that excess idle threads will wait for a new tasks before terminating
+when the number of threads is greater than the cores in the client side thread pool executor.
+Default is 60 sec.</td><td>60000</td></tr>
 <tr><td><small>phoenix.query.threadPoolSize</small></td><td style="text-align: left;">Number of threads
       in client side thread pool executor. As the number of machines/cores
       in the cluster grows, this value should be
 increased.</td><td>128</td></tr>
-<tr><td><small>phoenix.query.queueSize</small></td><td>Max queue depth
-of the
+<tr><td><small>phoenix.query.queueSize</small></td><td>Max queue depth of the
       bounded round robin backing the client side thread pool executor,
       beyond which an attempt to queue additional work is
       rejected. If zero, a SynchronousQueue is used
       instead of the bounded round robin queue. The default value is 5000.</td><td>5000</td></tr>
 <tr><td><small>phoenix.stats.guidepost.width</small></td><td>
-A server-side parameter that specifies the number of bytes between guideposts.
+Server-side parameter that specifies the number of bytes between guideposts.
       A smaller amount increases parallelization, but also increases the number of
       chunks which must be merged on the client side. The default value is 100 MB.
 </td><td>104857600</td></tr>
 <tr><td><small>phoenix.stats.guidepost.per.region</small></td><td>
-A server-side parameter that specifies the number of guideposts per region.
+Server-side parameter that specifies the number of guideposts per region.
       If set to a value greater than zero, then the guidepost width is determiend by
       <small><code>MAX_FILE_SIZE&nbsp;of&nbsp;table&nbsp;/&nbsp;phoenix.stats.guidepost.per.region</code></small>.
 Otherwise, if not set, then the <small><code>phoenix.stats.guidepost.width</code></small> parameter
 is used. No default value.
 </td><td>None</td></tr>
 <tr><td><small>phoenix.stats.updateFrequency</small></td><td>
-A server-side paramater that determines the frequency in milliseconds for which statistics
+Server-side paramater that determines the frequency in milliseconds for which statistics
 will be refreshed from the statistics table and subsequently used by the client. The
 default value is 15 min.
 </td><td>900000</td></tr>
 <tr><td><small>phoenix.stats.minUpdateFrequency</small></td><td>
-A client-side parameter that determines the minimum amount of time in milliseconds that
+Client-side parameter that determines the minimum amount of time in milliseconds that
       must pass before statistics may again be manually collected through another <code>UPDATE
       STATISTICS</code> call. The default value is <small><code>phoenix.stats.updateFrequency&nbsp;/&nbsp;2</code></small>. 
 </td><td>450000</td></tr>
 <tr><td><small>phoenix.stats.useCurrentTime</small></td><td>
-An advanced server-side parameter that if true causes the current time on the server-side
+Server-side parameter that if true causes the current time on the server-side
       to be used as the timestamp of rows in the statistics table when background tasks such as
       compactions or splits occur. If false, then the max timestamp found while traversing the
       table over which statistics are being collected is used as the timestamp. Unless your
@@ -96,8 +95,16 @@ overridden at connection
       property value. Note that the connection property value does not affect the batch size used by the coprocessor when these statements are executed completely on the server side.</td><td>1000</td></tr>
 <tr><td><small>phoenix.query.maxServerCacheBytes</small></td><td style="text-align: left;">Maximum size (in bytes) of a single sub-query result (usually the filtered result of a table) before compression and conversion to a hash map. Attempting to hash an intermediate sub-query result of a size bigger than this setting will result in a MaxServerCacheSizeExceededException. Default 100MB.</td><td>104857600</td></tr>
 <tr><td><small>phoenix.coprocessor.maxServerCacheTimeToLiveMs</small></td><td style="text-align: left;">Maximum living time (in milliseconds) of server caches. A cache entry expires after this amount of time has passed since last access. Consider adjusting this parameter when a server-side IOException("Could not find hash cache for joinId") happens. Getting warnings like "Earlier hash cache(s) might have expired on servers" might also be a sign that this number should be increased.</td><td>30000</td></tr>
-<tr><td><small>phoenix.query.useIndexes</small></td><td style="text-align: left;">Determines whether or not indexes are considered by the optimizer to satisfy a query. Default is true
+<tr><td><small>phoenix.query.useIndexes</small></td><td style="text-align: left;">Client-side property determining whether or not indexes are considered by the optimizer to satisfy a query. Default is true
 </td><td>true</td></tr>
+<tr><td><small>phoenix.index.failure.handling.rebuild</small></td><td style="text-align: left;">Server-side property determining whether or not a mutable index is rebuilt in the background in the event of a commit failure. Only applicable for indexes on mutable, non transactional tables. Default is true
+</td><td>true</td></tr>
+<tr><td><small>phoenix.index.failure.block.write</small></td><td style="text-align: left;">Server-side property determining whether or not a writes to the data table are disallowed in the event of a commit failure until the index can be caught up with the data table. Requires that <small>phoenix.index.failure.handling.rebuild</small> is true as well. Only applicable for indexes on mutable, non transactional tables. Default is false
+</td><td>false</td></tr>
+<tr><td><small>phoenix.index.failure.handling.rebuild.interval</small></td><td style="text-align: left;">Server-side property controlling the millisecond frequency at which the server checks whether or not a mutable index needs to be partially rebuilt to catch up with updates to the data table. Only applicable for indexes on mutable, non transactional tables. Default is 10 seconds.
+</td><td>10000</td></tr>
+<tr><td><small>phoenix.index.failure.handling.rebuild.overlap.time</small></td><td style="text-align: left;">Server-side property controlling how many milliseconds to go back from the timestamp at which the failure occurred to go back when a partial rebuild is performed. Only applicable for indexes on mutable, non transactional tables. Default is 1 millisecond.
+</td><td>1</td></tr>
 <tr><td><small>phoenix.index.mutableBatchSizeThreshold</small></td><td style="text-align: left;">Number of mutations in a batch beyond which index metadata will be sent as a separate RPC to each region server as opposed to included inline with each mutation. Defaults to 5.
 </td><td>5</td></tr>
 <tr><td><small>phoenix.schema.dropMetaData</small></td><td style="text-align: left;">Determines whether or not an HBase table is dropped when the Phoenix table is dropped. Default is true
@@ -135,35 +142,5 @@ overridden at connection
 <tr><td><small>phoenix.table.default.store.nulls</small></td><td style="text-align: left;">The default value of the STORE_NULLS flag used for table creation which determines whether or not null values should be explicitly stored in HBase. Default is false. This is a client side parameter. Available starting from Phoenix 4.3.</td><td>false</td></tr>
 <tr><td><small>phoenix.table.istransactional.default</small></td><td style="text-align: left;">The default value of the TRANSACTIONAL flag used for table creation which determines whether or not a table is transactional . Default is false. This is a client side parameter. Available starting from Phoenix 4.7.</td><td>false</td></tr>
 <tr><td><small>phoenix.transactions.enabled</small></td><td style="text-align: left;"> Determines whether or not transactions are enabled in Phoenix. A table may not be declared as transactional if transactions are disabled. Default is false. This is a client side parameter. Available starting from Phoenix 4.7.</td><td>false</td></tr>
-<tr><td><small>data.tx.snapshot.dir</small></td><td style="text-align: left;">The HDFS directory used to store snapshots of the transaction state. No default value. This is a server side parameter. Available starting from Phoenix 4.7.</td><td>None</td></tr>
-<tr><td><small>data.tx.timeout</small></td><td style="text-align: left;">The timeout in seconds for a transaction to complete. Default is 30 seconds. This is a server side parameter. Available starting from Phoenix 4.7.</td><td>30</td></tr>
-<tr><td><strike><small>phoenix.query.targetConcurrency</small></strike><br/>Obsolete as of 3.2/4.2</td><td style="text-align: left;">Target concurrent
-      threads to use for a query. It serves as a soft limit on the number of
-      scans into which a query may be split. The value should not exceed the hard limit imposed by<code> phoenix.query.maxConcurrency</code>.</td><td>32</td></tr>
-<tr><td><strike><small>phoenix.query.maxConcurrency</small></strike><br/>Obsolete as of 3.2/4.2</td><td style="text-align: left;">Maximum concurrent
-      threads to use for a query. It servers as a hard limit on the number
-      of scans into which a query may be split. A soft limit is imposed by
-<code>phoenix.query.targetConcurrency</code>.</td><td>64</td></tr>
-<tr><td><strike><small>phoenix.query.maxStatsAge</small></strike><br/>Obsolete as of 3.2/4.2</td><td>The maximum age of
-      stats in milliseconds after which they will no longer be used (i.e. the stats were not able to be updated in this amount of time and thus are considered too old). Default is 1 day.</td><td>1</td></tr>
-<tr><td><strike><small>phoenix.query.statsUpdateFrequency</small></strike><br/>Obsolete as of 3.2/4.2</td><td style="text-align: left;">The frequency
-      in milliseconds at which the stats for each table will be
-updated. Default is 15 min.</td><td>900000</td></tr>
-<tr><td><strike><small>phoenix.query.maxIntraRegionParallelization</small></strike><br/>Obsolete as of 3.2/4.2</td><td style="text-align: left;">The maximum number of threads that will be spawned to process data within a single region during query execution</td><td>64</td></tr>
 </tbody></table>
 <br />
-<h4>
-Parallelization</h4>
-<p>Phoenix breaks up queries into multiple scans and runs them in parallel through coprocessors to improve performance.&nbsp;Hari Kumar, from Ericsson Labs, did a good job of explaining the performance benefits of parallelization and coprocessors <a href="http://labs.ericsson.com/blog/hbase-performance-tuners" target="_blank">here</a>.</p>
-
-<p>As of 3.2/4.2, parallelization in Phoenix is driven by the guideposts as determined by the configuration
-parameters for <a href="http://phoenix.apache.org/update_statistics.html">statistics collection</a>. Each
-chunk of data between guideposts will be run in parallel in a separate scan to improve query performance.
-The chunk size is determined by the server-side <code>phoenix.stats.guidepost.width</code> or
-<code>phoenix.stats.guidepost.per.region</code> configuration parameters. As the size of the chunks decrease,
-you'll want to increase <code>phoenix.query.queueSize</code> as more work will be queued in that case. Note
-that at a minimum, separate
-scans will be run for each table region. Beyond the statistics collection configuration parameters,
-the client-side <code>phoenix.query.threadPoolSize</code> and <code>phoenix.query.queueSize</code> parameters
-and the server-side <code>hbase.regionserver.handler.count</code> parameter have an impact on performance.</p>
-

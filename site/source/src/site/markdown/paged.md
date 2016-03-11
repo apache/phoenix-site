@@ -1,6 +1,7 @@
 # Paged Queries
 
-Phoenix v 2.1 supports the use in queries of row value constructors, a standard SQL construct to enable paged queries. A row value constructor is an ordered sequence of values delimited by parentheses. For example:
+Phoenix supports the use in queries of row value constructors (RVC), a standard SQL construct to enable paged queries.
+A row value constructor is an ordered sequence of values delimited by parentheses. For example:
 
     (4, 'foo', 3.5)
     ('Doe', 'Jane')
