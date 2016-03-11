@@ -92,7 +92,7 @@ Just like with the <code>CREATE TABLE</code> statement, the <code>CREATE INDEX</
         SALT_BUCKETS=10, DATA_BLOCK_ENCODING='NONE'
 Note that if the primary table is salted, then the index is automatically salted in the same way for global indexes. In addition, the MAX_FILESIZE for the index is adjusted down, relative to the size of the primary versus index table. For more on salting see [here](salted.html). With local indexes, on the other hand, specifying SALT_BUCKETS is not allowed.
 
-## Consistency Guarantees
+##<a id="Consistency"/> Consistency Guarantees
 On successful return to the client after a commit, all data is guaranteed to be written to all interested indexes and the
 primary table. In other words, index updates are synchronous with the same strong consistency guarantees provided by HBase.
 
