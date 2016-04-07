@@ -10,6 +10,22 @@
 <tr></tr>
 
 <tr><td>
+<img src="images/using/eharmony.png"/>
+<br/><br/>
+At eHarmony, Apache Phoenix serves as an SQL abstraction for the HBase storage where
+we maintain details about potential relationship matches identified for our users. We
+store presentation-ready user match feeds in HBase, and serve the data to one of the
+most visited pages on <a href="http://www.eharmony.com">eharmony.com</a>. Apache Phoenix
+helped us to build a query abstraction layer that eased our development process,
+enabling us to to apply various filters and sorting on the aggregated data in the HBase
+store.
+<blockquote>"The integration with Apache Phoenix has not only stabilized our system, but also
+reduced response time for loading hundreds of matches on a page to below 200ms."</blockquote>
+<br/>
+Vijay Vangapandu, Principal Software Engineer
+</td></tr>
+
+<tr><td>
 <img src="images/using/sf.png"/>
 <br/><br/>
 In our Force.com platform, we rely on Apache Phoenix to run
@@ -116,17 +132,6 @@ and analyze performance and alignment with business objectives</li>
 Sudhir Kulkarni, VP of Data and Analytics
 <br/>
 </td></tr>
-
-<tr><td>
-<img src="images/using/dp.png"/>
-<br/><br/>
-
-At Delta Projects we use Phoenix for storing data as a basis for
-measuring activities and generating reports. We chose Phoenix because
-it provides the scalability of HBase and the expressiveness of SQL.<br/><br/>
-
-Kristoffer Sjögren, System Developer
-<br/></td></tr>
 
 </table>
 <!--End First Column-->
@@ -273,6 +278,17 @@ highly available applications quickly and reliably.<br/><br/>
 aggregations."</blockquote><br/>
 
 Martin Homolka, CTO
+<br/></td></tr>
+
+<tr><td>
+<img src="images/using/dp.png"/>
+<br/><br/>
+
+At Delta Projects we use Phoenix for storing data as a basis for
+measuring activities and generating reports. We chose Phoenix because
+it provides the scalability of HBase and the expressiveness of SQL.<br/><br/>
+
+Kristoffer Sjögren, System Developer
 <br/></td></tr>
 
 </table>
