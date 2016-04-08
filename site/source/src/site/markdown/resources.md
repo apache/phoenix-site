@@ -3,6 +3,7 @@ Below are some prior presentations that have been done on Apache Phoenix. Anothe
 
 | Title | Resources | Where | When |
 |-------|-----------|-------|------|
+| High Performance Clickstream Analytics with Apache HBase/Phoenix | [Slides](http://phoenix.apache.org/presentations/StrataHadoopWorld.pdf) | Strata + Hadoop World | 2016 |
 | Apache Phoenix: The Evolution of a Relational Database Layer over HBase | [Slides](http://www.slideshare.net/xefyr/apache-big-data-eu-2015-phoenix) | Apache Big Data EU | 2015 |
 | Lightning Talk for Apache Phoenix | [Slides](http://phoenix.apache.org/presentations/HPTS.pdf) | HPTS | 2015 |
 | Tuning Phoenix and HBase for OLTP | [Slides](http://phoenix.apache.org/presentations/TuningForOLTP.pdf) | Tuning Presentation | 2015 |
