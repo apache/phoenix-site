@@ -33,3 +33,4 @@ Ankit Singhal | Hortonworks | ankit@apache.org | Committer
 Cody Marcel | Salesforce | codymarcel@apache.org | Committer
 Dumindu Buddhika | University of Moratuwa | duminduk@apache.org | Committer
 Jan Fernando | Salesforce | jfernando@apache.org | Committer
+Josh Elser | Hortonworks | elserj@apache.org | Committer
