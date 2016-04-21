@@ -59,7 +59,7 @@ driver is provided in the standalone
 
 The JDBC connection string is composed as follows:
 
-    jdbc:phoenix:thin:url=<scheme>://<server-hostname>:<port>
+    jdbc:phoenix:thin:url=<scheme>://<server-hostname>:<port>[...]
 
 `<scheme>` specifies the transport protocol used when communicating with the
 server. The only supported transport at this time is `http`.
@@ -68,6 +68,9 @@ server. The only supported transport at this time is `http`.
 
 `<port>` is the port number on which the host is listening. Default is `8765`,
 though this is configurable (see below).
+
+A full list of options that can be provided via the JDBC URL string is [available
+in the below table](#jdbc_url_options)
 
 The script `bin/sqlline-thin.py` is intended to behave identically to its
 sibling script `bin/sqlline.py`. It supports the following usage options.
@@ -198,6 +201,34 @@ configuration.
         provided in avatica.connectioncache.expiryunit. Default is minutes.
       </td>
       <td>MINUTES</td>
+    </tr>
+    <tr><td colspan="3">&nbsp;</td></tr>
+    <tr>
+      <td colspan="3" id="jdbc_url_options"><b>JDBC URL options.</b></td>
+    </tr>
+    <tr>
+      <td><small>url</small></td>
+      <td style="text-align: left;">
+        The URL of the QueryServer.
+      </td>
+      <td>null</td>
+    </tr>
+    <tr>
+      <td><small>serialization</small></td>
+      <td style="text-align: left;">
+        The client-side analogy to phoenix.queryserver.serialization in the server
+        to control how the client should serialize data to send to the QueryServer.
+      </td>
+      <td>PROTOBUF</td>
+    </tr>
+    <tr>
+      <td><small>timeZone</small></td>
+      <td style="text-align: left;">
+        The time zone the JDBC connection should use. If not provided, the
+        time zone will be specified by JVM. The value of this should be parseable by
+        Java's TimeZone class.
+      </td>
+      <td>null</td>
     </tr>
     <tr><td colspan="3">&nbsp;</td></tr>
     <tr>
