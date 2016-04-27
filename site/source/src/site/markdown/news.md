@@ -1,7 +1,9 @@
 # Apache Phoenix News
 <br/>
 <hr/>
-#### [Announcing transaction support in 4.7.0 release](http://phoenix.apache.org/transactions.html)
+#### [Announcing first ever Phoenix conference on Wed, May 25th 9am-1pm](http://www.meetup.com/SF-Bay-Area-Apache-Phoenix-Meetup/events/230545182/) (April 21, 2016)
+<hr/>
+#### [Announcing transaction support in 4.7.0 release](http://phoenix.apache.org/transactions.html) (March 10, 2016)
 <hr/>
 #### [Announcing time series optimization in Phoenix 4.6 released](https://blogs.apache.org/phoenix/entry/new_optimization_for_time_series) (Oct 23, 2015)
 <hr/>
