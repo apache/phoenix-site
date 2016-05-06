@@ -50,7 +50,7 @@ The map reduce job that populates the index table must be kicked off separately 
       --schema MY_SCHEMA --data-table MY_TABLE --index-table ASYNC_IDX
       --output-path ASYNC_IDX_HFILES
 
-Only when the map reduce job is complete will the index be activated and start to be used in queries. The job is relilient to the client being exited. The output-path option is used to specify a HDFS directory that is used for writing HFiles to.
+Only when the map reduce job is complete will the index be activated and start to be used in queries. The job is resilient to the client being exited. The output-path option is used to specify a HDFS directory that is used for writing HFiles to.
 
 ## Index Usage
 Indexes are automatically used by Phoenix to service a query when it's determined more efficient to do so. However, a global index will not be used unless all of the columns referenced in the query are contained in the index.  For example, the following query would not use the index, because v2 is referenced in the query but not included in the index:
