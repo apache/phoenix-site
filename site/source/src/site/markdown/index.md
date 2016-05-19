@@ -2,7 +2,7 @@
 <br/>
 <p align="center">
 <img src="images/phoenix-logo-small.png"/>
-<h4 align="center">OLTP and operational analytics for Hadoop</h4> 
+<h4 align="center">OLTP and operational analytics for Apache Hadoop</h4> 
 </p>
 <br/>
 
