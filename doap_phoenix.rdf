@@ -27,8 +27,8 @@
     <name>Apache Phoenix</name>
     <homepage rdf:resource="http://phoenix.apache.org" />
     <asfext:pmc rdf:resource="http://phoenix.apache.org" />
-    <shortdesc>Apache Phoenix enables OLTP and SQL-based operational analytics for Hadoop</shortdesc>
-    <description>Apache Phoenix enables OLTP and operational analytics for Hadoop by providing a relational database layer leveraging Apache HBase as its backing store. It includes integration with Spark, Pig, Flume, Map Reduce, and other products in the Hadoop ecosystem. It is accessed as a JDBC driver and enables querying, updating, and managing HBase tables through standard SQL.</description>
+    <shortdesc>Apache Phoenix enables OLTP and SQL-based operational analytics for Apache Hadoop</shortdesc>
+    <description>Apache Phoenix enables OLTP and operational analytics for Apache Hadoop by providing a relational database layer leveraging Apache HBase as its backing store. It includes integration with Apache Spark, Pig, Flume, Map Reduce, and other products in the Hadoop ecosystem. It is accessed as a JDBC driver and enables querying, updating, and managing HBase tables through standard SQL.</description>
     <bug-database rdf:resource="http://issues.apache.org/jira/browse/PHOENIX" />
     <mailing-list rdf:resource="http://phoenix.apache.org/mailing_list.html" />
     <download-page rdf:resource="http://phoenix.apache.org/download.html" />
