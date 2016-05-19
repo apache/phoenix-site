@@ -8,6 +8,7 @@ The following is a list of contributors with commit privileges that have directl
 Name| Company| Email| Role
 ----|--------|------|-----
 Andrew Purtell | Salesforce | apurtell@apache.org | PMC
+Ankit Singhal | Hortonworks | ankit@apache.org | PMC
 Anoop Sam John | Intel | anoopsamjohn@apache.org | PMC
 Devaraj Das | Hortonworks | ddas@apache.org | PMC
 Eli Levine | Salesforce | elilevine@apache.org | PMC
@@ -29,8 +30,8 @@ Samarth Jain | Salesforce | samarth@apache.org | PMC
 Simon Toens | Salesforce | stoens@apache.org | PMC
 Steven Noels | NGDATA | stevenn@apache.org | PMC
 Thomas D'Silva | Salesforce | tdsilva@apache.org | PMC
-Ankit Singhal | Hortonworks | ankit@apache.org | Committer
 Cody Marcel | Salesforce | codymarcel@apache.org | Committer
 Dumindu Buddhika | University of Moratuwa | duminduk@apache.org | Committer
 Jan Fernando | Salesforce | jfernando@apache.org | Committer
 Josh Elser | Hortonworks | elserj@apache.org | Committer
+Sergey Soldatov | Hortonworks | ssa@apache.org | Committer
