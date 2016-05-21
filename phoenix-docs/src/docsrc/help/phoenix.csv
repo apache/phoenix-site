@@ -269,18 +269,21 @@ CONSTRAINT my_pk PRIMARY KEY (host ASC,created_date DESC ROW_TIMESTAMP)
 "
 
 "Commands","UPDATE STATISTICS","
-UPDATE STATISTICS tableRef [ALL | INDEX | COLUMNS]
+UPDATE STATISTICS tableRef [ALL | INDEX | COLUMNS] [SET guidepostOptions]
 ","
 Updates the statistics on the table and by default all of its associated index tables. To only
 update the table, use the COLUMNS option and to only update the INDEX, use the INDEX option.
-Note that the statistics for a single index may also be updated by using its full index name
-for the tableRef.
+The statistics for a single index may also be updated by using its full index name for the tableRef.
+The default guidepost properties may be overridden by specifying their values after the SET
+keyword. Note that when a major compaction occurs, the default guidepost properties will be
+used again.
 
 ","
 UPDATE STATISTICS my_table
 UPDATE STATISTICS my_schema.my_table INDEX
 UPDATE STATISTICS my_index
 UPDATE STATISTICS my_table COLUMNS
+UPDATE STATISTICS my_table SET phoenix.stats.guidepost.width=50000000
 "
 
 "Other Grammar","Options","
