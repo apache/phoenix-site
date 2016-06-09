@@ -8,7 +8,7 @@
 
 	<head>
 		<meta charset="UTF-8" />
-		<title>Statistics Collection | Apache Phoenix</title>
+		<title>PHO (Phoenix-HBase ORM) | Apache Phoenix</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="description" content="" />
 		<meta http-equiv="content-language" content="en" />
@@ -34,7 +34,7 @@
 
 	</head>
 
-	<body class="page-update_statistics project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
+	<body class="page-phoenix_orm project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
 
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
@@ -89,7 +89,7 @@
 									<li class="divider"/>
 									<li ><a href="phoenix_on_emr.html" title="Phoenix on Amazon EMR">Phoenix on Amazon EMR</a></li>
 									<li ><a href="phoenix_python.html" title="Phoenix Adapter for Python">Phoenix Adapter for Python</a></li>
-									<li ><a href="phoenix_orm.html" title="Phoenix ORM Library">Phoenix ORM Library</a></li>
+									<li class="active"><a href="" title="Phoenix ORM Library">Phoenix ORM Library</a></li>
 								</ul>
 							</li>
 							<li class="dropdown">
@@ -99,7 +99,7 @@
 									<li ><a href="udf.html" title="User-defined Functions">User-defined Functions</a></li>
 									<li class="divider"/>
 									<li ><a href="secondary_indexing.html" title="Secondary Indexes">Secondary Indexes</a></li>
-									<li class="active"><a href="" title="Statistics Collection">Statistics Collection</a></li>
+									<li ><a href="update_statistics.html" title="Statistics Collection">Statistics Collection</a></li>
 									<li ><a href="rowtimestamp.html" title="Row Timestamp Column">Row Timestamp Column</a></li>
 									<li ><a href="salted.html" title="Salted Tables">Salted Tables</a></li>
 									<li ><a href="skip_scan.html" title="Skip Scan">Skip Scan</a></li>
@@ -147,68 +147,188 @@
 		<div class="span12">
 			<div class="body-content">
 <div class="page-header">
- <h1>Statistics Collection</h1>
+ <h1>PHO (Phoenix-HBase ORM) <img src="images/pho.png" width="70" height="70" hspace="90" alt="" /></h1>
 </div> 
-<p>The UPDATE STATISTICS command updates the statistics collected on a table, to improve query performance. This command collects a set of keys per region per column family that are equal byte distanced from each other. These collected keys are called <i>guideposts</i> and they act as <i>hints/guides</i> to improve the parallelization of queries on a given target region.</p> 
-<p>Statistics are also automatically collected during major compactions and region splits so manually running this command may not be necessary.</p> 
+<p>PHO is a Object Relational Mapping (ORM) library for building and executing queries on HBase using Apache Phoenix. It provides ORM-like mappings and DSL-style query building. Initially developed and open sourced by eHarmony, it is available <a class="externalLink" href="https://github.com/eHarmony/pho">here</a>.</p> 
+<p>Its interfaces and generic annotations allows the ability to switch the data store api in the future without changing the queries. Currently, it only supports HBase integration using Apache Phoenix. However, it’s very easy to plugin other implementations if need be.</p> 
+<h1>Entity Class</h1> 
+<p>Suppose we have the following TestClass we want to query against in our data store:</p> 
+<div class="source"> 
+ <pre>  //class must be annotated with Entity
+  import com.google.code.morphia.annotations.Embedded;
+  import com.google.code.morphia.annotations.Entity;
+  @Entity(value=&quot;user_matches&quot;)
+  public class MatchDataFeedItemDto {
+	  @Embedded
+	  private MatchCommunicationElement communication;
+	  @Embedded
+	  private MatchElement match;
+	  @Embedded
+	  private MatchProfileElement matchedUser;
+  }
+
+  public class MatchElement {
+      // row key
+      @Property(value = &quot;UID&quot;)
+      private long userId;
+      @Property(value = &quot;MID&quot;)
+      private long matchId;
+      @Property(value = &quot;DLVRYDT&quot;)
+      private Date deliveredDate;
+      @Property(value = &quot;STATUS&quot;)
+      private int status;
+  }
+</pre> 
+</div> 
+<h1>Query Building</h1> 
+<p>Query building can be done in DSL style. More advanced query building is under development but, for now, we will use a combination of the QueryBuilder and the static, Hibernate-style Restrictions methods to construct our queries.</p> 
 <div class="section"> 
- <h2 id="Parallelization">Parallelization</h2> 
- <p>Phoenix breaks up queries into multiple scans and runs them in parallel to improve performance. parallelization in Phoenix is driven by the statistics related configuration parameters. Each chunk of data between guideposts will be run in parallel in a separate scan to improve query performance. The chunk size is determined by the server-side <tt>phoenix.stats.guidepost.width</tt> or <tt>phoenix.stats.guidepost.per.region</tt> parameters. As the size of the chunks decrease, you’ll want to increase <tt>phoenix.query.queueSize</tt> as more work will be queued in that case. Note that at a minimum, separate scans will be run for each table region. Beyond the statistics collection configuration parameters, the client-side <tt>phoenix.query.threadPoolSize</tt> and <tt>phoenix.query.queueSize</tt> parameters and the server-side <tt>hbase.regionserver.handler.count</tt> parameter have an impact on performance.</p> 
+ <div class="section"> 
+  <h3 id="Simple_Queries">Simple Queries</h3> 
+  <p>Construct a query to find all user matches which are delivered in past 2 days and not in closed state</p> 
+  <div class="source"> 
+   <pre>    import com.eharmony.datastore.api.DataStoreApi;
+	import com.eharmony.datastore.model.MatchDataFeedItemDto;
+	import com.eharmony.datastore.query.QuerySelect;
+	import com.eharmony.datastore.query.builder.QueryBuilder;
+	import com.eharmony.datastore.query.criterion.Restrictions;
+	@Repository
+	public class MatchStoreQueryRepositoryImpl implements MatchStoreQueryRepository {
+		final QuerySelect&lt;MatchDataFeedItemDto, MatchDataFeedItemDto&gt; query = QueryBuilder
+                .builderFor(MatchDataFeedItemDto.class)
+                .select()
+                .add(Restrictions.eq(&quot;userId&quot;, userId))
+                .add(Restrictions.eq(&quot;status&quot;, 2))
+                .add(Restrictions.gt(&quot;deliveredDate&quot;, timeThreshold.getTime())).build();
+        Iterable&lt;MatchDataFeedItemDto&gt; feedItems = dataStoreApi.findAll(query);
+</pre> 
+  </div> 
+ </div> 
+ <div class="section"> 
+  <h3 id="Compound_Queries">Compound Queries</h3> 
+  <p>Construct a more complex query where not only do we want to find items with a date older than a day ago, but also find the matches in different status and order the results by deliveryDate and limit the results size to 10:</p> 
+  <div class="source"> 
+   <pre>    //provided
+    List&lt;Integer&gt; statusFilters = request.getMatchStatusFilters();
+    String sortBy = request.getSortBy()
+    Disjunction disjunction = new Disjunction();
+    for (Integer statusFilter : statusFilters) {
+    	disjunction.add(Restrictions.eq(&quot;status&quot;, statusFilter));
+    }
+    final QuerySelect&lt;MatchDataFeedItemDto, MatchDataFeedItemDto&gt; query = QueryBuilder
+                .builderFor(MatchDataFeedItemDto.class)
+                .select()
+                .add(Restrictions.eq(&quot;userId&quot;, userId))
+                .add(Restrictions.gt(&quot;deliveredDate&quot;, timeThreshold.getTime()));
+    			.add(disjunction);
+    			.addOrder(new Ordering(sortBy, Order.DESCENDING)).build();
+    Iterable&lt;MatchDataFeedItemDto&gt; feedItems = dataStoreApi.findAll(query);
+</pre> 
+  </div> 
+  <p><i>Note:</i> by default, expressions will be ANDed together when added separately.</p> 
+ </div> 
+ <div class="section"> 
+  <h3 id="Query_Interface">Query Interface</h3> 
+  <p>The following query components are supported:</p> 
+  <div class="source"> 
+   <pre>  // equals
+  EqualityExpression eq(String propertyName, Object value);
+
+  // does not equal (not equals);
+  EqualityExpression ne(String propertyName, Object value);
+
+  // less than
+  EqualityExpression lt(String propertyName, Object value);
+
+  // less than or equal
+  EqualityExpression lte(String propertyName, Object value);
+
+  // greater than
+  EqualityExpression gt(String propertyName, Object value);
+
+  // greater than or equal
+  EqualityExpression gte(String propertyName, Object value);
+
+  // between from and to (inclusive)
+  RangeExpression between(String propertyName, Object from, Object to);
+
+  // and - takes a variable list of expressions as arguments
+  Conjunction and(Criterion... criteria);
+
+  // or - takes a variable list of expressions as arguments
+  Disjunction or(Criterion... criteria);
+
+</pre> 
+  </div> 
+ </div> 
+ <div class="section"> 
+  <h3 id="Resolving_Entity_and_Property_Names">Resolving Entity and Property Names</h3> 
+  <p>Always use the property names of your Java objects in your queries. If these names differ from those used in your datastore you will use annotations to provide the mappings. Entity Resolvers are configured to map the entity classes to table/collection names. Property Resolvers are configured to map the names of your object variables to column/field names.</p> 
+  <p>The following annotations are currently supported for the indicated data store type. Custom EntityResolvers and PropertyResolvers are easy to configure and create.</p> 
+  <p>see <a class="externalLink" href="https://code.google.com/p/morphia/wiki/AllAnnotations">Morphia Annotations</a> for entity class annotation mappings</p> 
+ </div> 
 </div> 
 <div class="section"> 
- <h2 id="Examples">Examples</h2> 
- <p>For a given table <tt>my_table</tt>:</p> 
+ <h2 id="Query_Execution">Query Execution</h2> 
+ <p>The QueryExecutor interface supports the following operations:</p> 
  <div class="source"> 
-  <pre>UPDATE STATISTICS my_table
-</pre> 
- </div> 
- <p>The above syntax would collect the statistics for the table my_table and all the index tables, views and view index tables associated with the table my_table.</p> 
- <p>The equivalent of the above syntax is</p> 
- <div class="source"> 
-  <pre>UPDATE STATISTICS my_table ALL
-</pre> 
- </div> 
- <p>To collect the statistics on the index table alone</p> 
- <div class="source"> 
-  <pre>UPDATE STATISTICS my_table INDEX
-</pre> 
- </div> 
- <p>To collect the statistics on the table alone</p> 
- <div class="source"> 
-  <pre>UPDATE STATISTICS my_table COLUMNS
+  <pre>  // return an iterable of type R from the query against type T (R and T will often be the same type)
+  &lt;T, R&gt; Iterable&lt;R&gt; findAll(QuerySelect&lt;T, R&gt; query);
+  
+  // return aone R from the query against type T
+  &lt;T, R&gt; R findOne(QuerySelect&lt;T, R&gt; query)
+  
+  // save the entity of type T to the data store
+  &lt;T&gt; T save(T entity);
+  
+  // save all of the entities in the provided iterable to data store
+  &lt;T&gt; Iterable&lt;T&gt; save(Iterable&lt;T&gt; entities);
+  
+  // saves all the entities in batches with configured batch size
+  &lt;T&gt; int[] saveBatch(Iterable&lt;T&gt; entities);
 </pre> 
  </div> 
 </div> 
 <div class="section"> 
  <h2 id="Configuration">Configuration</h2> 
- <p>The configuration parameters controlling statistics collection include:</p> 
- <ol style="list-style-type: decimal"> 
-  <li><tt>phoenix.stats.guidepost.width</tt> 
-   <ul> 
-    <li>A server-side parameter that specifies the number of bytes between guideposts. A smaller amount increases parallelization, but also increases the number of chunks which must be merged on the client side.</li> 
-    <li>The default value is 104857600 (100 MB).</li> 
-   </ul></li> 
-  <li><tt>phoenix.stats.guidepost.per.region</tt> 
-   <ul> 
-    <li>A server-side parameter that specifies the number of guideposts per region. If set to a value greater than zero, then the guidepost width is determiend by the MAX_FILE_SIZE of the table divided by this value. Otherwise, if not set then the <tt>phoenix.stats.guidepost.width</tt> parameter is used.</li> 
-    <li>No default value.</li> 
-   </ul></li> 
-  <li><tt>phoenix.stats.updateFrequency</tt> 
-   <ul> 
-    <li>A server-side paramater that determines the frequency in milliseconds for which statistics will be refreshed from the statistics table and subsequently used by the client.</li> 
-    <li>The default value is 900000 (15 mins)</li> 
-   </ul></li> 
-  <li><tt>phoenix.stats.minUpdateFrequency</tt> 
-   <ul> 
-    <li>A client-side parameter that determines the minimum amount of time in milliseconds that must pass before statistics may again be manually collected through another <tt>UPDATE STATISTICS</tt> call.</li> 
-    <li>The default value is <tt>phoenix.stats.updateFrequency</tt> divided by two (7.5 mins)</li> 
-   </ul></li> 
-  <li><tt>phoenix.stats.useCurrentTime</tt> 
-   <ul> 
-    <li>An advanced server-side parameter that if true causes the current time on the server-side to be used as the timestamp of rows in the statistics table when background tasks such as compactions or splits occur. If false, then the max timestamp found while traversing the table over which statistics are being collected is used as the timestamp. Unless your client is controlling the timestamps while reading and writing data, this parameter should be left alone.</li> 
-    <li>The default value is true.</li> 
-   </ul></li> 
- </ol> 
+ <p>Here are some example Spring configuration files for HBase using Apache Phoenix.</p> 
+ <div class="section"> 
+  <h3 id="HBase">HBase</h3> 
+  <p>configuration proeprties hbase.connection.url=jdbc:phoenix:zkhost:2181</p> 
+  <div class="source"> 
+   <pre>    &lt;!-- Register your entity bean here --&gt;
+    &lt;util:list id=&quot;entityPropertiesMappings&quot;&gt;
+	    &lt;value&gt;com.eharmony.datastore.model.MatchDataFeedItemDto&lt;/value&gt;
+	&lt;/util:list&gt;
+	&lt;bean id=&quot;entityPropertiesMappingContext&quot; class=&quot;com.eharmony.pho.mapper.EntityPropertiesMappingContext&quot;&gt;
+	    &lt;constructor-arg ref=&quot;entityPropertiesMappings&quot;/&gt;
+	&lt;/bean&gt;
+	
+	&lt;bean id=&quot;entityPropertiesResolver&quot; class=&quot;com.eharmony.pho.mapper.EntityPropertiesResolver&quot;&gt;
+	    &lt;constructor-arg ref=&quot;entityPropertiesMappingContext&quot;/&gt;
+	&lt;/bean&gt;
+	
+	&lt;bean id=&quot;phoenixHBaseQueryTranslator&quot; class=&quot;com.eharmony.pho.hbase.translator.PhoenixHBaseQueryTranslator&quot;&gt;
+	    &lt;constructor-arg name=&quot;propertyResolver&quot; ref=&quot;entityPropertiesResolver&quot; /&gt;
+	&lt;/bean&gt;
+	
+	&lt;bean id=&quot;phoenixProjectedResultMapper&quot; class=&quot;com.eharmony.pho.hbase.mapper.PhoenixProjectedResultMapper&quot;&gt;
+	    &lt;constructor-arg name=&quot;entityPropertiesResolver&quot; ref=&quot;entityPropertiesResolver&quot; /&gt;
+	&lt;/bean&gt;
+	
+	&lt;bean id=&quot;phoenixHBaseQueryExecutor&quot; class=&quot;com.eharmony.pho.hbase.query.PhoenixHBaseQueryExecutor&quot;&gt; 
+	    &lt;constructor-arg name=&quot;queryTranslator&quot; ref=&quot;phoenixHBaseQueryTranslator&quot;/&gt;
+	    &lt;constructor-arg name=&quot;resultMapper&quot; ref=&quot;phoenixProjectedResultMapper&quot; /&gt;
+	 &lt;/bean&gt;
+	 
+	&lt;bean id=&quot;dataStoreApi&quot; class=&quot;com.eharmony.pho.hbase.PhoenixHBaseDataStoreApiImpl&quot;&gt;
+	    &lt;constructor-arg name=&quot;connectionUrl&quot; value=&quot;${hbase.connection.url}&quot;/&gt;
+	    &lt;constructor-arg name=&quot;queryExecutor&quot; ref=&quot;phoenixHBaseQueryExecutor&quot;/&gt;
+	&lt;/bean&gt;
+
+</pre> 
+  </div> 
+ </div> 
 </div>
 			</div>
 		</div>
@@ -332,8 +452,8 @@
 						<li >
 							<a href="phoenix_python.html" title="Phoenix Adapter for Python">Phoenix Adapter for Python</a>
 						</li>
-						<li >
-							<a href="phoenix_orm.html" title="Phoenix ORM Library">Phoenix ORM Library</a>
+						<li class="active">
+							<a href="#" title="Phoenix ORM Library">Phoenix ORM Library</a>
 						</li>
 					</ul>
 				</div>
@@ -352,8 +472,8 @@
 						<li >
 							<a href="secondary_indexing.html" title="Secondary Indexes">Secondary Indexes</a>
 						</li>
-						<li class="active">
-							<a href="#" title="Statistics Collection">Statistics Collection</a>
+						<li >
+							<a href="update_statistics.html" title="Statistics Collection">Statistics Collection</a>
 						</li>
 						<li >
 							<a href="rowtimestamp.html" title="Row Timestamp Column">Row Timestamp Column</a>
