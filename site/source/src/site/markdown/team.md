@@ -17,6 +17,7 @@ Gabriel Reid | NGDATA | greid@apache.org | PMC
 James Taylor | Salesforce | jamestaylor@apache.org | PMC
 Jeffrey Zhong | Elementum | jeffreyz@apache.org | PMC
 Jesse Yates | Fineo | jyates@apache.org | PMC
+Josh Elser | Hortonworks | elserj@apache.org | PMC
 Josh Mahonin | Interset | jmahonin@apache.org | PMC
 Lars Hofhansl | Salesforce | larsh@apache.org | PMC
 Maryann Xue | Intel | maryannxue@apache.org | PMC
@@ -33,5 +34,4 @@ Thomas D'Silva | Salesforce | tdsilva@apache.org | PMC
 Cody Marcel | Salesforce | codymarcel@apache.org | Committer
 Dumindu Buddhika | University of Moratuwa | duminduk@apache.org | Committer
 Jan Fernando | Salesforce | jfernando@apache.org | Committer
-Josh Elser | Hortonworks | elserj@apache.org | Committer
 Sergey Soldatov | Hortonworks | ssa@apache.org | Committer
