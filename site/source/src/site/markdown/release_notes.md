@@ -4,6 +4,23 @@ Release notes provide details on issues and their fixes which may have an impact
 Phoenix behavior. For some issues an upgrade may be required to be performed for a fix to
 take affect. See below for directions specific to a particular release.
 
+###<u>Phoenix-4.8.0 Release Notes</u>
+
+[PHOENIX-3164](https://issues.apache.org/jira/browse/PHOENIX-3164) is a relatively serious
+bug that affects the [Phoenix Query Server](http://phoenix.apache.org/server.html)
+deployed with "security enabled" (Kerberos or Active Directory). Due to another late-game
+change in the 4.8.0 release as well as an issue with the use of Hadoop's UserGroupInformation
+class, every "client session" to the Phoenix Query Server with security enabled will
+result in a new instance of the Phoenix JDBC driver `PhoenixConnection` (and other related
+classes). This ultimately results in a new connection to ZooKeeper for each "client session".
+
+Within a short amount of time of active use with the Phoenix Query Server creating a new ZooKeeper
+connection for each "client session", the number of ZooKeeper connections will have grown rapidly
+likely triggering ZooKeeper's built-in denial of service protection
+([maxClientCnxns](https://zookeeper.apache.org/doc/r3.4.8/zookeeperAdmin.html)). This
+will cause all future connections to ZooKeeper by the host running the Phoenix Query Server to
+be dropped. This would prevent all HBase client API calls which need to access ZooKeeper
+from completing.
 
 ###<u>Phoenix-4.5.0 Release Notes</u>
 Both [PHOENIX-2067](https://issues.apache.org/jira/browse/PHOENIX-2067) and
