@@ -2,13 +2,15 @@
 "Commands","SELECT","
 selectStatement [ { UNION ALL selectStatement [...] } ]
 [ ORDER BY order [,...] ] [ LIMIT {bindParameter | number} ]
+[ OFFSET {bindParameter | number} [ ROW | ROWS ] ] [ FETCH { FIRST | NEXT } {bindParameter | number} { ROW | ROWS } ONLY ]
 ","
 Selects data from one or more tables.
 UNION ALL combines rows from multiple select statements.
 ORDER BY sorts the result based on the given expressions.
-LIMIT limits the number of rows returned by the query with no limit applied if unspecified or specified
-as null or less than zero. The LIMIT clause is executed after the ORDER BY clause to support top-N type
+LIMIT(or FETCH FIRST) limits the number of rows returned by the query with no limit applied if unspecified or specified
+as null or less than zero. The LIMIT(or FETCH FIRST) clause is executed after the ORDER BY clause to support top-N type
 queries.
+OFFSET clause skips that many rows before beginning to return rows.
 An optional hint may be used to override decisions made by the query optimizer.
 
 ","

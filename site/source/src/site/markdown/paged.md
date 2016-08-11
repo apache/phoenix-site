@@ -1,6 +1,12 @@
 # Paged Queries
 
-Phoenix supports the use in queries of row value constructors (RVC), a standard SQL construct to enable paged queries.
+Phoenix supports , standard SQL constructs to enable paged queries 
+
+* Row Value Constructors (RVC)
+* OFFSET with limit
+
+**Row Value Constructors (RVC)**
+
 A row value constructor is an ordered sequence of values delimited by parentheses. For example:
 
     (4, 'foo', 3.5)
@@ -30,3 +36,17 @@ Another primary use case for row value constructors is to support query-more typ
     LIMIT 20
 
 Assuming that the client binds the three bind variables to the values of the last row processed, the next invocation would find the next 20 rows that match the query. If the columns you supply in your row value constructor match in order the columns from your primary key (or from a secondary index), then Phoenix will be able to turn the row value constructor expression into the start row of your scan. This enables a very efficient mechanism to locate _at or after_ a row.
+
+**OFFSET with LIMIT**
+
+Use OFFSET to specify the starting row offset into the result set returned by your query and LIMIT to specify the page size.
+
+For example, If page size is 10, then to select second page, following queries can be used(rows will be returned from 11 to 20):
+
+    SELECT title, author, isbn, description
+    FROM library
+    WHERE published_date > 2010
+    ORDER BY title, author, isbn
+    OFFSET 10 LIMIT 10
+
+Offset reads and skips the rows on the server or client depending upon the type of the query whereas RVC is effective for queries reading on primary axis as it can simply starts from the key provided.
