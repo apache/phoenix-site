@@ -22,6 +22,27 @@ will cause all future connections to ZooKeeper by the host running the Phoenix Q
 be dropped. This would prevent all HBase client API calls which need to access ZooKeeper
 from completing.
 
+As part of [PHOENIX-1734](https://issues.apache.org/jira/browse/PHOENIX-1734) we have changed
+the local index implementation to store index data in the separate column families in the same
+ data table. So while upgrading the phoenix at server we need to remove below local index 
+related configurations from `hbase-site.xml` and run upgrade steps mentioned 
+[here](secondary_indexing.html#Upgrading_Local_Indexes_created_before_4.8.0)
+
+```
+<property>
+  <name>hbase.master.loadbalancer.class</name>
+  <value>org.apache.phoenix.hbase.index.balancer.IndexLoadBalancer</value>
+</property>
+<property>
+  <name>hbase.coprocessor.master.classes</name>
+  <value>org.apache.phoenix.hbase.index.master.IndexMasterObserver</value>
+</property>
+<property>
+  <name>hbase.coprocessor.regionserver.classes</name>
+  <value>org.apache.hadoop.hbase.regionserver.LocalIndexMerger</value>
+</property>
+```
+ 
 ###<u>Phoenix-4.5.0 Release Notes</u>
 Both [PHOENIX-2067](https://issues.apache.org/jira/browse/PHOENIX-2067) and
 [PHOENIX-2120](https://issues.apache.org/jira/browse/PHOENIX-2120) cause rows to not be ordered

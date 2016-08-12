@@ -37,7 +37,7 @@ Each are useful in different scenarios and have their own failure profiles and p
 Global indexing targets _read heavy_ uses cases. With global indexes, all the performance penalties for indexes occur at write time. We intercept the data table updates on write ([DELETE](language/index.html#delete), [UPSERT VALUES](language/index.html#upsert_values) and [UPSERT SELECT](language/index.html#upsert_select)), build the index update and then sent any necessary updates to all interested index tables. At read time, Phoenix will select the index table to use that will produce the fastest query time and directly scan it just like any other HBase table. By default, unless hinted, an index will not be used for a query that references a column that isn't part of the index.
 
 ## Local Indexes
-Local indexing targets _write heavy_, _space constrained_ use cases. Just like with global indexes, Phoenix will automatically select whether or not to use a local index at query-time. With local indexes, index data and table data co-reside on same server preventing any network overhead during writes. Local indexes can be used even when the query isn't fully covered (i.e. Phoenix automatically retrieve the columns not in the index through point gets against the data table). Unlike global indexes, all local indexes of a table are stored in a single, separate shared table. At read time when the local index is used, every region must be examined for the data as the exact region location of index data cannot be predetermined. Thus some overhead occurs at read-time.
+Local indexing targets _write heavy_, _space constrained_ use cases. Just like with global indexes, Phoenix will automatically select whether or not to use a local index at query-time. With local indexes, index data and table data co-reside on same server preventing any network overhead during writes. Local indexes can be used even when the query isn't fully covered (i.e. Phoenix automatically retrieve the columns not in the index through point gets against the data table). Unlike global indexes, all local indexes of a table are stored in a single, separate shared table prior to 4.8.0 version. From 4.8.0 onwards we are storing all local index data in the separate shadow column families in the same data table. At read time when the local index is used, every region must be examined for the data as the exact region location of index data cannot be predetermined. Thus some overhead occurs at read-time.
 
 ## Index Population
 By default, when an index is created, it is populated synchronously during the CREATE INDEX call. This may not be feasible depending on the current size of the data table. As of 4.5, initially population of an index may be done asynchronously by including the ASYNC keyword in the index creation DDL statement:
@@ -232,9 +232,7 @@ The above property enables custom WAL edits to be written, ensuring proper writi
 
 The above properties prevent deadlocks from occurring during index maintenance for global indexes (HBase 0.98.4+ and Phoenix 4.3.1+ only) by ensuring index updates are processed with a higher priority than data updates. It also prevents deadlocks by ensuring metadata rpc calls are processed with a higher priority than data rpc calls.
 
-Local indexing also requires special configurations in the master to ensure data table and local index regions co-location.
-
-You will need to add the following parameters to `hbase-site.xml` on the master:
+From Phoenix 4.8.0 onward, no configuration changes are required to use local indexing. In Phoenix 4.7 and below, the following configuration changes are required to the server-side hbase-site.xml on the master and regions server nodes:
 
 ```
 <property>
@@ -245,16 +243,22 @@ You will need to add the following parameters to `hbase-site.xml` on the master:
   <name>hbase.coprocessor.master.classes</name>
   <value>org.apache.phoenix.hbase.index.master.IndexMasterObserver</value>
 </property>
-```
-
-To support local index regions merge on data regions merge you will need to add the following parameter to `hbase-site.xml` in all the region servers and restart. (It’s applicable for Phoenix 4.3+ versions)
-
-```
 <property>
   <name>hbase.coprocessor.regionserver.classes</name>
   <value>org.apache.hadoop.hbase.regionserver.LocalIndexMerger</value>
 </property>
 ```
+### Upgrading Local Indexes created before 4.8.0
+While upgrading the Phoenix to 4.8.0+ version at server remove above three local indexing related configurations from `hbase-site.xml` if present. From client we are supporting both online(while initializing the connection from phoenix client of 4.8.0+ versions) and offline(using psql tool) upgrade of local indexes created before 4.8.0. As part of upgrade we  recreate the local indexes in ASYNC mode. After upgrade user need to build the indexes using [IndexTool](http://phoenix.apache.org/secondary_indexing.html#Index_Population)
+
+Following client side configuration used in the upgrade. 
+	
+1. <code>phoenix.client.localIndexUpgrade</code> 
+    * The value of it is true means online upgrade and false means offline upgrade.
+    * **Default: true**
+
+Command to run offline upgrade using psql tool
+`$ psql [zookeeper] -l`
 
 ## Tuning
 Out the box, indexing is pretty fast. However, to optimize for your particular environment and workload, there are several properties you can tune.
