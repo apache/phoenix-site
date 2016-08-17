@@ -15,6 +15,7 @@ An optional hint may be used to override decisions made by the query optimizer.
 
 ","
 SELECT * FROM TEST LIMIT 1000;
+SELECT * FROM TEST LIMIT 1000 OFFSET 100;
 SELECT full_name FROM SALES_PERSON WHERE ranking >= 5.0
     UNION ALL SELECT reviewer_name FROM CUSTOMER_REVIEW WHERE score >= 8.0
 "
@@ -286,6 +287,40 @@ UPDATE STATISTICS my_schema.my_table INDEX
 UPDATE STATISTICS my_index
 UPDATE STATISTICS my_table COLUMNS
 UPDATE STATISTICS my_table SET phoenix.stats.guidepost.width=50000000
+"
+
+"Commands","CREATE SCHEMA","
+CREATE SCHEMA [IF NOT EXISTS] schemaName
+","
+creates a schema and corresponding name-space in hbase. To enable namespace mapping, see https://phoenix.apache.org/tuning.html
+
+User that execute this command should have admin permissions to create namespace in HBase.
+","
+CREATE SCHEMA IF NOT EXISTS my_schema
+CREATE SCHEMA my_schema
+"
+
+"Commands","USE","
+USE { schemaName | DEFAULT }
+","
+Sets a default schema for the connection and is used as a target schema for all statements issued from the connection that do not specify schema name explicitly.
+USE DEFAULT unset the schema for the connection so that no schema will be used for the statements issued from the connection.
+
+schemaName should already be existed for the USE SCHEMA statement to succeed. see CREATE SCHEMA for creating schema.
+","
+USE my_schema
+USE DEFAULT
+"
+
+"Commands","DROP SCHEMA","
+DROP SCHEMA [IF EXISTS] schemaName
+","
+Drops a schema and corresponding name-space from hbase. To enable namespace mapping, see https://phoenix.apache.org/tuning.html
+
+This statement succeed only when schema doesn't hold any tables.
+","
+DROP SCHEMA IF EXISTS my_schema
+DROP SCHEMA my_schema
 "
 
 "Other Grammar","Options","

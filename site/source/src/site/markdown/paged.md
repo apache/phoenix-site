@@ -47,6 +47,6 @@ For example, If page size is 10, then to select second page, following queries c
     FROM library
     WHERE published_date > 2010
     ORDER BY title, author, isbn
-    OFFSET 10 LIMIT 10
+    LIMIT 10 OFFSET 10
 
 Offset reads and skips the rows on the server or client depending upon the type of the query whereas RVC is effective for queries reading on primary axis as it can simply starts from the key provided.
