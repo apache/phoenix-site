@@ -1,6 +1,8 @@
 # Apache Phoenix News
 <br/>
 <hr/>
+#### [Announcing Phoenix 4.8 released](https://blogs.apache.org/phoenix/entry/announcing_phoenix_4_8_released) (August 10, 2016)
+<hr/>
 #### [Announcing support for latest Phoenix in Amazon EMR](http://docs.aws.amazon.com/ElasticMapReduce/latest/ReleaseGuide/emr-phoenix.html) (June 2, 2016)
 <hr/>
 #### [Announcing first ever Phoenix conference on Wed, May 25th 9am-1pm](http://www.meetup.com/SF-Bay-Area-Apache-Phoenix-Meetup/events/230545182/) (April 21, 2016)
