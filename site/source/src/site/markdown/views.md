@@ -47,9 +47,8 @@ In addition, you may create an INDEX over a VIEW, just as with a TABLE. This is 
 Views have the following restrictions:
 
 1. An INDEX over a VIEW is only maintained if the updates are made through the VIEW. Updates made through the underlying TABLE or the parent VIEW will not be reflected in the index ([PHOENIX-1499](https://issues.apache.org/jira/browse/PHOENIX-1499)).
-2. A column of a table may not be dropped once it has VIEWs ([PHOENIX-2156](https://issues.apache.org/jira/browse/PHOENIX-2156)).
 3. A primary key column may not be added to a VIEW when its base table has a primary key constraint that ends with a variable length column ([PHOENIX-2157](https://issues.apache.org/jira/browse/PHOENIX-2157)).
 4. A VIEW may be defined over only a single table through a simple SELECT * query. You may not create a VIEW over multiple, joined tables nor over aggregations ([PHOENIX-1505](https://issues.apache.org/jira/browse/PHOENIX-1505), [PHOENIX-1506](https://issues.apache.org/jira/browse/PHOENIX-1506)). 
-5. If a VIEW is derived from another VIEW, the indexes from the base/derived VIEW will not be considered when executing queries ([PHOENIX-1367](https://issues.apache.org/jira/browse/PHOENIX-1367)).
+5. If a VIEW is derived from another VIEW, the indexes from the parent VIEW will not be considered when executing queries ([PHOENIX-1367](https://issues.apache.org/jira/browse/PHOENIX-1367)).
 6. All columns must be projected into a VIEW when it's created (i.e. only CREATE VIEW ... AS SELECT * is supported). Note, however, you may drop non primary key columns inherited from the base table in a VIEW after it is created through the ALTER VIEW command. Providing a subset of columns and or expressions in the SELECT clause will be supported in a future release ([PHOENIX-1507](https://issues.apache.org/jira/browse/PHOENIX-1507)).
 

@@ -2,6 +2,10 @@
 
 As items are implemented from our road map, they are moved here to track the progress we've made:
 
+1. **[Namespace Mapping](https://issues.apache.org/jira/browse/PHOENIX-1311)**. Maps Phoenix schema to HBase namespace to improve isolation between different schemas. **Available in our 4.8  release**
+1. **[Hive Integration](https://issues.apache.org/jira/browse/PHOENIX-2743)**. Enables Hive to be used with Phoenix in support of joining huge tables to other huge tables. **Available in our 4.8  release**
+1. **[Local Index Improvements](https://issues.apache.org/jira/browse/PHOENIX-1734)**. Reworked local index implementation to guarantee colocation of table and index data and use supported HBase APIs for better maintainability. **Available in our 4.8  release**
+1. **[DISTINCT Query Optimization](https://issues.apache.org/jira/browse/PHOENIX-258)**. Push seek logic to server for SELECT DISTINCT and COUNT DISTINCT queries over the leading parts of the primary key leading to dramically better performance. **Available in our 4.8  release**
 1. **[Transaction Support](transactions.html)**. Supports transactions by integrating with [Tephra](https://github.com/continuuity/tephra). **Available in our 4.7  release**
 1. **[Time series Optimization](rowtimestamp.html)**. Optimizes queries against time series data as explained in more detail [here](https://blogs.apache.org/phoenix/entry/new_optimization_for_time_series). **Available in our 4.6  release**
 1. **[Asynchronous Index Population](secondary_indexing.html#Asynchronous_Index_Population)**. Enables an index to be created asynchronously using a map reduce job. **Available in our 4.5 release**

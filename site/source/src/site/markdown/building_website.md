@@ -6,7 +6,8 @@
  $ svn checkout https://svn.apache.org/repos/asf/phoenix
 ```
 
-2. Edit/Add source markdown files in `/src/site/markdown` directory
+2. Edit/Add source markdown files in `/src/site/markdown` directory.
+2. Edit `phoenix-docs/src/docsrc/help/phoenix.csv` to update Reference pages, adding any missing new words to `phoenix-docs/src/tools/org/h2/build/doc/dictionary.txt`, and manually remove `site/publish/language/*.html`.
 3. Run `build.sh` located at root to generate/update html web pages in `site/publish` directory
 4. `svn commit` source markdown files and html web pages
 
