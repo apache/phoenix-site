@@ -1202,7 +1202,10 @@ The binary representation is an 8 byte long (the number of milliseconds from the
 possible (although not necessarily recommended) to store more information within a TIME column
 than what is provided by ""java.sql.Time"". Note that the internal representation is based on
 a number of milliseconds since the epoch (which is based on a time in GMT), while
-""java.sql.Time"" will format times based on the client's local time zone.
+""java.sql.Time"" will format times based on the client's local time zone. Please note that
+this TIME type is different than the TIME type as defined by the SQL 92 standard in that it
+includes year, month, and day components. As such, it is not in compliance with the JDBC APIs.
+As the underlying data is still stored as a long, only the presentation of the value is incorrect.
 ","
 TIME
 "
@@ -1216,7 +1219,10 @@ The binary representation is an 8 byte long (the number of milliseconds from the
 possible (although not necessarily recommended) to store more information within a DATE column than
 what is provided by ""java.sql.Date"". Note that the internal representation is based on a number
 of milliseconds since the epoch (which is based on a time in GMT), while ""java.sql.Date""
-will format dates based on the client's local time zone.
+will format dates based on the client's local time zone. Please note that this DATE type
+is different than the DATE type as defined by the SQL 92 standard in that it includes
+a time component. As such, it is not in compliance with the JDBC APIs. As the underlying data
+is still stored as a long, only the presentation of the value is incorrect.
 ","
 DATE
 "
@@ -1809,7 +1815,8 @@ time zone id, the local time zone will be used for parsing.
 The configuration setting ""phoenix.query.dateFormatTimeZone""
 can also be set to a time zone id, which will cause the
 default of GMT to be overridden with the configured
-time zone id.
+time zone id. Please see the Data Type reference guide about
+how Apache Phoenix presently defines the DATE datatype.
 ","
 TO_DATE('Sat, 3 Feb 2001 03:05:06 GMT', 'EEE, d MMM yyyy HH:mm:ss z')
 TO_DATE('1970-01-01', 'yyyy-MM-dd', 'GMT+1')
@@ -1820,7 +1827,8 @@ CURRENT_DATE()
 ","
 Returns the current server-side date, bound at the start of the execution
 of a query based on the current time on the region server owning the
-metadata of the table being queried.
+metadata of the table being queried. Please see the Data Type reference guide
+about how Apache Phoenix presently defines the DATE datatype.
 ","
 CURRENT_DATE()
 "
@@ -1829,7 +1837,8 @@ CURRENT_DATE()
 CURRENT_TIME()
 ","
 Same as CURRENT_DATE(), except returns a value of type TIME. In either case,
-the underlying representation is the epoch time as a long value.
+the underlying representation is the epoch time as a long value. Please see the
+Data Type reference guide about how Apache Phoenix presently defines the TIME datatype.
 ","
 CURRENT_TIME()
 "
