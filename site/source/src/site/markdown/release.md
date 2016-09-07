@@ -21,3 +21,4 @@ Follow the instructions. Signed binary and source tars will be generated in _rel
 2. Svn commit binary and source tars to https://dist.apache.org/repos/dist/dev/phoenix
 3. Once voting is successful, copy artifacts to https://dist.apache.org/repos/dist/release/phoenix and set version back to SNAPSHOT and commit. Ex.: mvn versions:set -DnewVersion=4.3.0-SNAPSHOT -DgenerateBackupPoms=false
 4. Set git tag -a v4.2.0 release_sha -m "Phoenix v4.2.0"
+5. Remove any obsolete releases on https://dist.apache.org/repos/dist/release/phoenix given the current release
