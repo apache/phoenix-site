@@ -1817,9 +1817,12 @@ can also be set to a time zone id, which will cause the
 default of GMT to be overridden with the configured
 time zone id. Please see the Data Type reference guide about
 how Apache Phoenix presently defines the DATE datatype.
+Additionally, Phoenix supports the ANSI SQL ""date"" literal which acts
+similarly to the single-argument ""TO_DATE"" function.
 ","
 TO_DATE('Sat, 3 Feb 2001 03:05:06 GMT', 'EEE, d MMM yyyy HH:mm:ss z')
 TO_DATE('1970-01-01', 'yyyy-MM-dd', 'GMT+1')
+date "1970-01-01 12:30:00"
 "
 
 "Functions (Time and Date)","CURRENT_DATE","
@@ -1831,6 +1834,38 @@ metadata of the table being queried. Please see the Data Type reference guide
 about how Apache Phoenix presently defines the DATE datatype.
 ","
 CURRENT_DATE()
+"
+
+"Functions (Time and Date)","TO_TIME","
+TO_TIME( string [, formatString [, timeZoneIdString]] )
+","
+Converts the given string into a TIME instance. When a date format is not provided
+it defaults to ""yyyy-MM-dd HH:mm:ss.SSS"" or whatever is defined by the
+configuration property ""phoenix.query.dateFormat"". The configuration setting
+""phoenix.query.dateFormatTimeZone"" can also be set to a time zone id, which will
+cause the default of GMT to be overridden with the configured time zone id.
+Additionally, Phoenix supports the ANSI SQL ""time"" literal which acts similarly to the
+single-argument ""TO_TIME"" function.
+","
+TO_TIME('2005-10-01 14:03:22.559')
+TO_TIME('1970-01-01', 'yyyy-MM-dd', 'GMT+1')
+time '2005-10-01 14:03:22.559'
+"
+
+"Functions (Time and Date)","TO_TIMESTAMP","
+TO_TIMESTAMP( string [, formatString [, timeZoneIdString]] )
+","
+Converts the given string into a TIMESTAMP instance. When a date format is not provided
+it defaults to ""yyyy-MM-dd HH:mm:ss.SSS"" or whatever is defined by the
+configuration property ""phoenix.query.dateFormat"". The configuration setting
+""phoenix.query.dateFormatTimeZone"" can also be set to a time zone id, which will
+cause the default of GMT to be overridden with the configured time zone id.
+Additionally, Phoenix supports the ANSI SQL ""timestamp"" literal which acts similarly to
+the single-argument ""TO_TIMESTAMP"" function.
+","
+TO_TIMESTAMP('2005-10-01 14:03:22.559')
+TO_TIMESTAMP('1970-01-01', 'yyyy-MM-dd', 'GMT+1')
+timestamp '2005-10-01 14:03:22.559'
 "
 
 "Functions (Time and Date)","CURRENT_TIME","
@@ -2011,4 +2046,42 @@ LOG(3, 2)
 LOG(2, 3)
 LOG(2)
 "
+"Functions (General)","GET_BIT","
+GET_BIT( binaryValue, offsetInt )
+","
+Retrieves the bit at the given index in the given binary value.
+","
+GET_BIT(CAST('FFFF' as BINARY), 1)
+"
 
+"Functions (General)","GET_BYTE","
+GET_BYTE( binaryValue, offsetInt )
+","
+Retrieves the byte at the given index in the given binary value.
+","
+GET_BYTE(CAST('FFFF' as BINARY), 1)
+"
+
+"Functions (General)","OCTET_LENGTH","
+OCTET_LENGTH( binaryValue )
+","
+Returns the number of bytes in a binary value.
+","
+OCTET_LENGTH(NAME)
+"
+
+"Functions (General)","SET_BIT","
+SET_BIT( binaryValue, offsetInt, newValue )
+","
+Replaces the bit at the given index in the binary value with the provided newValue.
+","
+SET_BIT(CAST('FFFF' as BINARY), 1, 61)
+"
+
+"Functions (General)","SET_BYTE","
+SET_BYTE( binaryValue, offsetInt, newValue )
+","
+Replaces the byte at the given index in the binary value with the provided newValue.
+","
+SET_BYTE(CAST('FFFF' as BINARY), 1, 61)
+"
