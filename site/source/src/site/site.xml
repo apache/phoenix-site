@@ -85,6 +85,7 @@
             <item href="pherf.html" name="Performance Testing"/>
             <item href="http:divider" name=""/>
             <item href="phoenix_spark.html" name="Apache Spark Integration"/>
+            <item href="hive_storage_handler.html" name="Apache Hive Storage Handler"/>
             <item href="pig_integration.html" name="Apache Pig Integration"/>
             <item href="phoenix_mr.html" name="Map Reduce Integration"/>
             <item href="flume.html" name="Apache Flume Plugin"/>
