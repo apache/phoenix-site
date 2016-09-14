@@ -8,7 +8,7 @@
 
 	<head>
 		<meta charset="UTF-8" />
-		<title>PHO (Phoenix-HBase ORM) | Apache Phoenix</title>
+		<title>Namespace Mapping | Apache Phoenix</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="description" content="" />
 		<meta http-equiv="content-language" content="en" />
@@ -34,7 +34,7 @@
 
 	</head>
 
-	<body class="page-phoenix_orm project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
+	<body class="page-namspace_mapping project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
 
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
@@ -90,7 +90,7 @@
 									<li class="divider"/>
 									<li ><a href="phoenix_on_emr.html" title="Phoenix on Amazon EMR">Phoenix on Amazon EMR</a></li>
 									<li ><a href="phoenix_python.html" title="Phoenix Adapter for Python">Phoenix Adapter for Python</a></li>
-									<li class="active"><a href="" title="Phoenix ORM Library">Phoenix ORM Library</a></li>
+									<li ><a href="phoenix_orm.html" title="Phoenix ORM Library">Phoenix ORM Library</a></li>
 								</ul>
 							</li>
 							<li class="dropdown">
@@ -100,7 +100,7 @@
 									<li ><a href="udf.html" title="User-defined Functions">User-defined Functions</a></li>
 									<li class="divider"/>
 									<li ><a href="secondary_indexing.html" title="Secondary Indexes">Secondary Indexes</a></li>
-									<li ><a href="namspace_mapping.html" title="Namespace Mapping">Namespace Mapping</a></li>
+									<li class="active"><a href="" title="Namespace Mapping">Namespace Mapping</a></li>
 									<li ><a href="update_statistics.html" title="Statistics Collection">Statistics Collection</a></li>
 									<li ><a href="rowtimestamp.html" title="Row Timestamp Column">Row Timestamp Column</a></li>
 									<li ><a href="paged.html" title="Paged Queries">Paged Queries</a></li>
@@ -149,188 +149,140 @@
 		<div class="span12">
 			<div class="body-content">
 <div class="page-header">
- <h1>PHO (Phoenix-HBase ORM) <img src="images/pho.png" width="70" height="70" hspace="90" alt="" /></h1>
+ <h1>Namespace Mapping</h1>
 </div> 
-<p>PHO is a Object Relational Mapping (ORM) library for building and executing queries on HBase using Apache Phoenix. It provides ORM-like mappings and DSL-style query building. Initially developed and open sourced by eHarmony, it is available <a class="externalLink" href="https://github.com/eHarmony/pho">here</a>.</p> 
-<p>Its interfaces and generic annotations allows the ability to switch the data store api in the future without changing the queries. Currently, it only supports HBase integration using Apache Phoenix. However, it’s very easy to plugin other implementations if need be.</p> 
-<h1>Entity Class</h1> 
-<p>Suppose we have the following TestClass we want to query against in our data store:</p> 
-<div class="source"> 
- <pre>  //class must be annotated with Entity
-  import com.google.code.morphia.annotations.Embedded;
-  import com.google.code.morphia.annotations.Entity;
-  @Entity(value=&quot;user_matches&quot;)
-  public class MatchDataFeedItemDto {
-	  @Embedded
-	  private MatchCommunicationElement communication;
-	  @Embedded
-	  private MatchElement match;
-	  @Embedded
-	  private MatchProfileElement matchedUser;
-  }
-
-  public class MatchElement {
-      // row key
-      @Property(value = &quot;UID&quot;)
-      private long userId;
-      @Property(value = &quot;MID&quot;)
-      private long matchId;
-      @Property(value = &quot;DLVRYDT&quot;)
-      private Date deliveredDate;
-      @Property(value = &quot;STATUS&quot;)
-      private int status;
-  }
-</pre> 
-</div> 
-<h1>Query Building</h1> 
-<p>Query building can be done in DSL style. More advanced query building is under development but, for now, we will use a combination of the QueryBuilder and the static, Hibernate-style Restrictions methods to construct our queries.</p> 
-<div class="section"> 
- <div class="section"> 
-  <h3 id="Simple_Queries">Simple Queries</h3> 
-  <p>Construct a query to find all user matches which are delivered in past 2 days and not in closed state</p> 
-  <div class="source"> 
-   <pre>    import com.eharmony.datastore.api.DataStoreApi;
-	import com.eharmony.datastore.model.MatchDataFeedItemDto;
-	import com.eharmony.datastore.query.QuerySelect;
-	import com.eharmony.datastore.query.builder.QueryBuilder;
-	import com.eharmony.datastore.query.criterion.Restrictions;
-	@Repository
-	public class MatchStoreQueryRepositoryImpl implements MatchStoreQueryRepository {
-		final QuerySelect&lt;MatchDataFeedItemDto, MatchDataFeedItemDto&gt; query = QueryBuilder
-                .builderFor(MatchDataFeedItemDto.class)
-                .select()
-                .add(Restrictions.eq(&quot;userId&quot;, userId))
-                .add(Restrictions.eq(&quot;status&quot;, 2))
-                .add(Restrictions.gt(&quot;deliveredDate&quot;, timeThreshold.getTime())).build();
-        Iterable&lt;MatchDataFeedItemDto&gt; feedItems = dataStoreApi.findAll(query);
-</pre> 
-  </div> 
- </div> 
- <div class="section"> 
-  <h3 id="Compound_Queries">Compound Queries</h3> 
-  <p>Construct a more complex query where not only do we want to find items with a date older than a day ago, but also find the matches in different status and order the results by deliveryDate and limit the results size to 10:</p> 
-  <div class="source"> 
-   <pre>    //provided
-    List&lt;Integer&gt; statusFilters = request.getMatchStatusFilters();
-    String sortBy = request.getSortBy()
-    Disjunction disjunction = new Disjunction();
-    for (Integer statusFilter : statusFilters) {
-    	disjunction.add(Restrictions.eq(&quot;status&quot;, statusFilter));
-    }
-    final QuerySelect&lt;MatchDataFeedItemDto, MatchDataFeedItemDto&gt; query = QueryBuilder
-                .builderFor(MatchDataFeedItemDto.class)
-                .select()
-                .add(Restrictions.eq(&quot;userId&quot;, userId))
-                .add(Restrictions.gt(&quot;deliveredDate&quot;, timeThreshold.getTime()));
-    			.add(disjunction);
-    			.addOrder(new Ordering(sortBy, Order.DESCENDING)).build();
-    Iterable&lt;MatchDataFeedItemDto&gt; feedItems = dataStoreApi.findAll(query);
-</pre> 
-  </div> 
-  <p><i>Note:</i> by default, expressions will be ANDed together when added separately.</p> 
- </div> 
- <div class="section"> 
-  <h3 id="Query_Interface">Query Interface</h3> 
-  <p>The following query components are supported:</p> 
-  <div class="source"> 
-   <pre>  // equals
-  EqualityExpression eq(String propertyName, Object value);
-
-  // does not equal (not equals);
-  EqualityExpression ne(String propertyName, Object value);
-
-  // less than
-  EqualityExpression lt(String propertyName, Object value);
-
-  // less than or equal
-  EqualityExpression lte(String propertyName, Object value);
-
-  // greater than
-  EqualityExpression gt(String propertyName, Object value);
-
-  // greater than or equal
-  EqualityExpression gte(String propertyName, Object value);
-
-  // between from and to (inclusive)
-  RangeExpression between(String propertyName, Object from, Object to);
-
-  // and - takes a variable list of expressions as arguments
-  Conjunction and(Criterion... criteria);
-
-  // or - takes a variable list of expressions as arguments
-  Disjunction or(Criterion... criteria);
-
-</pre> 
-  </div> 
- </div> 
- <div class="section"> 
-  <h3 id="Resolving_Entity_and_Property_Names">Resolving Entity and Property Names</h3> 
-  <p>Always use the property names of your Java objects in your queries. If these names differ from those used in your datastore you will use annotations to provide the mappings. Entity Resolvers are configured to map the entity classes to table/collection names. Property Resolvers are configured to map the names of your object variables to column/field names.</p> 
-  <p>The following annotations are currently supported for the indicated data store type. Custom EntityResolvers and PropertyResolvers are easy to configure and create.</p> 
-  <p>see <a class="externalLink" href="https://code.google.com/p/morphia/wiki/AllAnnotations">Morphia Annotations</a> for entity class annotation mappings</p> 
- </div> 
-</div> 
-<div class="section"> 
- <h2 id="Query_Execution">Query Execution</h2> 
- <p>The QueryExecutor interface supports the following operations:</p> 
- <div class="source"> 
-  <pre>  // return an iterable of type R from the query against type T (R and T will often be the same type)
-  &lt;T, R&gt; Iterable&lt;R&gt; findAll(QuerySelect&lt;T, R&gt; query);
-  
-  // return aone R from the query against type T
-  &lt;T, R&gt; R findOne(QuerySelect&lt;T, R&gt; query)
-  
-  // save the entity of type T to the data store
-  &lt;T&gt; T save(T entity);
-  
-  // save all of the entities in the provided iterable to data store
-  &lt;T&gt; Iterable&lt;T&gt; save(Iterable&lt;T&gt; entities);
-  
-  // saves all the entities in batches with configured batch size
-  &lt;T&gt; int[] saveBatch(Iterable&lt;T&gt; entities);
-</pre> 
- </div> 
-</div> 
+<p>From v4.8.0 onwards, user can enable to map it’s schema to the namespace so that any table created with schema will be created in the corresponding namespace of HBase.</p> 
+<p>Earlier, every table (with schema or without schema) was created in default namespace.</p> 
 <div class="section"> 
  <h2 id="Configuration">Configuration</h2> 
- <p>Here are some example Spring configuration files for HBase using Apache Phoenix.</p> 
+ <p>Parameters to enable namespace mapping:-</p> 
+ <table class="bodyTable table table-striped table-hover" border="1"> 
+  <tbody> 
+   <tr class="a"> 
+    <td><b>Property</b></td> 
+    <td><b>Description</b></td> 
+    <td><b>Default </b></td> 
+   </tr> 
+   <tr class="b"> 
+    <td><small>phoenix.schema.isNamespaceMappingEnabled</small></td> 
+    <td style="text-align: left;">If it is enabled, then the tables created with schema will be mapped to namespace.This needs to be set at client and server both. if set once, should not be rollback. Old client will not work after this property is enabled.</td> 
+    <td>false</td> 
+   </tr> 
+   <tr class="a"> 
+    <td><small>phoenix.schema.mapSystemTablesToNamespace</small></td> 
+    <td style="text-align: left;">Enabling this property will take affect when phoenix.connection.isNamespaceMappingEnabled is also set to true. If it is enabled, SYSTEM tables if present will automatically migrated to SYSTEM namespace. And If set to false , then system tables will be created in default namespace only. This needs to be set at client and server both.</td> 
+    <td>true</td> 
+   </tr> 
+  </tbody> 
+ </table> 
+</div> 
+<div class="section"> 
+ <h2 id="Grammer_Available">Grammer Available</h2> 
+ <p>Following DDL statements can be used to interact with schema.</p> 
+ <ul> 
+  <li> <p><a class="externalLink" href="https://phoenix.apache.org/language/index.html#create_schema">CREATE SCHEMA</a></p></li> 
+  <li> <p><a class="externalLink" href="https://phoenix.apache.org/language/index.html#use">USE SCHEMA</a></p></li> 
+  <li> <p><a class="externalLink" href="https://phoenix.apache.org/language/index.html#drop_schema">DROP SCHEMA</a> </p></li> 
+ </ul> 
+</div> 
+<div class="section"> 
+ <h2 id="F.A.Q">F.A.Q</h2> 
+ <ul> 
+  <li><a href="#how_to_migrate_existing_tables_with_schema_to_namespace">How to migrate existing tables with schema to namespace?</a></li> 
+  <li><a href="#how_system_tables_will_be_migrated">How system tables will be migrated?</a></li> 
+  <li><a href="#What_permissions_are_required_to_CREATE_and_DROP_SCHEMA">What permissions are required to CREATE and DROP SCHEMA?</a></li> 
+  <li><a href="#how_schemas_are_mapped_for_different_table_type">How schemas are mapped for different table types?</a></li> 
+  <li><a href="#What_is_namespace_and_benefits_of_mapping_table_to_namespace">What is namespace and benefits of mapping table to namespace?</a></li> 
+ </ul> 
  <div class="section"> 
-  <h3 id="HBase">HBase</h3> 
-  <p>configuration proeprties hbase.connection.url=jdbc:phoenix:zkhost:2181</p> 
+  <h3 id="how_to_migrate_existing_tables_with_schema_to_namespace"> How to migrate existing tables with schema to namespace<a name="How_to_migrate_existing_tables_with_schema_to_namespace"></a></h3> 
+  <p>For kerberized environment, run with the user who have sufficient permissiont(“admin”) to create a namespace.</p> 
+  <p>Table will be mapped to namespace of name “schema_name” only , Currently there is no support migrating existing table to different schema or namespace.</p> 
+  <p>Usage example:</p> 
+  <p>Move table(‘table_name’) to namespace of name ‘schema_name’</p> 
   <div class="source"> 
-   <pre>    &lt;!-- Register your entity bean here --&gt;
-    &lt;util:list id=&quot;entityPropertiesMappings&quot;&gt;
-	    &lt;value&gt;com.eharmony.datastore.model.MatchDataFeedItemDto&lt;/value&gt;
-	&lt;/util:list&gt;
-	&lt;bean id=&quot;entityPropertiesMappingContext&quot; class=&quot;com.eharmony.pho.mapper.EntityPropertiesMappingContext&quot;&gt;
-	    &lt;constructor-arg ref=&quot;entityPropertiesMappings&quot;/&gt;
-	&lt;/bean&gt;
-	
-	&lt;bean id=&quot;entityPropertiesResolver&quot; class=&quot;com.eharmony.pho.mapper.EntityPropertiesResolver&quot;&gt;
-	    &lt;constructor-arg ref=&quot;entityPropertiesMappingContext&quot;/&gt;
-	&lt;/bean&gt;
-	
-	&lt;bean id=&quot;phoenixHBaseQueryTranslator&quot; class=&quot;com.eharmony.pho.hbase.translator.PhoenixHBaseQueryTranslator&quot;&gt;
-	    &lt;constructor-arg name=&quot;propertyResolver&quot; ref=&quot;entityPropertiesResolver&quot; /&gt;
-	&lt;/bean&gt;
-	
-	&lt;bean id=&quot;phoenixProjectedResultMapper&quot; class=&quot;com.eharmony.pho.hbase.mapper.PhoenixProjectedResultMapper&quot;&gt;
-	    &lt;constructor-arg name=&quot;entityPropertiesResolver&quot; ref=&quot;entityPropertiesResolver&quot; /&gt;
-	&lt;/bean&gt;
-	
-	&lt;bean id=&quot;phoenixHBaseQueryExecutor&quot; class=&quot;com.eharmony.pho.hbase.query.PhoenixHBaseQueryExecutor&quot;&gt; 
-	    &lt;constructor-arg name=&quot;queryTranslator&quot; ref=&quot;phoenixHBaseQueryTranslator&quot;/&gt;
-	    &lt;constructor-arg name=&quot;resultMapper&quot; ref=&quot;phoenixProjectedResultMapper&quot; /&gt;
-	 &lt;/bean&gt;
-	 
-	&lt;bean id=&quot;dataStoreApi&quot; class=&quot;com.eharmony.pho.hbase.PhoenixHBaseDataStoreApiImpl&quot;&gt;
-	    &lt;constructor-arg name=&quot;connectionUrl&quot; value=&quot;${hbase.connection.url}&quot;/&gt;
-	    &lt;constructor-arg name=&quot;queryExecutor&quot; ref=&quot;phoenixHBaseQueryExecutor&quot;/&gt;
-	&lt;/bean&gt;
-
+   <pre>$  bin/psql.py &lt;zookeeper&gt; -m &lt;schema_name&gt;.&lt;table_name&gt;
 </pre> 
   </div> 
  </div> 
+ <div class="section"> 
+  <h3 id="how_system_tables_will_be_migrated"> How system tables will be migrated?<a name="How_system_tables_will_be_migrated"></a></h3> 
+  <p>SYSTEM tables will be migrated automatically during first connection made after enabling phoenix.schema.mapSystemTablesToNamespace along with phoenix.schema.isNamespaceMappingEnabled.</p> 
+ </div> 
+ <div class="section"> 
+  <h3 id="What_permissions_are_required_to_CREATE_and_DROP_SCHEMA"> What permissions are required to CREATE and DROP SCHEMA?</h3> 
+  <p>User must have “admin” permission in HBase to execute CREATE and DROP SCHEMA successfully as these commands will internally create or delete the namespace.</p> 
+  <p>Details for ACL management in HBase can be found <a class="externalLink" href="http://hbase.apache.org/book.html#hbase.accesscontrol.configuration">here</a></p> 
+ </div> 
+ <div class="section"> 
+  <h3 id="how_schemas_are_mapped_for_different_table_type"> How schemas are mapped for different table types?<a name="How_schemas_are_mapped_for_different_table_types"></a></h3> 
+  <p>Schema support in Phoenix is similar to the other databases. </p> 
+  <p>Below table can help you in mapping of physical table to Phoenix table:-</p> 
+  <table border="0" class="bodyTable table table-striped table-hover"> 
+   <thead> 
+    <tr class="a"> 
+     <th>DDL </th> 
+     <th>Table Type </th> 
+     <th>Physical Table </th> 
+     <th>Description</th> 
+    </tr> 
+   </thead> 
+   <tbody> 
+    <tr class="b"> 
+     <td>CREATE TABLE S.T (ID INTEGER PRIMARY KEY) </td> 
+     <td>TABLE </td> 
+     <td>S:T </td> 
+     <td>Table T will be created in S namespace</td> 
+    </tr> 
+    <tr class="a"> 
+     <td>CREATE INDEX IDX ON S.T(ID) (ID INTEGER PRIMARY KEY) </td> 
+     <td>INDEX</td> 
+     <td>S:IDX</td> 
+     <td>Indexes will inherit the schema and namespace from table</td> 
+    </tr> 
+    <tr class="b"> 
+     <td>CREATE VIEW V SELECT * FROM S.T</td> 
+     <td>VIEW with default schema</td> 
+     <td>S:T</td> 
+     <td>View will not inherit the schema from parent table and can have default schema as well</td> 
+    </tr> 
+    <tr class="a"> 
+     <td>CREATE VIEW X.V SELECT * FROM S.T</td> 
+     <td>VIEW with different schema than physical table</td> 
+     <td>S:T</td> 
+     <td>View will use the parent physical table only and can have different(or same) schema as well</td> 
+    </tr> 
+    <tr class="b"> 
+     <td>CREATE VIEW S.V SELECT * FROM S.T</td> 
+     <td>VIEW with same schema as of physical table</td> 
+     <td>S:T</td> 
+     <td>View will use the parent physical table only and can have different(or same) schema as well</td> 
+    </tr> 
+    <tr class="a"> 
+     <td>CREATE VIEW idx on S.V</td> 
+     <td>VIEW INDEX</td> 
+     <td>S:_IDX_T</td> 
+     <td>View indexes will also inherit the schema and map to corresponding namespace</td> 
+    </tr> 
+   </tbody> 
+  </table> 
+ </div> 
+ <div class="section"> 
+  <h3 id="What_is_namespace_and_benefits_of_mapping_table_to_namespace"> What is namespace and benefits of mapping table to namespace?</h3> 
+  <p>A namespace is a logical grouping of tables analogous to a database in relation database systems. This abstraction lays the groundwork for upcoming multi-tenancy related features:</p> 
+  <ul> 
+   <li>Quota Management - Restrict the amount of resources (i.e. regions, tables) a namespace can consume.</li> 
+   <li>Namespace Security Administration - Provide another level of security administration for tenants.</li> 
+   <li>Region server groups - A namespace/table can be pinned onto a subset of RegionServers thus guaranteeing a course level of isolation.</li> 
+  </ul> 
+  <p>Details about Namespace Managment can be read from <a class="externalLink" href="http://hbase.apache.org/book.html#_namespace">here</a></p> 
+ </div> 
+</div> 
+<div class="section"> 
+ <h2 id="Resources">Resources</h2> 
+ <ul> 
+  <li><a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-1311">PHOENIX-1311</a> : For implementation details and discussion over the namespace mapping feature.</li> 
+ </ul> 
 </div>
 			</div>
 		</div>
@@ -457,8 +409,8 @@
 						<li >
 							<a href="phoenix_python.html" title="Phoenix Adapter for Python">Phoenix Adapter for Python</a>
 						</li>
-						<li class="active">
-							<a href="#" title="Phoenix ORM Library">Phoenix ORM Library</a>
+						<li >
+							<a href="phoenix_orm.html" title="Phoenix ORM Library">Phoenix ORM Library</a>
 						</li>
 					</ul>
 				</div>
@@ -477,8 +429,8 @@
 						<li >
 							<a href="secondary_indexing.html" title="Secondary Indexes">Secondary Indexes</a>
 						</li>
-						<li >
-							<a href="namspace_mapping.html" title="Namespace Mapping">Namespace Mapping</a>
+						<li class="active">
+							<a href="#" title="Namespace Mapping">Namespace Mapping</a>
 						</li>
 						<li >
 							<a href="update_statistics.html" title="Statistics Collection">Statistics Collection</a>

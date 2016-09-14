@@ -13,7 +13,6 @@
 * [Why isn't my query doing a RANGE SCAN?](#Why_isnt_my_query_doing_a_RANGE_SCAN)
 * [Should I pool Phoenix JDBC Connections?](#Should_I_pool_Phoenix_JDBC_Connections)
 * [Why does Phoenix add an empty or dummy KeyValue when doing an upsert?](#Why_empty_key_value)
-* [How to move existing table with schema to namespace?](#map_table_namespace)
 
 ### I want to get started. Is there a Phoenix _Hello World_?
 
@@ -309,15 +308,3 @@ all) records. A scan over Phoenix will include the empty column to
 ensure that rows that only consist of the primary key (and have null
 for all non-key columns) will be included in a scan result.
 
-### <a id="map_table_namespace"/>How to move existing table with schema to namespace?
-**Pre-requisite:** you need 4.8 or higher version to map table to a namespae. To enable namespace mapping in configuration, see [tuning.html](tuning.html)
-
-For kerberized environment, run with the user who have sufficient permissiont("admin") to create a namespace.
-
-Table will be mapped to namespace of name "schema_name" only , Currently we don't support migrating existing table to different schema or namespace.
-
-Usage example:
-
-Move table('table_name') to namespace of name 'schema_name'
-
-    $  bin/psql.py <zookeeper> -m <schema_name>.<table_name>
