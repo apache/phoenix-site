@@ -550,7 +550,8 @@ SERIAL
 "
 
 "Other Grammar","Column Def","
-columnRef dataType [[NOT] NULL] [DEFAULT constantOperand] [PRIMARY KEY [ASC | DESC] [ROW_TIMESTAMP]]
+columnRef dataType [[NOT] NULL] [DEFAULT constantOperand]
+[PRIMARY KEY [ASC | DESC] [ROW_TIMESTAMP]]
 ","
 Define a new primary key column. The column name is case insensitive by default and
 case sensitive if double quoted. The sort order of a primary key may be ascending (ASC)
