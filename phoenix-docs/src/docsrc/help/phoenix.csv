@@ -21,14 +21,24 @@ SELECT full_name FROM SALES_PERSON WHERE ranking >= 5.0
 "
 "Commands","UPSERT VALUES","
 UPSERT INTO tableName [( { columnRef | columnDef } [,...] )] VALUES ( constantTerm [,...] )
+[ON DUPLICATE KEY { IGNORE | UPDATE columnRef = operand } ]
 ","
 Inserts if not present and updates otherwise the value in the table. The list of
 columns is optional and if not present, the values will map to the column in the
 order they are declared in the schema. The values must evaluate to constants.
 
+Use the ON DUPLICATE KEY clause (available in Phoenix 4.9) if you need the UPSERT to be atomic. Performance
+will be slower in this case as the row needs to be read on the server side when
+the commit is done. Use IGNORE if you do not want the UPSERT performed if the
+row already exists. Otherwise, with UPDATE, the expression will be evaluated and the
+result used to set the column, for example to perform an atomic increment. An UPSERT
+to the same row in the same commit batch will be processed in the order of execution.
+
 ","
 UPSERT INTO TEST VALUES('foo','bar',3);
 UPSERT INTO TEST(NAME,ID) VALUES('foo',123);
+UPSERT INTO TEST(ID, COUNTER) VALUES(123, 0) ON DUPLICATE KEY UPDATE COUNTER = COUNTER + 1;
+UPSERT INTO TEST(ID, MY_COL) VALUES(123, 0) ON DUPLICATE KEY IGNORE;
 "
 "Commands","UPSERT SELECT","
 UPSERT [/*+ hint */] INTO tableName [( { columnRef | columnDef } [,...] )] select
@@ -327,15 +337,15 @@ DROP SCHEMA my_schema
 { [familyName .] name= value } [,...]
 ","
 Sets a built-in Phoenix table property or an HBase table or column descriptor metadata attribute.
-The name is case insensitive. Built-in Phoenix table options include SALT_BUCKETS, DISABLE_WAL,
-IMMUTABLE_ROWS, MULTI_TENANT, DEFAULT_COLUMN_FAMILY, STORE_NULLS, TRANSACTIONAL, and UPDATE_CACHE_FREQUENCY.
-If the name is a known HColumnDescriptor attribute, then the value is applied to the specified
-column family or, if omitted, to all column families. Otherwise, the HBase metadata attribute
-value is applied to the HTableDescriptor. Note that no validation is performed on the property
-name or value, so unknown or misspelled options will end up as adhoc metadata attributes values
-on the HBase table.
+The name is case insensitive. If the name is a known HColumnDescriptor attribute, then the value
+is applied to the specified column family or, if omitted, to all column families. Otherwise, the
+HBase metadata attribute value is applied to the HTableDescriptor. Note that no validation is
+performed on the property name or value, so unknown or misspelled options will end up as adhoc
+metadata attributes values on the HBase table.
 
-The SALT_BUCKETS numeric property causes an extra byte to be transparently
+Built-in Phoenix table options include:
+
+SALT_BUCKETS numeric property causes an extra byte to be transparently
 prepended to every row key to ensure an evenly distributed read and write load across all
 region servers. This is especially useful when your row key is always monotonically increasing
 and causing hot spotting on a single region server. However, even if it's not, it often improves
@@ -346,12 +356,12 @@ data table is salted (since by default an index has the same number of salt buck
 data table). If split points are not defined for the table, the table will automatically be pre-split
 at each possible salt bucket value. For more information, see http://phoenix.incubator.apache.org/salted.html
 
-The DISABLE_WAL boolean option when true causes HBase not to write data to the write-ahead-log,
+DISABLE_WAL boolean option when true causes HBase not to write data to the write-ahead-log,
 thus making updates faster at the expense of potentially losing data in the event of a region server
 failure. This option is useful when updating a table which is not the source-of-truth and thus making
 the lose of data acceptable.
 
-The IMMUTABLE_ROWS boolean option when true declares that your table has rows which are write-once,
+IMMUTABLE_ROWS boolean option when true declares that your table has rows which are write-once,
 append-only (i.e. the same row is never updated). With this option set, indexes added to
 the table are managed completely on the client-side, with no need to perform incremental index
 maintenance, thus improving performance. Deletes of rows in immutable tables are allowed with some
@@ -359,25 +369,25 @@ restrictions if there are indexes on the table. Namely, the WHERE clause may not
 not contained by every index. Upserts are expected to never update an existing row (failure to follow
 this will result in invalid indexes). For more information, see http://phoenix.incubator.apache.org/secondary_indexing.html
 
-The MULTI_TENANT boolean option when true enables views to be created over the table across different
+MULTI_TENANT boolean option when true enables views to be created over the table across different
 tenants. This option is useful to share the same physical HBase table across many different
 tenants. For more information, see http://phoenix.incubator.apache.org/multi-tenancy.html
 
-The DEFAULT_COLUMN_FAMILY string option determines the column family used used when none
+DEFAULT_COLUMN_FAMILY string option determines the column family used used when none
 is specified. The value is case sensitive. If this option is not present, a column family
 name of '0' is used.
 
-The STORE_NULLS boolean option (available as of Phoenix 4.3) determines whether or not null values should be
+STORE_NULLS boolean option (available as of Phoenix 4.3) determines whether or not null values should be
 explicitly stored in HBase. This option is generally only useful if a table is configured to store multiple
 versions in order to facilitate doing flashback queries (i.e. queries to look at the state of a record in the past).
 
-The TRANSACTIONAL option (available as of Phoenix 4.7) determines whether a table (and its
+TRANSACTIONAL option (available as of Phoenix 4.7) determines whether a table (and its
 secondary indexes) are tranactional. The default value is FALSE, but may be overriden with the
 phoenix.table.istransactional.default property. A table may be altered to become transactional,
 but it cannot be transitioned back to be non transactional. For more information on transactions, see
 http://phoenix.apache.org/transactions.html
 
-The UPDATE_CACHE_FREQUENCY option (available as of Phoenix 4.7) determines how often the server
+UPDATE_CACHE_FREQUENCY option (available as of Phoenix 4.7) determines how often the server
 will be checked for meta data updates (for example, the addition or removal of a table column or
 the updates of table statistics). Possible values are ALWAYS (the default), NEVER, and a millisecond
 numeric value. An ALWAYS value will cause the client to check with the server each time a statement
@@ -385,13 +395,18 @@ is executed that references a table (or once per commit for an UPSERT VALUES sta
 value indicates how long the client will hold on to its cached version of the metadata before checking
 back with the server for updates.
 
-The APPEND_ONLY_SCHEMA boolean option (available as of Phoenix 4.8) when true declares that columns will only be added
+APPEND_ONLY_SCHEMA boolean option (available as of Phoenix 4.8) when true declares that columns will only be added
 but never removed from a table. With this option set we can prevent the RPC from the client to the server to fetch the
 table metadata when the client already has all columns declared in a CREATE TABLE/VIEW IF NOT EXISTS statement.
 
-The AUTO_PARTITION_SEQ string option (available as of Phoenix 4.8) when set on a base table determines the sequence used
-to automatically generate a WHERE clause with the first PK column and the unique identifier from the sequence for child views. With this option set, we prevent allocating a sequence in the event that the view already exists.
+AUTO_PARTITION_SEQ string option (available as of Phoenix 4.8) when set on a base table determines the sequence used
+to automatically generate a WHERE clause with the first PK column and the unique identifier from the sequence for child
+views. With this option set, we prevent allocating a sequence in the event that the view already exists.
 
+The GUIDE_POSTS_WIDTH option (available as of Phoenix 4.9) enables specifying a different guidepost width per table. The guidepost width
+determines the byte sized chunk of work over which a query will be parallelized. A value of 0 means that no guideposts should be collected
+for the table. A value of null removes any table specific guidepost setting, causing the global server-side phoenix.stats.guidepost.width config
+parameter to be used again. For more information, see the Statistics Collection page.
 ","
 IMMUTABLE_ROWS=true
 DEFAULT_COLUMN_FAMILY='a'
@@ -399,6 +414,7 @@ SALT_BUCKETS=10
 DATA_BLOCK_ENCODING='NONE',a.VERSIONS=10
 MAX_FILESIZE=2000000000,MEMSTORE_FLUSHSIZE=80000000
 UPDATE_CACHE_FREQUENCY=300000
+GUIDE_POSTS_WIDTH=30000000
 CREATE SEQUENCE id;
 CREATE TABLE base_table (partition_id INTEGER, val DOUBLE) AUTO_PARTITION_SEQ=id;
 CREATE VIEW my_view AS SELECT * FROM base_table;
@@ -534,13 +550,14 @@ SERIAL
 "
 
 "Other Grammar","Column Def","
-columnRef dataType [[NOT] NULL] [PRIMARY KEY [ASC | DESC] [ROW_TIMESTAMP]]
+columnRef dataType [[NOT] NULL] [DEFAULT constantOperand] [PRIMARY KEY [ASC | DESC] [ROW_TIMESTAMP]]
 ","
 Define a new primary key column. The column name is case insensitive by default and
 case sensitive if double quoted. The sort order of a primary key may be ascending (ASC)
-or descending. The default is ascending. Additionally, if the column is the only column
-that forms the primary key, then it can be designated as ROW_TIMESTAMP column provided its data type is
-one of these: BIGINT, UNSIGNED_LONG, DATE, TIME and TIMESTAMP.
+or descending (DESC). The default is ascending. You may also specify a default value (Phoenix 4.9 or above) for the column
+with a constant expression. If the column is the only column that forms the primary key, then it can
+be designated as ROW_TIMESTAMP column provided its data type is one of these: BIGINT, UNSIGNED_LONG,
+DATE, TIME and TIMESTAMP.
 
 ","
 id char(15) not null primary key
