@@ -1,6 +1,11 @@
 # Bulk CSV Data Loading
 
-Phoenix provides two methods for loading CSV data into Phoenix tables -- a single-threaded client loading tool via the [psql](download.html#Loading-Data) command, and a MapReduce-based bulk load tool. The psql tool is typically appropriate for tens of megabytes, while the MapReduce-based loader is typically better for larger load volumes.
+Phoenix provides two methods for bulk loading data into Phoenix tables:
+
+* Single-threaded client loading tool for CSV via the [psql](download.html#Loading-Data) command
+* MapReduce-based bulk load tool for CSV and JSON.
+
+The psql tool is typically appropriate for tens of megabytes, while the MapReduce-based loader is typically better for larger load volumes.
 
 Use of both loaders is described below.
 
@@ -43,7 +48,7 @@ The following parameters can be used for loading data with PSQL:
 
 For higher-throughput loading distributed over the cluster, the MapReduce loader can be used. This loader first converts all data into HFiles, and then provides the created HFiles to HBase after the HFile creation is complete. 
 
-The MapReduce loader is launched using the `hadoop` command with the Phoenix client jar, as follows:
+The CSV MapReduce loader is launched using the `hadoop` command with the Phoenix client jar, as follows:
 
     hadoop jar phoenix-<version>-client.jar org.apache.phoenix.mapreduce.CsvBulkLoadTool --table EXAMPLE --input /data/example.csv
 
@@ -54,6 +59,10 @@ When using Phoenix 4.0 and above, there is a known HBase issue( "Notice to Mapre
 OR
 
     HADOOP_CLASSPATH=/path/to/hbase-protocol.jar:/path/to/hbase/conf hadoop jar phoenix-<version>-client.jar org.apache.phoenix.mapreduce.CsvBulkLoadTool --table EXAMPLE --input /data/example.csv
+
+The JSON MapReduce loader is launched using the `hadoop` command with the Phoenix client jar, as follows:
+
+    hadoop jar phoenix-<version>-client.jar org.apache.phoenix.mapreduce.JsonBulkLoadTool --table EXAMPLE --input /data/example.json
 
 The input file must be present on HDFS (not the local filesystem where the command is being run). 
 
