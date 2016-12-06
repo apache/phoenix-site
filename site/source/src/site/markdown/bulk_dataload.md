@@ -1,9 +1,9 @@
-# Bulk CSV Data Loading
+# Bulk Data Loading
 
 Phoenix provides two methods for bulk loading data into Phoenix tables:
 
-* Single-threaded client loading tool for CSV via the [psql](download.html#Loading-Data) command
-* MapReduce-based bulk load tool for CSV and JSON.
+* Single-threaded client loading tool for CSV formatted data via the [psql](download.html#Loading-Data) command
+* MapReduce-based bulk load tool for CSV and JSON formatted data
 
 The psql tool is typically appropriate for tens of megabytes, while the MapReduce-based loader is typically better for larger load volumes.
 
