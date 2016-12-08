@@ -1,37 +1,37 @@
-# Hive Storage Handler 
+# Phoenix Storage Handler for Apache Hive
 
-Hive Storage Handler is a Apache Phoenix plugin that allows access to Phoenix tables from Apache Hive CLI using HiveQL.
+The Apache Phoenix Storage Handler is a plugin that enables Apache Hive access to Phoenix tables from the Apache Hive command line using HiveQL.
 
 ## Prerequisites
 
 * Phoenix 4.8.0+
-* Hive 1.2.1+ 
+* Hive 1.2.1+
 
 ## Hive Setup
 
 Make phoenix-version-hive.jar available for Hive:
 
-1. Add to hive-env.sh:
+Step 1: Add to hive-env.sh:
 
 ```
 HIVE_AUX_JARS_PATH=<path to jar>
 ```
 
-2. Add property to hive-site.xml. That will allow Hive Map-Reduce jobs to use this jar:
+Step 2: Add a property to hive-site.xml so that Hive MapReduce jobs can use the .jar:
 
 ```
-<property> 
-  <name>hive.aux.jars.path</name> 
+<property>
+  <name>hive.aux.jars.path</name>
   <value>file://<path></value>
 </property>
 ```
 
-## Table creation and deletion
-Phoenix Storage Handler supports both INTERNAL and EXTERNAL Hive tables. 
+## Table Creation and Deletion
+The Phoenix Storage Handler supports both INTERNAL and EXTERNAL Hive tables.
 
-### Create INTERNAL table. 
-For internal tables Hive manages the lifecycle of the table and data. When hive table is created, a corresponding Phoenix table will be created as well. 
-Once the hive table is dropped, the Phoenix table will be deleted too. 
+### Create INTERNAL Table
+For INTERNAL tables, Hive manages the lifecycle of the table and data. When a Hive table is created, a corresponding Phoenix table is also created.
+Once the Hive table is dropped, the Phoenix table is also deleted.
 
 ```sql
 	create table phoenix_table (
@@ -52,8 +52,8 @@ Once the hive table is dropped, the Phoenix table will be deleted too.
 	);
 ```
 
-### Create EXTERNAL table
-For external tables Hive works with an existing Phoenix table and manages only Hive metadata. Deleting an external table from Hive only deletes Hive metadata and keeps Phoenix table 
+### Create EXTERNAL Table
+For EXTERNAL tables, Hive works with an existing Phoenix table and manages only Hive metadata. Dropping an EXTERNAL table from Hive deletes only Hive metadata but does not delete the Phoenix table.
 
 ```sql
 create external table ext_table (
@@ -76,71 +76,72 @@ TBLPROPERTIES (
 ### Properties
 
 1. phoenix.table.name
-    * Specified the Phoenix table name 
-    * Default : the same as hive table                
+    * Specifies the Phoenix table name
+    * Default: the same as the Hive table                
 2. phoenix.zookeeper.quorum           
-    * Specified the ZK quorum for HBase
-    * Default : localhost
+    * Specifies the ZooKeeper quorum for HBase
+    * Default: localhost
 3. phoenix.zookeeper.znode.parent    
-    * Specified the ZK parent node for HBase
-    * Default : /hbase
-4. phoenix.zookeeper.client.port 
-    * Specified the ZK port
-    * Default : 2181   
+    * Specifies the ZooKeeper parent node for HBase
+    * Default: /hbase
+4. phoenix.zookeeper.client.port
+    * Specifies the ZooKeeper port
+    * Default: 2181   
 5. phoenix.rowkeys                 
-    * The list of columns that would match the RowKey in Phoenix table
+    * The list of columns to be the primary key in a Phoenix table
     * Required
 6. phoenix.column.mapping         
-    * mappings between column names for hive and phoenix. See Limitations for details.
- 
+    * Mappings between column names for Hive and Phoenix. See [Limitations](#Limitations) for details.
 
 
-## Data ingestion/delete/update 
-Data ingestion can be done by all ways that supported by Hive or Phoenix:
-Hive: 
+
+## Data Ingestion, Deletions, and Updates
+Data ingestion can be done by all ways that Hive and Phoenix support:
+
+Hive:
 
 ```
 	 insert into table T values (....);
-	 inseet into table T select c1,c2,c3 from source_table;
+	 insert into table T select c1,c2,c3 from source_table;
 ```
 
-Phoenix: 
+Phoenix:
 
 ```
 	 upsert into table T values (.....);
          Phoenix CSV BulkLoad tools
 ```
 
-All delete/update should be performed on Phoenix side. See *Limitation* for more details
+All delete and update operations should be performed on the Phoenix side. See [Limitations](#Limitations) for more details.
 
-## Additinal configuration options
+## Additional Configuration Options
 
-Those options can be set in Hive CLI 
+Those options can be set in a Hive command-line interface (CLI) environment.
 
-### Performance tuning
+### Performance Tuning
 
-Parameters | Default Value | Description
+Parameter | Default Value | Description
 ------------ | ------------- | -------------
 phoenix.upsert.batch.size | 1000 | Batch size for upsert.
-[phoenix-table-name].disable.wal | false | It temporarily sets table attribute  `DISABLE_WAL = true`. May be used to improve the performance
-[phoenix-table-name].auto.flush | false | When WAL is disabled and if this value is true. Then flush memstore to hfile.
+[phoenix-table-name].disable.wal | false | Temporarily sets the table attribute  `DISABLE_WAL` to `true`. Sometimes used to improve performance
+[phoenix-table-name].auto.flush | false | When WAL is disabled and if this value is `true`, then MemStore is flushed to an HFile.
 
 ### Query Data
-You can use HiveQL for querying data on phoenix table. A single table query as fast as Phoenix CLI when `hive.fetch.task.conversion=more` and `hive.exec.parallel=true`.
+You can use HiveQL for querying data in a Phoenix table. A Hive query on a single table can be as fast as running the query in the Phoenix CLI with the following property settings: `hive.fetch.task.conversion=more` and `hive.exec.parallel=true`
 
-Parameters | Default Value | Description
+Parameter | Default Value | Description
 ------------ | ------------- | -------------
-hbase.scan.cache | 100 | Read row size for an unit request.
-hbase.scan.cacheblock | false | Whether or not cache block.
-split.by.stats | false | If true, mappers will use table statistics. One mapper per guide post.
-[hive-table-name].reducer.count | 1 | Number of reducer. In tez mode is affected only single-table query. See Limitations
-[phoenix-table-name].query.hint | | Hint for phoenix query (like NO_INDEX)
+hbase.scan.cache | 100 | Read row size for a unit request
+hbase.scan.cacheblock | false | Whether or not cache block
+split.by.stats | false | If true, mappers use table statistics. One mapper per guide post.
+[hive-table-name].reducer.count | 1 | Number of reducers. In Tez mode, this affects only single-table queries. See [Limitations](#Limitations).
+[phoenix-table-name].query.hint | | Hint for Phoenix query (for example, `NO_INDEX`)
 
-## Limitations
-1. Hive update/delete requires transaction manager support on Hive side as well as using transaction engine on Phoenix side. Futher Hive/Phoenix JIRAs will be listed in *Resource* section.
-2. Column mapping doesn't work correctly with mapping row key columns
-3. Currently MR and Tez jobs always have a single reducer.  
- 
-## Resources
+## Limitations <a id="Limitations"></a>
+* Hive update and delete operations require transaction manager support on both Hive and Phoenix sides. Related Hive and Phoenix JIRAs are listed in the [Resources](#Resources) section.
+* Column mapping does not work correctly with mapping row key columns.
+* MapReduce and Tez jobs always have a single reducer.  
+
+## Resources <a id="Resources"></a>
 * [PHOENIX-2743] (https://issues.apache.org/jira/browse/PHOENIX-2743) : Implementation, accepted by Apache Phoenix community. Original pull request contains modification for Hive classes.
-* [PHOENIX-331] (https://issues.apache.org/jira/browse/PHOENIX-331) : Another implementation with support of Hive 0.98. Outdated
+* [PHOENIX-331] (https://issues.apache.org/jira/browse/PHOENIX-331) : An outdated implementation with support of Hive 0.98.
