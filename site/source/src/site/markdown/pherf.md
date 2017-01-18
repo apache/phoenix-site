@@ -5,35 +5,24 @@
 
 Pherf is a standalone tool that can perform performance and functional testing through Phoenix. Pherf can be used both generate highly customized data sets and to measure performance of SQL against that data.
 
-## Build
-
-Building Pherf is done through Phoenix's normal build Maven process. Pherf can be built using two profiles.
-
-* Cluster ( **default** ) - This profile builds Pherf such that it can run along side an existing cluster. The dependencies are pulled from the HBase classpath.
-* Standalone              - This profile builds all of Pherf's dependencies into a single standalone jar. The deps will be pulled from the versions specified in Phoenix's pom.   
-
 ### Build all of Phoenix. This includes Pherf's default profile
 `mvn clean package -DskipTests`
 
-### Build Phoenix with Pherf's standalone profile
-`mvn clean package -P standalone -DskipTests`
+## Running
 
-## Installing
-When Pherf is built using the Maven commands specified above, it will produce a [zip](https://github.com/apache/phoenix/tree/master/phoenix-pherf) file in the module's target directory.
-
-1. Simply unpack this zip into the desired location.
-2. Edit the env.sh to include the required property values.
-3. `./pherf.sh -h`
-4. To test on a real cluster: `./pherf.sh -drop all -l -q -z localhost -schemaFile .*user_defined_schema.sql -scenarioFile .*user_defined_scenario.xml`
-5. That's it.
+* Edit the config/env.sh to include the required property values.
+* `bin/pherf-standalone.py -h`
+* To use libraries included with HBase deployment on a cluster: `bin/pherf-cluster.py -h`
+* Example: `bin/pherf-cluster.py -drop all -l -q -z [zookeeper] -schemaFile .*user_defined_schema.sql -scenarioFile .*user_defined_scenario.xml`
+HBASE_CONF_DIR, HBASE_DIR environment variable needs to be set to use against a cluster deployment
 
 ## Example run commands.
 
 ### List all scenario files available to run.
-$./pherf.sh -listFiles
+$./pherf-standalone.py -listFiles
 
 ### Drop all existing tables, load and query data specified in all scenario files.
-$./pherf.sh -drop all -l -q -z localhost 
+$./pherf-standalone.py -drop all -l -q -z localhost 
 
 ## Pherf arguments:
 
@@ -53,7 +42,7 @@ $./pherf.sh -drop all -l -q -z localhost
 - -rowCountOverride [number of rows] _Specify number of rows to be upserted rather than using row count specified in schema_ </ br>
 
 ## Adding Rules for Data Creation
-Review [test_scenario.xml](/src/test/resources/scenario/test_scenario.xml) 
+Review [test_scenario.xml](https://git-wip-us.apache.org/repos/asf?p=phoenix.git;a=blob;f=phoenix-pherf/src/test/resources/scenario/test_scenario.xml) 
 for syntax examples.<br />
 
 * Rules are defined as `<columns />` and are applied in the order they appear in file.
