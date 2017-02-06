@@ -8,7 +8,7 @@
 
 	<head>
 		<meta charset="UTF-8" />
-		<title>Source Repository | Apache Phoenix</title>
+		<title>Apache Kafka Plugin | Apache Phoenix</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="description" content="" />
 		<meta http-equiv="content-language" content="en" />
@@ -34,7 +34,7 @@
 
 	</head>
 
-	<body class="page-source project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
+	<body class="page-kafka project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
 
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
@@ -58,7 +58,7 @@
 									<li ><a href="team.html" title="Team">Team</a></li>
 									<li ><a href="resources.html" title="Presentations">Presentations</a></li>
 									<li ><a href="mailing_list.html" title="Mailing Lists">Mailing Lists</a></li>
-									<li class="active"><a href="" title="Source Repository">Source Repository</a></li>
+									<li ><a href="source.html" title="Source Repository">Source Repository</a></li>
 									<li ><a href="issues.html" title="Issue Tracking">Issue Tracking</a></li>
 									<li ><a href="download.html" title="Download">Download</a></li>
 									<li ><a href="installation.html" title="Installation">Installation</a></li>
@@ -87,7 +87,7 @@
 									<li ><a href="pig_integration.html" title="Apache Pig Integration">Apache Pig Integration</a></li>
 									<li ><a href="phoenix_mr.html" title="Map Reduce Integration">Map Reduce Integration</a></li>
 									<li ><a href="flume.html" title="Apache Flume Plugin">Apache Flume Plugin</a></li>
-									<li ><a href="kafka.html" title="Apache Kafka Plugin">Apache Kafka Plugin</a></li>
+									<li class="active"><a href="" title="Apache Kafka Plugin">Apache Kafka Plugin</a></li>
 								</ul>
 							</li>
 							<li class="dropdown">
@@ -155,25 +155,158 @@
 		<div class="span12">
 			<div class="body-content">
 <div class="page-header">
- <h1>Source Repository</h1>
+ <h1>Apache Kafka Plugin</h1>
 </div> 
-<p>Apache Phoenix source is available on Apache Git server:</p> 
-<p><a class="externalLink" href="https://git-wip-us.apache.org/repos/asf/phoenix.git">https://git-wip-us.apache.org/repos/asf/phoenix.git</a></p> 
+<p>The plugin enables us to reliably and efficiently stream large amounts of data/logs onto HBase using the Phoenix API. </p> 
+<p>Apache Kafka™ is a distributed, partitioned, replicated commit log service. It provides the functionality of a messaging system, but with a unique design.</p> 
+<p>So, at a high level, producers send messages over the network to the Kafka cluster which in turn serves them up to consumers like this:</p> 
+<h1><img src="https://kafka.apache.org/090/images/producer_consumer.png" alt="alt text" /></h1> 
+<p>We are providing <b>PhoenixConsumer</b> to recieves the messages from <b>Kafka Producer</b>.</p> 
 <div class="section"> 
  <div class="section"> 
-  <h3 id="Source_access">Source access</h3> 
-  <p>The source can be checked out from GIT with this command. See <a class="externalLink" href="http://git-scm.com/docs/git-clone">http://git-scm.com/docs/git-clone</a>:</p> 
-  <div> 
-   <pre><tt>$ git clone https://git-wip-us.apache.org/repos/asf/phoenix.git</tt></pre> 
+  <div class="section"> 
+   <h4 id="Prerequisites:">Prerequisites:</h4> 
+   <ul> 
+    <li>Phoenix 4.8.0+</li> 
+    <li>Kafka 0.9.0.0+</li> 
+   </ul> 
   </div> 
-  <hr /> 
-  <p>Mirror on Github: <a class="externalLink" href="https://github.com/apache/phoenix">https://github.com/apache/phoenix</a></p> 
-  <hr /> 
-  <p>Related: <a href="building.html">Using &gt; Building</a></p> 
- </div> 
- <div class="section"> 
-  <h3 id="Site_source_access">Site source access</h3> 
-  <p>Source for the Apache Phoenix website is kept in ASF SVN in <a class="externalLink" href="https://svn.apache.org/repos/asf/phoenix">https://svn.apache.org/repos/asf/phoenix</a></p> 
+  <div class="section"> 
+   <h4 id="Installation__Setup:">Installation &amp; Setup:</h4> 
+   <ol style="list-style-type: decimal"> 
+    <li>Download and build Phoenix 4.8.0+</li> 
+    <li>Follow the instructions as specified <a href="building.html">here</a> to build the project as the Kafka plugin</li> 
+   </ol> 
+  </div> 
+  <div class="section"> 
+   <h4 id="Phoenix_Consumer_for_RegexEventSerializer_Example:">Phoenix Consumer for RegexEventSerializer Example:</h4> 
+   <p>Create a <tt>kafka-consumer-regex.properties</tt> file with below properties</p> 
+   <div class="source"> 
+    <pre>serializer=regex
+serializer.rowkeyType=uuid
+serializer.regex=([^\,]*),([^\,]*),([^\,]*)
+serializer.columns=c1,c2,c3
+
+jdbcUrl=jdbc:phoenix:localhost
+table=SAMPLE1
+ddl=CREATE TABLE IF NOT EXISTS SAMPLE1(uid VARCHAR NOT NULL,c1 VARCHAR,c2 VARCHAR,c3 VARCHAR CONSTRAINT pk PRIMARY KEY(uid))
+
+bootstrap.servers=localhost:9092
+topics=topic1,topic2
+poll.timeout.ms=100
+</pre> 
+   </div> 
+  </div> 
+  <div class="section"> 
+   <h4 id="Phoenix_Consumer_for_JsonEventSerializer_Example:">Phoenix Consumer for JsonEventSerializer Example:</h4> 
+   <p>Create a <tt>kafka-consumer-json.properties</tt> file with below properties</p> 
+   <div class="source"> 
+    <pre>serializer=json
+serializer.rowkeyType=uuid
+serializer.columns=c1,c2,c3
+
+jdbcUrl=jdbc:phoenix:localhost
+table=SAMPLE2
+ddl=CREATE TABLE IF NOT EXISTS SAMPLE2(uid VARCHAR NOT NULL,c1 VARCHAR,c2 VARCHAR,c3 VARCHAR CONSTRAINT pk PRIMARY KEY(uid))
+
+bootstrap.servers=localhost:9092
+topics=topic1,topic2
+poll.timeout.ms=100
+</pre> 
+   </div> 
+  </div> 
+  <div class="section"> 
+   <h4 id="Phoenix_Consumer_Execution_Procedure:">Phoenix Consumer Execution Procedure:</h4> 
+   <p>Start the Kakfa Producer then send some messages</p> 
+   <div class="source"> 
+    <pre>&gt; bin/kafka-console-producer.sh --broker-list localhost:9092 --topic topic1
+</pre> 
+   </div> 
+   <p>Learn more about Apache Kafka <a class="externalLink" href="https://kafka.apache.org/documentation.html">here</a></p> 
+   <p>Start the <b>PhoenixConsumer</b> using below command</p> 
+   <div class="source"> 
+    <pre>HADOOP_CLASSPATH=$(hbase classpath):/path/to/hbase/conf hadoop jar phoenix-kafka-&lt;version&gt;-minimal.jar org.apache.phoenix.kafka.consumer.PhoenixConsumerTool --file /data/kafka-consumer.properties
+</pre> 
+   </div> 
+   <p>The input file must be present on HDFS (not the local filesystem where the command is being run).</p> 
+  </div> 
+  <div class="section"> 
+   <h4 id="Configuration:">Configuration:</h4> 
+   <table border="0" class="bodyTable table table-striped table-hover"> 
+    <thead> 
+     <tr class="a"> 
+      <th>Property Name </th> 
+      <th>Default</th> 
+      <th>Description</th> 
+     </tr> 
+    </thead> 
+    <tbody> 
+     <tr class="b"> 
+      <td>bootstrap.servers </td> 
+      <td> </td> 
+      <td>List of Kafka servers used to bootstrap connections to Kafka. This list should be in the form host1:port1,host2:port2,…</td> 
+     </tr> 
+     <tr class="a"> 
+      <td>topics </td> 
+      <td> </td> 
+      <td>List of topics to use as input for this connector. This list should be in the form topic1,topic2,…</td> 
+     </tr> 
+     <tr class="b"> 
+      <td>poll.timeout.ms </td> 
+      <td>100 </td> 
+      <td>Default poll timeout in millisec</td> 
+     </tr> 
+     <tr class="a"> 
+      <td>batchSize </td> 
+      <td>100 </td> 
+      <td>Default number of events per transaction</td> 
+     </tr> 
+     <tr class="b"> 
+      <td>zookeeperQuorum </td> 
+      <td> </td> 
+      <td>Zookeeper quorum of the HBase cluster</td> 
+     </tr> 
+     <tr class="a"> 
+      <td>table </td> 
+      <td> </td> 
+      <td>The name of the table in HBase to write to.</td> 
+     </tr> 
+     <tr class="b"> 
+      <td>ddl </td> 
+      <td> </td> 
+      <td>The CREATE TABLE query for the HBase table where the events will be upserted to. If specified, the query will be executed. Recommended to include the IF NOT EXISTS clause in the ddl.</td> 
+     </tr> 
+     <tr class="a"> 
+      <td>serializer </td> 
+      <td> </td> 
+      <td>Event serializers for processing the Kafka Message.This Plugin supports all Phoenix Flume Event Serializers. Like regex, json</td> 
+     </tr> 
+     <tr class="b"> 
+      <td>serializer.regex </td> 
+      <td>(.*) </td> 
+      <td>The regular expression for parsing the message.</td> 
+     </tr> 
+     <tr class="a"> 
+      <td>serializer.columns </td> 
+      <td> </td> 
+      <td>The columns that will be extracted from the Flume event for inserting into HBase.</td> 
+     </tr> 
+     <tr class="b"> 
+      <td>serializer.headers </td> 
+      <td> </td> 
+      <td>Headers of the Flume Events that go as part of the UPSERT query. The data type for these columns are VARCHAR by default.</td> 
+     </tr> 
+     <tr class="a"> 
+      <td>serializer.rowkeyType </td> 
+      <td> </td> 
+      <td>A custom row key generator . Can be one of timestamp,date,uuid,random and nanotimestamp. This should be configured in cases where we need a custom row key value to be auto generated and set for the primary key column.</td> 
+     </tr> 
+    </tbody> 
+   </table> 
+   <p><b>Note:</b> This Plugin supports all Phoenix Flume Event Serializers.</p> 
+   <p><b>RegexEventSerializer</b> which primarily breaks the Kafka Message based on the regex specified in the configuration file.</p> 
+   <p><b>JsonEventSerializer</b> which primarily breaks the Kafka Message based on the schema specified in the configuration file.</p> 
+  </div> 
  </div> 
 </div>
 			</div>
@@ -215,8 +348,8 @@
 						<li >
 							<a href="mailing_list.html" title="Mailing Lists">Mailing Lists</a>
 						</li>
-						<li class="active">
-							<a href="#" title="Source Repository">Source Repository</a>
+						<li >
+							<a href="source.html" title="Source Repository">Source Repository</a>
 						</li>
 						<li >
 							<a href="issues.html" title="Issue Tracking">Issue Tracking</a>
@@ -292,8 +425,8 @@
 						<li >
 							<a href="flume.html" title="Apache Flume Plugin">Apache Flume Plugin</a>
 						</li>
-						<li >
-							<a href="kafka.html" title="Apache Kafka Plugin">Apache Kafka Plugin</a>
+						<li class="active">
+							<a href="#" title="Apache Kafka Plugin">Apache Kafka Plugin</a>
 						</li>
 					</ul>
 				</div>

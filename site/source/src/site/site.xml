@@ -89,6 +89,7 @@
             <item href="pig_integration.html" name="Apache Pig Integration"/>
             <item href="phoenix_mr.html" name="Map Reduce Integration"/>
             <item href="flume.html" name="Apache Flume Plugin"/>
+            <item href="kafka.html" name="Apache Kafka Plugin"/>
         </menu>
         <menu name="Addons">
             <item href="http://docs.aws.amazon.com/ElasticMapReduce/latest/ReleaseGuide/emr-phoenix.html" name="Phoenix on Amazon EMR"/>
