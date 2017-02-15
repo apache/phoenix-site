@@ -26,8 +26,8 @@ The choice of which method to use to access Phoenix comes down to each specific 
 
 1. To ensure that all requisite Phoenix / HBase platform dependencies are available on the classpath 
 for the Spark executors and drivers, set both '_spark.executor.extraClassPath_' and 
-'_spark.driver.extraClassPath_' in spark-defaults.conf to include the 'phoenix-_`<version>`_-client-**spark**.jar'
-Note that for Phoenix versions `<` 4.7.0, you must use the 'phoenix-_`<version>`_-client.jar'
+'_spark.driver.extraClassPath_' in spark-defaults.conf to include the 'phoenix-_`<version>`_-client.jar'
+Note that for Phoenix versions 4.7 and 4.8 you must use the 'phoenix-_`<version>`_-client-spark.jar'
 2. Add the following dependency to your build:
 
 ```
