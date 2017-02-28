@@ -34,6 +34,7 @@ Thomas D'Silva | Salesforce | tdsilva@apache.org | PMC
 Cheng Lei | Sogou | chenglei@apache.org | Committer
 Cody Marcel | Salesforce | codymarcel@apache.org | Committer
 Dumindu Buddhika | University of Moratuwa | duminduk@apache.org | Committer
+Geoffrey Jacoby | Salesforce | gjacoby@apache.org | Committer
 Jan Fernando | Salesforce | jfernando@apache.org | Committer
 Kevin Liew | Simba Technologies | kliew@apache.org | Committer
 Sergey Soldatov | Hortonworks | ssa@apache.org | Committer
