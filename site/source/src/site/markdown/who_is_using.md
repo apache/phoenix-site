@@ -299,6 +299,17 @@ it provides the scalability of HBase and the expressiveness of SQL.<br/><br/>
 Kristoffer Sjögren, System Developer
 <br/></td></tr>
 
+<tr><td>
+<br/>
+<img src="images/using/sogou.png"/>
+<br/><br/>
+
+We adopted Apache Phoenix since 2015, mainly for two scenarios:
+1.Business Intelligence: We use HBase+Phoenix to store billion records of our Ad Exchange,  thanks to the SQL abstraction and secondary indexes of Phoenix, we can provide multidimensional statistical and analytical  reports to our advertisers, empowering them with thorough insight to make the intelligent decisions maximizing their investment revenue.<br/><br/>
+2.Technology Infrastructure： Our Monitoring Platform and  Distributed Service Tracing Platform  uses HBase+Phoenix  to continuously collect various metrics and logs(about 100k records per second at present) ,and with the high performance of Phoenix we can easily generate statistics for our system operation health measurement and service dependency analysis.<br/><br/>
+
+Cheng Lei,  Infrastructure Software Enginner<br/></td></tr>
+
 </table>
 <!--End Second Column-->
 </td>
