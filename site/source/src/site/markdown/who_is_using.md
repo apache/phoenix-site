@@ -10,6 +10,24 @@
 <tr></tr>
 
 <tr><td>
+<img src="images/using/sf.png"/>
+<br/><br/>
+In our Force.com platform, we rely on Apache Phoenix to run
+interactive queries against big data residing in HBase leveraging
+<br/><br/>
+<ul>
+<li> multi-tenant tables for customization and scale out across our
+diverse customer schemas</li>
+<li> aggregation to build roll-up summaries</li>
+<li> secondary indexes to improve performance</li>
+</ul>
+<blockquote>"Apache Phoenix is the foundation of our big data stack, allowing us
+to run interactive queries against HBase data in a performant manner."</blockquote>
+<br/>
+Steven Tamm, CTO
+</td></tr>
+
+<tr><td>
 <img src="images/using/bb.png"/>
 <br/><br/>
 At Bloomberg, patterns of access to financial datasets are diverse and complex. HBase provides the scalability and strong consistency that our use cases demand. However, we need more than a key-value store. We need ANSI SQL to reduce the barriers to adoption, we need features such as secondary indices to support lookups along multiple axes and cursors to handle UI pagination. Apache Phoenix provides a rich set of capabilities above HBase that makes it a critical piece of our data platform.
@@ -31,24 +49,6 @@ store.
 reduced response time for loading hundreds of matches on a page to below 200ms."</blockquote>
 <br/>
 Vijay Vangapandu, Principal Software Engineer
-</td></tr>
-
-<tr><td>
-<img src="images/using/sf.png"/>
-<br/><br/>
-In our Force.com platform, we rely on Apache Phoenix to run
-interactive queries against big data residing in HBase leveraging
-<br/><br/>
-<ul>
-<li> multi-tenant tables for customization and scale out across our
-diverse customer schemas</li>
-<li> aggregation to build roll-up summaries</li>
-<li> secondary indexes to improve performance</li>
-</ul>
-<blockquote>"Apache Phoenix is the foundation of our big data stack, allowing us
-to run interactive queries against HBase data in a performant manner."</blockquote>
-<br/>
-Steven Tamm, CTO
 </td></tr>
 
 <tr><td>
@@ -141,6 +141,17 @@ Sudhir Kulkarni, VP of Data and Analytics
 <br/>
 </td></tr>
 
+<tr><td>
+<img src="images/using/dp.png"/>
+<br/><br/>
+
+At Delta Projects we use Phoenix for storing data as a basis for
+measuring activities and generating reports. We chose Phoenix because
+it provides the scalability of HBase and the expressiveness of SQL.<br/><br/>
+
+Kristoffer Sjögren, System Developer
+<br/></td></tr>
+
 </table>
 <!--End First Column-->
 </td>
@@ -150,6 +161,21 @@ Sudhir Kulkarni, VP of Data and Analytics
 <tr></tr>
 
 <tr style="display: none;"><td></td></tr>
+
+<tr><td>
+<br/>
+<img src="images/using/sogou.png"/>
+<br/><br/>
+
+We adopted Apache Phoenix since 2015, mainly for two scenarios:
+<br/>
+<br/>
+<ol>
+<li>Business Intelligence: We use HBase+Phoenix to store billion records of our Ad Exchange,  thanks to the SQL abstraction and secondary indexes of Phoenix, we can provide multidimensional statistical and analytical  reports to our advertisers, empowering them with thorough insight to make the intelligent decisions maximizing their investment revenue.</li>
+<li>Technology Infrastructure： Our Monitoring Platform and  Distributed Service Tracing Platform  uses HBase+Phoenix  to continuously collect various metrics and logs(about 100k records per second at present) ,and with the high performance of Phoenix we can easily generate statistics for our system operation health measurement and service dependency analysis.</li>
+</ol>
+
+Cheng Lei,  Infrastructure Software Enginner<br/></td></tr>
 
 <tr><td><br/>
 <img src="images/using/homeaway.png"/>
@@ -288,27 +314,6 @@ aggregations."</blockquote><br/>
 Martin Homolka, CTO
 <br/></td></tr>
 
-<tr><td>
-<img src="images/using/dp.png"/>
-<br/><br/>
-
-At Delta Projects we use Phoenix for storing data as a basis for
-measuring activities and generating reports. We chose Phoenix because
-it provides the scalability of HBase and the expressiveness of SQL.<br/><br/>
-
-Kristoffer Sjögren, System Developer
-<br/></td></tr>
-
-<tr><td>
-<br/>
-<img src="images/using/sogou.png"/>
-<br/><br/>
-
-We adopted Apache Phoenix since 2015, mainly for two scenarios:
-1.Business Intelligence: We use HBase+Phoenix to store billion records of our Ad Exchange,  thanks to the SQL abstraction and secondary indexes of Phoenix, we can provide multidimensional statistical and analytical  reports to our advertisers, empowering them with thorough insight to make the intelligent decisions maximizing their investment revenue.<br/><br/>
-2.Technology Infrastructure： Our Monitoring Platform and  Distributed Service Tracing Platform  uses HBase+Phoenix  to continuously collect various metrics and logs(about 100k records per second at present) ,and with the high performance of Phoenix we can easily generate statistics for our system operation health measurement and service dependency analysis.<br/><br/>
-
-Cheng Lei,  Infrastructure Software Enginner<br/></td></tr>
 
 </table>
 <!--End Second Column-->
