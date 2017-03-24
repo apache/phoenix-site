@@ -13,13 +13,13 @@ We are providing **PhoenixConsumer** to recieves the messages from **Kafka Produ
 
 #### Prerequisites:
 
-* Phoenix 4.8.0+
+* Phoenix 4.10.0+
 * Kafka 0.9.0.0+
 
 #### Installation & Setup:
 
-1. Download and build Phoenix 4.8.0+
-2. Follow the instructions as specified [here](building.html) to build the project as the Kafka plugin
+Use our binary artifacts for Phoenix 4.10.0+ directly or download and build Phoenix yourself (see
+instructions [here](building.html))
 
 #### Phoenix Consumer for RegexEventSerializer Example:
 
