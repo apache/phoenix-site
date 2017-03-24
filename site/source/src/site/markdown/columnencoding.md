@@ -1,6 +1,11 @@
-#Column Mapping and Immutable Data Encoding
+#Storage Formats
 
-As part of Phoenix 4.10, we have released a new feature that provides a layer of indirection between phoenix column names and the corresponding hbase column qualifiers. We have also introduced a new encoding scheme for immutable tables. For more details on benefits of using column mapping and immutable data encoding, go to this [blog](https://blogs.apache.org/phoenix/entry/column-mapping-and-immutable-data).
+As part of Phoenix 4.10, we have reduced the on disk storage to improve overall performance by implementing the following enhancements:
+
+* Introduce a layer of indirection between Phoenix column names and the corresponding HBase column qualifiers.
+* Support a new encoding scheme for immutable tables that packs all values into a single cell per column family
+
+For more details on column mapping and immutable data encoding, see [this blog](https://blogs.apache.org/phoenix/entry/column-mapping-and-immutable-data).
 
 
 ###How to use column mapping?

@@ -101,6 +101,7 @@
             <item href="udf.html" name="User-defined Functions"/>
             <item href="http:divider" name=""/>
             <item href="secondary_indexing.html" name="Secondary Indexes"/>
+            <item href="columnencoding.html" name="Storage Formats"/>
             <item href="atomic_upsert.html" name="Atomic Upsert"/>
             <item href="namspace_mapping.html" name="Namespace Mapping"/>
             <item href="update_statistics.html" name="Statistics Collection"/>
@@ -117,7 +118,6 @@
             <item href="server.html" name="Query Server"/>
             <item href="tracing.html" name="Tracing"/>
             <item href="metrics.html" name="Metrics"/>
-            <item href="columnencoding.html" name="Column Mapping and Immutable Encoding"/>
         </menu>
         <menu name="Reference">
             <item href="language/index.html" name="Grammar"/>

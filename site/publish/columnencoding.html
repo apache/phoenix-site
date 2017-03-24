@@ -8,7 +8,7 @@
 
 	<head>
 		<meta charset="UTF-8" />
-		<title>Column Mapping and Immutable Data Encoding | Apache Phoenix</title>
+		<title>Storage Formats | Apache Phoenix</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="description" content="" />
 		<meta http-equiv="content-language" content="en" />
@@ -105,6 +105,7 @@
 									<li ><a href="udf.html" title="User-defined Functions">User-defined Functions</a></li>
 									<li class="divider"/>
 									<li ><a href="secondary_indexing.html" title="Secondary Indexes">Secondary Indexes</a></li>
+									<li class="active"><a href="" title="Storage Formats">Storage Formats</a></li>
 									<li ><a href="atomic_upsert.html" title="Atomic Upsert">Atomic Upsert</a></li>
 									<li ><a href="namspace_mapping.html" title="Namespace Mapping">Namespace Mapping</a></li>
 									<li ><a href="update_statistics.html" title="Statistics Collection">Statistics Collection</a></li>
@@ -121,7 +122,6 @@
 									<li ><a href="server.html" title="Query Server">Query Server</a></li>
 									<li ><a href="tracing.html" title="Tracing">Tracing</a></li>
 									<li ><a href="metrics.html" title="Metrics">Metrics</a></li>
-									<li class="active"><a href="" title="Column Mapping and Immutable Encoding">Column Mapping and Immutable Encoding</a></li>
 								</ul>
 							</li>
 							<li class="dropdown">
@@ -156,9 +156,14 @@
 		<div class="span12">
 			<div class="body-content">
 <div class="page-header">
- <h1>Column Mapping and Immutable Data Encoding</h1>
+ <h1>Storage Formats</h1>
 </div> 
-<p>As part of Phoenix 4.10, we have released a new feature that provides a layer of indirection between phoenix column names and the corresponding hbase column qualifiers. We have also introduced a new encoding scheme for immutable tables. For more details on benefits of using column mapping and immutable data encoding, go to this <a class="externalLink" href="https://blogs.apache.org/phoenix/entry/column-mapping-and-immutable-data">blog</a>.</p> 
+<p>As part of Phoenix 4.10, we have reduced the on disk storage to improve overall performance by implementing the following enhancements:</p> 
+<ul> 
+ <li>Introduce a layer of indirection between Phoenix column names and the corresponding HBase column qualifiers.</li> 
+ <li>Support a new encoding scheme for immutable tables that packs all values into a single cell per column family</li> 
+</ul> 
+<p>For more details on column mapping and immutable data encoding, see <a class="externalLink" href="https://blogs.apache.org/phoenix/entry/column-mapping-and-immutable-data">this blog</a>.</p> 
 <div class="section"> 
  <div class="section"> 
   <h3 id="How_to_use_column_mapping">How to use column mapping?</h3> 
@@ -415,6 +420,9 @@ COLUMN_ENCODED_BYTES = 1;
 						<li >
 							<a href="secondary_indexing.html" title="Secondary Indexes">Secondary Indexes</a>
 						</li>
+						<li class="active">
+							<a href="#" title="Storage Formats">Storage Formats</a>
+						</li>
 						<li >
 							<a href="atomic_upsert.html" title="Atomic Upsert">Atomic Upsert</a>
 						</li>
@@ -462,9 +470,6 @@ COLUMN_ENCODED_BYTES = 1;
 						</li>
 						<li >
 							<a href="metrics.html" title="Metrics">Metrics</a>
-						</li>
-						<li class="active">
-							<a href="#" title="Column Mapping and Immutable Encoding">Column Mapping and Immutable Encoding</a>
 						</li>
 					</ul>
 				</div>
