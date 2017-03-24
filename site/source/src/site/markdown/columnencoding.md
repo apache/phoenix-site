@@ -1,6 +1,6 @@
 #Storage Formats
 
-As part of Phoenix 4.10, we have reduced the on disk storage to improve overall performance by implementing the following enhancements:
+As part of Phoenix 4.10, we have reduced the on disk storage size to improve overall performance by implementing the following enhancements:
 
 * Introduce a layer of indirection between Phoenix column names and the corresponding HBase column qualifiers.
 * Support a new encoding scheme for immutable tables that packs all values into a single cell per column family
