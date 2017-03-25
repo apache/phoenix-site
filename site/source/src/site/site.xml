@@ -79,7 +79,8 @@
             <item href="faq.html" name="F.A.Q."/>
             <item href="Phoenix-in-15-minutes-or-less.html" name="Quick Start"/>
             <item href="building.html" name="Building"/>
-            <item href="tuning.html" name="Tuning"/>
+            <item href="tuning_guide.html" name="Tuning"/>
+            <item href="tuning.html" name="Configuration"/>
             <item href="upgrading.html" name="Backward Compatibility"/>
             <item href="release_notes.html" name="Release Notes"/>
             <item href="pherf.html" name="Performance Testing"/>

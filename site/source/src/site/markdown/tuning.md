@@ -1,4 +1,4 @@
-# Configuration and Tuning
+# Configuration
 
 Phoenix provides many different knobs and dials to configure and tune the system to run more optimally on your cluster. The configuration is done through a series of Phoenix-specific properties specified both on client and server-side <code>hbase-site.xml</code> files. In addition to these properties, there are of course all the <a href="http://hbase.apache.org/book/config.files.html" target="_blank">HBase configuration</a> properties with the most important ones documented <a href="http://hbase.apache.org/book/important_configurations.html" target="_blank">here</a>.<br/>
 <br/>
