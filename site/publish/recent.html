@@ -161,6 +161,7 @@
 </div> 
 <p>As items are implemented from our road map, they are moved here to track the progress we’ve made:</p> 
 <ol style="list-style-type: decimal"> 
+ <li><b><a class="externalLink" href="https://phoenix.apache.org/columnencoding.html">Reduce on disk storage</a></b>. Reduce on disk storage to improve performance by a) packing all values into a single cell per column family and b) provide an indirection between the column name and the column qualifier. <b>Available in our 4.10 release</b></li> 
  <li><b><a class="externalLink" href="https://phoenix.apache.org/atomic_upsert.html">Atomic update</a></b>. Atomic update is now possible in the UPSERT VALUES statement in support of counters and other use cases. <b>Available in our 4.9 release</b></li> 
  <li><b><a class="externalLink" href="https://phoenix.apache.org/language/index.html#column_def">DEFAULT declaration</a></b>. When defining a column it is now possible to provide a DEFAULT declaration for the initial value. <b>Available in our 4.9 release</b></li> 
  <li><b><a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-1311">Namespace Mapping</a></b>. Maps Phoenix schema to HBase namespace to improve isolation between different schemas. <b>Available in our 4.8 release</b></li> 

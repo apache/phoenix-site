@@ -2,8 +2,9 @@
 
 As items are implemented from our road map, they are moved here to track the progress we've made:
 
-1. **[Atomic update](https://phoenix.apache.org/atomic_upsert.html)**. Atomic update is now possible in the UPSERT VALUES statement in support of counters and other use cases. **Available in our 4.9  release**
-6. **[DEFAULT declaration](https://phoenix.apache.org/language/index.html#column_def)**. When defining a column it is now possible to provide a DEFAULT declaration for the initial value. **Available in our 4.9  release**
+1. **[Reduce on disk storage](https://phoenix.apache.org/columnencoding.html)**. Reduce on disk storage to improve performance by a) packing all values into a single cell per column family and b) provide an indirection between the column name and the column qualifier. **Available in our 4.10 release**
+1. **[Atomic update](https://phoenix.apache.org/atomic_upsert.html)**. Atomic update is now possible in the UPSERT VALUES statement in support of counters and other use cases. **Available in our 4.9 release**
+6. **[DEFAULT declaration](https://phoenix.apache.org/language/index.html#column_def)**. When defining a column it is now possible to provide a DEFAULT declaration for the initial value. **Available in our 4.9 release**
 1. **[Namespace Mapping](https://issues.apache.org/jira/browse/PHOENIX-1311)**. Maps Phoenix schema to HBase namespace to improve isolation between different schemas. **Available in our 4.8  release**
 1. **[Hive Integration](https://issues.apache.org/jira/browse/PHOENIX-2743)**. Enables Hive to be used with Phoenix in support of joining huge tables to other huge tables. **Available in our 4.8  release**
 1. **[Local Index Improvements](https://issues.apache.org/jira/browse/PHOENIX-1734)**. Reworked local index implementation to guarantee colocation of table and index data and use supported HBase APIs for better maintainability. **Available in our 4.8  release**
