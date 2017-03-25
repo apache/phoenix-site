@@ -45,7 +45,7 @@
 
 <span id="alerts" style="background-color:#ffc; text-align: center;display: block;padding:10px; border-bottom: solid 1px #cc9">
 <strong><a href="news.html">News</a>:</strong>
-&nbsp;Phoenix 4.8 has been [released](https://blogs.apache.org/phoenix/entry/announcing_phoenix_4_8_released) 
+&nbsp;Phoenix 4.10 has been [released](https://blogs.apache.org/phoenix/entry/announcing-phoenix-4-10-released) 
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
 <a href='https://twitter.com/ApachePhoenix'><img title="Follow Apache Phoenix on Twitter" src="images/follow.png"/></a></span>
 ## Overview

@@ -1,6 +1,10 @@
 # Apache Phoenix News
 <br/>
 <hr/>
+#### [Announcing Phoenix 4.10 released](https://blogs.apache.org/phoenix/entry/announcing-phoenix-4-10-released) (March 23, 2017)
+<hr/>
+#### [Announcing Phoenix 4.9 released](https://blogs.apache.org/phoenix/entry/announcing_phoenix_4_9_released) (December 1, 2016)
+<hr/>
 #### [Announcing Phoenix 4.8 released](https://blogs.apache.org/phoenix/entry/announcing_phoenix_4_8_released) (August 10, 2016)
 <hr/>
 #### [Announcing support for latest Phoenix in Amazon EMR](http://docs.aws.amazon.com/ElasticMapReduce/latest/ReleaseGuide/emr-phoenix.html) (June 2, 2016)
