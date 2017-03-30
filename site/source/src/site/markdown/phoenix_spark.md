@@ -5,7 +5,7 @@ as RDDs or DataFrames, and enables persisting them back to Phoenix.
 
 #### Prerequisites
 
-* Phoenix 4.4.0+
+* Phoenix 4.4.0+ 
 * Spark 1.3.1+ (prebuilt with Hadoop 2.4 recommended)
 
 #### Why not JDBC?
@@ -24,11 +24,13 @@ The choice of which method to use to access Phoenix comes down to each specific 
 
 #### Spark setup
 
-1. To ensure that all requisite Phoenix / HBase platform dependencies are available on the classpath 
+* To ensure that all requisite Phoenix / HBase platform dependencies are available on the classpath 
 for the Spark executors and drivers, set both '_spark.executor.extraClassPath_' and 
 '_spark.driver.extraClassPath_' in spark-defaults.conf to include the 'phoenix-_`<version>`_-client.jar'
-Note that for Phoenix versions 4.7 and 4.8 you must use the 'phoenix-_`<version>`_-client-spark.jar'
-2. Add the following dependency to your build:
+   
+* Note that for Phoenix versions 4.7 and 4.8 you must use the 'phoenix-_`<version>`_-client-spark.jar'. As of Phoenix 4.10, the 'phoenix-_`<version>`_-client.jar' is compiled against Spark 2.x. If compability with Spark 1.x if needed, you must compile Phoenix with the `spark16` maven profile.   
+   
+* To help your IDE, you can add the following _provided_ dependency to your build:
 
 ```
 <dependency>
