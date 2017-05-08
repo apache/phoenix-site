@@ -1,6 +1,8 @@
 # Apache Phoenix News
 <br/>
 <hr/>
+#### [RSVP for <strong>PhoenixCon 2017</strong>](https://www.eventbrite.com/e/phoenixcon-2017-tickets-32872245772) before space runs out (June 13, 2017)
+<hr/>
 #### [Announcing Phoenix 4.10 released](https://blogs.apache.org/phoenix/entry/announcing-phoenix-4-10-released) (March 23, 2017)
 <hr/>
 #### [Announcing Phoenix 4.9 released](https://blogs.apache.org/phoenix/entry/announcing_phoenix_4_9_released) (December 1, 2016)

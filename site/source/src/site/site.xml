@@ -57,8 +57,9 @@
         <menu name="About">
             <item href="index.html" name="Overview"/>
             <item href="who_is_using.html" name="Who is Using"/>
-            <item href="recent.html" name="New Features"/>
+            <item href="recent.html" name="Recent Improvements"/>
             <item href="roadmap.html" name="Roadmap"/>
+            <item href="news.html" name="News"/>
             <item href="performance.html" name="Performance"/>
             <item href="team.html" name="Team"/>
             <item href="resources.html" name="Presentations"/>
