@@ -212,7 +212,7 @@ ALTER TABLE my_table SET IMMUTABLE_ROWS=true,DISABLE_WAL=true;
 "
 
 "Commands","CREATE INDEX","
-CREATE INDEX [IF NOT EXISTS] indexName
+CREATE [LOCAL] INDEX [IF NOT EXISTS] indexName
 ON tableRef ( expression [ASC | DESC] [,...] )
 [ INCLUDE ( columnRef [,...] ) ]
 [ ASYNC ]
