@@ -1944,12 +1944,28 @@ Returns the week of the specified date.
 WEEK(TO_TIME('2010-6-15'))
 "
 
+"Functions (Time and Date)","DAYOFYEAR","
+DAYOFYEAR(dateTerm|timeTerm|timestampTerm)
+","
+Returns the day of the year of the specified date.
+","
+DAYOFYEAR(TO_DATE('2004-01-18 10:00:10'))
+"
+
 "Functions (Time and Date)","DAYOFMONTH","
 DAYOFMONTH(dateTerm|timeTerm|timestampTerm)
 ","
 Returns the day of the month of the specified date.
 ","
 DAYOFMONTH(TO_DATE('2004-01-18 10:00:10'))
+"
+
+"Functions (Time and Date)","DAYOFWEEK","
+DAYOFWEEK(dateTerm|timeTerm|timestampTerm)
+","
+Returns the day of the week of the specified date.
+","
+DAYOFWEEK(TO_DATE('2004-01-18 10:00:10'))
 "
 
 "Functions (Time and Date)","HOUR","
