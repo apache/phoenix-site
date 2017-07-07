@@ -1459,6 +1459,22 @@ The last value in each distinct group ordered according to the ORDER BY specific
 LAST_VALUE( name ) WITHIN GROUP (ORDER BY salary DESC)
 "
 
+"Functions (Aggregate)","FIRST_VALUES","
+FIRST_VALUES( { expression , numeric } ) WITHIN GROUP (ORDER BY { expression } { ASC | DESC } )
+","
+Returns an array of at most the given numeric size of the first values in each distinct group ordered according to the ORDER BY specification.
+","
+FIRST_VALUES( name, 3 ) WITHIN GROUP (ORDER BY salary DESC)
+"
+
+"Functions (Aggregate)","LAST_VALUES","
+LAST_VALUES( { expression , numeric } ) WITHIN GROUP (ORDER BY { expression } { ASC | DESC } )
+","
+Returns an array of at most the given numeric size of the last values in each distinct group ordered according to the ORDER BY specification.
+","
+LAST_VALUES( name, 3 ) WITHIN GROUP (ORDER BY salary DESC)
+"
+
 "Functions (Aggregate)","NTH_VALUE","
 NTH_VALUE( { expression, nthNumeric } ) WITHIN GROUP (ORDER BY { expression } { ASC | DESC } )
 ","

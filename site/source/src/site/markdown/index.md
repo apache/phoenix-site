@@ -45,7 +45,7 @@
 
 <span id="alerts" style="background-color:#ffc; text-align: center;display: block;padding:10px; border-bottom: solid 1px #cc9">
 <strong><a href="news.html">News</a>:</strong>
-&nbsp;<strong>RSVP</strong> for [<span style="color:red;text-decoration:underline"><strong>PhoenixCon 2017</strong></span>](https://www.eventbrite.com/e/phoenixcon-2017-tickets-32872245772), Tue June 13th, before space runs out!&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+&nbsp;<strong>Phoenix 4.11.0</strong> has been released and is available for download <a href='download.html'><span style="color:red;text-decoration:underline"><b>here</b></span></a>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
 <a href='https://twitter.com/ApachePhoenix'><img title="Follow Apache Phoenix on Twitter" src="images/follow.png"/></a></span>
 ## Overview
 Apache Phoenix enables OLTP and operational analytics in Hadoop for low latency applications by combining the best of both worlds:
