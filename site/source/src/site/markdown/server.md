@@ -97,6 +97,27 @@ API -- there is no wire API defined in Phoenix itself.
 For more information in building clients in other languages that work with
 Avatica, please feel free to reach out to the [Apache Calcite dev mailing list](mailto:dev@calcite.apache.org).
 
+## Impersonation
+
+By default, the Phoenix Query Server executes queries on behalf of the end-user. HBase permissions
+are enforced given the end-user, not the Phoenix Query Server's identity. In some cases, it may
+be desirable to execute the query as some other user -- this is referred to as "impersonation".
+This can enable workflows where a trusted user has the privilege to run queries for other users.
+
+This can be enabled by setting the configuration property `phoenix.queryserver.withRemoteUserExtractor`
+to `true`. The URL of the Query Server can be modified to include the required request parameter.
+For example, to let "bob" to run a query as "alice", the following JDBC URL could be used:
+
+    jdbc:phoenix:thin:url=http://localhost:8765?doAs=alice
+
+The standard Hadoop "proxyuser" configuration keys are checked to validate if the "real" remote user
+is allowed to impersonate the "doAs" user. See the [Hadoop documentation](https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/Superusers.html)
+for more information on how to configure these rules.
+
+As a word of warning: there is no end-to-end test coverage for the HBase 0.98 and 1.1 Phoenix releases
+because of missing test-related code in those HBase releases. While we expect no issues on these
+Phoenix release lines, we recommend additional testing by the user to verify that there are no issues.
+
 ## Configuration
 
 Server components are spread across a number of java packages, so effective
@@ -269,6 +290,28 @@ configuration.
         provided in avatica.statementcache.expiryunit. Default is minutes.
       </td>
       <td>MINUTES</td>
+    </tr>
+    <tr><td colspan="3">&nbsp;</td></tr>
+    <tr>
+      <td colspan="3"><b>Configurations relating to impersonation.</b></td>
+    </tr>
+    <tr><td><b>Property</b></td><td><b>Description</b></td><td><b>Default</b></td></tr>
+    <tr>
+      <td><small>phoenix.queryserver.withRemoteUserExtractor</small></td>
+      <td style="text-align: left;">
+        Boolean which controls if a remote user to impersonate should be
+        extracted from the HTTP request parameter made by that user instead of the
+        HTTP-authenticated user name (which is the default).
+      </td>
+      <td>false</td>
+    </tr>
+    <tr>
+      <td><small>phoenix.queryserver.remoteUserExtractor.param</small></td>
+      <td style="text-align: left;">
+        The name of the HTTP request parameter to use to extract the user name
+        to execute the query as.
+      </td>
+      <td>doAs</td>
     </tr>
   </tbody>
 </table>
