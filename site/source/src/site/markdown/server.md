@@ -59,7 +59,7 @@ driver is provided in the standalone
 
 The JDBC connection string is composed as follows:
 
-    jdbc:phoenix:thin:url=<scheme>://<server-hostname>:<port>[...]
+    jdbc:phoenix:thin:url=<scheme>://<server-hostname>:<port>[;option=value...]
 
 `<scheme>` specifies the transport protocol used when communicating with the
 server. The only supported transport at this time is `http`.

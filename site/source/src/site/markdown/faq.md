@@ -1,6 +1,7 @@
 # F.A.Q.
 
 * [I want to get started. Is there a Phoenix Hello World?](#I_want_to_get_started_Is_there_a_Phoenix_Hello_World)
+* [What is the Phoenix JDBC URL syntax?](#What_is_the_Phoenix_JDBC_URL_syntax)
 * [Is there a way to bulk load in Phoenix?](#Is_there_a_way_to_bulk_load_in_Phoenix)
 * [How I map Phoenix table to an existing HBase table?](#How_I_map_Phoenix_table_to_an_existing_HBase_table)
 * [Are there any tips for optimizing Phoenix?](#Are_there_any_tips_for_optimizing_Phoenix)
@@ -91,7 +92,46 @@ You should get the following output
 `Hello`
 `World!`
 
+### What is the Phoenix JDBC URL syntax?
 
+#### Thick Driver
+
+The Phoenix (Thick) Driver JDBC URL syntax is as follows (where elements in square brackets are optional):
+
+`jdbc:phoenix:[comma-separated ZooKeeper Quorum [:port [:hbase root znode [:kerberos_principal [:path to kerberos keytab] ] ] ]`
+
+The simplest URL is:
+
+`jdbc:phoenix:localhost`
+
+Whereas the most complicated URL is:
+
+`jdbc:phoenix:zookeeper1.domain,zookeeper2.domain,zookeeper3.domain:2181:/hbase-1:phoenix@EXAMPLE.COM:/etc/security/keytabs/phoenix.keytab`
+
+Please note that each optional element in the URL requires all previous optional elements. For example, to specify the
+HBase root ZNode, the ZooKeeper port *must* also be specified.
+
+This information is initially covered on the [index page](/#connStr).
+
+#### Thin Driver
+
+The Phoenix Thin Driver (used with the Phoenix Query Server) JDBC URL syntax is as follows:
+
+`jdbc:phoenix:thin:[key=value[;key=value...]]`
+
+There are a number of keys exposed for client-use. The most commonly-used keys are: `url` and `serialization`. The `url`
+key is required to interact with the Phoenix Query Server.
+
+The simplest URL is:
+
+`jdbc:phoenix:thin:url=http://localhost:8765`
+
+Where as very complicated URL is:
+
+`jdbc:phoenix:thin:url=http://queryserver.domain:8765;serialization=PROTOBUF;authentication=SPENGO;principal=phoenix@EXAMPLE.COM;keytab=/etc/security/keytabs/phoenix.keytab`
+
+Please refer to the [Apache Avatica documentation](https://calcite.apache.org/avatica/docs/client_reference.html) for a full list of supported options in the Thin client JDBC URL,
+or see the [Query Server documentation](server.html)
 
 ### Is there a way to bulk load in Phoenix?
 
@@ -307,4 +347,3 @@ The same issue comes up even if only one column is null for some (or
 all) records. A scan over Phoenix will include the empty column to
 ensure that rows that only consist of the primary key (and have null
 for all non-key columns) will be included in a scan result.
-

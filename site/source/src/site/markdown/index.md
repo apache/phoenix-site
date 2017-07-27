@@ -81,7 +81,7 @@ Use JDBC to get a connection to an HBase cluster like this:
 <pre><code>Connection conn = DriverManager.getConnection("jdbc:phoenix:server1,server2:3333",props);</code></pre>
 where <code>props</code> are optional properties which may include Phoenix and HBase configuration properties, and
 the connection string which is composed of:
-<pre><code>jdbc:phoenix</code> [ <code>:&lt;zookeeper quorum&gt;</code> [ <code>:&lt;port number&gt;</code> ] [ <code>:&lt;root node&gt;</code> ] [ <code>:&lt;principal&gt;</code> ] [ <code>:&lt;keytab file&gt;</code> ] ]
+<pre><code>jdbc:phoenix</code> [ <code>:&lt;zookeeper quorum&gt;</code> [ <code>:&lt;port number&gt;</code> [ <code>:&lt;root node&gt;</code> [ <code>:&lt;principal&gt;</code> [ <code>:&lt;keytab file&gt;</code> ] ] ] ] ]
 </pre>
 
 For any omitted parts, the relevant property value, hbase.zookeeper.quorum, hbase.zookeeper.property.clientPort, and zookeeper.znode.parent
@@ -96,6 +96,7 @@ while the following connection string might be used for shorter running queries:
 
 <pre><code>Connection conn = DriverManager.getConnection("jdbc:phoenix:my_server:shortRunning", shortRunningProps);</code></pre>
 
+Please read the relevant [FAQ entry](faq.html#What_is_the_Phoenix_JDBC_URL_syntax) for example URLs.
 
 ##<a id="transactions"></a>Transactions
 To enable full ACID transactions, a beta feature available in the 4.7.0 release, set the <code>phoenix.transactions.enabled</code> property to true. In this case, you'll also need to run the transaction manager that's included in the distribution. Once enabled, a table may optionally be declared as transactional (see [here](transactions.html) for directions). Commits over transactional tables will have an all-or-none behavior - either all data will be committed (including any updates to secondary indexes) or none of it will (and an exception will be thrown). Both cross table and cross row transactions are supported. In addition, transactional tables will see their own uncommitted data when querying. An optimistic concurrency model is used to detect row level conflicts with first commit wins semantics. The later commit would produce an exception indicating that a conflict was detected. A transaction is started implicitly when a transactional table is referenced in a statement, at which point you will not see updates from other connections until either a commit or rollback occurs.
