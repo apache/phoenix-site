@@ -49,7 +49,7 @@ The commit message should reference the jira ticket issue (which has the format
 2. Make and commit changes
 3. Generate a patch based on the name of the JIRA issue, as follows:
 
-    `git format-patch --stdout origin > PHOENIX-{NUMBER}.patch`
+    `git format-patch --stdout HEAD^ > PHOENIX-{NUMBER}.patch`
 
 4. Attach the created patch file to the jira ticket
 
