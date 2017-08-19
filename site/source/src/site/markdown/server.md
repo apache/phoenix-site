@@ -315,3 +315,60 @@ configuration.
     </tr>
   </tbody>
 </table>
+
+## Query Server Additions
+
+The Phoenix Query Server is meant to be horizontally scalable which means that it
+is a natural fit add-on features like service discovery and load balancing.
+
+### Load balancing
+
+The Query Server can use off-the-shelf HTTP load balancers such as the [Apache HTTP Server](https://httpd.apache.org),
+[nginx](https://nginx.org), or [HAProxy](https://haproxy.org). The primary requirement of
+using these load balancers is that the implementation must implement "sticky session" (when a client
+communicates with a backend server, that client continues to talk to that backend server). The Query Server also
+provides some bundled functionality for load balancing using ZooKeeper.
+
+The ZooKeeper-based load balancer functions by automatically registering PQS instances in
+ZooKeeper and then allows clients to query the list of available servers. This implementation, unlike
+the others mentioned above, requires that client use the advertised information to make a routing decision.
+In this regard, this ZooKeeper-based approach is more akin to a service-discovery layer than a traditional
+load balancer. This load balancer implementation does *not* support SASL-based (Kerberos) ACLs in
+ZooKeeper (see [PHOENIX-4085](https://issues.apache.org/jira/browse/PHOENIX-4085)).
+
+The following are configuration properties used to configure this load balancer:
+
+
+<table border="1">
+  <tbody>
+    <tr>
+      <td colspan="3"><b>Configurations relating to the ZooKeeper-based load balancer.</b></td>
+    </tr>
+    <tr><td><b>Property</b></td><td><b>Description</b></td><td><b>Default</b></td></tr>
+    <tr>
+      <td><small>phoenix.queryserver.loadbalancer.enabled</small></td>
+      <td style="text-align: left;">Should PQS register itself in ZooKeeper for the load balancer.</td>
+      <td>false</td>
+    </tr>
+    <tr>
+      <td><small>phoenix.queryserver.base.path</small></td>
+      <td style="text-align: left;">Root znode the PQS instance should register itself to.</td>
+      <td>/phoenix</td>
+    </tr>
+    <tr>
+      <td><small>phoenix.queryserver.service.name</small></td>
+      <td style="text-align: left;">A unique name to identify this PQS instance from others.</td>
+      <td>queryserver</td>
+    </tr>
+    <tr>
+      <td><small>phoenix.queryserver.zookeeper.acl.username</small></td>
+      <td style="text-align: left;">Name to set for a DIGEST ZooKeeper ACL, optional.</td>
+      <td>phoenix</td>
+    </tr>
+    <tr>
+      <td><small>phoenix.queryserver.zookeeper.acl.password</small></td>
+      <td style="text-align: left;">Password to set for a DIGEST ZooKeeper ACL, optional.</td>
+      <td>phoenix</td>
+    </tr>
+  </tbody>
+</table>
