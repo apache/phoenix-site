@@ -70,6 +70,43 @@ DELETE FROM TEST WHERE ID=123;
 DELETE FROM TEST WHERE NAME LIKE 'foo%';
 "
 
+"Commands","DECLARE CURSOR","
+DECLARE CURSOR cursorName FOR selectStatement
+","
+Creates a cursor for the select statement
+
+","
+DECLARE CURSOR TEST_CURSOR FOR SELECT * FROM TEST_TABLE
+"
+
+"Commands","OPEN CURSOR","
+OPEN CURSOR cursorName
+","
+Opens already declared cursor to perform FETCH operations
+
+","
+OPEN CURSOR TEST_CURSOR
+"
+
+"Commands","FETCH NEXT","
+FETCH NEXT [n ROWS] FROM cursorName
+","
+Retrieves next or next n rows from already opened cursor
+
+","
+FETCH NEXT FROM TEST_CURSOR
+FETCH NEXT 10 ROWS FROM TEST_CURSOR
+"
+
+"Commands","CLOSE","
+CLOSE cursorName
+","
+Closes an already open cursor
+
+","
+CLOSE TEST_CURSOR
+"
+
 "Commands","CREATE TABLE","
 CREATE TABLE [IF NOT EXISTS] tableRef
 ( columnDef [,...] [constraint] )
@@ -1379,6 +1416,18 @@ If no rows are selected, the result is 0.
 Aggregates are only allowed in select statements.
 ","
 COUNT(*)
+"
+
+"Functions (Aggregate)","APPROX_COUNT_DISTINCT","
+APPROX_COUNT_DISTINCT( { * | { term } } )
+","
+The approximate distinct count of all row, or of the non-null values.
+The relative error of approximation by default is less than 0.00405
+This method returns a long.
+If no rows are selected, the result is 0.
+Aggregates are only allowed in select statements.
+","
+APPROX_COUNT_DISTINCT(*)
 "
 
 "Functions (Aggregate)","MAX","

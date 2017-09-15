@@ -311,6 +311,35 @@ We track secondary index performance via our [performance framework](http://phoe
 
 That said, we have seen secondary indexing (both immutable and mutable) go as quickly as < 2x the regular write path on a small, (3 node) desktop-based cluster. This is actually pretty reasonable as we have to write to multiple tables as well as build the index update.
 
+## Index Scrutiny Tool
+With Phoenix 4.12, there is now a tool to run a MapReduce job to verify that an index table is valid against its data table.  The only way to find orphaned rows in either table is to scan over all rows in the table and do a lookup in the other table for the corresponding row.  For that reason, the tool can run with either the data or index table as the "source" table, and the other as the "target" table.  The tool writes all invalid rows it finds either to file or to an output table PHOENIX\_INDEX\_SCRUTINY.  An invalid row is a source row that either has no corresponding row in the target table, or has an incorrect value in the target table (i.e. covered column value).
+
+The tool has job counters that track its status.  `VALID_ROW_COUNT`, `INVALID_ROW_COUNT`, `BAD_COVERED_COL_VAL_COUNT`.  Note that invalid rows - bad col val rows = number of orphaned rows.  These counters are written to the table PHOENIX\_INDEX\_SCRUTINY\_METADATA, along with other job metadata.
+
+The Index Scrutiny Tool can be launched via the `hbase` command (in hbase/bin) as follows:
+
+    hbase org.apache.phoenix.mapreduce.index.IndexScrutinyTool -dt my_table -it my_index -o
+It can also be run from Hadoop using either the phoenix-core or phoenix-server jar  as follows:
+
+    HADOOP_CLASSPATH=$(hbase mapredcp) hadoop jar phoenix-<version>-server.jar org.apache.phoenix.mapreduce.index.IndexScrutinyTool -dt my_table -it my_index -o
+By default two mapreduce jobs are launched, one with the data table as the source table and one with the index table as the source table.
+    
+The following parameters can be used with the Index Scrutiny Tool:
+
+| *Parameter*                | *Description*                                 |
+|----------------------------|-----------------------------------------------|
+|-dt,--data-table                  |Data table name (mandatory)                     |
+|-it,--index-table                  |Index table name (mandatory)                 |
+|-s,--schema                 |Phoenix schema name (optional)                 |
+|-src,--source          |DATA\_TABLE\_SOURCE, INDEX\_TABLE\_SOURCE, or BOTH.  Defaults to BOTH                        |
+|-o,--output        |Whether to output invalid rows.  Off by default            |
+|-of,--output-format         |TABLE or FILE output format.  Defaults to TABLE |
+|-om,--output-max              |Maximum number of invalid rows to output per mapper.  Defaults to 1M      |
+|-op,--output-path           |For FILE output format, the HDFS directory where files are written
+|-t,--time              |Timestamp in millis at which to run the scrutiny.  This is important so that incoming writes don't throw off the scrutiny.  Defaults to current time minus 60 seconds             |
+|-b,--batch-size                 |Number of rows to compare at a time    |
+
+
 ## Resources
 There have been several presentations given on how secondary indexing works in Phoenix that have a more in-depth look at how indexing works (with pretty pictures!):
  

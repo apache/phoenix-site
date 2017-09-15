@@ -8,7 +8,7 @@
 
 	<head>
 		<meta charset="UTF-8" />
-		<title>Phoenix on Amazon EMR | Apache Phoenix</title>
+		<title>Cursor | Apache Phoenix</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="description" content="" />
 		<meta http-equiv="content-language" content="en" />
@@ -34,7 +34,7 @@
 
 	</head>
 
-	<body class="page-phoenix_on_emr project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
+	<body class="page-cursors project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
 
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
@@ -124,7 +124,7 @@
 									<li ><a href="server.html" title="Query Server">Query Server</a></li>
 									<li ><a href="metrics.html" title="Metrics">Metrics</a></li>
 									<li ><a href="tracing.html" title="Tracing">Tracing</a></li>
-									<li ><a href="cursors.html" title="Cursor">Cursor</a></li>
+									<li class="active"><a href="" title="Cursor">Cursor</a></li>
 								</ul>
 							</li>
 							<li class="dropdown">
@@ -159,9 +159,42 @@
 		<div class="span12">
 			<div class="body-content">
 <div class="page-header">
- <h1>Phoenix on Amazon EMR</h1>
+ <h1>Cursor</h1>
 </div> 
-<p>You can now use Phoenix 4.7 on AWS. For a detailed guide, see <a class="externalLink" href="http://docs.aws.amazon.com/ElasticMapReduce/latest/ReleaseGuide/emr-phoenix.html">here</a>.</p>
+<p>Inorder to be able work on a subset of the rows in a query, Phoenix provides support for CURSOR control structure. The following sequence shows how to use cursor. </p> 
+<ol style="list-style-type: decimal"> 
+ <li> <p>Define cursor for a query using DECLARE statement</p> 
+  <div class="source"> 
+   <pre>PreparedStatement statement = conn.prepareStatement(&quot;DECLARE empCursor CURSOR FOR SELECT * FROM EMP_TABLE&quot;);
+statement.execute(); 
+</pre>
+  </div></li> 
+ <li> <p>Open the cursor</p> 
+  <div class="source"> 
+   <pre>statement = con.prepareStatement(&quot;OPEN empCursor&quot;);
+statement.execute();
+</pre>
+  </div></li> 
+ <li> <p>Fetch subset of rows to work with</p> 
+  <div class="source"> 
+   <pre>statement = con.prepareStatement(&quot;FETCH NEXT 10 ROWS FROM empCursor&quot;); 
+ResultSet rset = statement.execute();
+</pre>
+  </div></li> 
+ <li> <p>Iterate through the subset of rows and process them as required</p> 
+  <div class="source"> 
+   <pre>while (rset.next != null){
+  ...
+}
+</pre>
+  </div></li> 
+ <li> <p>Fetch additional set of rows to process and finally close the cursor when done</p> 
+  <div class="source"> 
+   <pre>statement = con.prepareStatement(“CLOSE empCursor&quot;);
+statement.execute();
+</pre>
+  </div></li> 
+</ol>
 			</div>
 		</div>
 	</div>
@@ -355,8 +388,8 @@
 						<li >
 							<a href="tracing.html" title="Tracing">Tracing</a>
 						</li>
-						<li >
-							<a href="cursors.html" title="Cursor">Cursor</a>
+						<li class="active">
+							<a href="#" title="Cursor">Cursor</a>
 						</li>
 					</ul>
 				</div>

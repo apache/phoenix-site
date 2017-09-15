@@ -118,8 +118,9 @@
             <item href="http:divider" name=""/>
             <item href="bulk_dataload.html" name="Bulk Loading"/>
             <item href="server.html" name="Query Server"/>
-            <item href="tracing.html" name="Tracing"/>
             <item href="metrics.html" name="Metrics"/>
+            <item href="tracing.html" name="Tracing"/>
+            <item href="cursors.html" name="Cursor"/>
         </menu>
         <menu name="Reference">
             <item href="language/index.html" name="Grammar"/>
