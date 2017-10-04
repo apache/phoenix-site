@@ -19,6 +19,7 @@ SELECT * FROM TEST LIMIT 1000 OFFSET 100;
 SELECT full_name FROM SALES_PERSON WHERE ranking >= 5.0
     UNION ALL SELECT reviewer_name FROM CUSTOMER_REVIEW WHERE score >= 8.0
 "
+
 "Commands","UPSERT VALUES","
 UPSERT INTO tableName [( { columnRef | columnDef } [,...] )] VALUES ( constantTerm [,...] )
 [ON DUPLICATE KEY { IGNORE | UPDATE columnRef = operand } ]
@@ -695,12 +696,14 @@ PRODUCT_METRICS(referrer VARCHAR)
 
 "Other Grammar","Aliased Table Ref","
 { [ schemaName. ] tableName } [ [ AS ] tableAlias ] [( columnDef [,...] )]
+[ TABLESAMPLE ({positiveDecimal}) ]
 ","
 A reference to an optionally aliased table optionally followed by dynamic column definitions.
 
 ","
 PRODUCT_METRICS AS PM
 PRODUCT_METRICS(referrer VARCHAR)
+PRODUCT_METRICS TABLESAMPLE (12.08)
 "
 
 

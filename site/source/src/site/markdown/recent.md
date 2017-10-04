@@ -2,6 +2,7 @@
 
 As items are implemented from our road map, they are moved here to track the progress we've made:
 
+1. **[Table Sampling](tablesample.html)**. Support the <code>TABLESAMPLE</code> clause by implementing a filter that uses the guideposts established by stats gathering to only return a percentage of the rows. **Available in our 4.12 release**
 1. **[Reduce on disk storage](https://phoenix.apache.org/columnencoding.html)**. Reduce on disk storage to improve performance by a) packing all values into a single cell per column family and b) provide an indirection between the column name and the column qualifier. **Available in our 4.10 release**
 1. **[Atomic update](https://phoenix.apache.org/atomic_upsert.html)**. Atomic update is now possible in the UPSERT VALUES statement in support of counters and other use cases. **Available in our 4.9 release**
 6. **[DEFAULT declaration](https://phoenix.apache.org/language/index.html#column_def)**. When defining a column it is now possible to provide a DEFAULT declaration for the initial value. **Available in our 4.9 release**

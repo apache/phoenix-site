@@ -14,7 +14,6 @@ Our roadmap is driven by our user community. Below, in prioritized order, is the
 7. **[STRUCT type](https://issues.apache.org/jira/browse/PHOENIX-477)**. Allow declarations of multiple fields of different data types that would be packed into a single cell to reduce the per column storage overhead.
 17. **[OLAP Extensions](https://issues.apache.org/jira/browse/PHOENIX-154)**. Support the `WINDOW`, `PARTITION OVER`, `RANK`, and other SQL-92 extensions.
 16. **[Multi-version Row Queries](https://issues.apache.org/jira/browse/PHOENIX-590)**. Expose the time dimension of rows through a built-in function to allow aggregation and trending over multiple row versions.
-18. **[Table Sampling](https://issues.apache.org/jira/browse/PHOENIX-153)**. Support the <code>TABLESAMPLE</code> clause by implementing a filter that uses the guideposts established by stats gathering to only return n rows per region.
 14. **Security Features**. A number of existing HBase security features in 0.94 could be leverage and new security features being added to 0.98 could be leveraged in the future.
     * **[Support GRANT and REVOKE](https://issues.apache.org/jira/browse/PHOENIX-672)**. Support the standard GRANT and REVOKE SQL commands through an HBase AccessController.
     * **[Surface support for encryption](https://issues.apache.org/jira/browse/PHOENIX-673)**. Surface specification of what should be encrypted now that HBase supports transparent encryption.

@@ -8,7 +8,7 @@
 
 	<head>
 		<meta charset="UTF-8" />
-		<title>Phoenix Storage Handler for Apache Hive | Apache Phoenix</title>
+		<title>Table Sampliing | Apache Phoenix</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="description" content="" />
 		<meta http-equiv="content-language" content="en" />
@@ -34,7 +34,7 @@
 
 	</head>
 
-	<body class="page-hive_storage_handler project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
+	<body class="page-tablesample project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
 
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
@@ -85,7 +85,7 @@
 									<li ><a href="pherf.html" title="Performance Testing">Performance Testing</a></li>
 									<li class="divider"/>
 									<li ><a href="phoenix_spark.html" title="Apache Spark Integration">Apache Spark Integration</a></li>
-									<li class="active"><a href="" title="Phoenix Storage Handler for Apache Hive">Phoenix Storage Handler for Apache Hive</a></li>
+									<li ><a href="hive_storage_handler.html" title="Phoenix Storage Handler for Apache Hive">Phoenix Storage Handler for Apache Hive</a></li>
 									<li ><a href="pig_integration.html" title="Apache Pig Integration">Apache Pig Integration</a></li>
 									<li ><a href="phoenix_mr.html" title="Map Reduce Integration">Map Reduce Integration</a></li>
 									<li ><a href="flume.html" title="Apache Flume Plugin">Apache Flume Plugin</a></li>
@@ -115,7 +115,7 @@
 									<li ><a href="paged.html" title="Paged Queries">Paged Queries</a></li>
 									<li ><a href="salted.html" title="Salted Tables">Salted Tables</a></li>
 									<li ><a href="skip_scan.html" title="Skip Scan">Skip Scan</a></li>
-									<li ><a href="tablesample.html" title="Table Sampling">Table Sampling</a></li>
+									<li class="active"><a href="" title="Table Sampling">Table Sampling</a></li>
 									<li class="divider"/>
 									<li ><a href="views.html" title="Views">Views</a></li>
 									<li ><a href="multi-tenancy.html" title="Multi tenancy">Multi tenancy</a></li>
@@ -160,220 +160,65 @@
 		<div class="span12">
 			<div class="body-content">
 <div class="page-header">
- <h1>Phoenix Storage Handler for Apache Hive</h1>
+ <h1>Table Sampliing</h1>
 </div> 
-<p>The Apache Phoenix Storage Handler is a plugin that enables Apache Hive access to Phoenix tables from the Apache Hive command line using HiveQL.</p> 
+<p>To support table sampling, similar to the Postgresql and T-SQL syntax, a TABLESAMPLE clause has been encorporated into the table aliases ref as of Phoenix 4.12. The general syntax is described <a href="language/index.html#aliased_table_ref">here</a>. This feature limits the number of rows returned from a table to a PERCENT of rows. See <a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-153">PHOENIX-153</a> for implementation details.</p> 
+<p>This feature is implmented with a Bernoulli trial, a consistent-hashing based tablesampler, to achieve a Bernoulli sampling on a given population (rows). When executed, given a sampling rate, it leverages Phoenix’s stats as well HBase’s region distribution to perform a table sampling.</p> 
+<p>As part of the <a href="update_statistics.html">statistics collection</a>, a guide post (a row referrence) is created for rows at equidistant bytes from each other. When sampling is required, a Bernoulli trial process is applied repeatedly on each guide post on each region with a probability that porportional to the sampling rate. A included guide post will result in all the rows in between this and next guide post being included into sample population.</p> 
 <div class="section"> 
- <h2 id="Prerequisites">Prerequisites</h2> 
- <ul> 
-  <li>Phoenix 4.8.0+</li> 
-  <li>Hive 1.2.1+</li> 
- </ul> 
-</div> 
-<div class="section"> 
- <h2 id="Hive_Setup">Hive Setup</h2> 
- <p>Make phoenix-version-hive.jar available for Hive:</p> 
- <p>Step 1: Add to hive-env.sh:</p> 
- <div class="source"> 
-  <pre>HIVE_AUX_JARS_PATH=&lt;path to jar&gt;
-</pre> 
- </div> 
- <p>Step 2: Add a property to hive-site.xml so that Hive MapReduce jobs can use the .jar:</p> 
- <div class="source"> 
-  <pre>&lt;property&gt;
-  &lt;name&gt;hive.aux.jars.path&lt;/name&gt;
-  &lt;value&gt;file://&lt;path&gt;&lt;/value&gt;
-&lt;/property&gt;
-</pre> 
- </div> 
-</div> 
-<div class="section"> 
- <h2 id="Table_Creation_and_Deletion">Table Creation and Deletion</h2> 
- <p>The Phoenix Storage Handler supports both INTERNAL and EXTERNAL Hive tables.</p> 
  <div class="section"> 
-  <h3 id="Create_INTERNAL_Table">Create INTERNAL Table</h3> 
-  <p>For INTERNAL tables, Hive manages the lifecycle of the table and data. When a Hive table is created, a corresponding Phoenix table is also created. Once the Hive table is dropped, the Phoenix table is also deleted.</p> 
-  <div class="source"> 
-   <pre>	create table phoenix_table (
-	  s1 string,
-	  i1 int,
-	  f1 float,
-	  d1 double
-	)
-	STORED BY 'org.apache.phoenix.hive.PhoenixStorageHandler'
-	TBLPROPERTIES (
-	  &quot;phoenix.table.name&quot; = &quot;phoenix_table&quot;,
-	  &quot;phoenix.zookeeper.quorum&quot; = &quot;localhost&quot;,
-	  &quot;phoenix.zookeeper.znode.parent&quot; = &quot;/hbase&quot;,
-	  &quot;phoenix.zookeeper.client.port&quot; = &quot;2181&quot;,
-	  &quot;phoenix.rowkeys&quot; = &quot;s1, i1&quot;,
-	  &quot;phoenix.column.mapping&quot; = &quot;s1:s1, i1:i1, f1:f1, d1:d1&quot;,
-	  &quot;phoenix.table.options&quot; = &quot;SALT_BUCKETS=10, DATA_BLOCK_ENCODING='DIFF'&quot;
-	);
-</pre> 
+  <div class="section"> 
+   <h4 id="Performance">Performance</h4> 
+   <p>Sampling on a table with a sampling rate = 100% will cost same amount of computational resource as a query without sampling. This resouces consumption quicky fall off when a smaller sampling rate is choosing. In general, the amortized complexity for sampling process is <tt>O(k + mn)</tt> , with n being the number of the regions of the sampled hbase table, m being the number of guide posts, and k being the size of sampled population.</p> 
+  </div> 
+  <div class="section"> 
+   <h4 id="Repeatable">Repeatable</h4> 
+   <p>Repeatable means it guarantees that the repeated sampling on the same table will resulted in the same sampled result.</p> 
+   <p>Repeatable feature is made possible by a consistent-hashing process applied on the binary representation of the start rowkey of each guideposts of each region when sampling process is in action. During hashing, a FNV1 implementation with lazy mod method is adopted by default. see <a class="externalLink" href="http://www.isthe.com/chongo/tech/comp/fnv/">FNV1</a>.</p> 
   </div> 
  </div> 
- <div class="section"> 
-  <h3 id="Create_EXTERNAL_Table">Create EXTERNAL Table</h3> 
-  <p>For EXTERNAL tables, Hive works with an existing Phoenix table and manages only Hive metadata. Dropping an EXTERNAL table from Hive deletes only Hive metadata but does not delete the Phoenix table.</p> 
-  <div class="source"> 
-   <pre>create external table ext_table (
-  i1 int,
-  s1 string,
-  f1 float,
-  d1 decimal
-)
-STORED BY 'org.apache.phoenix.hive.PhoenixStorageHandler'
-TBLPROPERTIES (
-  &quot;phoenix.table.name&quot; = &quot;ext_table&quot;,
-  &quot;phoenix.zookeeper.quorum&quot; = &quot;localhost&quot;,
-  &quot;phoenix.zookeeper.znode.parent&quot; = &quot;/hbase&quot;,
-  &quot;phoenix.zookeeper.client.port&quot; = &quot;2181&quot;,
-  &quot;phoenix.rowkeys&quot; = &quot;i1&quot;,
-  &quot;phoenix.column.mapping&quot; = &quot;i1:i1, s1:s1, f1:f1, d1:d1&quot;
-);
-</pre> 
-  </div> 
- </div> 
- <div class="section"> 
-  <h3 id="Properties">Properties</h3> 
-  <ol style="list-style-type: decimal"> 
-   <li>phoenix.table.name 
-    <ul> 
-     <li>Specifies the Phoenix table name</li> 
-     <li>Default: the same as the Hive table</li> 
-    </ul></li> 
-   <li>phoenix.zookeeper.quorum 
-    <ul> 
-     <li>Specifies the ZooKeeper quorum for HBase</li> 
-     <li>Default: localhost</li> 
-    </ul></li> 
-   <li>phoenix.zookeeper.znode.parent 
-    <ul> 
-     <li>Specifies the ZooKeeper parent node for HBase</li> 
-     <li>Default: /hbase</li> 
-    </ul></li> 
-   <li>phoenix.zookeeper.client.port 
-    <ul> 
-     <li>Specifies the ZooKeeper port</li> 
-     <li>Default: 2181</li> 
-    </ul></li> 
-   <li>phoenix.rowkeys 
-    <ul> 
-     <li>The list of columns to be the primary key in a Phoenix table</li> 
-     <li>Required</li> 
-    </ul></li> 
-   <li>phoenix.column.mapping 
-    <ul> 
-     <li>Mappings between column names for Hive and Phoenix. See <a href="#Limitations">Limitations</a> for details.</li> 
-    </ul></li> 
-  </ol> 
- </div> 
 </div> 
 <div class="section"> 
- <h2 id="Data_Ingestion_Deletions_and_Updates">Data Ingestion, Deletions, and Updates</h2> 
- <p>Data ingestion can be done by all ways that Hive and Phoenix support:</p> 
- <p>Hive:</p> 
+ <h2 id="Examples">Examples</h2> 
+ <p>For example, to tablesample a table , you would execute the following command. Please note, the sampling rate is a numeric value between 0 and 100, inclusive.</p> 
  <div class="source"> 
-  <pre>	 insert into table T values (....);
-	 insert into table T select c1,c2,c3 from source_table;
+  <pre>select * from PERSON TABLESAMPLE(12.08);
 </pre> 
  </div> 
- <p>Phoenix:</p> 
+ <p>Some more examples:</p> 
  <div class="source"> 
-  <pre>	 upsert into table T values (.....);
-         Phoenix CSV BulkLoad tools
+  <pre>select * from PERSON TABLESAMPLE (12.08) where ADDRESS = 'CA' OR name&gt;'aaa';
+select count( * ) from PERSON TABLESAMPLE (12.08) LIMIT 2
+select count( * ) from (select NAME from PERSON TABLESAMPLE (49) limit 20)
+select * from (select /+NO_INDEX/ * from PERSON tablesample (10) where Name &gt; 'tina10') where ADDRESS = 'CA'
+select * from PERSON1, PERSON2 tablesample (70) where PERSON1.Name = PERSON2.NAME
+select /+NO_INDEX/ count( * ) from PERSON tableSample (19), US_POPULATION tableSample (28) where PERSON.Name &gt; US_POPULATION.STATE
+upsert into personbig(ID, ADDRESS) select id, address from personbig tablesample (1);
 </pre> 
  </div> 
- <p>All delete and update operations should be performed on the Phoenix side. See <a href="#Limitations">Limitations</a> for more details.</p> 
-</div> 
-<div class="section"> 
- <h2 id="Additional_Configuration_Options">Additional Configuration Options</h2> 
- <p>Those options can be set in a Hive command-line interface (CLI) environment.</p> 
- <div class="section"> 
-  <h3 id="Performance_Tuning">Performance Tuning</h3> 
-  <table border="0" class="bodyTable table table-striped table-hover"> 
-   <thead> 
-    <tr class="a"> 
-     <th>Parameter </th> 
-     <th>Default Value </th> 
-     <th>Description</th> 
-    </tr> 
-   </thead> 
-   <tbody> 
-    <tr class="b"> 
-     <td>phoenix.upsert.batch.size </td> 
-     <td>1000 </td> 
-     <td>Batch size for upsert.</td> 
-    </tr> 
-    <tr class="a"> 
-     <td>[phoenix-table-name].disable.wal </td> 
-     <td>false </td> 
-     <td>Temporarily sets the table attribute <tt>DISABLE_WAL</tt> to <tt>true</tt>. Sometimes used to improve performance</td> 
-    </tr> 
-    <tr class="b"> 
-     <td>[phoenix-table-name].auto.flush </td> 
-     <td>false </td> 
-     <td>When WAL is disabled and if this value is <tt>true</tt>, then MemStore is flushed to an HFile.</td> 
-    </tr> 
-   </tbody> 
-  </table> 
+ <p>To use it in aggregation:</p> 
+ <div class="source"> 
+  <pre>select count( * ) from PERSON TABLESAMPLE (49) LIMIT 2
+select count( * ) from (select NAME from PERSON TABLESAMPLE (49) limit 20)
+</pre> 
  </div> 
- <div class="section"> 
-  <h3 id="Query_Data">Query Data</h3> 
-  <p>You can use HiveQL for querying data in a Phoenix table. A Hive query on a single table can be as fast as running the query in the Phoenix CLI with the following property settings: <tt>hive.fetch.task.conversion=more</tt> and <tt>hive.exec.parallel=true</tt></p> 
-  <table border="0" class="bodyTable table table-striped table-hover"> 
-   <thead> 
-    <tr class="a"> 
-     <th>Parameter </th> 
-     <th>Default Value </th> 
-     <th>Description</th> 
-    </tr> 
-   </thead> 
-   <tbody> 
-    <tr class="b"> 
-     <td>hbase.scan.cache </td> 
-     <td>100 </td> 
-     <td>Read row size for a unit request</td> 
-    </tr> 
-    <tr class="a"> 
-     <td>hbase.scan.cacheblock </td> 
-     <td>false </td> 
-     <td>Whether or not cache block</td> 
-    </tr> 
-    <tr class="b"> 
-     <td>split.by.stats </td> 
-     <td>false </td> 
-     <td>If true, mappers use table statistics. One mapper per guide post.</td> 
-    </tr> 
-    <tr class="a"> 
-     <td>[hive-table-name].reducer.count </td> 
-     <td>1 </td> 
-     <td>Number of reducers. In Tez mode, this affects only single-table queries. See <a href="#Limitations">Limitations</a>.</td> 
-    </tr> 
-    <tr class="b"> 
-     <td>[phoenix-table-name].query.hint </td> 
-     <td> </td> 
-     <td>Hint for Phoenix query (for example, <tt>NO_INDEX</tt>)</td> 
-    </tr> 
-   </tbody> 
-  </table> 
+ <p>To explain the query:</p> 
+ <div class="source"> 
+  <pre>explain select count( * ) from PERSON TABLESAMPLE (49) LIMIT 2)
+</pre> 
  </div> 
 </div> 
 <div class="section"> 
- <h2 id="Limitations">Limitations </h2> 
+ <h2 id="Tuning">Tuning</h2> 
  <ul> 
-  <li>Hive update and delete operations require transaction manager support on both Hive and Phoenix sides. Related Hive and Phoenix JIRAs are listed in the <a href="#Resources">Resources</a> section.</li> 
-  <li>Column mapping does not work correctly with mapping row key columns.</li> 
-  <li>MapReduce and Tez jobs always have a single reducer.</li> 
+  <li> <p>Due to sampling process, the TABLESAMPLE clause should be used with some caution. For example, a join of two tables is likely to return a match for each row in both tables; however, when tablesampling process is applied on either one or both of the two tables, the joining may not match the expectation when without sampling.</p></li> 
+  <li> <p>The stats needs to be collected in order to achieve the best sampling accuracy. To turn on statistics collection, refer to <a href="update_statistics.html">Statistics Collection</a>.</p></li> 
  </ul> 
-</div> 
-<div class="section"> 
- <h2 id="Resources">Resources </h2> 
- <ul> 
-  <li><a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-2743">PHOENIX-2743</a> : Implementation, accepted by Apache Phoenix community. Original pull request contains modification for Hive classes.</li> 
-  <li><a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-331">PHOENIX-331</a> : An outdated implementation with support of Hive 0.98.</li> 
- </ul> 
+ <p></p> 
+ <div> 
+  <pre>  ALTER TABLE my_table SET GUIDE_POSTS_WIDTH = 10000000  </pre> 
+ </div> * A denser guide post setting improves the sampling accuracy, but reduces the performance at the same time. A comparison is experimented as fig below: 
+ <p><img src="images/sampling_accuracy_perf.jpg" alt="table samping performance" /></p> 
 </div>
 			</div>
 		</div>
@@ -485,8 +330,8 @@ TBLPROPERTIES (
 						<li >
 							<a href="phoenix_spark.html" title="Apache Spark Integration">Apache Spark Integration</a>
 						</li>
-						<li class="active">
-							<a href="#" title="Phoenix Storage Handler for Apache Hive">Phoenix Storage Handler for Apache Hive</a>
+						<li >
+							<a href="hive_storage_handler.html" title="Phoenix Storage Handler for Apache Hive">Phoenix Storage Handler for Apache Hive</a>
 						</li>
 						<li >
 							<a href="pig_integration.html" title="Apache Pig Integration">Apache Pig Integration</a>
@@ -541,8 +386,8 @@ TBLPROPERTIES (
 						<li >
 							<a href="skip_scan.html" title="Skip Scan">Skip Scan</a>
 						</li>
-						<li >
-							<a href="tablesample.html" title="Table Sampling">Table Sampling</a>
+						<li class="active">
+							<a href="#" title="Table Sampling">Table Sampling</a>
 						</li>
 						<li >
 							<a href="http:divider" title=""></a>
