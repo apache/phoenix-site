@@ -1,4 +1,4 @@
-# Table Sampliing
+# Table Sampling
 
 To support table sampling, similar to the Postgresql and T-SQL syntax, a TABLESAMPLE clause has been
 encorporated into the table aliases ref as of Phoenix 4.12. The general syntax is described
