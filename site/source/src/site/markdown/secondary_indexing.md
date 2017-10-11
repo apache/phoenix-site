@@ -339,6 +339,9 @@ The following parameters can be used with the Index Scrutiny Tool:
 |-t,--time              |Timestamp in millis at which to run the scrutiny.  This is important so that incoming writes don't throw off the scrutiny.  Defaults to current time minus 60 seconds             |
 |-b,--batch-size                 |Number of rows to compare at a time    |
 
+### Limitations
+* If rows are actively being updated or deleted while the scrutiny is running, the tool may give you false positives for inconsistencies ([PHOENIX-4277](https://issues.apache.org/jira/browse/PHOENIX-4277)).
+* Snapshot reads are not supported by the scrutiny tool ([PHOENIX-4270](https://issues.apache.org/jira/browse/PHOENIX-4270)).
 
 ## Resources
 There have been several presentations given on how secondary indexing works in Phoenix that have a more in-depth look at how indexing works (with pretty pictures!):
