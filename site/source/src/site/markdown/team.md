@@ -39,3 +39,4 @@ Ethan Wang | Salesforce | ewang@apache.org | Committer
 Geoffrey Jacoby | Salesforce | gjacoby@apache.org | Committer
 Jan Fernando | Salesforce | jfernando@apache.org | Committer
 Kevin Liew | Simba Technologies | kliew@apache.org | Committer
+Vincent Poon | Salesforce | vincentpoon@apache.org | Committer
