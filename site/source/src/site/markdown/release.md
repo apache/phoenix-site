@@ -38,13 +38,13 @@ git tag -a v4.11.0-HBase-0.98 v4.11.0-HBase-0.98-rc0 -m "Phoenix v4.11.0-HBase-0
 ```
 
 3. Remove any obsolete releases on https://dist.apache.org/repos/dist/release/phoenix given the current release
-4. Release to maven: 
+4. Release to maven (remove release directory from local repro if present): 
 
 ```
 mvn clean deploy gpg:sign -DperformRelease=true -Dgpg.passphrase=[your_pass_phrase_here] -Dgpg.keyname=[your_key_here] -DskipTests -P release -pl phoenix-core,phoenix-pig,phoenix-tracing-webapp,phoenix-queryserver,phoenix-spark,phoenix-flume,phoenix-pherf,phoenix-queryserver-client,phoenix-hive -am
 ```
 
-5. Go to https://repository.apache.org/#stagingRepositories and press release button
+5. Go to https://repository.apache.org/#stagingRepositories and close and release the staged artifacts
 6. Set version back to upcoming SNAPSHOT and commit: 
 
 ```
