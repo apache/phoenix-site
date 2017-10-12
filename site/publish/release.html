@@ -168,17 +168,19 @@
  <ol style="list-style-type: decimal"> 
   <li>Make sure you have setup your user for release signing. Details <a class="externalLink" href="http://www.apache.org/dev/release-signing.html">http://www.apache.org/dev/release-signing.html</a>.</li> 
   <li>Clone the branch locally from which you want to do a release.</li> 
-  <li>Set version to release and commit.</li> 
- </ol> 
- <div class="source"> 
-  <pre>mvn versions:set -DnewVersion=4.11.0-HBase-0.98 -DgenerateBackupPoms=false
+  <li> <p>Set version to release and commit.</p> 
+   <div> 
+    <pre>
+mvn versions:set -DnewVersion=4.11.0-HBase-0.98 -DgenerateBackupPoms=false
 </pre> 
- </div> 
+   </div></li> 
+ </ol> 
 </div> 
 <div class="section"> 
  <h2 id="Build_binary_and_source_tars">Build binary and source tars</h2> 
- <div class="source"> 
-  <pre>$ cd dev; ./make_rc.sh
+ <div> 
+  <pre>
+$ cd dev; ./make_rc.sh
 </pre> 
  </div> 
  <p>Follow the instructions. Signed binary and source tars will be generated in <i>release</i> directory. As last part of this script, it will ask if you want to tag branch at this time. If all looks good then svn commit binary and source tars to <a class="externalLink" href="https://dist.apache.org/repos/dist/dev/phoenix">https://dist.apache.org/repos/dist/dev/phoenix</a> </p> 
@@ -193,36 +195,35 @@
 <div class="section"> 
  <h2 id="Release">Release</h2> 
  <ol style="list-style-type: decimal"> 
-  <li>Once voting is successful, copy artifacts to <a class="externalLink" href="https://dist.apache.org/repos/dist/release/phoenix">https://dist.apache.org/repos/dist/release/phoenix</a>:</li> 
- </ol> 
- <div class="source"> 
-  <pre>svn mv https://dist.apache.org/repos/dist/dev/phoenix/apache-phoenix-4.11.0-HBase-0.98-rc1 https://dist.apache.org/repos/dist/release/phoenix/apache-phoenix-4.11.0-HBase-0.98
+  <li> <p>Once voting is successful, copy artifacts to <a class="externalLink" href="https://dist.apache.org/repos/dist/release/phoenix">https://dist.apache.org/repos/dist/release/phoenix</a>:</p> 
+   <div> 
+    <pre>
+svn mv https://dist.apache.org/repos/dist/dev/phoenix/apache-phoenix-4.11.0-HBase-0.98-rc1      
+       https://dist.apache.org/repos/dist/release/phoenix/apache-phoenix-4.11.0-HBase-0.98
 </pre> 
- </div> 
- <ol style="list-style-type: decimal"> 
-  <li>Step release tag:</li> 
- </ol> 
- <div class="source"> 
-  <pre>git tag -a v4.11.0-HBase-0.98 v4.11.0-HBase-0.98-rc0 -m &quot;Phoenix v4.11.0-HBase-0.98 release
+   </div></li> 
+  <li> <p>Set release tag and commit: </p> 
+   <div> 
+    <pre>
+git tag -a v4.11.0-HBase-0.98 v4.11.0-HBase-0.98-rc0 -m &quot;Phoenix v4.11.0-HBase-0.98 release
 </pre> 
- </div> 
- <ol style="list-style-type: decimal"> 
-  <li>Remove any obsolete releases on <a class="externalLink" href="https://dist.apache.org/repos/dist/release/phoenix">https://dist.apache.org/repos/dist/release/phoenix</a> given the current release</li> 
-  <li>Release to maven (remove release directory from local repro if present):</li> 
- </ol> 
- <div class="source"> 
-  <pre>mvn clean deploy gpg:sign -DperformRelease=true -Dgpg.passphrase=[your_pass_phrase_here] -Dgpg.keyname=[your_key_here] -DskipTests -P release -pl phoenix-core,phoenix-pig,phoenix-tracing-webapp,phoenix-queryserver,phoenix-spark,phoenix-flume,phoenix-pherf,phoenix-queryserver-client,phoenix-hive -am
+   </div></li> 
+  <li>Remove any obsolete releases on <a class="externalLink" href="https://dist.apache.org/repos/dist/release/phoenix">https://dist.apache.org/repos/dist/release/phoenix</a> given the current release.</li> 
+  <li> <p>Release to maven (remove release directory from local repro if present): </p> 
+   <div> 
+    <pre>
+mvn clean deploy gpg:sign -DperformRelease=true -Dgpg.passphrase=[your_pass_phrase_here]
+-Dgpg.keyname=[your_key_here] -DskipTests -P release -pl phoenix-core,phoenix-pig,phoenix-tracing-webapp,
+phoenix-queryserver,phoenix-spark,phoenix-flume,phoenix-pherf,phoenix-queryserver-client,phoenix-hive -am
 </pre> 
- </div> 
- <ol style="list-style-type: decimal"> 
-  <li>Go to <a class="externalLink" href="https://repository.apache.org/#stagingRepositories">https://repository.apache.org/#stagingRepositories</a> and close and release the staged artifacts</li> 
-  <li>Set version back to upcoming SNAPSHOT and commit:</li> 
- </ol> 
- <div class="source"> 
-  <pre>mvn versions:set -DnewVersion=4.12.0-HBase-0.98-SNAPSHOT -DgenerateBackupPoms=false
+   </div></li> 
+  <li>Go to <a class="externalLink" href="https://repository.apache.org/#stagingRepositories">https://repository.apache.org/#stagingRepositories</a> and <tt>close</tt> -&gt; <tt>release</tt> the staged artifacts.</li> 
+  <li> <p>Set version back to upcoming SNAPSHOT and commit:</p> 
+   <div> 
+    <pre>
+mvn versions:set -DnewVersion=4.12.0-HBase-0.98-SNAPSHOT -DgenerateBackupPoms=false
 </pre> 
- </div> 
- <ol style="list-style-type: decimal"> 
+   </div></li> 
   <li>Create new branch based on current release if needed.</li> 
  </ol> 
 </div>
