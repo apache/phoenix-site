@@ -79,6 +79,5 @@ COLUMN_ENCODED_BYTES = 1;
 
 When using SINGLE_CELL_ARRAY_WITH_OFFSETS encoding, one has to use a number based column mapping scheme. An attempt to use SINGLE_CELL_ARRAY_WITH_OFFSETS with COLUMN_ENCODED_BYTES = NONE will throw an error.
 
-
- 
-
+###How to disable column mapping?
+To disable column mapping across all new tables, you need to set <code>phoenix.default.column.encoded.bytes.attrib</code> to 0. One can also leave it on globally and have it disabled selectively for a table by setting the COLUMN_ENCODED_BYTES = 0 property in the create table statement. 

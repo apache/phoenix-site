@@ -275,6 +275,8 @@ http://phoenix.apache.org/language/index.html#explain
 You can improve parallelization with the [UPDATE STATISTICS](https://phoenix.apache.org/update_statistics.html) command. This command subdivides each region by determining keys called *guideposts* that are equidistant from each other, then uses these guideposts to break up queries into multiple parallel scans.
 Statistics are turned on by default. With Phoenix 4.9, the user can set guidepost width for each table. Optimal guidepost width depends on a number of factors such as cluster size, cluster usage, number of cores per node, table size, and disk I/O.
 
+In Phoenix 4.12, we have added a new configuration <code>phoenix.use.stats.parallelization</code> that controls whether statistics should be used for driving parallelization. Note that one can still run stats collection. The information collected is used to surface estimates on number of bytes and rows a query will scan when an EXPLAIN is generated for it. 
+
 # Further Tuning
 
 For advice about tuning the underlying HBase and JVM layers, see [Operational and Performance Configuration Options](https://hbase.apache.org/book.html#schema.ops) in the Apache HBase™ Reference Guide.

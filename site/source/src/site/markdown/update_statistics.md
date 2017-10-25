@@ -1,13 +1,18 @@
 # Statistics Collection
 
-The UPDATE STATISTICS command updates the statistics collected on a table, to improve
-query performance. This command collects a set of keys per region per column family that
+The UPDATE STATISTICS command updates the statistics collected on a table. 
+This command collects a set of keys per region per column family that
 are equal byte distanced from each other. These collected keys are called *guideposts*
 and they act as *hints/guides* to improve the parallelization of queries on a given
 target region.
 
 Statistics are also automatically collected during major compactions and region splits so
 manually running this command may not be necessary.
+
+In 4.12, we have added a new configuration <code>phoenix.use.stats.parallelization</code>
+which controls whether statistical information on the data should be used to drive
+query parallelization (as described below). The default value of the configuration is true.
+
 
 ##Parallelization
 Phoenix breaks up queries into multiple scans and runs them in parallel to reduce latency.
