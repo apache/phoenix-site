@@ -2187,3 +2187,19 @@ Replaces the byte at the given index in the binary value with the provided newVa
 ","
 SET_BYTE(CAST('FFFF' as BINARY), 1, 61)
 "
+
+"Functions (String)","COLLATION_KEY","
+COLLATION_KEY( stringTerm, localeString [, upperCaseBoolean [, strengthInt [, decompositionInt ] ] ] )
+","
+Calculates a collation key that can be used to sort strings in a
+natural-language-aware way. The localeString must be of the form
+returned by the Java 6 implementation of java.util.Locale.toString()
+e.g. 'zh_TW_STROKE' or 'en_US' or 'fr_FR'. The third, fourth and fifth
+arguments are optional and determine respectively whether to use a
+special upper-case collator, the strength value of the collator, and
+the decomposition value of the collator. (See java.text.Collator to
+learn about strength and decomposition).
+","
+SELECT NAME FROM EMPLOYEE ORDER BY COLLATION_KEY(NAME, 'zh_TW')
+"
+
