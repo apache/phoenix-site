@@ -1,6 +1,8 @@
 # Apache Phoenix News
 <br/>
 <hr/>
+#### [Announcing Phoenix 4.13 released](https://blogs.apache.org/phoenix/entry/announcing-phoenix-4-13-released) (November 9, 2017)
+<hr/>
 #### [Announcing Phoenix 4.12 released](https://blogs.apache.org/phoenix/entry/announcing-phoenix-4-12-released) (October 9, 2017)
 <hr/>
 #### [Announcing Phoenix 4.11 released](https://blogs.apache.org/phoenix/entry/announcing-phoenix-4-11-released) (June 20, 2017)
