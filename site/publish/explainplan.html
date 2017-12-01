@@ -8,7 +8,7 @@
 
 	<head>
 		<meta charset="UTF-8" />
-		<title>Storage Formats | Apache Phoenix</title>
+		<title>Explain Plans | Apache Phoenix</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="description" content="" />
 		<meta http-equiv="content-language" content="en" />
@@ -34,7 +34,7 @@
 
 	</head>
 
-	<body class="page-columnencoding project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
+	<body class="page-explainplan project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
 
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
@@ -107,7 +107,7 @@
 									<li ><a href="udf.html" title="User-defined Functions">User-defined Functions</a></li>
 									<li class="divider"/>
 									<li ><a href="secondary_indexing.html" title="Secondary Indexes">Secondary Indexes</a></li>
-									<li class="active"><a href="" title="Storage Formats">Storage Formats</a></li>
+									<li ><a href="columnencoding.html" title="Storage Formats">Storage Formats</a></li>
 									<li ><a href="atomic_upsert.html" title="Atomic Upsert">Atomic Upsert</a></li>
 									<li ><a href="namspace_mapping.html" title="Namespace Mapping">Namespace Mapping</a></li>
 									<li ><a href="update_statistics.html" title="Statistics Collection">Statistics Collection</a></li>
@@ -139,7 +139,7 @@
 									<li ><a href="sequences.html" title="Sequences">Sequences</a></li>
 									<li ><a href="joins.html" title="Joins">Joins</a></li>
 									<li ><a href="subqueries.html" title="Subqueries">Subqueries</a></li>
-									<li ><a href="explainplan.html" title="Explain Plan">Explain Plan</a></li>
+									<li class="active"><a href="" title="Explain Plan">Explain Plan</a></li>
 								</ul>
 							</li>
 						</ul>
@@ -161,136 +161,90 @@
 		<div class="span12">
 			<div class="body-content">
 <div class="page-header">
- <h1>Storage Formats</h1>
+ <h1>Explain Plans</h1>
 </div> 
-<p>As part of Phoenix 4.10, we have reduced the on disk storage size to improve overall performance by implementing the following enhancements:</p> 
+<p>An <tt>EXPLAIN</tt> plan tells you a lot about how a query will be run:</p> 
 <ul> 
- <li>Introduce a layer of indirection between Phoenix column names and the corresponding HBase column qualifiers.</li> 
- <li>Support a new encoding scheme for immutable tables that packs all values into a single cell per column family</li> 
+ <li>All the HBase range queries that will be executed</li> 
+ <li>An estimate of the number of bytes that will be scanned</li> 
+ <li>An estimate of the number of rows that will be traversed</li> 
+ <li>Time at which the above estimate information was collected</li> 
+ <li>Which HBase table will be used for each scan</li> 
+ <li>Which operations (sort, merge, scan, limit) are executed on the client versus the server</li> 
 </ul> 
-<p>For more details on column mapping and immutable data encoding, see <a class="externalLink" href="https://blogs.apache.org/phoenix/entry/column-mapping-and-immutable-data">this blog</a>.</p> 
+<p>Use an <tt>EXPLAIN</tt> plan to check how a query will run, and consider rewriting queries to meet the following goals:</p> 
+<ul> 
+ <li>Emphasize operations on the server rather than the client. Server operations are distributed across the cluster and operate in parallel, while client operations execute within the single client JDBC driver.</li> 
+ <li>Use <tt>RANGE SCAN</tt> or <tt>SKIP SCAN</tt> whenever possible rather than <tt>TABLE SCAN</tt>.</li> 
+ <li>Filter against leading columns in the primary key constraint. This assumes you have designed the primary key to lead with frequently-accessed or frequently-filtered columns as described in “Primary Keys,” above.</li> 
+ <li>If necessary, introduce a local index or a global index that covers your query.</li> 
+ <li>If you have an index that covers your query but the optimizer is not detecting it, try hinting the query: <tt>SELECT /*+ INDEX() */ …</tt></li> 
+</ul> 
+<p>See also: <a class="externalLink" href="http://phoenix.apache.org/language/index.html#explain">http://phoenix.apache.org/language/index.html#explain</a></p> 
 <div class="section"> 
  <div class="section"> 
-  <h3 id="How_to_use_column_mapping">How to use column mapping?</h3> 
-  <p>One can set the column mapping property only at the time of creating the table. Before deciding on using column mapping, you need to think about how many columns you expect in a table and its view hierarchy to have in the lifecycle. For various mapping schemes, below are the limits on number of columns:</p> 
-  <table border="0" class="bodyTable table table-striped table-hover"> 
-   <thead> 
-    <tr class="a"> 
-     <th>Config/Property Value </th> 
-     <th>Max # of columns</th> 
-    </tr> 
-   </thead> 
-   <tbody> 
-    <tr class="b"> 
-     <td>1 </td> 
-     <td>255</td> 
-    </tr> 
-    <tr class="a"> 
-     <td>2 </td> 
-     <td>65535</td> 
-    </tr> 
-    <tr class="b"> 
-     <td>3 </td> 
-     <td>16777215</td> 
-    </tr> 
-    <tr class="a"> 
-     <td>4 </td> 
-     <td>2147483647</td> 
-    </tr> 
-    <tr class="b"> 
-     <td>NONE </td> 
-     <td>no limit(theoretically)</td> 
-    </tr> 
-   </tbody> 
-  </table> 
-  <p>For mutable tables, this limit applies to columns in <b>all</b> column families. For immutable tables, the limit applies to <b>per</b> column family. By default, any new phoenix tables will be using the column mapping feature. These defaults could be overridden by setting below config to the desired value in hbase-site.xml.</p> 
-  <table border="0" class="bodyTable table table-striped table-hover"> 
-   <thead> 
-    <tr class="a"> 
-     <th>Table type </th> 
-     <th>Default Column mapping </th> 
-     <th>Config</th> 
-    </tr> 
-   </thead> 
-   <tbody> 
-    <tr class="b"> 
-     <td>Mutable/Immutable </td> 
-     <td>2 byte qualifiers </td> 
-     <td>phoenix.default.column.encoded.bytes.attrib</td> 
-    </tr> 
-   </tbody> 
-  </table> 
-  <p>Keep in mind that this config controls global level defaults that would apply to all tables. If you would like to use a different mapping scheme than this global default, then you can use the COLUMN_ENCODED_BYTES table property.</p> 
-  <div class="source"> 
-   <pre>CREATE TABLE T
-(    
-a_string varchar not null,  
-col1 integer  
-CONSTRAINT pk PRIMARY KEY (a_string)  
-)  
-COLUMN_ENCODED_BYTES = 1;
-</pre> 
-  </div> 
- </div> 
- <div class="section"> 
-  <h3 id="How_to_use_immutable_data_encoding">How to use immutable data encoding?</h3> 
-  <p>Like column mapping, one can set the immutable data encoding only at the time of creating the table. Through our performance testing, we have found that using SINGLE_CELL_ARRAY_WITH_OFFSETS generally provides really good performance improvement and space savings. Below are some scenarios in when it would be better to use ONE_CELL_PER_COLUMN encoding instead.</p> 
+  <h3 id="Anatomy_of_an_Explain_Plan">Anatomy of an Explain Plan</h3> 
+  <p>An explain plan consists of lines of text that describe operations that Phoenix will perform during a query, using the following terms:</p> 
   <ul> 
-   <li>Data is sparse i.e. less than 50% of the columns have values</li> 
-   <li>Size of data within a column family gets too big. Our general guidance here is that with default HBase block size of 64K, if data within a column family grows beyond 50K then we shouldn’t be using SINGLE_CELL_ARRAY_WITH_OFFSETS.</li> 
-   <li>For immutable tables that are going to have views on them</li> 
+   <li><tt>AGGREGATE INTO ORDERED DISTINCT ROWS</tt>—aggregates the returned rows using an operation such as addition. When <tt>ORDERED</tt> is used, the <tt>GROUP BY</tt> operation is applied to the leading part of the primary key constraint, which allows the aggregation to be done in place rather than keeping all distinct groups in memory on the server side.</li> 
+   <li><tt>AGGREGATE INTO SINGLE ROW</tt>—aggregates the results into a single row using an aggregate function with no <tt>GROUP BY</tt> clause. For example, the <tt>count()</tt> statement returns one row with the total number of rows that match the query.</li> 
+   <li><tt>CLIENT</tt>—the operation will be performed on the client side. It’s faster to perform most operations on the server side, so you should consider whether there’s a way to rewrite the query to give the server more of the work to do.</li> 
+   <li><tt>FILTER BY</tt> expression—returns only results that match the expression.</li> 
+   <li><tt>FULL SCAN OVER</tt> tableName—the operation will scan every row in the specified table.</li> 
+   <li><tt>INNER-JOIN</tt>—the operation will join multiple tables on rows where the join condition is met.</li> 
+   <li><tt>MERGE SORT</tt>—performs a merge sort on the results.</li> 
+   <li><tt>RANGE SCAN OVER</tt> tableName <tt>[</tt> … <tt>]</tt>—The information in the square brackets indicates the start and stop for each primary key that’s used in the query.</li> 
+   <li><tt>ROUND ROBIN</tt>—when the query doesn’t contain <tt>ORDER BY</tt> and therefore the rows can be returned in any order, <tt>ROUND ROBIN</tt> order maximizes parallelization on the client side.</li> 
+   <li>x<tt>-CHUNK</tt>—describes how many threads will be used for the operation. The maximum parallelism is limited to the number of threads in thread pool. The minimum parallelization corresponds to the number of regions the table has between the start and stop rows of the scan. The number of chunks will increase with a lower guidepost width, as there is more than one chunk per region.</li> 
+   <li><tt>PARALLEL</tt>x-<tt>WAY</tt>—describes how many parallel scans will be merge sorted during the operation.</li> 
+   <li><tt>SERIAL</tt>—some queries run serially. For example, a single row lookup or a query that filters on the leading part of the primary key and limits the results below a configurable threshold.</li> 
+   <li><tt>EST_BYTES_READ</tt> - provides an estimate of the total number of bytes that will be scanned as part of executing the query</li> 
+   <li><tt>EST_ROWS_READ</tt> - provides an estimate of the total number of rows that will be scanned as part of executing the query</li> 
+   <li><tt>EST_INFO_TS</tt> - epoch time in milliseconds at which the estimate information was collected</li> 
   </ul> 
-  <p>By default, immutable non-multitenant tables are created using the two byte column mapping and the SINGLE_CELL_ARRAY_WITH_OFFSETS data encoding. On the other hand, immutable multi-tenant tables are created with two byte column mapping scheme and ONE_COLUMN_PER_CELL data encoding. This is because we generally expect users to create tenant specific views on the base multi-tenant tables which as mentioned in the criteria above is more suitable for ONE_CELL_PER_COLUMN encoding. Like column mapping, if you would like to change these global defaults, you can do so by setting below configs in the hbase-site.xml.</p> 
-  <table border="0" class="bodyTable table table-striped table-hover"> 
-   <thead> 
-    <tr class="a"> 
-     <th>Immutable Table type </th> 
-     <th>Immutable storage scheme </th> 
-     <th>Config</th> 
-    </tr> 
-   </thead> 
-   <tbody> 
-    <tr class="b"> 
-     <td>Multi-tenant </td> 
-     <td>ONE_CELL_PER_COLUMN </td> 
-     <td>phoenix.default.multitenant.immutable.storage.scheme</td> 
-    </tr> 
-    <tr class="a"> 
-     <td>Non multi-tenant </td> 
-     <td>SINGLE_CELL_ARRAY_WITH_OFFSETS </td> 
-     <td>phoenix.default.immutable.storage.scheme</td> 
-    </tr> 
-   </tbody> 
-  </table> 
-  <p>One could also provide specific immutable storage scheme and column mapping scheme using the table properties IMMUTABLE_STORAGE_SCHEME and COLUMN_ENCODED_BYTES. For example - </p> 
-  <div class="source"> 
-   <pre>CREATE IMMUTABLE TABLE T   
-(  
-a_string varchar not null,   
-col1 integer  
-CONSTRAINT pk PRIMARY KEY (a_string)  
-)   
-IMMUTABLE_STORAGE_SCHEME = SINGLE_CELL_ARRAY_WITH_OFFSETS,  
-COLUMN_ENCODED_BYTES = 1;  
-</pre> 
-  </div> 
-  <p>One could chose to not use the SINGLE_CELL_ARRAY_WITH_OFFSETS encoding but still use one of the number based column mapping. Here is an example - </p> 
-  <div class="source"> 
-   <pre>CREATE IMMUTABLE TABLE T   
-(  
-a_string varchar not null,  
-col1 integer  
-CONSTRAINT pk PRIMARY KEY (a_string)  
-)  
-IMMUTABLE_STORAGE_SCHEME = ONE_CELL_PER_COLUMN,   
-COLUMN_ENCODED_BYTES = 1;  
-</pre> 
-  </div> 
-  <p>When using SINGLE_CELL_ARRAY_WITH_OFFSETS encoding, one has to use a number based column mapping scheme. An attempt to use SINGLE_CELL_ARRAY_WITH_OFFSETS with COLUMN_ENCODED_BYTES = NONE will throw an error.</p> 
  </div> 
  <div class="section"> 
-  <h3 id="How_to_disable_column_mapping">How to disable column mapping?</h3> 
-  <p>To disable column mapping across all new tables, you need to set <tt>phoenix.default.column.encoded.bytes.attrib</tt> to 0. One can also leave it on globally and have it disabled selectively for a table by setting the COLUMN_ENCODED_BYTES = 0 property in the create table statement. </p> 
+  <h3 id="Example">Example</h3> 
+  <div class="source"> 
+   <pre>+-----------------------------------------------------------------------------------------------------------------------------------
+|                                            PLAN                                 | EST_BYTES_READ  | EST_ROWS_READ  | EST_INFO_TS  |
++-----------------------------------------------------------------------------------------------------------------------------------
+| CLIENT 36-CHUNK 237878 ROWS 6787437019 BYTES PARALLEL 36-WAY FULL SCAN
+| OVER exDocStoreb                                                                |     237878      |   6787437019   | 1510353318102|
+|   PARALLEL INNER-JOIN TABLE 0 (SKIP MERGE)                                      |     237878      |   6787437019   | 1510353318102|
+|     CLIENT 36-CHUNK PARALLEL 36-WAY RANGE SCAN OVER indx_exdocb 
+|      [0,' 42ecf4abd4bd7e7606025dc8eee3de 6a3cc04418cbc2619ddc01f54d88d7 c3bf'] 
+|      - [0,' 42ecf4abd4bd7e7606025dc8eee3de 6a3cc04418cbc2619ddc01f54d88d7 c3bg' |     237878      |   6787437019   | 1510353318102|
+|       SERVER FILTER BY FIRST KEY ONLY                                           |     237878      |   6787437019   | 1510353318102|
+|       SERVER AGGREGATE INTO ORDERED DISTINCT ROWS BY [&quot;ID&quot;]                     |     237878      |   6787437019   | 1510353318102|
+|     CLIENT MERGE SORT                                                           |     237878      |   6787437019   | 1510353318102|
+|   DYNAMIC SERVER FILTER BY (A.CURRENT_TIMESTAMP, [A.ID](http://a.id/)) 
+    IN ((TMP.MCT, TMP.TID))                                                       |     237878      |   6787437019   | 1510353318102|
++-----------------------------------------------------------------------------------------------------------------------------------
+</pre> 
+  </div> 
+ </div> 
+ <div class="section"> 
+  <h3 id="JDBC_Explain_Plan_API_and_the_estimates_information">JDBC Explain Plan API and the estimates information</h3> 
+  <p>The information displayed in the explain plan API can also be accessed programmatically through the standard JDBC interfaces. When statistics collection is enabled for a table, the explain plan also gives an estimate of number of rows and bytes a query is going to scan. To get hold of the info, you can use corresponding columns in the result set returned by the explain plan statement. When stats collection is not enabled or if for some reason Phoenix cannot provide the estimate information, the columns return null. Below is an example:</p> 
+  <div class="source"> 
+   <pre>String explainSql = &quot;EXPLAIN SELECT * FROM T&quot;;
+Long estimatedBytes = null;
+Long estimatedRows = null;
+Long estimateInfoTs = null;
+try (Statement statement = conn.createStatement(explainSql)) {
+        int paramIdx = 1;
+        ResultSet rs = statement.executeQuery(explainSql);
+        rs.next();
+        estimatedBytes =
+                (Long) rs.getObject(PhoenixRuntime.EXPLAIN_PLAN_ESTIMATED_BYTES_READ_COLUMN);
+        estimatedRows =
+                (Long) rs.getObject(PhoenixRuntime.EXPLAIN_PLAN_ESTIMATED_ROWS_READ_COLUMN);
+        estimateInfoTs =
+                (Long) rs.getObject(PhoenixRuntime.EXPLAIN_PLAN_ESTIMATE_INFO_TS_COLUMN);
+}
+</pre> 
+  </div> 
  </div> 
 </div>
 			</div>
@@ -435,8 +389,8 @@ COLUMN_ENCODED_BYTES = 1;
 						<li >
 							<a href="secondary_indexing.html" title="Secondary Indexes">Secondary Indexes</a>
 						</li>
-						<li class="active">
-							<a href="#" title="Storage Formats">Storage Formats</a>
+						<li >
+							<a href="columnencoding.html" title="Storage Formats">Storage Formats</a>
 						</li>
 						<li >
 							<a href="atomic_upsert.html" title="Atomic Upsert">Atomic Upsert</a>
@@ -521,8 +475,8 @@ COLUMN_ENCODED_BYTES = 1;
 						<li >
 							<a href="subqueries.html" title="Subqueries">Subqueries</a>
 						</li>
-						<li >
-							<a href="explainplan.html" title="Explain Plan">Explain Plan</a>
+						<li class="active">
+							<a href="#" title="Explain Plan">Explain Plan</a>
 						</li>
 					</ul>
 				</div>

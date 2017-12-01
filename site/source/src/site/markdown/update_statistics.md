@@ -9,10 +9,6 @@ target region.
 Statistics are also automatically collected during major compactions and region splits so
 manually running this command may not be necessary.
 
-In 4.12, we have added a new configuration <code>phoenix.use.stats.parallelization</code>
-which controls whether statistical information on the data should be used to drive
-query parallelization (as described below). The default value of the configuration is true.
-
 
 ##Parallelization
 Phoenix breaks up queries into multiple scans and runs them in parallel to reduce latency.
@@ -82,4 +78,8 @@ The configuration parameters controlling statistics collection include:
       table over which statistics are being collected is used as the timestamp. Unless your
       client is controlling the timestamps while reading and writing data, this parameter
       should be left alone.
+    * The default value is true.
+5. <code>phoenix.use.stats.parallelization</code>
+    * This configuration is available starting Phoenix 4.12. It controls whether statistical information 
+      on the data should be used to drive query parallelization.
     * The default value is true.

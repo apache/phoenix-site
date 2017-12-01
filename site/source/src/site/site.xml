@@ -132,6 +132,7 @@
             <item href="sequences.html" name="Sequences"/>
             <item href="joins.html" name="Joins"/>
             <item href="subqueries.html" name="Subqueries"/>
+            <item href="explainplan.html" name="Explain Plan"/>
         </menu>
 
     </body>
