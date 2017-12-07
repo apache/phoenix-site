@@ -16,7 +16,7 @@ Enis Soztutar | Hortonworks | enis@apache.org | PMC
 Gabriel Reid | NGDATA | greid@apache.org | PMC
 James Taylor | Salesforce | jamestaylor@apache.org | PMC
 Jeffrey Zhong | Elementum | jeffreyz@apache.org | PMC
-Jesse Yates | Fineo | jyates@apache.org | PMC
+Jesse Yates | Tesla | jyates@apache.org | PMC
 Josh Elser | Hortonworks | elserj@apache.org | PMC
 Josh Mahonin | Interset | jmahonin@apache.org | PMC
 Lars Hofhansl | Salesforce | larsh@apache.org | PMC
@@ -26,7 +26,7 @@ Mujtaba Chohan | Salesforce | mujtaba@apache.org | PMC
 Nick Dimiduk | Icebrg | ndimiduk@apache.org | PMC
 Rajeshbabu Chintaguntla | Hortonworks | rajeshbabu@apache.org | PMC
 Ramkrishna Vasudevan | Intel | ramkrishna@apache.org | PMC
-Ravi Magham | Bazaarvoice | ravimagham@apache.org | PMC
+Ravi Magham | Elementum | ravimagham@apache.org | PMC
 Samarth Jain | Salesforce | samarth@apache.org | PMC
 Sergey Soldatov | Hortonworks | ssa@apache.org | PMC
 Simon Toens | Salesforce | stoens@apache.org | PMC
