@@ -27,7 +27,7 @@ Nick Dimiduk | Icebrg | ndimiduk@apache.org | PMC
 Rajeshbabu Chintaguntla | Hortonworks | rajeshbabu@apache.org | PMC
 Ramkrishna Vasudevan | Intel | ramkrishna@apache.org | PMC
 Ravi Magham | Elementum | ravimagham@apache.org | PMC
-Samarth Jain | Salesforce | samarth@apache.org | PMC
+Samarth Jain | Netflix | samarth@apache.org | PMC
 Sergey Soldatov | Hortonworks | ssa@apache.org | PMC
 Simon Toens | Salesforce | stoens@apache.org | PMC
 Steven Noels | NGDATA | stevenn@apache.org | PMC
@@ -38,5 +38,6 @@ Dumindu Buddhika | University of Moratuwa | duminduk@apache.org | Committer
 Ethan Wang | Salesforce | ewang@apache.org | Committer
 Geoffrey Jacoby | Salesforce | gjacoby@apache.org | Committer
 Jan Fernando | Salesforce | jfernando@apache.org | Committer
+Karan Mehta | Salesforce | karanmehta93@apache.org | Committer
 Kevin Liew | Simba Technologies | kliew@apache.org | Committer
 Vincent Poon | Salesforce | vincentpoon@apache.org | Committer
