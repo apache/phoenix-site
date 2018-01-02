@@ -111,7 +111,7 @@ To load this file, the default delimiter (comma) would be used, and the array de
 #### A note on separator characters
 
 The default separator character for both loaders is a comma (,). A common separator for input files is the tab character, 
-which can tricky to supply on the command line. A common mistake is trying to supply a tab as the separator by typing the following
+which can be tricky to supply on the command line. A common mistake is trying to supply a tab as the separator by typing the following
 
     -d '\t'
 
