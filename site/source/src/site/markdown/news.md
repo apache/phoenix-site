@@ -1,6 +1,8 @@
 # Apache Phoenix News
 <br/>
 <hr/>
+#### [Announcing CDH-compatible Phoenix 4.13.2 released](https://blogs.apache.org/phoenix/entry/announcing-cdh-compatible-phoenix-4) (January 22, 2018)
+<hr/>
 #### [Announcing Phoenix 4.13 released](https://blogs.apache.org/phoenix/entry/announcing-phoenix-4-13-released) (November 9, 2017)
 <hr/>
 #### [Announcing Phoenix 4.12 released](https://blogs.apache.org/phoenix/entry/announcing-phoenix-4-12-released) (October 9, 2017)
