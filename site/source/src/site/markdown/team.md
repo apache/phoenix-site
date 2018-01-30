@@ -40,4 +40,5 @@ Geoffrey Jacoby | Salesforce | gjacoby@apache.org | Committer
 Jan Fernando | Salesforce | jfernando@apache.org | Committer
 Karan Mehta | Salesforce | karanmehta93@apache.org | Committer
 Kevin Liew | Simba Technologies | kliew@apache.org | Committer
+Pedro Boado | Trend Devs | pboado@apache.org | Committer
 Vincent Poon | Salesforce | vincentpoon@apache.org | Committer
