@@ -2,6 +2,8 @@
 
 Tuning Phoenix can be complex, but with a little knowledge of how it works you can make significant changes to the performance of your reads and writes. The most important factor in performance is the design of your schema, especially as it affects the underlying HBase row keys. Look in “General Tips” below to find design advice for different anticipated data access patterns. Subsequent sections describe how to use secondary indexes, hints, and explain plans.
 
+**Note:** Phoenix and HBase work well when your application does point lookups and small range scans. This can be achieved by good primary key design (see below). If you find that your application requires many full table scans, then Phoenix and HBase are likely not the best tool for the job. Instead, look at using other tools that write to HDFS directly using columnar representations such as Parquet.
+
 # Primary Keys
 
 The underlying row key design is the single most important factor in Phoenix performance, and it's important to get it right at design time because you cannot change it later without re-writing the data and index tables.
@@ -175,14 +177,25 @@ Hints let you override default query processing behavior and specify such factor
 
 See also: [Hint](https://phoenix.apache.org/language/#hint).
 
+### Explain Plans
+
+An `EXPLAIN` plan tells you a lot about how a query will be run. To generate an explain plan run [this](language/index.html#explain) query and to interpret the plan, see [this](explainplan.html) reference.
+
+### Parallelization
+
+You can improve parallelization with the [UPDATE STATISTICS](https://phoenix.apache.org/update_statistics.html) command. This command subdivides each region by determining keys called *guideposts* that are equidistant from each other, then uses these guideposts to break up queries into multiple parallel scans.
+Statistics are turned on by default. With Phoenix 4.9, the user can set guidepost width for each table. Optimal guidepost width depends on a number of factors such as cluster size, cluster usage, number of cores per node, table size, and disk I/O.
+
+In Phoenix 4.12, we have added a new configuration <code>phoenix.use.stats.parallelization</code> that controls whether statistics should be used for driving parallelization. Note that one can still run stats collection. The information collected is used to surface estimates on number of bytes and rows a query will scan when an EXPLAIN is generated for it. 
+
 ## Writing
 
-### Batching large numbers of records
+### Updating data with UPSERT VALUES
 
-When using `UPSERT` to write a large number of records, turn off autocommit and batch records. 
-**Note:** Phoenix uses `commit()` instead of `executeBatch()` to control batch updates.
+When using `UPSERT VALUES` to write a large number of records, turn off autocommit and batch records in reasonably small batches (try 100 rows and adjust from there to fine-tune performance).
 
-Start with a batch size of 1000 and adjust as needed. Here's some pseudocode showing one way to commit records in batches:
+**Note:** With the default fat driver, `executeBatch()` will not provide any benefit.  Instead update mutliple rows by executing `UPSERT VALUES` mutliple times and then use `commit()` to submit the batch to the cluster. With the thin driver, however, it's important to use `executeBatch()` as this will minimize the number of RPCs between the client and query server.
+
 
 ```
 try (Connection conn = DriverManager.getConnection(url)) {
@@ -203,6 +216,13 @@ try (Connection conn = DriverManager.getConnection(url)) {
 
 **Note:** Because the Phoenix client keeps uncommitted rows in memory, be careful not to set `commitSize` too high.
 
+### Updating data with UPSERT SELECT
+When using `UPSERT SELECT` to write many rows in a single statement, turn on autocommit and the rows will be automatically batched according to the `phoenix.mutate.batchSize`. This will minimize the amount of data returned back to the client and is the most efficient means of updating many rows.
+
+### Deleting data
+
+When deleting a large data set, turn on autoCommit before issuing the `DELETE` query so that the client does not need to remember the row keys of all the keys as they are deleted. This prevents the client from buffering the rows affected by the `DELETE` so that Phoenix can delete them directly on the region servers without the expense of returning them to the client.
+
 ### Reducing RPC traffic
 
 To reduce RPC traffic, set the `UPDATE_CACHE_FREQUENCY` (4.7 or above) on your table and indexes when you create them (or issue an `ALTER TABLE`/`INDEX` call. See https://phoenix.apache.org/#Altering.
@@ -210,22 +230,6 @@ To reduce RPC traffic, set the `UPDATE_CACHE_FREQUENCY` (4.7 or above) on your t
 ### Using local indexes
 
 If using 4.8, consider using local indexes to minimize the write time. In this case, the writes for the secondary index will be to the same region server as your base table. This approach does involve a performance hit on the read side, though, so make sure to quantify both write speed improvement and read speed reduction.
-
-## Deleting
-
-When deleting a large data set, turn on autoCommit before issuing the `DELETE` query so that the client does not need to remember the row keys of all the keys as they are deleted. This prevents the client from buffering the rows affected by the `DELETE` so that Phoenix can delete them directly on the region servers without the expense of returning them to the client.
-
-# Explain Plans
-
-An `EXPLAIN` plan tells you a lot about how a query will be run. To generate explain plan look at this reference: http://phoenix.apache.org/language/index.html#explain. For a more detailed explaination on how to interpret the explain plan and further use it for tuning queries go to: http://phoenix.apache.org/explainplan.html 
-
-
-# Improving parallelization
-
-You can improve parallelization with the [UPDATE STATISTICS](https://phoenix.apache.org/update_statistics.html) command. This command subdivides each region by determining keys called *guideposts* that are equidistant from each other, then uses these guideposts to break up queries into multiple parallel scans.
-Statistics are turned on by default. With Phoenix 4.9, the user can set guidepost width for each table. Optimal guidepost width depends on a number of factors such as cluster size, cluster usage, number of cores per node, table size, and disk I/O.
-
-In Phoenix 4.12, we have added a new configuration <code>phoenix.use.stats.parallelization</code> that controls whether statistics should be used for driving parallelization. Note that one can still run stats collection. The information collected is used to surface estimates on number of bytes and rows a query will scan when an EXPLAIN is generated for it. 
 
 # Further Tuning
 

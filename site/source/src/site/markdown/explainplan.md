@@ -1,4 +1,4 @@
-# Explain Plans
+# Explain Plan
 
 An `EXPLAIN` plan tells you a lot about how a query will be run:
 
