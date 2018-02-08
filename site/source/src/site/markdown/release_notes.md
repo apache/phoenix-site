@@ -4,6 +4,26 @@ Release notes provide details on issues and their fixes which may have an impact
 Phoenix behavior. For some issues an upgrade may be required to be performed for a fix to
 take affect. See below for directions specific to a particular release.
 
+###<u>Phoenix 5.0.0-alpha Release Notes</u>
+
+Phoenix 5.0.0-alpha is a "preview" release. This release is the first
+version of Phoenix which is compatible with Apache Hadoop 3.0.x and Apache
+HBase 2.0.x. This release also is designated an "alpha" release because
+there are several known deficiencies which impact the production readiness.
+This release should be used carefully by users who have taken the time
+to understand what is known to be working and what is not.
+
+Known issues:
+
+* The Apache Hive integration is known to be non-functional (PHOENIX-4423)
+* Split/Merge logic with Phoenix local indexes are broken (PHOENIX-4440)
+* Apache Tepha integration/transactional tables are non-functional (PHOENIX-4580)
+* Point-in-time queries and tools that look at "old" cells are broken, e.g. IndexScrutiny (PHOENIX-4378)
+
+The developers would like to encourage users to test this release out and
+report any observed issues so that the official 5.0.0 release quality may
+be significantly improved.
+
 ###<u>Phoenix-4.8.0 Release Notes</u>
 
 [PHOENIX-3164](https://issues.apache.org/jira/browse/PHOENIX-3164) is a relatively serious
