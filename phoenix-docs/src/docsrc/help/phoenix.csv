@@ -1847,19 +1847,31 @@ RAND(5)
 "
 
 "Functions (String)","UPPER","
-UPPER( stringTerm )
+UPPER( stringTerm [, localeString ] )
 ","
-Returns upper case string of the string argument.
+Returns upper case string of the string argument. If localeString (available in Phoenix 4.14)
+is provided, it identifies the locale whose rules are used for the
+conversion. If localeString is not provided, the default locale is
+used. The localeString must be of the form returned by the Java 6
+implementation of java.util.Locale.toString() e.g. 'zh_TW_STROKE' or
+'en_US' or 'fr_FR'.
 ","
 UPPER('Hello')
+UPPER('Hello', 'tr_TR')
 "
 
 "Functions (String)","LOWER","
-LOWER( stringTerm )
+LOWER( stringTerm [, localeString ] )
 ","
-Returns lower case string of the string argument.
+Returns lower case string of the string argument. If localeString (available in Phoenix 4.14)
+is provided, it identifies the locale whose rules are used for the
+conversion. If localeString is not provided, the default locale is
+used. The localeString must be of the form returned by the Java 6
+implementation of java.util.Locale.toString() e.g. 'zh_TW_STROKE' or
+'en_US' or 'fr_FR'.
 ","
 LOWER('HELLO')
+LOWER('HELLO', 'en_US')
 "
 
 "Functions (String)","REVERSE","
