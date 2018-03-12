@@ -371,6 +371,60 @@ DROP SCHEMA IF EXISTS my_schema
 DROP SCHEMA my_schema
 "
 
+"Commands","GRANT","
+GRANT {permissionString} [ON [SCHEMA schemaName] tableName] TO [GROUP] userString
+","
+Grant permissions at table, schema or user level. Permissions are managed by HBase in hbase:acl table, hence access controls need to be enabled. This feature will be available from Phoenix 4.14 version onwards.
+
+Possible permissions are R - Read, W - Write, X - Execute, C - Create and A - Admin.
+To enable/disable access controls, see https://hbase.apache.org/book.html#hbase.accesscontrol.configuration
+
+Permissions should be granted on base tables. It will be propagated to all its indexes and views.
+Group permissions are applicable to all users in the group and schema permissions are applicable to all tables with that schema.
+Grant statements without table/schema specified are assigned at GLOBAL level.
+
+Phoenix doesn't expose Execute('X') functionality to end users. However, it is required for mutable tables with secondary indexes.
+
+Important Note:
+
+Every user requires 'RX' permissions on all Phoenix SYSTEM tables in order to work correctly. Users also require 'RWX' permissions on SYSTEM.SEQUENCE table for using SEQUENCES.
+
+","
+GRANT 'RXC' TO 'User1'
+GRANT 'RWXC' TO GROUP 'Group1'
+GRANT 'A' ON Table1 TO 'User2'
+GRANT 'RWX' ON my_schema.my_table TO 'User2'
+GRANT 'A' ON SCHEMA my_schema TO 'User3'
+"
+
+"Commands","REVOKE","
+REVOKE [ON [SCHEMA schemaName] tableName] FROM [GROUP] userString
+","
+Revoke permissions at table, schema or user level. Permissions are managed by HBase in hbase:acl table, hence access controls need to be enabled. This feature will be available from Phoenix 4.14 version onwards.
+
+To enable/disable access controls, see https://hbase.apache.org/book.html#hbase.accesscontrol.configuration
+
+Group permissions are applicable to all users in the group and schema permissions are applicable to all tables with that schema.
+Permissions should be revoked on base tables. It will be propagated to all its indexes and views.
+Revoke statements without table/schema specified are assigned at GLOBAL level.
+
+Revoke removes all the permissions at that level.
+
+Important Note:
+
+Revoke permissions needs to be exactly at the same level as permissions assigned via Grant permissions statement. Level refers to table, schema or user.
+Revoking any of 'RX' permissions on any Phoenix SYSTEM tables will cause exceptions.
+Revoking any of 'RWX' permissions on SYSTEM.SEQUENCE will cause exceptions while accessing sequences.
+
+The examples below are for revoking permissions granted using the examples from GRANT statement above.
+","
+REVOKE FROM 'User1'
+REVOKE FROM GROUP 'Group1'
+REVOKE ON Table1 FROM 'User2'
+REVOKE ON my_schema.my_table FROM 'User2'
+REVOKE ON SCHEMA my_schema FROM 'User3'
+"
+
 "Other Grammar","Options","
 { [familyName .] name= value } [,...]
 ","
