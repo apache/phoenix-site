@@ -194,6 +194,12 @@ configuration.
       <td><em>unset</em></td>
     </tr>
     <tr>
+      <td><small>phoenix.queryserver.kerberos.allowed.realms</small></td>
+      <td style="text-align: left;">A comma-separated list of Kerberos realms, other than that of the PQS's
+      HTTP principal's realm, that should be allowed to authenticate with PQS via SPNEGO.</td>
+      <td><em>unset</em></td>
+    </tr>
+    <tr>
       <td><small>phoenix.queryserver.dns.nameserver</small></td>
       <td style="text-align: left;">The DNS hostname</td>
       <td>default</td>

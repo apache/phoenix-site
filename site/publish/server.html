@@ -309,125 +309,130 @@ log4j.logger.org.eclipse.jetty.server=INFO
     <td><i>unset</i></td> 
    </tr> 
    <tr class="a"> 
+    <td><small>phoenix.queryserver.kerberos.allowed.realms</small></td> 
+    <td style="text-align: left;">A comma-separated list of Kerberos realms, other than that of the PQS's HTTP principal's realm, that should be allowed to authenticate with PQS via SPNEGO.</td> 
+    <td><i>unset</i></td> 
+   </tr> 
+   <tr class="b"> 
     <td><small>phoenix.queryserver.dns.nameserver</small></td> 
     <td style="text-align: left;">The DNS hostname</td> 
     <td>default</td> 
    </tr> 
-   <tr class="b"> 
+   <tr class="a"> 
     <td><small>phoenix.queryserver.dns.interface</small></td> 
     <td style="text-align: left;">The name of the network interface to query for DNS.</td> 
     <td>default</td> 
    </tr> 
-   <tr class="a"> 
+   <tr class="b"> 
     <td colspan="3">&nbsp;</td> 
    </tr> 
-   <tr class="b"> 
+   <tr class="a"> 
     <td colspan="3"><b>Configurations relating to the server connection cache.</b></td> 
    </tr> 
-   <tr class="a"> 
+   <tr class="b"> 
     <td><b>Property</b></td> 
     <td><b>Description</b></td> 
     <td><b>Default</b></td> 
    </tr> 
-   <tr class="b"> 
+   <tr class="a"> 
     <td><small>avatica.connectioncache.concurrency</small></td> 
     <td style="text-align: left;">Connection cache concurrency level. Default is 10.</td> 
     <td>10</td> 
    </tr> 
-   <tr class="a"> 
+   <tr class="b"> 
     <td><small>avatica.connectioncache.initialcapacity</small></td> 
     <td style="text-align: left;">Connection cache initial capacity. Default is 100.</td> 
     <td>100</td> 
    </tr> 
-   <tr class="b"> 
+   <tr class="a"> 
     <td><small>avatica.connectioncache.maxcapacity</small></td> 
     <td style="text-align: left;"> Connection cache maximum capacity. Approaching this point, the cache will start to evict least recently used connection objects. Default is 1000. </td> 
     <td>1000</td> 
    </tr> 
-   <tr class="a"> 
+   <tr class="b"> 
     <td><small>avatica.connectioncache.expiryduration</small></td> 
     <td style="text-align: left;"> Connection cache expiration duration. Any connections older than this value will be discarded. Default is 10 minutes. </td> 
     <td>10</td> 
    </tr> 
-   <tr class="b"> 
+   <tr class="a"> 
     <td><small>avatica.connectioncache.expiryunit</small></td> 
     <td style="text-align: left;"> Connection cache expiration unit. Unit modifier applied to the value provided in avatica.connectioncache.expiryunit. Default is minutes. </td> 
     <td>MINUTES</td> 
    </tr> 
-   <tr class="a"> 
+   <tr class="b"> 
     <td colspan="3">&nbsp;</td> 
    </tr> 
-   <tr class="b"> 
+   <tr class="a"> 
     <td colspan="3" id="jdbc_url_options"><b>JDBC URL options.</b></td> 
    </tr> 
-   <tr class="a"> 
+   <tr class="b"> 
     <td><small>url</small></td> 
     <td style="text-align: left;"> The URL of the QueryServer. </td> 
     <td>null</td> 
    </tr> 
-   <tr class="b"> 
+   <tr class="a"> 
     <td><small>serialization</small></td> 
     <td style="text-align: left;"> The client-side analogy to phoenix.queryserver.serialization in the server to control how the client should serialize data to send to the QueryServer. </td> 
     <td>PROTOBUF</td> 
    </tr> 
-   <tr class="a"> 
+   <tr class="b"> 
     <td><small>timeZone</small></td> 
     <td style="text-align: left;"> The time zone the JDBC connection should use. If not provided, the time zone will be specified by JVM. The value of this should be parseable by Java's TimeZone class. </td> 
     <td>null</td> 
    </tr> 
-   <tr class="b"> 
+   <tr class="a"> 
     <td colspan="3">&nbsp;</td> 
    </tr> 
-   <tr class="a"> 
+   <tr class="b"> 
     <td colspan="3"><b>Configurations relating to the server statement cache.</b></td> 
    </tr> 
-   <tr class="b"> 
+   <tr class="a"> 
     <td><b>Property</b></td> 
     <td><b>Description</b></td> 
     <td><b>Default</b></td> 
    </tr> 
-   <tr class="a"> 
+   <tr class="b"> 
     <td><small>avatica.statementcache.concurrency</small></td> 
     <td style="text-align: left;">Statement cache concurrency level. Default is 100.</td> 
     <td>100</td> 
    </tr> 
-   <tr class="b"> 
+   <tr class="a"> 
     <td><small>avatica.statementcache.initialcapacity</small></td> 
     <td style="text-align: left;">Statement cache initial capacity. Default is 1000.</td> 
     <td>1000</td> 
    </tr> 
-   <tr class="a"> 
+   <tr class="b"> 
     <td><small>avatica.statementcache.maxcapacity</small></td> 
     <td style="text-align: left;"> Statement cache maximum capacity. Approaching this point, the cache will start to evict least recently used statement objects. Default is 10000. </td> 
     <td>10000</td> 
    </tr> 
-   <tr class="b"> 
+   <tr class="a"> 
     <td><small>avatica.statementcache.expiryduration</small></td> 
     <td style="text-align: left;"> Statement cache expiration duration. Any statements older than this value will be discarded. Default is 5 minutes. </td> 
     <td>5</td> 
    </tr> 
-   <tr class="a"> 
+   <tr class="b"> 
     <td><small>avatica.statementcache.expiryunit</small></td> 
     <td style="text-align: left;"> Statement cache expiration unit. Unit modifier applied to the value provided in avatica.statementcache.expiryunit. Default is minutes. </td> 
     <td>MINUTES</td> 
    </tr> 
-   <tr class="b"> 
+   <tr class="a"> 
     <td colspan="3">&nbsp;</td> 
    </tr> 
-   <tr class="a"> 
+   <tr class="b"> 
     <td colspan="3"><b>Configurations relating to impersonation.</b></td> 
    </tr> 
-   <tr class="b"> 
+   <tr class="a"> 
     <td><b>Property</b></td> 
     <td><b>Description</b></td> 
     <td><b>Default</b></td> 
    </tr> 
-   <tr class="a"> 
+   <tr class="b"> 
     <td><small>phoenix.queryserver.withRemoteUserExtractor</small></td> 
     <td style="text-align: left;"> Boolean which controls if a remote user to impersonate should be extracted from the HTTP request parameter made by that user instead of the HTTP-authenticated user name (which is the default). </td> 
     <td>false</td> 
    </tr> 
-   <tr class="b"> 
+   <tr class="a"> 
     <td><small>phoenix.queryserver.remoteUserExtractor.param</small></td> 
     <td style="text-align: left;"> The name of the HTTP request parameter to use to extract the user name to execute the query as. </td> 
     <td>doAs</td> 
