@@ -183,9 +183,14 @@ configuration.
       <td><em>unset</em></td>
     </tr>
     <tr>
-      <td><small>phoenix.queryserver.kerberos.http.principal</small></td>
+      <td><small>phoenix.queryserver.http.kerberos.principal</small></td>
       <td style="text-align: left;">The kerberos principal to use when authenticating SPNEGO connections.
       phoenix.queryserver.kerberos.principal will be used if this property is undefined.</td>
+      <td><em>unset</em></td>
+    </tr>
+    <tr>
+      <td><small>phoenix.queryserver.kerberos.http.principal</small></td>
+      <td style="text-align: left;">Deprecated, use phoenix.queryserver.http.kerberos.principal instead.</td>
       <td><em>unset</em></td>
     </tr>
     <tr>
