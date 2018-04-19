@@ -8,7 +8,7 @@
 
 	<head>
 		<meta charset="UTF-8" />
-		<title>Statistics Collection | Apache Phoenix</title>
+		<title>Python Driver for Phoenix | Apache Phoenix</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="description" content="" />
 		<meta http-equiv="content-language" content="en" />
@@ -34,7 +34,7 @@
 
 	</head>
 
-	<body class="page-update_statistics project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
+	<body class="page-python project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
 
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
@@ -91,7 +91,7 @@
 									<li ><a href="phoenix_mr.html" title="Map Reduce Integration">Map Reduce Integration</a></li>
 									<li ><a href="flume.html" title="Apache Flume Plugin">Apache Flume Plugin</a></li>
 									<li ><a href="kafka.html" title="Apache Kafka Plugin">Apache Kafka Plugin</a></li>
-									<li ><a href="python.html" title="Python Driver">Python Driver</a></li>
+									<li class="active"><a href="" title="Python Driver">Python Driver</a></li>
 								</ul>
 							</li>
 							<li class="dropdown">
@@ -112,7 +112,7 @@
 									<li ><a href="columnencoding.html" title="Storage Formats">Storage Formats</a></li>
 									<li ><a href="atomic_upsert.html" title="Atomic Upsert">Atomic Upsert</a></li>
 									<li ><a href="namspace_mapping.html" title="Namespace Mapping">Namespace Mapping</a></li>
-									<li class="active"><a href="" title="Statistics Collection">Statistics Collection</a></li>
+									<li ><a href="update_statistics.html" title="Statistics Collection">Statistics Collection</a></li>
 									<li ><a href="rowtimestamp.html" title="Row Timestamp Column">Row Timestamp Column</a></li>
 									<li ><a href="paged.html" title="Paged Queries">Paged Queries</a></li>
 									<li ><a href="salted.html" title="Salted Tables">Salted Tables</a></li>
@@ -163,78 +163,53 @@
 		<div class="span12">
 			<div class="body-content">
 <div class="page-header">
- <h1>Statistics Collection</h1>
+ <h1>Python Driver for Phoenix</h1>
 </div> 
-<p>The UPDATE STATISTICS command updates the statistics collected on a table. This command collects a set of keys per region per column family that are equal byte distanced from each other. These collected keys are called <i>guideposts</i> and they act as <i>hints/guides</i> to improve the parallelization of queries on a given target region.</p> 
-<p>Statistics are also automatically collected during major compactions and region splits so manually running this command may not be necessary.</p> 
+<p>The Python Driver for Apache Phoenix implements the <a class="externalLink" href="https://www.python.org/dev/peps/pep-0249/">Python DB 2.0 API</a> to access Phoenix via the Phoenix Query Server. The driver is tested with Python 2.7, 3.5, and 3.6. This code was originally called <a class="externalLink" href="https://code.oxygene.sk/lukas/python-phoenixdb">Python Phoenixdb</a> and was graciously donated by its authors to the Apache Phoenix project.</p> 
+<p>All future development of the project is being done in Apache Phoenix.</p> 
 <div class="section"> 
- <h2 id="Parallelization">Parallelization</h2> 
- <p>Phoenix breaks up queries into multiple scans and runs them in parallel to reduce latency. Parallelization in Phoenix is driven by the statistics related configuration parameters. Each chunk of data between guideposts will be run in parallel in a separate scan to improve query performance. The chunk size is determined by the GUIDE_POSTS_WIDTH table property (Phoenix 4.9 or above) or the global server-side <tt>phoenix.stats.guidepost.width</tt> parameter if the table property is not set. As the size of the chunks decrease, you’ll want to increase <tt>phoenix.query.queueSize</tt> as more work will be queued in that case. Note that at a minimum, separate scans will be run for each table region. Statistics in Phoenix provides a means of gaining intraregion parallelization. In addition to the guidepost width specification, the client-side <tt>phoenix.query.threadPoolSize</tt> and <tt>phoenix.query.queueSize</tt> parameters and the server-side <tt>hbase.regionserver.handler.count</tt> parameter have an impact on the amount of parallelization.</p> 
+ <h2 id="Installation">Installation</h2> 
+ <p>Phoenix does not presently deploy the driver, so users must first build the driver and install it themselves:</p> 
+ <div class="source"> 
+  <pre>$ cd python
+$ pip install -r requirements.txt
+$ python setup.py install
+</pre> 
+ </div> 
+ <p>Deploying a binary release to central Python package-hosting services (e.g. installable via <tt>pip</tt>) will be done eventually. Presently, releases are in source-form only.</p> 
 </div> 
 <div class="section"> 
  <h2 id="Examples">Examples</h2> 
- <p>To update the statistics for a given table <tt>my_table</tt>, execute the following command:</p> 
  <div class="source"> 
-  <pre>UPDATE STATISTICS my_table
-</pre> 
- </div> 
- <p>The above syntax would collect the statistics for the table my_table and all the index tables, views and view index tables associated with the table my_table.</p> 
- <p>The equivalent of the above syntax is</p> 
- <div class="source"> 
-  <pre>UPDATE STATISTICS my_table ALL
-</pre> 
- </div> 
- <p>To collect the statistics on the index table alone</p> 
- <div class="source"> 
-  <pre>UPDATE STATISTICS my_table INDEX
-</pre> 
- </div> 
- <p>To collect the statistics on the table alone</p> 
- <div class="source"> 
-  <pre>UPDATE STATISTICS my_table COLUMNS
-</pre> 
- </div> 
- <p>To modify the guidepost width to 10MB for a table, execute the following command:</p> 
- <div class="source"> 
-  <pre>ALTER TABLE my_table SET GUIDE_POSTS_WIDTH = 10000000
-</pre> 
- </div> 
- <p>To remove the guidepost width, set the property to null:</p> 
- <div class="source"> 
-  <pre>ALTER TABLE my_table SET GUIDE_POSTS_WIDTH = null
+  <pre>import phoenixdb
+import phoenixdb.cursor
+
+database_url = 'http://localhost:8765/'
+conn = phoenixdb.connect(database_url, autocommit=True)
+
+cursor = conn.cursor()
+cursor.execute(&quot;CREATE TABLE users (id INTEGER PRIMARY KEY, username VARCHAR)&quot;)
+cursor.execute(&quot;UPSERT INTO users VALUES (?, ?)&quot;, (1, 'admin'))
+cursor.execute(&quot;SELECT * FROM users&quot;)
+print(cursor.fetchall())
+
+cursor = conn.cursor(cursor_factory=phoenixdb.cursor.DictCursor)
+cursor.execute(&quot;SELECT * FROM users WHERE id=1&quot;)
+print(cursor.fetchone()['USERNAME'])
 </pre> 
  </div> 
 </div> 
 <div class="section"> 
- <h2 id="Configuration">Configuration</h2> 
- <p>The configuration parameters controlling statistics collection include:</p> 
- <ol style="list-style-type: decimal"> 
-  <li><tt>phoenix.stats.guidepost.width</tt> 
-   <ul> 
-    <li>A server-side parameter that specifies the number of bytes between guideposts. A smaller amount increases parallelization, but also increases the number of chunks which must be merged on the client side.</li> 
-    <li>The default value is 104857600 (100 MB).</li> 
-   </ul></li> 
-  <li><tt>phoenix.stats.updateFrequency</tt> 
-   <ul> 
-    <li>A server-side paramater that determines the frequency in milliseconds for which statistics will be refreshed from the statistics table and subsequently used by the client.</li> 
-    <li>The default value is 900000 (15 mins)</li> 
-   </ul></li> 
-  <li><tt>phoenix.stats.minUpdateFrequency</tt> 
-   <ul> 
-    <li>A client-side parameter that determines the minimum amount of time in milliseconds that must pass before statistics may again be manually collected through another <tt>UPDATE STATISTICS</tt> call.</li> 
-    <li>The default value is <tt>phoenix.stats.updateFrequency</tt> divided by two (7.5 mins)</li> 
-   </ul></li> 
-  <li><tt>phoenix.stats.useCurrentTime</tt> 
-   <ul> 
-    <li>An advanced server-side parameter that if true causes the current time on the server-side to be used as the timestamp of rows in the statistics table when background tasks such as compactions or splits occur. If false, then the max timestamp found while traversing the table over which statistics are being collected is used as the timestamp. Unless your client is controlling the timestamps while reading and writing data, this parameter should be left alone.</li> 
-    <li>The default value is true.</li> 
-   </ul></li> 
-  <li><tt>phoenix.use.stats.parallelization</tt> 
-   <ul> 
-    <li>This configuration is available starting Phoenix 4.12. It controls whether statistical information on the data should be used to drive query parallelization.</li> 
-    <li>The default value is true.</li> 
-   </ul></li> 
- </ol> 
+ <h2 id="Limitations">Limitations </h2> 
+ <ul> 
+  <li>The driver presently does not support Kerberos authentication <a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-4688">PHOENIX-4688</a></li> 
+ </ul> 
+</div> 
+<div class="section"> 
+ <h2 id="Resources">Resources </h2> 
+ <ul> 
+  <li><a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-4636">PHOENIX-4636</a> : Initial landing of the driver into Apache Phoenix.</li> 
+ </ul> 
 </div>
 			</div>
 		</div>
@@ -364,8 +339,8 @@
 						<li >
 							<a href="kafka.html" title="Apache Kafka Plugin">Apache Kafka Plugin</a>
 						</li>
-						<li >
-							<a href="python.html" title="Python Driver">Python Driver</a>
+						<li class="active">
+							<a href="#" title="Python Driver">Python Driver</a>
 						</li>
 					</ul>
 				</div>
@@ -393,8 +368,8 @@
 						<li >
 							<a href="namspace_mapping.html" title="Namespace Mapping">Namespace Mapping</a>
 						</li>
-						<li class="active">
-							<a href="#" title="Statistics Collection">Statistics Collection</a>
+						<li >
+							<a href="update_statistics.html" title="Statistics Collection">Statistics Collection</a>
 						</li>
 						<li >
 							<a href="rowtimestamp.html" title="Row Timestamp Column">Row Timestamp Column</a>
