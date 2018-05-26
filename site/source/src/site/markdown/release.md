@@ -40,7 +40,7 @@ Follow the instructions. Signed binary and source tars will be generated in _rel
     <pre>
     mvn clean deploy gpg:sign -DperformRelease=true -Dgpg.passphrase=[your_pass_phrase_here]
     -Dgpg.keyname=[your_key_here] -DskipTests -P release -pl phoenix-core,phoenix-pig,phoenix-tracing-webapp,
-    phoenix-queryserver,phoenix-spark,phoenix-flume,phoenix-pherf,phoenix-queryserver-client,phoenix-hive -am
+    phoenix-queryserver,phoenix-spark,phoenix-flume,phoenix-pherf,phoenix-queryserver-client,phoenix-hive,phoenix-client,phoenix-server -am
     </pre>
 5. Go to https://repository.apache.org/#stagingRepositories and <code>close</code> -> <code>release</code> the staged artifacts.
 6. Set version back to upcoming SNAPSHOT and commit: 
