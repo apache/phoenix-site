@@ -24,6 +24,7 @@ Maryann Xue | Intel | maryannxue@apache.org | PMC
 Michael Stack | Cloudera | stack@apache.org | PMC
 Mujtaba Chohan | Salesforce | mujtaba@apache.org | PMC
 Nick Dimiduk | Icebrg | ndimiduk@apache.org | PMC
+Pedro Boado | Santander UK | pboado@apache.org | PMC
 Rajeshbabu Chintaguntla | Hortonworks | rajeshbabu@apache.org | PMC
 Ramkrishna Vasudevan | Intel | ramkrishna@apache.org | PMC
 Ravi Magham | Elementum | ravimagham@apache.org | PMC
@@ -32,6 +33,7 @@ Sergey Soldatov | Hortonworks | ssa@apache.org | PMC
 Simon Toens | Salesforce | stoens@apache.org | PMC
 Steven Noels | NGDATA | stevenn@apache.org | PMC
 Thomas D'Silva | Salesforce | tdsilva@apache.org | PMC
+Vincent Poon | Salesforce | vincentpoon@apache.org | PMC
 Cheng Lei | Sogou | chenglei@apache.org | Committer
 Cody Marcel | Salesforce | codymarcel@apache.org | Committer
 Dumindu Buddhika | University of Moratuwa | duminduk@apache.org | Committer
@@ -40,5 +42,3 @@ Geoffrey Jacoby | Salesforce | gjacoby@apache.org | Committer
 Jan Fernando | Salesforce | jfernando@apache.org | Committer
 Karan Mehta | Salesforce | karanmehta93@apache.org | Committer
 Kevin Liew | Simba Technologies | kliew@apache.org | Committer
-Pedro Boado | Trend Devs | pboado@apache.org | Committer
-Vincent Poon | Salesforce | vincentpoon@apache.org | Committer
