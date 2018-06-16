@@ -11,7 +11,7 @@ function addRelease(version, date, commit) {
     tr.innerHTML =
         '<td>' + version + '</td>' +
         '<td>' + date + '</td>' +
-        '<td><a href="https://git-wip-us.apache.org/repos/asf?p=phoenix.git;a=commit;h=' + commit + '">' + commit + '</a></td>' +
+        '<td><a href="https://git-wip-us.apache.org/repos/asf?p=phoenix.git;a=commit;h=' + commit + '">' + commit.substring(0,12) + '</a></td>' +
         '<td><ul><li>' +
           '<a href="' + dynUrl + 'apache-phoenix-' + version + '/bin/apache-phoenix-' + version + '-bin.tar.gz">bin</a> ( ' +
           '<a href="' + apacheUrl + 'apache-phoenix-' + version + '/bin/apache-phoenix-' + version + '-bin.tar.gz.sha256">sha256</a> ' +
