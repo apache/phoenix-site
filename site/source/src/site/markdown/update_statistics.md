@@ -53,6 +53,14 @@ To remove the guidepost width, set the property to null:
 
     ALTER TABLE my_table SET GUIDE_POSTS_WIDTH = null
 
+##Known issues
+
+* <code>**Duplicated records** (SQL count shows more rows than HBase row_count) for Phoenix versions earlier than **4.12** </code>
+
+May happen for tables with several regions where guide posts were not generated for last region(s) because the region size is smaller than the guide post width.
+In that case, the parallel scans for those regions would start with the latest guide post instead of startkey of this region.
+**Fixed in 4.12** as part of [PHOENIX-4007](https://issues.apache.org/jira/browse/PHOENIX-4007) 
+
 ## Configuration
 
 The configuration parameters controlling statistics collection include:
