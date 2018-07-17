@@ -1,6 +1,8 @@
 # Apache Phoenix News
 <br/>
 <hr/>
+#### [Announcing Phoenix 5.0.0 released](https://blogs.apache.org/phoenix/entry/apache-phoenix-releases-next-major) (July 4, 2018)
+<hr/>
 #### [PhoenixCon 2018 announced for June 18th, 2018](https://phoenix.apache.org/phoenixcon-2018) (March 24, 2018)
 <hr/>
 #### [Announcing CDH-compatible Phoenix 4.13.2 released](https://blogs.apache.org/phoenix/entry/announcing-cdh-compatible-phoenix-4) (January 22, 2018)
