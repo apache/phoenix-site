@@ -17,3 +17,13 @@ Below are some prior presentations that have been done on Apache Phoenix. Anothe
 | How Apache Phoenix enables interactive, low latency applications over HBase | [Slides](http://phoenix.apache.org/presentations/ApacheCon2014-16x9.pdf), [Video](https://www.youtube.com/watch?v=9qfBnFyKZwM) | ApacheCon | 2014 |
 | How (and why) Phoenix puts the SQL back into NoSQL | [Slides](http://phoenix.apache.org/presentations/HadoopSummit2013-16x9.pdf), [Video](http://www.youtube.com/watch?v=YHsHdQ08trg) | Hadoop Summit | 2013  |
 | How (and why) Phoenix puts the SQL back into NoSQL | [Slides](http://phoenix.apache.org/presentations/HBaseCon2013-4x3.pdf), [Video](http://www.cloudera.com/content/cloudera/en/resources/library/hbasecon/hbasecon-2013--how-and-why-phoenix-puts-the-sql-back-into-nosql-video.html) | HBaseCon | 2013 |
+
+## PhoenixCon
+
+PhoenixCon is a developer-focused event available to the public. The event is comprised of users and developers giving
+presentations about how they are using Apache Phoenix or new features coming to the project.
+
+For previous presentations given at PhoenixCon events, please refer to the
+[archives](https://phoenix.apache.org/phoenixcon-archives.html).
+
+See the following for more information about [PhoenixCon 2018](https://phoenix.apache.org/phoenixcon-2018/).
