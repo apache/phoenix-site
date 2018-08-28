@@ -78,8 +78,18 @@ any one tenant is allowed to consume. After this percentage, an
       for conversion of a date to/from a string, whether through the
       <code>TO_CHAR(&lt;date&gt;)</code> or
 <code>TO_DATE(&lt;date-string&gt;)</code> functions, or through
-<code>resultSet.getString(&lt;date-column&gt;)</code>. Default is yyyy-MM-dd HH:mm:ss</td><td>yyyy-MM-dd HH:mm:ss</td></tr>
+<code>resultSet.getString(&lt;date-column&gt;)</code>. Default is yyyy-MM-dd HH:mm:ss.SSS</td><td>yyyy-MM-dd HH:mm:ss.SSS</td></tr>
 <tr><td><small>phoenix.query.dateFormatTimeZone</small></td><td style="text-align: left;">A timezone id that specifies the default time zone in which date, time, and timestamp literals should be interpreted when interpreting string literals or using the <code>TO_DATE</code> function. A time zone id can be a timezone abbreviation such as "PST", or a full name such as "America/Los_Angeles", or a custom offset such as "GMT-9:00". The time zone id "LOCAL" can also be used to interpret all date, time, and timestamp literals as being in the current timezone of the client.</td><td>GMT</td></tr>
+<tr><td><small>phoenix.query.timeFormat</small></td><td style="text-align: left;">Default pattern to use
+      for conversion of TIME to/from a string, whether through the
+      <code>TO_CHAR(&lt;time&gt;)</code> or
+<code>TO_TIME(&lt;time-string&gt;)</code> functions, or through
+<code>resultSet.getString(&lt;time-column&gt;)</code>. Default is yyyy-MM-dd HH:mm:ss.SSS</td><td>yyyy-MM-dd HH:mm:ss.SSS</td></tr>
+<tr><td><small>phoenix.query.timestampFormat</small></td><td style="text-align: left;">Default pattern to use
+      for conversion of TIMESTAMP to/from a string, whether through the
+      <code>TO_CHAR(&lt;timestamp&gt;)</code> or
+<code>TO_TIMESTAMP(&lt;timestamp-string&gt;)</code> functions, or through
+<code>resultSet.getString(&lt;timestamp-column&gt;)</code>. Default is yyyy-MM-dd HH:mm:ss.SSS</td><td>yyyy-MM-dd HH:mm:ss.SSS</td></tr>
 <tr><td><small>phoenix.query.numberFormat</small></td><td style="text-align: left;">Default pattern to use
       for conversion of a decimal number to/from a string, whether through the
       <code>TO_CHAR(&lt;decimal-number&gt;)</code> or
