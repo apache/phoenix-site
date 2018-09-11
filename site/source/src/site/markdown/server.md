@@ -118,6 +118,14 @@ As a word of warning: there is no end-to-end test coverage for the HBase 0.98 an
 because of missing test-related code in those HBase releases. While we expect no issues on these
 Phoenix release lines, we recommend additional testing by the user to verify that there are no issues.
 
+## Metrics
+
+By default, the Phoenix Query Server exposes various Phoenix global client metrics via JMX (for HBase versions 1.3 and up).
+The list of metrics are available [here](https://phoenix.apache.org/metrics.html).
+
+PQS Metrics use [Hadoop Metrics 2](https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/Metrics.html) internally for metrics publishing. Hence it publishes various JVM related metrics. Metrics can be filtered based on certain tags, which can be configured by the property specified in hbase-site.xml on the classpath. Further details are provided in Configuration section.
+
+
 ## Configuration
 
 Server components are spread across a number of java packages, so effective
@@ -338,6 +346,18 @@ configuration.
         to execute the query as.
       </td>
       <td>doAs</td>
+    </tr>
+     <tr><td colspan="3">&nbsp;</td></tr>
+    <tr>
+      <td colspan="3"><b>Configurations relating to metrics.</b></td>
+    </tr>
+    <tr><td><b>Property</b></td><td><b>Description</b></td><td><b>Default</b></td></tr>
+    <tr>
+      <td><small>phoenix.client.metrics.tag</small></td>
+      <td style="text-align: left;">
+        Tag for filtering categories of Phoenix global client metrics emitted by PQS in hadoop-metrics2.properties
+      </td>
+      <td>FAT_CLIENT</td>
     </tr>
   </tbody>
 </table>
