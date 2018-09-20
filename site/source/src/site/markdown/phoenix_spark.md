@@ -169,8 +169,16 @@ val df = sqlContext.load("org.apache.phoenix.spark", Map("table" -> "INPUT_TABLE
   "zkUrl" -> hbaseConnectionString))
 
 // Save to OUTPUT_TABLE
-df.save("org.apache.phoenix.spark", SaveMode.Overwrite, Map("table" -> "OUTPUT_TABLE",
-  "zkUrl" -> hbaseConnectionString))
+df.saveToPhoenix(Map("table" -> "OUTPUT_TABLE", "zkUrl" -> hbaseConnectionString))
+
+or
+
+df.write \
+ .format("org.apache.phoenix.spark") \
+ .mode("overwrite") \
+ .option("table", "OUTPUT_TABLE") \
+ .option("zkUrl", "localhost:2181") \
+ .save()
 ```
 
 ### PySpark
