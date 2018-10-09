@@ -52,7 +52,5 @@ The following limitations are enforced for the ON DUPLICATE KEY clause usage:
   does not handle atomicity unless the latest value is being updated.
 * The same column should not be updated more than once in the same statement.
 * No aggregation or references to sequences are allowed within the clause.
-* Although global indexes on columns being atomically updated are supported, it's not recommended
-  as a potentially a separate RPC across the wire would be made while the row is under lock to
-  maintain the secondary index.
+* Global indexes on columns being atomically updated are not supported, as potentially a separate RPC across the wire would be made while the row is under lock to maintain the secondary index.
 

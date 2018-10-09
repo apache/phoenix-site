@@ -207,7 +207,7 @@ ON DUPLICATE KEY UPDATE
   <li>The CURRENT_SCN property may not be set on connection when this clause is used as HBase does not handle atomicity unless the latest value is being updated.</li> 
   <li>The same column should not be updated more than once in the same statement.</li> 
   <li>No aggregation or references to sequences are allowed within the clause.</li> 
-  <li>Although global indexes on columns being atomically updated are supported, it’s not recommended as a potentially a separate RPC across the wire would be made while the row is under lock to maintain the secondary index.</li> 
+  <li>Global indexes on columns being atomically updated are not supported, as potentially a separate RPC across the wire would be made while the row is under lock to maintain the secondary index.</li> 
  </ul> 
 </div>
 			</div>
