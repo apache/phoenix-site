@@ -14,7 +14,7 @@ Devaraj Das | Hortonworks | ddas@apache.org | PMC
 Eli Levine | Salesforce | elilevine@apache.org | PMC
 Enis Soztutar | Hortonworks | enis@apache.org | PMC
 Gabriel Reid | NGDATA | greid@apache.org | PMC
-James Taylor | Salesforce | jamestaylor@apache.org | PMC
+James Taylor | Lyft | jamestaylor@apache.org | PMC
 Jeffrey Zhong | Elementum | jeffreyz@apache.org | PMC
 Jesse Yates | Tesla | jyates@apache.org | PMC
 Josh Elser | Hortonworks | elserj@apache.org | PMC
@@ -37,7 +37,7 @@ Vincent Poon | Salesforce | vincentpoon@apache.org | PMC
 Cheng Lei | Sogou | chenglei@apache.org | Committer
 Cody Marcel | Salesforce | codymarcel@apache.org | Committer
 Dumindu Buddhika | University of Moratuwa | duminduk@apache.org | Committer
-Ethan Wang | Salesforce | ewang@apache.org | Committer
+Ethan Wang | Facebook | ewang@apache.org | Committer
 Geoffrey Jacoby | Salesforce | gjacoby@apache.org | Committer
 Jan Fernando | Salesforce | jfernando@apache.org | Committer
 Karan Mehta | Salesforce | karanmehta93@apache.org | Committer
