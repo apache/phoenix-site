@@ -1,6 +1,8 @@
 # Apache Phoenix News
 <br/>
 <hr/>
+#### [NoSQL Day 2019 in Washington, DC](https://blogs.apache.org/phoenix/entry/nosql-day-2019) (February 28, 2019)
+<hr/>
 #### [Announcing Phoenix 5.0.0 released](https://blogs.apache.org/phoenix/entry/apache-phoenix-releases-next-major) (July 4, 2018)
 <hr/>
 #### [PhoenixCon 2018 announced for June 18th, 2018](https://phoenix.apache.org/phoenixcon-2018) (March 24, 2018)
