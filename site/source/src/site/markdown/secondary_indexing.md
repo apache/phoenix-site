@@ -202,6 +202,26 @@ The following server-side configurations controls this behavior:
 * <code>phoenix.index.failure.handling.rebuild</code> must be set to false to disable a mutable index from being
  rebuilt in the background in the event of a commit failure.
 
+#### BulkLoad Tool Limitation
+
+The BulkLoadTools (e.g. CSVBulkLoadTool and JSONBulkLoadTool) cannot presently generate correct updates to mutable
+secondary indexes when pre-existing records are being updated. In the normal mutable secondary index write path, we can
+safely calculate a Delete (for the old record) and a Put (for the new record) for each secondary index while holding a
+row-lock to prevent concurrent updates. In the context of a MapReduce job, we cannot effectively execute this same logic
+because we are specifically doing this "out of band" from the HBase RegionServers. As such, while these Tools generate
+HFiles for the index tables with the proper updates for the data being loaded, any previous index records corresponding
+to the same record in the table are not deleted. This net-effect of this limitation is: if you use these Tools to re-ingest
+the same records to an index table, that index table will have duplicate records in it which will result in incorrect
+query results from that index table.
+
+To perform incremental loads of data using the BulkLoadTools which may update existing records, you must
+drop and re-create all index tables after the data table is loaded. Re-creating the index with the `ASYNC` option and
+using `IndexTool` to populate and enable that index is likely a must for tables of non-trivial size.
+
+To perform incremental loading of CSV datasets that do not require any manual index intervention, the `psql` tool can
+be used in place of the BulkLoadTools. Additionally, a MapReduce job could be written to parse CSV/JSON data and write
+it directly to Phoenix; although, such a tool is not currently provided by Phoenix for users.
+
 ## Setup
 
 Non transactional, mutable indexing requires special configuration options on the region server and master to run - Phoenix ensures that they are setup correctly when you enable mutable indexing on the table; if the correct properties are not set, you will not be able to use secondary indexing. After adding these settings to your hbase-site.xml, you'll need to do a rolling restart of your cluster.
@@ -251,9 +271,9 @@ From Phoenix 4.8.0 onward, no configuration changes are required to use local in
 ### Upgrading Local Indexes created before 4.8.0
 While upgrading the Phoenix to 4.8.0+ version at server remove above three local indexing related configurations from `hbase-site.xml` if present. From client we are supporting both online(while initializing the connection from phoenix client of 4.8.0+ versions) and offline(using psql tool) upgrade of local indexes created before 4.8.0. As part of upgrade we  recreate the local indexes in ASYNC mode. After upgrade user need to build the indexes using [IndexTool](http://phoenix.apache.org/secondary_indexing.html#Index_Population)
 
-Following client side configuration used in the upgrade. 
-	
-1. <code>phoenix.client.localIndexUpgrade</code> 
+Following client side configuration used in the upgrade.
+
+1. <code>phoenix.client.localIndexUpgrade</code>
     * The value of it is true means online upgrade and false means offline upgrade.
     * **Default: true**
 
@@ -288,7 +308,7 @@ All the following parameters must be set in `hbase-site.xml` - they are true for
 6. hbase.htable.threads.keepalivetime
     * Amount of time in seconds after we expire threads in the HTable's thread pool.
     * Using the "direct handoff" approach, new threads will only be created if it is necessary and will grow unbounded. This could be bad but HTables  only create as many Runnables as there are region servers; therefore, it also scales when new region servers are added.
-    * **Default: 60** 
+    * **Default: 60**
 7. index.tablefactory.cache.size
     * Number of index HTables we should keep in cache.
     * Increasing this number ensures that we do not need to recreate an HTable for each attempt to write to an index table. Conversely, you could see memory pressure if this value is set too high.
@@ -323,7 +343,7 @@ It can also be run from Hadoop using either the phoenix-core or phoenix-server j
 
     HADOOP_CLASSPATH=$(hbase mapredcp) hadoop jar phoenix-<version>-server.jar org.apache.phoenix.mapreduce.index.IndexScrutinyTool -dt my_table -it my_index -o
 By default two mapreduce jobs are launched, one with the data table as the source table and one with the index table as the source table.
-    
+
 The following parameters can be used with the Index Scrutiny Tool:
 
 | *Parameter*                | *Description*                                 |
@@ -345,7 +365,7 @@ The following parameters can be used with the Index Scrutiny Tool:
 
 ## Resources
 There have been several presentations given on how secondary indexing works in Phoenix that have a more in-depth look at how indexing works (with pretty pictures!):
- 
+
 * [San Francisco HBase Meetup](http://files.meetup.com/1350427/PhoenixIndexing-SF-HUG_09-26-13.pptx) - Sept. 26, 2013
 * [Los Anglees HBase Meetup](http://www.slideshare.net/jesse_yates/phoenix-secondary-indexing-la-hug-sept-9th-2013) - Sept, 4th, 2013
 * [Local Indexes](https://github.com/Huawei-Hadoop/hindex/blob/master/README.md#how-it-works) by Huawei
