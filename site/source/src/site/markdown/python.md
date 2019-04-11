@@ -38,7 +38,8 @@ print(cursor.fetchone()['USERNAME'])
 ```
 
 ## Limitations <a id="Limitations"></a>
-* The driver presently does not support Kerberos authentication [PHOENIX-4688](https://issues.apache.org/jira/browse/PHOENIX-4688)
+* None presently known.
 
 ## Resources <a id="Resources"></a>
 * [PHOENIX-4636] (https://issues.apache.org/jira/browse/PHOENIX-4636) : Initial landing of the driver into Apache Phoenix.
+* [PHOENIX-4688] (https://issues.apache.org/jira/browse/PHOENIX-4688) : Implementation of Kerberos authentication via SPNEGO.
