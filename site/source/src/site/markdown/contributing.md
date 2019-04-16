@@ -30,18 +30,28 @@ To setup your development, see [these](develop.html) directions.
 
 ### Generate a patch
 
-There are two general approaches that can be used for creating and submitting a patch: GitHub pull requests, or manually creating a patch with Git. Both of these are explained below.
+There are two general approaches that can be used for creating and submitting a patch: GitHub pull requests, or manually creating a patch with Git. Both of these are explained below. Please make sure that the patch applies cleanly on all the active branches including master: 5.x-HBase-2.0, 4.x-HBase-1.4, 4.x-HBase-1.3, and 4.x-HBase-1.2
 
 Regardless of which approach is taken, please make sure to follow the Phoenix code conventions (more information below). Whenever possible, unit tests or integration tests should be included with patches.
 
-The commit message should reference the jira ticket issue (which has the format
-`PHOENIX-{NUMBER}`).
+Please make sure that the patch contains only one commit and click on the 'Submit patch' button to automatically trigger the tests on the patch.
 
+The commit message should reference the jira ticket issue (which has the format
+`PHOENIX-{NUMBER}`: <Jira title>).
+
+To effectively get the patch reviewed, please raise the pull request against an appropriate branch.
+
+#### Naming convention for the patch
+When you generate the patch, make sure the name of the patch has following format:
+`PHOENIX-{NUMBER}.{BRANCH-NAME}.{VERSION}`
+
+Ex. PHOENIX-4872.master.v1.patch, PHOENIX-4872.master.v2.patch, PHOENIX-4872.4.x-HBase-1.3.v1.patch etc
 
 #### GitHub workflow
 
 1. Create a pull request in GitHub for the [mirror of the Phoenix Git repository](https://github.com/apache/phoenix). 
-2. Add a comment in the Jira issue with a link to the pull request. This makes it clear that the patch is ready for review.
+2. Generate a patch and attach it to the jira, so that Hadoop QA runs automated tests.
+3. If you update the PR, generate a new patch with different name from the previous, so that change in the patch is detected and tests are run on the new patch.
 
 #### Local Git workflow
 
