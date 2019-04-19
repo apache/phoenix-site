@@ -27,7 +27,7 @@ Maryann Xue | Databricks | maryannxue@apache.org | PMC
 Michael Stack | Cloudera | stack@apache.org | PMC
 Mujtaba Chohan | Salesforce | mujtaba@apache.org | PMC
 Nick Dimiduk | Icebrg | ndimiduk@apache.org | PMC
-Pedro Boado | Santander UK | pboado@apache.org | PMC
+Pedro Boado | Datadog | pboado@apache.org | PMC
 Rajeshbabu Chintaguntla | Hortonworks | rajeshbabu@apache.org | PMC
 Ramkrishna Vasudevan | Intel | ramkrishna@apache.org | PMC
 Ravi Magham | Elementum | ravimagham@apache.org | PMC
