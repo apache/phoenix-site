@@ -31,7 +31,7 @@ Well, that's kind of the point: give folks something with which they're already 
 Didn't make it to the last HBase Meetup did you? SQL is just a way of expressing *<strong>what you want to get</strong>* not *<strong>how you want to get it</strong>*. Check out my [presentation](http://files.meetup.com/1350427/IntelPhoenixHBaseMeetup.ppt) for various existing and to-be-done Phoenix features to support your favorite HBase trick. Have ideas of your own? We'd love to hear about them: file an [issue](issues.html) for us and/or join our [mailing list](mailing_list.html).
 
 *<strong>Blah, blah, blah - I just want to get started!</strong>*<br/>
-Ok, great! Just follow our [install instructions](download.html#Installation):
+Ok, great! Just follow our [install instructions](installation.html):
 
 * [download](download.html) and expand our installation tar
 * copy the phoenix server jar that is compatible with your HBase installation into the lib directory of every region server
