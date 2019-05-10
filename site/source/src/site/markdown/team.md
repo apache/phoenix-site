@@ -46,5 +46,8 @@ Ethan Wang | Facebook | ewang@apache.org | Committer
 Gerald Sangudi | 23andme | sangudi@apache.org | Committer
 Jaanai Zhang | Alibaba | jaanai@apache.org | Committer
 Jan Fernando | Salesforce | jfernando@apache.org | Committer
+Kadir Ozdemir | Salesforce | kadir@apache.org | Committer
 Kevin Liew | Simba Technologies | kliew@apache.org | Committer
+Mihir Monani | Salesforce | mihir6692@apache.org | Committer
+Swaroopa Kadam | Salesforce | skadam@apache.org | Committer
 Ohad Shacham | Yahoo Research, Oath | ohads@apache.org | Committer
