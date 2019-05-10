@@ -37,6 +37,7 @@ Simon Toens | Salesforce | stoens@apache.org | PMC
 Steven Noels | NGDATA | stevenn@apache.org | PMC
 Thomas D'Silva | Salesforce | tdsilva@apache.org | PMC
 Vincent Poon | Salesforce | vincentpoon@apache.org | PMC
+Abhishek Singh Chouhan | Salesforce | achouhan@apache.org | Committer
 Akshita Malhotra | Salesforce | akshitamalhotra@apache.org | Committer
 Chinmay Kulkarni | Salesforce | chinmayskulkarni@apache.org | Committer
 Cody Marcel | Salesforce | codymarcel@apache.org | Committer
