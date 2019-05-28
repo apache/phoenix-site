@@ -35,7 +35,7 @@ Follow the instructions. Signed binary and source tars will be generated in _rel
     </pre>
 3. Remove any obsolete releases on https://dist.apache.org/repos/dist/release/phoenix given the current release.
 
-4. Ensure you ~/.m2/settings.xml is setup correctly: 
+4. Ensure your ~/.m2/settings.xml is setup correctly: 
 
     ```
 	    <server>
