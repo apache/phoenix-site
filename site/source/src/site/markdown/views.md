@@ -1,6 +1,6 @@
 #Views
 
-The standard SQL view syntax (with some limitations) is now supported by Phoenix to enable multiple virtual tables to all share the same underlying physical HBase table. This is especially important in HBase, as you cannot realistically expect to have more than perhaps up to a hundred physical tables and continue to get reasonable performance from HBase.
+The standard SQL view syntax (with some limitations) is now supported by Phoenix to enable multiple virtual tables to all share the same underlying physical HBase table. This is important in HBase as there are limits to the number of Regions which HBase can manage. Limiting the number of tables can help limit the number of Regions in a cluster.
 
 For example, given the following table definition that defines a base table to collect product metrics:
 
