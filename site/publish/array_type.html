@@ -169,17 +169,15 @@
 <p>The Apache Phoenix 3.0/4.0 release introduces support for the <a class="externalLink" href="http://docs.oracle.com/javase/tutorial/jdbc/basics/array.html">JDBC ARRAY type</a>. Any primitive type may be used in an ARRAY. Here is an example of declaring an array type when creating a table:</p> 
 <div class="source"> 
  <pre>CREATE TABLE regions (
-    region_name VARCHAR PRIMARY KEY,
-    zips VARCHAR ARRAY[10],
-    CONSTRAINT pk PRIMARY KEY (region_name));
+    region_name VARCHAR NOT NULL PRIMARY KEY,
+    zips VARCHAR ARRAY[10]);
 </pre> 
 </div> 
 <p>or alternately:</p> 
 <div class="source"> 
  <pre>CREATE TABLE regions (
-    region_name VARCHAR PRIMARY KEY,
-    zips VARCHAR[],
-    CONSTRAINT pk PRIMARY KEY (region_name));
+    region_name VARCHAR NOT NULL PRIMARY KEY,
+    zips VARCHAR[]);
 </pre> 
 </div> 
 <p>Insertion into the array may be done entirely through a SQL statement:</p> 
@@ -205,12 +203,12 @@ stmt.execute();
 </div> 
 <p>or an individual element in the array may be accessed via a subscript notation. The subscript is one-based, so the following would select the first element:</p> 
 <div class="source"> 
- <pre>SELECT zip[1] FROM regions WHERE region_name = 'SF Bay Area';
+ <pre>SELECT zips[1] FROM regions WHERE region_name = 'SF Bay Area';
 </pre> 
 </div> 
 <p>Use of the array subscript notation is supported in other expressions as well, for example in a WHERE clause:</p> 
 <div class="source"> 
- <pre>SELECT region_name FROM regions WHERE zip[1] = '94030' OR zip[2] = '94030' OR zip[3] = '94030';
+ <pre>SELECT region_name FROM regions WHERE zips[1] = '94030' OR zips[2] = '94030' OR zips[3] = '94030';
 </pre> 
 </div> 
 <p>The length of the array grows dynamically as needed with the current length and is accessible through the ARRAY_LENGTH build it function:</p> 
@@ -221,18 +219,18 @@ stmt.execute();
 <p>Attempts to access an array element beyond the current length will evaluate to <tt>null</tt>.</p> 
 <p>For searching in an array, built-in functions like ANY and ALL are provided. For example,</p> 
 <div class="source"> 
- <pre>SELECT region_name FROM regions WHERE '94030' = ANY(zip);
-SELECT region_name FROM regions WHERE '94030' = ALL(zip);
+ <pre>SELECT region_name FROM regions WHERE '94030' = ANY(zips);
+SELECT region_name FROM regions WHERE '94030' = ALL(zips);
 </pre> 
 </div> 
 <p>The built-in function ANY checks if any of the element in the array satisfies the condition and it is equivalent to OR condition:</p> 
 <div class="source"> 
- <pre>SELECT region_name FROM regions WHERE zip[1] = '94030' OR zip[2] = '94030' OR zip[3] = '94030';
+ <pre>SELECT region_name FROM regions WHERE zips[1] = '94030' OR zips[2] = '94030' OR zips[3] = '94030';
 </pre> 
 </div> 
 <p>The built-in function ALL checks if all the elements in the array satisfies the condition and it is equivalent to AND condition:</p> 
 <div class="source"> 
- <pre>SELECT region_name FROM regions WHERE zip[1] = '94030' AND zip[2] = '94030' AND zip[3] = '94030';
+ <pre>SELECT region_name FROM regions WHERE zips[1] = '94030' AND zips[2] = '94030' AND zips[3] = '94030';
 </pre> 
 </div> 
 <div class="section"> 
