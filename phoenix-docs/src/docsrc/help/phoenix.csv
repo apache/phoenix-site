@@ -119,7 +119,7 @@ Column families that exist in the HBase table but are not listed are ignored.
 At create time, to improve query performance, an empty key value is added to the first column family of any existing rows or the default column family if no column families are explicitly defined. Upserts will also add this empty key value. This improves query performance by having a key value column we can guarantee always being there and thus minimizing the amount of data that must be projected and subsequently returned back to the client. HBase table and column configuration options may be passed through as key/value pairs to configure the HBase table as desired. Note that when using the IF NOT EXISTS clause, if a table already exists, then no change will be made to it. Additionally, no validation is done to check whether the existing table metadata matches the proposed table metadata. so it's better to use DROP TABLE followed by CREATE TABLE is the table metadata may be changing.
 
 ","
-CREATE TABLE my_schema.my_table ( id BIGINT not null primary key, date)
+CREATE TABLE my_schema.my_table ( id BIGINT not null primary key, date Date)
 CREATE TABLE my_table ( id INTEGER not null primary key desc, date DATE not null,
     m.db_utilization DECIMAL, i.db_utilization)
     m.DATA_BLOCK_ENCODING='DIFF'
