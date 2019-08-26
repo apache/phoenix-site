@@ -11,6 +11,7 @@ Andrew Purtell | Salesforce | apurtell@apache.org | PMC
 Ankit Singhal | Hortonworks | ankit@apache.org | PMC
 Anoop Sam John | Intel | anoopsamjohn@apache.org | PMC
 Cheng Lei | Sogou | chenglei@apache.org | PMC
+Chinmay Kulkarni | Salesforce | chinmayskulkarni@apache.org | PMC
 Devaraj Das | Hortonworks | ddas@apache.org | PMC
 Eli Levine | Salesforce | elilevine@apache.org | PMC
 Enis Soztutar | Hortonworks | enis@apache.org | PMC
@@ -39,7 +40,6 @@ Thomas D'Silva | Salesforce | tdsilva@apache.org | PMC
 Vincent Poon | Salesforce | vincentpoon@apache.org | PMC
 Abhishek Singh Chouhan | Salesforce | achouhan@apache.org | Committer
 Akshita Malhotra | Salesforce | akshitamalhotra@apache.org | Committer
-Chinmay Kulkarni | Salesforce | chinmayskulkarni@apache.org | Committer
 Cody Marcel | Salesforce | codymarcel@apache.org | Committer
 Dumindu Buddhika | University of Moratuwa | duminduk@apache.org | Committer
 Ethan Wang | Facebook | ewang@apache.org | Committer
