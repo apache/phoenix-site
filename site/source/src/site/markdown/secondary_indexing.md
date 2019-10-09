@@ -359,6 +359,27 @@ The following parameters can be used with the Index Scrutiny Tool:
 |-t,--time              |Timestamp in millis at which to run the scrutiny.  This is important so that incoming writes don't throw off the scrutiny.  Defaults to current time minus 60 seconds             |
 |-b,--batch-size                 |Number of rows to compare at a time    |
 
+## Index Upgrade Tool
+
+IndexUpgradeTool accepts following parameters
+
+1. --operation / -o : *upgrade* or *rollback* 
+2. --tables / -tb : *[table1,table2,table3]*
+3. --file / -f : csv file with above format
+4. --dry-run / -d : if passed this will just output steps that will be executed; like a dry run
+5. --help / -h : Help on how to use the tool
+6. --logfile / -lf : file location to dump the logs. 
+7. --index-sync-rebuild / -sr: Whether or not synchronously rebuild the indexes; default rebuild asynchronous
+
+
+${HBASE_HOME}/bin/hbase org.apache.phoenix.mapreduce.index.IndexUpgradeTool -o [upgrade/rollback] -tb [table_name]
+ -lf [/tmp/index-upgrade-tool.log]
+
+Depending on whether index is mutable, it will remove *Indexer* coprocessor from a data table and load new coprocessor *IndexRegionObserver*. For both immutable and mutable, it will load *GlobalIndexChecker* coprocessor on Index table. During this process, data table and index table are *disabled-loaded/unloaded with coproc-enabled* within short time span. At the end, it does an asynchronous index rebuilds. Index reads are not blocked while index-rebuild is still ongoing, however, they may be a bit slower for rows written prior to upgrade.
+
+IndexUpgradeTool doesn't make any distinction between view-index and table-index. When a table is passed, it will perform the upgrade-operation on all the 'children' indexes of the given table. 
+
+
 ### Limitations
 * If rows are actively being updated or deleted while the scrutiny is running, the tool may give you false positives for inconsistencies ([PHOENIX-4277](https://issues.apache.org/jira/browse/PHOENIX-4277)).
 * Snapshot reads are not supported by the scrutiny tool ([PHOENIX-4270](https://issues.apache.org/jira/browse/PHOENIX-4270)).
