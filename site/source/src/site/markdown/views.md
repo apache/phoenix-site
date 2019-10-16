@@ -1,6 +1,6 @@
 #Views
 
-The standard SQL view syntax (with some limitations) is now supported by Phoenix to enable multiple virtual tables to all share the same underlying physical HBase table. This is important in HBase as there are limits to the number of Regions which HBase can manage. Limiting the number of tables can help limit the number of Regions in a cluster.
+The standard SQL view syntax (with some limitations) is now supported by Phoenix to enable multiple virtual tables to all share the same underlying physical HBase table. This is important in HBase as there are limits to the number of regions which HBase can manage. Limiting the number of tables can help limit the number of regions in a cluster.
 
 For example, given the following table definition that defines a base table to collect product metrics:
 
@@ -18,6 +18,8 @@ You may define the following view:
     WHERE metric_type = 'm';
 In this case, the same underlying physical HBase table (i.e. PRODUCT_METRICS) stores all of the data.
 Notice that unlike with standard SQL views, you may define additional columns for your view. The view inherits all of the columns from its base table, in addition to being able to optionally add new KeyValue columns. You may also add these columns after-the-fact with an ALTER VIEW statement. 
+
+**NOTE**: Phoenix 4.15.0 onwards contains [PHOENIX-4810](https://issues.apache.org/jira/browse/PHOENIX-4810) which introduces a new endpoint coprocessor on the SYSTEM.CHILD_LINK table for adding parent->child links, whenever a view is created. Thus, when namespace mapping is enabled, users that wish to create views will need to be granted EXEC permissions on SYSTEM.CHILD_LINK in order to be able to invoke this coprocessor.
 
 ## Updatable Views
 If your view uses only simple equality expressions in the WHERE clause, you are also allowed to issue DML against the view. These views are termed *updatable views*. For example, in this case you could issue the following UPSERT statement:
