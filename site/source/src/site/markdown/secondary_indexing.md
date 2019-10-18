@@ -226,6 +226,10 @@ it directly to Phoenix; although, such a tool is not currently provided by Phoen
 
 Non transactional, mutable indexing requires special configuration options on the region server and master to run - Phoenix ensures that they are setup correctly when you enable mutable indexing on the table; if the correct properties are not set, you will not be able to use secondary indexing. After adding these settings to your hbase-site.xml, you'll need to do a rolling restart of your cluster.
 
+As Phoenix matures, it needs less and less manual configuration. For older Phoenix versions you'll need to add the properties listed for that version, *as well as the properties listed for the later versions*.
+
+#### For Phoenix 4.12 and later
+
 You will need to add the following parameters to `hbase-site.xml` on each region server:
 
 ```
@@ -236,6 +240,11 @@ You will need to add the following parameters to `hbase-site.xml` on each region
 ```
 
 The above property enables custom WAL edits to be written, ensuring proper writing/replay of the index updates. This codec supports the usual host of WALEdit options, most notably WALEdit compression.
+
+
+#### For Phoenix 4.8 - 4.11
+
+The following configuration changes are also required to the server-side hbase-site.xml on the master and regions server nodes:
 
 ```
 <property>
@@ -250,9 +259,12 @@ The above property enables custom WAL edits to be written, ensuring proper writi
 </property>
 ```
 
-The above properties prevent deadlocks from occurring during index maintenance for global indexes (HBase 0.98.4+ and Phoenix 4.3.1+ only) by ensuring index updates are processed with a higher priority than data updates. It also prevents deadlocks by ensuring metadata rpc calls are processed with a higher priority than data rpc calls.
 
-From Phoenix 4.8.0 onward, no configuration changes are required to use local indexing. In Phoenix 4.7 and below, the following configuration changes are required to the server-side hbase-site.xml on the master and regions server nodes:
+The above properties prevent deadlocks from occurring during index maintenance for global indexes (HBase 0.98.4+ and Phoenix 4.3.1+) by ensuring index updates are processed with a higher priority than data updates. It also prevents deadlocks by ensuring metadata rpc calls are processed with a higher priority than data rpc calls.
+
+#### For Phoenix versions 4.7 and below
+
+The following configuration changes are also required to the server-side hbase-site.xml on the master and regions server nodes:
 
 ```
 <property>
@@ -268,6 +280,10 @@ From Phoenix 4.8.0 onward, no configuration changes are required to use local in
   <value>org.apache.hadoop.hbase.regionserver.LocalIndexMerger</value>
 </property>
 ```
+
+
+The above properties are required to use local indexing.
+
 ### Upgrading Local Indexes created before 4.8.0
 While upgrading the Phoenix to 4.8.0+ version at server remove above three local indexing related configurations from `hbase-site.xml` if present. From client we are supporting both online(while initializing the connection from phoenix client of 4.8.0+ versions) and offline(using psql tool) upgrade of local indexes created before 4.8.0. As part of upgrade we  recreate the local indexes in ASYNC mode. After upgrade user need to build the indexes using [IndexTool](http://phoenix.apache.org/secondary_indexing.html#Index_Population)
 
