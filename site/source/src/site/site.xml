@@ -100,6 +100,8 @@
             <item href="http://python-phoenixdb.readthedocs.io/en/latest" name="Phoenix Adapter for Python"/>
             <item href="phoenix_orm.html" name="Phoenix ORM Library"/>
             <item href="https://prestosql.io/docs/current/connector/phoenix.html" name="Phoenix Connector for Presto"/>
+            <item href="omid.html" name="Apache Phoenix Omid Transaction Manager"/>
+            <item href="tephra.html" name="Apache Phoenix Tephra Transaction Manager"/>
         </menu>
         <menu name="Features">
             <item href="transactions.html" name="Transactions"/>
