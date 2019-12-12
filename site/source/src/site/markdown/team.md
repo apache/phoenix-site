@@ -44,6 +44,7 @@ Cody Marcel | Salesforce | codymarcel@apache.org | Committer
 Dumindu Buddhika | University of Moratuwa | duminduk@apache.org | Committer
 Ethan Wang | Facebook | ewang@apache.org | Committer
 Gerald Sangudi | 23andme | sangudi@apache.org | Committer
+Istvan Toth | Cloudera | stoty@apache.org | Committer
 Jaanai Zhang | Alibaba | jaanai@apache.org | Committer
 Jan Fernando | Salesforce | jfernando@apache.org | Committer
 Kadir Ozdemir | Salesforce | kadir@apache.org | Committer
