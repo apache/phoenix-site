@@ -9,28 +9,28 @@
 <span >
 <table class="hidetable">
 <tr>
-<td width="25%">
+<td width="33%">
 <a href="download.html" title="Download Phoenix latest binary and source release"><img src="images/download.png"/></a>
 <br/><font size="2">Download latest Apache Phoenix binary and source release artifacts</font>
 </td>
-<td width="25%">
+<td width="33%">
 <a href="issues.html" title="Phoenix Issues/JIRAs list"><img src="images/jira.png"/></a>
 <br/><font size="2">Browse through Apache Phoenix JIRAs</font>
 </td>
-<td width="25%"><br/>
+<td width="34%"><br/>
 <a href="source.html" title="Sync and build Phoenix source code"><img src="images/scode.png"/></a>
 <br/><font size="2">Sync and build Apache Phoenix from source code</font>
 </td>
-<td width="25%"><br/>
+<!--td width="25%"><br/>
 <img title="Search Phoenix JIRAs, web-site, user/dev. email list, source code and javadocs." src="images/search.png"/>
 <form action="http://search-hadoop.com/?" method="get">
 <input value="Phoenix" name="fc_project" type="hidden"/>
 <input placeholder="Search Phoenix" required="required" style="width:180px" size="18" name="q" id="query" type="search"/>
 </form>
-</td>
+</td-->
 </tr>
 </table>
-<table class="showtable">
+<!--table class="showtable">
 <tr>
 <td><br/>
 <form action="http://search-hadoop.com/?" method="get">
@@ -40,7 +40,7 @@
 </form>
 </td>
 </tr>
-</table>
+</table-->
 </span>
 
 <span id="alerts" style="background-color:#ffc; text-align: center;display: block;padding:10px; border-bottom: solid 1px #cc9">
