@@ -6,7 +6,7 @@ See our installation instructions [here](installation.html), our release notes [
 and a list of fixes and new features [here](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12334393&projectId=12315120).
 Follow [Verify the Integrity of the Files](https://www.apache.org/dyn/closer.cgi#verify) for how to verify your mirrored downloads.
 
-Current release 4.14.3 can run on Apache HBase 1.3 and 1.4.  CDH HBase 5.11, 5.12, 5.13 and 5.14 is supported by 4.14.0. Apache HBase 2.0 is supported by 5.0.0. Please follow the appropriate link depending on your HBase version. 
+Current release 4.15.0 can run on Apache HBase 1.3, 1.4 and 1.5.  CDH HBase 5.11, 5.12, 5.13 and 5.14 is supported by 4.14.0. Apache HBase 2.0 is supported by 5.0.0. Please follow the appropriate link depending on your HBase version. 
  
 
 <table id="releases">
@@ -23,6 +23,9 @@ If you are looking for an old release that is not present here or on the mirror,
 <script>
 //<![CDATA[
 addRelease('5.0.0-HBase-2.0','04/jul/2018');
+addRelease('4.15.0-HBase-1.5','20/dec/2019');
+addRelease('4.15.0-HBase-1.4','20/dec/2019');
+addRelease('4.15.0-HBase-1.3','20/dec/2019');
 addRelease('4.14.3-HBase-1.4','20/aug/2019');
 addRelease('4.14.3-HBase-1.3','20/aug/2019');
 addRelease('4.14.0-cdh5.14.2','09/jun/2018');
