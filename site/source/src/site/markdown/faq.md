@@ -222,7 +222,7 @@ Example:
 ` CREATE TABLE TEST (HOST VARCHAR NOT NULL PRIMARY KEY, DESCRIPTION VARCHAR) COMPRESSION='GZ'`
 
 * Create **indexes**
-See [faq.html#/How_do_I_create_Secondary_Index_on_a_table](faq.html#/How_do_I_create_Secondary_Index_on_a_table)
+See [#How_do_I_create_Secondary_Index_on_a_table](#How_do_I_create_Secondary_Index_on_a_table)
 
 * **Optimize cluster** parameters
 See http://hbase.apache.org/book/performance.html
