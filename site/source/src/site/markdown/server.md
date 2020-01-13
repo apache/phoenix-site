@@ -25,8 +25,12 @@ tested thoroughly enough to be stated as "guaranteed").
 
 ## Installation
 
-The query server and its JDBC client are part of the standard Phoenix
+In the 4.x and 5.0 releases the query server and its JDBC client are part of the standard Phoenix
 distribution. They require no additional dependencies.
+
+After the 5.0 release, the query server has been unbundled into the phoenix-queryserver
+repository, and its version number has been reset to 1.0. At the time of writing
+there is no released version of the standalone query server.
 
 ## Usage
 
@@ -61,16 +65,16 @@ The JDBC connection string is composed as follows:
 
     jdbc:phoenix:thin:url=<scheme>://<server-hostname>:<port>[;option=value...]
 
-`<scheme>` specifies the transport protocol used when communicating with the
-server. The only supported transport at this time is `http`.
+`<scheme>` specifies the transport protocol (http or https) used when communicating with the
+server.
 
 `<server-hostname>` is the name of the host offering the service.
 
 `<port>` is the port number on which the host is listening. Default is `8765`,
 though this is configurable (see below).
 
-A full list of options that can be provided via the JDBC URL string is [available
-in the below table](#jdbc_url_options)
+The full list of options that can be provided via the JDBC URL string is [available
+in the Avatica documentation](https://calcite.apache.org/avatica/docs/client_reference.html)
 
 The script `bin/sqlline-thin.py` is intended to behave identically to its
 sibling script `bin/sqlline.py`. It supports the following usage options.
@@ -160,6 +164,41 @@ configuration.
       <td><small>phoenix.queryserver.serialization</small></td>
       <td style="text-align: left;">The transport/serialization format, either PROTOBUF or JSON.</td>
       <td>PROTOBUF</td>
+    </tr>
+    <tr><td colspan="3">&nbsp;</td></tr>
+    <tr>
+      <td colspan="3"><b>Configurations relating to HTTPS.</b></td>
+	</tr>	
+	<tr>
+      <td colspan="3"><em>HTTPS support is only available in the unbundled phoenix-queryserver 1.0.0-SNAPSHOT 
+version at the time of writing.</em></td>
+    </tr>
+    <tr><td><b>Property</b></td><td><b>Description</b></td><td><b>Default</b></td></tr>
+    <tr>
+      <td><small>phoenix.queryserver.tls.enabled</small></td>
+      <td style="text-align: left;">Boolean which controls if QueryServer uses HTTPS transport. 
+      When using HTTPS, the key- and trustore files, and their passwords must also be provided.</td>
+      <td>false</td>
+    </tr>
+    <tr>
+      <td><small>phoenix.queryserver.tls.keystore</small></td>
+      <td style="text-align: left;">The keystore file that contains the private key of the HTTPS service</td>
+      <td><em>unset</em></td>
+    </tr>
+    <tr>
+      <td><small>phoenix.queryserver.tls.keystore.password</small></td>
+      <td style="text-align: left;">The password for the keystore file that contains the HTTPS private key</td>
+      <td><em>empty string</em></td>
+    </tr>
+	<tr>
+      <td><small>phoenix.queryserver.tls.truststore</small></td>
+      <td style="text-align: left;">The keystore file that contains the HTTPS certificate</td>
+      <td><em>unset</em></td>
+    </tr>
+    <tr>
+      <td><small>phoenix.queryserver.tls.truststore.password</small></td>
+      <td style="text-align: left;">The password for the keystore file that contains the HTTPS certificate</td>
+      <td><em>empty string</em></td>
     </tr>
     <tr><td colspan="3">&nbsp;</td></tr>
     <tr>
@@ -256,34 +295,6 @@ configuration.
         provided in avatica.connectioncache.expiryunit. Default is minutes.
       </td>
       <td>MINUTES</td>
-    </tr>
-    <tr><td colspan="3">&nbsp;</td></tr>
-    <tr>
-      <td colspan="3" id="jdbc_url_options"><b>JDBC URL options.</b></td>
-    </tr>
-    <tr>
-      <td><small>url</small></td>
-      <td style="text-align: left;">
-        The URL of the QueryServer.
-      </td>
-      <td>null</td>
-    </tr>
-    <tr>
-      <td><small>serialization</small></td>
-      <td style="text-align: left;">
-        The client-side analogy to phoenix.queryserver.serialization in the server
-        to control how the client should serialize data to send to the QueryServer.
-      </td>
-      <td>PROTOBUF</td>
-    </tr>
-    <tr>
-      <td><small>timeZone</small></td>
-      <td style="text-align: left;">
-        The time zone the JDBC connection should use. If not provided, the
-        time zone will be specified by JVM. The value of this should be parseable by
-        Java's TimeZone class.
-      </td>
-      <td>null</td>
     </tr>
     <tr><td colspan="3">&nbsp;</td></tr>
     <tr>
