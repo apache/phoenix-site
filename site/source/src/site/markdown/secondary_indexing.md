@@ -52,6 +52,14 @@ The map reduce job that populates the index table must be kicked off separately 
 
 Only when the map reduce job is complete will the index be activated and start to be used in queries. The job is resilient to the client being exited. The output-path option is used to specify a HDFS directory that is used for writing HFiles to.
 
+You can also start index population for all indexes in BUILDING("b") state with the following HBase command line:
+
+    ${HBASE_HOME}/bin/hbase org.apache.phoenix.mapreduce.index.automation.PhoenixMRJobSubmitter
+
+#### ASYNC Index threshold
+
+As of 4.16, setting the phoenix.index.async.threshold property to a positive number will disallow synchronous index creation if the estimated indexed data size exceeds phoenix.index.async.threshold (in bytes).
+    
 ## Index Usage
 Indexes are automatically used by Phoenix to service a query when it's determined more efficient to do so. However, a global index will not be used unless all of the columns referenced in the query are contained in the index.  For example, the following query would not use the index, because v2 is referenced in the query but not included in the index:
 
