@@ -84,8 +84,9 @@ that probability.
 Scenario can have multiple querySets. Consider following example, concurrency of 1-4 means that each query will be 
 executed starting with concurrency level of 1 and reach up to maximum concurrency of 4. Per thread, query would be 
 executed to a minimum of 10 times or 10 seconds (whichever comes first). QuerySet by defult is executed serially but you
- can change executionType to PARALLEL so queries are executed concurrently. Scenarios are defined in XMLs stored 
- in the resource directory.
+can change executionType to PARALLEL so queries are executed concurrently. Each Query may have an optional timeoutDuration
+field that defines the amount of time (in milliseconds) before execution for that Query is cancelled. Scenarios are defined
+in the resource directory in XMLs stored in the resource directory..
 
 ```
 
@@ -93,20 +94,40 @@ executed to a minimum of 10 times or 10 seconds (whichever comes first). QuerySe
     <!--Minimum of executionDurationInMs or numberOfExecutions. Which ever is reached first -->
     <querySet concurrency="1-4" executionType="PARALLEL" executionDurationInMs="10000" numberOfExecutions="10">
         <query id="q1" verifyRowCount="false" statement="select count(*) from PHERF.TEST_TABLE"/>
-        <query id="q2" tenantId="1234567890" ddl="create view if not exists 
+        <query id="q2" tenantId="1234567890" timeoutDuration="10000" ddl="create view if not exists 
         myview(mypk varchar not null primary key, mycol varchar)" statement="upsert select ..."/>
     </querySet>
     <querySet concurrency="3" executionType="SERIAL" executionDurationInMs="20000" numberOfExecutions="100">
         <query id="q3" verifyRowCount="false" statement="select count(*) from PHERF.TEST_TABLE"/>
         <query id="q4" statement="select count(*) from PHERF.TEST_TABLE WHERE TENANT_ID='00D000000000062'"/>
     </querySet>
-</scenario>
+</scenarios>
         
 ```
 
 ## Results
 Results are written real time in _results_ directory. Open the result that is saved in .jpg format for real time 
-visualization.
+visualization. Results are written using DataModelResult objects, which are modified over the course of each Pherf
+run.
+
+###XML results
+Pherf XML results have a similar format to the corresponding scenario.xml file used for the Pherf run, but also include
+additional information, such as the execution time of queries, whether queries timed out, and result row count.
+
+```
+ <queryResults expectedAggregateRowCount="100000" id="q1" statement="SELECT COUNT(*) FROM PHERF.USER_DEFINED_TEST" timeoutDuration="0">
+    <threadTimes threadName="1,1">
+        <runTimesInMs elapsedDurationInMs="1873" resultRowCount="100000" startTime="2020-04-09T11:28:12.623-07:00" timedOut="true"/>
+        <runTimesInMs elapsedDurationInMs="1793" resultRowCount="100000" startTime="2020-04-09T11:28:14.511-07:00" timedOut="true"/>
+        <runTimesInMs elapsedDurationInMs="1764" resultRowCount="100000" startTime="2020-04-09T11:28:16.319-07:00" timedOut="true"/>
+    </threadTimes>
+</queryResults>
+```
+
+###CSV results
+Each row in a CSV result file represents a single execution of a query and provides details about a query execution's
+runtime, timeout status, result row count, and more. The header file format can be found in Header.java.
+
 
 ## Testing
 Default quorum is localhost. If you want to override set the system variable.
