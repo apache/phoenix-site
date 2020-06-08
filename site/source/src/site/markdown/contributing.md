@@ -30,7 +30,7 @@ To setup your development, see [these](develop.html) directions.
 
 ### Generate a patch
 
-There are two general approaches that can be used for creating and submitting a patch: GitHub pull requests, or manually creating a patch with Git. Both of these are explained below. Please make sure that the patch applies cleanly on all the active branches including master: 5.x-HBase-2.0, 4.x-HBase-1.5, 4.x-HBase-1.4, and 4.x-HBase-1.3.
+There are two general approaches that can be used for creating and submitting a patch: GitHub pull requests, or manually creating a patch with Git. Both of these are explained below. Please make sure that the patch applies cleanly on all the active branches including **master** and the unified **4.x** branch.
 
 Regardless of which approach is taken, please make sure to follow the Phoenix code conventions (more information below). Whenever possible, unit tests or integration tests should be included with patches.
 
