@@ -1,21 +1,37 @@
 # Python Driver for Phoenix
 
-The Python Driver for Apache Phoenix implements the [Python DB 2.0 API](https://www.python.org/dev/peps/pep-0249/) to access Phoenix via the Phoenix Query Server. The driver is tested with Python 2.7, 3.5, and 3.6. This code was originally called [Python Phoenixdb](https://code.oxygene.sk/lukas/python-phoenixdb) and was graciously donated by its authors to the Apache Phoenix project.
+The Python Driver for Apache Phoenix implements the [Python DB 2.0 API](https://www.python.org/dev/peps/pep-0249/) to access Phoenix via the Phoenix Query Server. 
+The driver is tested with Python 2.7 and 3.5-3.8. This code was originally called [Python Phoenixdb](https://code.oxygene.sk/lukas/python-phoenixdb) 
+and was graciously donated by its authors to the Apache Phoenix project.
 
 All future development of the project is being done in Apache Phoenix.
 
 ## Installation
 
-Phoenix does not presently deploy the driver, so users must first build the driver and install it themselves:
+### From PyPI
+
+The latest release is always available from PyPI, and can be installed by
+pip/pip3 as usual.
+
 
 ```
-$ cd python
+pip3 install --user phoenixdb
+```
+
+### From source
+
+You can build phoenixdb from the official source [release](https://phoenix.apache.org/download.html), 
+or you can use the latest development version from the soure
+[repository](https://phoenix.apache.org/source.html). The pythondb source
+lives in the `python-phoenixdb` direcory of the python-queryserver
+repository.
+
+
+```
+$ cd python-phoenixdb # (Only when building from the git repo)
 $ pip install -r requirements.txt
 $ python setup.py install
 ```
-
-Deploying a binary release to central Python package-hosting services (e.g. installable via `pip`) will be done eventually. Presently, releases
-are in source-form only.
 
 ## Examples
 

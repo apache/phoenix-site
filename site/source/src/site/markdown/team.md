@@ -17,6 +17,7 @@ Eli Levine | Salesforce | elilevine@apache.org | PMC
 Enis Soztutar | Hortonworks | enis@apache.org | PMC
 Gabriel Reid | NGDATA | greid@apache.org | PMC
 Geoffrey Jacoby | Salesforce | gjacoby@apache.org | PMC
+Istvan Toth | Cloudera | stoty@apache.org | PMC
 James Taylor | Lyft | jamestaylor@apache.org | PMC
 Jeffrey Zhong | Elementum | jeffreyz@apache.org | PMC
 Jesse Yates | Tesla | jyates@apache.org | PMC
@@ -44,7 +45,6 @@ Cody Marcel | Salesforce | codymarcel@apache.org | Committer
 Dumindu Buddhika | University of Moratuwa | duminduk@apache.org | Committer
 Ethan Wang | Facebook | ewang@apache.org | Committer
 Gerald Sangudi | 23andme | sangudi@apache.org | Committer
-Istvan Toth | Cloudera | stoty@apache.org | Committer
 Jaanai Zhang | Alibaba | jaanai@apache.org | Committer
 Jan Fernando | Salesforce | jfernando@apache.org | Committer
 Kadir Ozdemir | Salesforce | kadir@apache.org | Committer

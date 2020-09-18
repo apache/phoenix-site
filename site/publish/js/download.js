@@ -26,8 +26,21 @@ function addRelease(version, date) {
           ' | <a href="' + apacheUrlHttps + 'apache-phoenix-' + version + '/src/apache-phoenix-' + version + '-src.tar.gz.asc">asc</a> ]' +
         '</li>' +  parcelsHtml +
         '</ul></td>';
-    document.getElementById('releases').appendChild(tr);
+    document.getElementById('core-releases').appendChild(tr);
 }
 
-
+function addPhoenixdbRelease(version, date) {
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+        '<td>' + version + '</td>' +
+        '<td>' + date + '</td>' +
+        '<td><ul><li>' +
+          '<a href="' + dynUrl + 'python-phoenixdb-' + version + '/src/python-phoenixdb-' + version + '-src.tar.gz">src</a> ' +
+          '&nbsp;&nbsp;' +
+          '[ <a href="' + apacheUrlHttps + 'python-phoenixdb-' + version + '/src/python-phoenixdb-' + version + '-src.tar.gz.sha512">sha512</a>' +
+          ' | <a href="' + apacheUrlHttps + 'python-phoenixdb-' + version + '/src/python-phoenixdb-' + version + '-src.tar.gz.asc">asc</a> ]' +
+        '</li>' +
+        '</ul></td>';
+    document.getElementById('python-phoenixdb-releases').appendChild(tr);
+}
 
