@@ -443,7 +443,7 @@
   </tr> 
   <tr class="a"> 
    <td><small>phoenix.log.level</small></td> 
-   <td style="text-align: left;">Client-side property enabling query (select statement) logging. The logs are written to the SYSTEM.LOG table. Possible values: OFF: No logging INFO: Enables query logging DEBUG: More details TRACE: Logs query parameters as well. Available starting from Phoenix 4.14.</td> 
+   <td style="text-align: left;">Client-side property enabling query (select statement) logging. The logs are written to the SYSTEM.LOG table. Possible values: <tt>OFF</tt>: No logging <tt>INFO</tt>: Enables query logging <tt>DEBUG</tt>: More details <tt>TRACE</tt>: Logs query parameters as well. Available starting from Phoenix 4.14. <b>WARNING:</b> Enabling this feature may leak sensitive information to anyone who can access the SYSTEM.LOG table.</td> 
    <td>OFF</td> 
   </tr> 
   <tr class="b"> 
