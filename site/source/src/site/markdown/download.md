@@ -17,6 +17,14 @@ Current release 4.15.0 can run on Apache HBase 1.3, 1.4 and 1.5.  CDH HBase 5.11
 </tr>
 </table>
 
+<table id="phoenix-thirdparty-releases">
+<tr>
+    <th width='180'>Phoenix Thirdparty Version</th>
+    <th width='100'>Release Date</th>
+    <th>Download</th>
+</tr>
+</table>
+
 <table id="python-phoenixdb-releases">
 <tr>
     <th width='180'>Python Driver Version</th>
@@ -42,5 +50,6 @@ addRelease('4.14.0-cdh5.12.2','09/jun/2018');
 addRelease('4.14.0-cdh5.11.2','09/jun/2018');
 addRelease('5.0.0-alpha-HBase-2.0','09/feb/2018');
 addPhoenixdbRelease('1.0.0','18/sep/2020');
+addPhoenixThirdpartyRelease('1.0.0','26/okt/2020');
 //]]>
 </script>

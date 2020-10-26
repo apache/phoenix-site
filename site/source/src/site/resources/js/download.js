@@ -44,3 +44,17 @@ function addPhoenixdbRelease(version, date) {
     document.getElementById('python-phoenixdb-releases').appendChild(tr);
 }
 
+function addPhoenixThirdpartyRelease(version, date) {
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+        '<td>' + version + '</td>' +
+        '<td>' + date + '</td>' +
+        '<td><ul><li>' +
+          '<a href="' + dynUrl + 'phoenix-thirdparty-' + version + '/phoenix-thirdparty-' + version + '-src.tar.gz">src</a> ' +
+          '&nbsp;&nbsp;' +
+          '[ <a href="' + apacheUrlHttps + 'phoenix-thirdparty-' + version + '/phoenix-thirdparty-' + version + '-src.tar.gz.sha512">sha512</a>' +
+          ' | <a href="' + apacheUrlHttps + 'phoenix-thirdparty-' + version + '/phoenix-thirdparty-' + version + '-src.tar.gz.asc">asc</a> ]' +
+        '</li>' +
+        '</ul></td>';
+    document.getElementById('phoenix-thirdparty-releases').appendChild(tr);
+}
