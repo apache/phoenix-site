@@ -58,3 +58,18 @@ function addPhoenixThirdpartyRelease(version, date) {
         '</ul></td>';
     document.getElementById('phoenix-thirdparty-releases').appendChild(tr);
 }
+
+function addPhoenixOmidRelease(version, date) {
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+        '<td>' + version + '</td>' +
+        '<td>' + date + '</td>' +
+        '<td><ul><li>' +
+          '<a href="' + dynUrl + 'phoenix-omid-' + version + '/phoenix-omid-' + version + '-src.tar.gz">src</a> ' +
+          '&nbsp;&nbsp;' +
+          '[ <a href="' + apacheUrlHttps + 'phoenix-omid-' + version + '/phoenix-omid-' + version + '-src.tar.gz.sha512">sha512</a>' +
+          ' | <a href="' + apacheUrlHttps + 'phoenix-omid-' + version + '/phoenix-omid-' + version + '-src.tar.gz.asc">asc</a> ]' +
+        '</li>' +
+        '</ul></td>';
+    document.getElementById('phoenix-omid-releases').appendChild(tr);
+}
