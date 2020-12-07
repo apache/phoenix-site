@@ -34,7 +34,7 @@ Phoenix supports two types of indexing techniques: global and local indexing.
 Each are useful in different scenarios and have their own failure profiles and performance characteristics.
 
 ## Global Indexes
-Global indexing targets _read heavy_ uses cases. With global indexes, all the performance penalties for indexes occur at write time. We intercept the data table updates on write ([DELETE](language/index.html#delete), [UPSERT VALUES](language/index.html#upsert_values) and [UPSERT SELECT](language/index.html#upsert_select)), build the index update and then sent any necessary updates to all interested index tables. At read time, Phoenix will select the index table to use that will produce the fastest query time and directly scan it just like any other HBase table. By default, unless hinted, an index will not be used for a query that references a column that isn't part of the index.
+Global indexing targets _read heavy_ uses cases. With global indexes, all the performance penalties for indexes occur at write time. We intercept the data table updates on write ([DELETE](language/index.html#delete), [UPSERT VALUES](language/index.html#upsert_values) and [UPSERT SELECT](language/index.html#upsert_select)), build the index update and then sent any necessary updates to all interested index tables. At read time, Phoenix will select the index table to use that will produce the fastest query time and directly scan it just like any other HBase table. An index will not be used for a query that references a column that isn't part of the index.
 
 ## Local Indexes
 Local indexing targets _write heavy_, _space constrained_ use cases. Just like with global indexes, Phoenix will automatically select whether or not to use a local index at query-time. With local indexes, index data and table data co-reside on same server preventing any network overhead during writes. Local indexes can be used even when the query isn't fully covered (i.e. Phoenix automatically retrieve the columns not in the index through point gets against the data table). Unlike global indexes, all local indexes of a table are stored in a single, separate shared table prior to 4.8.0 version. From 4.8.0 onwards we are storing all local index data in the separate shadow column families in the same data table. At read time when the local index is used, every region must be examined for the data as the exact region location of index data cannot be predetermined. Thus some overhead occurs at read-time.
@@ -58,14 +58,14 @@ You can also start index population for all indexes in BUILDING("b") state with 
 
 #### ASYNC Index threshold
 
-As of 4.16, setting the phoenix.index.async.threshold property to a positive number will disallow synchronous index creation if the estimated indexed data size exceeds phoenix.index.async.threshold (in bytes).
+As of 4.16 (and 5.1), setting the phoenix.index.async.threshold property to a positive number will disallow synchronous index creation if the estimated indexed data size exceeds phoenix.index.async.threshold (in bytes).
     
 ## Index Usage
 Indexes are automatically used by Phoenix to service a query when it's determined more efficient to do so. However, a global index will not be used unless all of the columns referenced in the query are contained in the index.  For example, the following query would not use the index, because v2 is referenced in the query but not included in the index:
 
     SELECT v2 FROM my_table WHERE v1 = 'foo'
 
-There are three means of getting an index to be used in this case:
+There are two means of getting an index to be used in this case:
 
 1. Create a _covered_ index by including v2 in the index:
 
@@ -73,13 +73,7 @@ There are three means of getting an index to be used in this case:
     CREATE INDEX my_index ON my_table (v1) INCLUDE (v2)
     </pre>
 This will cause the v2 column value to be copied into the index and kept in synch as it changes. This will obviously increase the size of the index.
-2. Hint the query to force it to use the index:
-
-    <pre>
-    SELECT /*+ INDEX(my_table my_index) */ v2 FROM my_table WHERE v1 = 'foo'
-    </pre>
-This will cause each data row to be retrieved when the index is traversed to find the missing v2 column value. This hint should only be used if you know that the index has good selective (i.e. a small number of table rows have a value of 'foo' in this example), as otherwise you'll get better performance by the default behavior of doing a full table scan.
-3. Create a _local_ index:
+2. Create a _local_ index:
 
     <pre>
     CREATE LOCAL INDEX my_index ON my_table (v1)
@@ -110,7 +104,11 @@ crash. This is an important design consideration driven by your requirements and
 
 Outlined below are the different options with various levels of consistency guarantees.
 
-### Transactional Tables
+### Local Indexes
+
+Since Phoenix 4.8 local indexes are always guaranteed to be consistent.
+
+### Global Indexes on Transactional Tables
 By declaring your table as [transactional](transactions.html), you achieve the highest level of consistency guarantee
 between your table and index. In this case, your commit of your table mutations and related index updates are atomic
 with strong [ACID](https://en.wikipedia.org/wiki/ACID) guarantees. If the commit fails, then none of your data (table
@@ -123,22 +121,68 @@ and the operational overhead of running the transaction manager is acceptable. A
 with secondary indexes potentially lowers your availability of being able to write to your data table, as both the
 data table and its secondary index tables must be availalbe as otherwise the write will fail.
 
-### Immutable Tables
-For a table in which the data is only written once and never updated in-place, certain optimizations may be made to reduce the write-time overhead for incremental maintenance. This is common with time-series data such as log or event data, where once a row is written, it will never be updated.  To take advantage of these optimizations, declare your table as immutable by adding the <code>IMMUTABLE_ROWS=true</code> property to your DDL statement:
+### Global Indexes on Immutable Tables
+For a table in which the data is only written once and never updated in-place, certain optimizations may be made to reduce the write-time overhead for incremental maintenance. 
+This is common with time-series data such as log or event data, where once a row is written, it will never be updated.
+To take advantage of these optimizations, declare your table as immutable by adding the <code>IMMUTABLE_ROWS=true</code> property to your DDL statement:
 
     CREATE TABLE my_table (k VARCHAR PRIMARY KEY, v VARCHAR) IMMUTABLE_ROWS=true
 
-All indexes on a table declared with <code>IMMUTABLE_ROWS=true</code> are considered immutable (note that by default, tables are considered mutable). For global immutable indexes, the index is maintained entirely on the client-side with the index table being generated as changes to the data table occur. Local immutable indexes, on the other hand, are maintained on the server-side. Note that no safeguards are in-place to enforce that a table declared as immutable doesn't actually mutate data (as that would negate the performance gain achieved). If that was to occur, the index would no longer be in sync with the table.
+All indexes on a table declared with <code>IMMUTABLE_ROWS=true</code> are considered immutable (note that by default, tables are considered mutable). 
+For global immutable indexes, the index is maintained entirely on the client-side with the index table being generated as changes to the data table occur. 
+Local immutable indexes, on the other hand, are maintained on the server-side. 
+Note that no safeguards are in-place to enforce that a table declared as immutable doesn't actually mutate data (as that would negate the performance gain achieved). 
+If that was to occur, the index would no longer be in sync with the table.
 
 If you have an existing table that you'd like to switch from immutable indexing to mutable indexing, use the <code>ALTER TABLE</code> command as show below:
 
     ALTER TABLE my_table SET IMMUTABLE_ROWS=false
 
-Index on non transactional, immutable tables have no mechanism in place to automatically deal with a commit failure. Maintaining
+Global Indexing for Immutable tables has been completely rewritten for version 4.15 (and 5.1)
+
+#### Immutable table indexes for 4.15 (and 5.1) and newer versions
+
+Immutable index updates go through the same three phase writes as mutable index updates do except that deleting or un-verifying existing index rows is not applicable to immutable indexes.
+This guarantees that the index tables are always in sync with the data tables.
+
+#### Immutable table indexes for 4.14 (and 5.0) and older versions
+
+Indexes on non transactional, immutable tables have no mechanism in place to automatically deal with a commit failure. Maintaining
 consistency between the table and index is left to the client to handle. Because the updates are idempotent, the simplest
 solution is for the client to continue retrying the batch of mutations until they succeed.
 
-### Mutable Tables
+### Global Indexes on Mutable Tables
+
+Global Indexing for Mutable tables has been completely rewritten for version 4.15 (and 5.1)
+
+#### Mutable table indexes for 4.15 (and 5.1) and newer versions
+
+The new Strongly Consistent Global Indexing feature uses a three-phase indexing algorithm to guarantee that the index tables are always in sync with the data tables.
+
+The implementation uses a shadow column to track the status of index rows:
+
+* **Write:**
+  1. Set the status of existing index rows to unverified and write the new index rows with the unverified status
+  2. Write the data table rows
+  3. Delete the existing index rows and set the status of new rows to verified
+
+* **Read:**
+  1. Read the index rows and check their status
+  2. The unverified rows are repaired from the data table
+
+* **Delete:**
+  1. Set the index table rows with the unverified status
+  2. Delete the data table rows
+  3. Delete index table rows
+
+See [resources](http://phoenix.apache.org/secondary_indexing.html#Resources) for more in-depth information.
+
+All newly created tables use the new indexing algorithm.
+
+Indexes created with older Phoenix versions will continue to use the old implementation, until upgraded with [IndexUpgradeTool](http://phoenix.apache.org/secondary_indexing.html#Index_Upgrade_Tool)
+
+#### Mutable table indexes for 4.14 (and 5.0) and older versions
+
 For non transactional mutable tables, we maintain index update durability by adding the index updates to the Write-Ahead-Log (WAL) entry of the primary table row.
 Only after the WAL entry is successfully synced to disk do we attempt to make the index/primary table updates. We write the
 index updates in parallel by default, leading to very high throughput. If the server crashes while we are writing the index
@@ -151,9 +195,9 @@ It's important to note several points:
  * For non transactional tables, you could see the index table out of sync with the primary table.
  * As noted above, this is ok as we are only a very small bit behind and out of sync for very short periods
  * Each data row and its index row(s) are guaranteed to to be written or lost - we never see partial updates as this is part of the atomicity guarantees of HBase.
-* Data is first written to the table followed by the index tables (the reverse is true if the WAL is disabled).
+ * Data is first written to the table followed by the index tables (the reverse is true if the WAL is disabled).
 
-#### Singular Write Path
+##### Singular Write Path
 
 There is a single write path that guarantees the failure properties. All writes to the HRegion get intercepted by our
 coprocessor. We then build the index updates based on the pending update (or updates, in the case of the batch).
@@ -169,7 +213,7 @@ Once the WAL is written, we ensure that the index and primary table data will be
     * If the index updates fail, the various means of maintaining consistency are outlined below.
     * If the Phoenix system catalog table cannot be reached when a failure occurs, we force the server to be immediately aborted and failing this, call System.exit on the JVM, forcing the server to die. By killing the server, we ensure that the WAL will be replayed on recovery, replaying the index updates to their appropriate tables. This ensures that a secondary index is not continued to be used when it's in a know, invalid state.
 
-#### Disallow table writes until mutable index is consistent
+##### Disallow table writes until mutable index is consistent
 The highest level of maintaining consistency between your non transactional table and index is to declare that writes to the
 data table should be temporarily disallowed in the event of a failure to update the index. In this consistency
 mode, the table and index will be held at the timestamp before the failure occurred, with writes to the data
@@ -183,7 +227,7 @@ in the event of a commit failure until the index can be caught up with the data 
 * <code>phoenix.index.failure.handling.rebuild</code> must be true (the default) to enable a mutable index to
 be rebuilt in the background in the event of a commit failure.
 
-#### Disable mutable indexes on write failure until consistency restored
+##### Disable mutable indexes on write failure until consistency restored
 The default behavior with mutable indexes is to mark the index as disabled if a write to them fails at commit time,
 partially rebuild them in the background, and then mark them as active again once consistency is restored. In this
 consistency mode, writes to the data table will not be blocked while the secondary index is being rebuilt. However,
@@ -199,7 +243,7 @@ table. The default is 10000 or 10 seconds.
 * <code>phoenix.index.failure.handling.rebuild.overlap.time</code> controls how many milliseconds to go back from the timestamp
 at which the failure occurred to go back when a partial rebuild is performed. The default is 1.
 
-#### Disable mutable index on write failure with manual rebuild required
+##### Disable mutable index on write failure with manual rebuild required
 This is the lowest level of consistency for mutable secondary indexes. In this case, when a write to a secondary
 index fails, the index will be marked as disabled with a manual
 [rebuild of the index](http://phoenix.apache.org/language/index.html#alter_index) required to enable it to be used
@@ -383,35 +427,46 @@ The following parameters can be used with the Index Scrutiny Tool:
 |-t,--time              |Timestamp in millis at which to run the scrutiny.  This is important so that incoming writes don't throw off the scrutiny.  Defaults to current time minus 60 seconds             |
 |-b,--batch-size                 |Number of rows to compare at a time    |
 
+### Limitations
+* If rows are actively being updated or deleted while the scrutiny is running, the tool may give you false positives for inconsistencies ([PHOENIX-4277](https://issues.apache.org/jira/browse/PHOENIX-4277)).
+* Snapshot reads are not supported by the scrutiny tool ([PHOENIX-4270](https://issues.apache.org/jira/browse/PHOENIX-4270)).
+
 ## Index Upgrade Tool
+IndexUpgradeTool updates global indexes created by Phoenix 4.14 and earlier (or 5.0) to use the new Strongly Consistent Global Indexes implementation.
 
-IndexUpgradeTool accepts following parameters
+It accepts following parameters:
 
-1. --operation / -o : *upgrade* or *rollback* 
-2. --tables / -tb : *[table1,table2,table3]*
-3. --file / -f : csv file with above format
-4. --dry-run / -d : if passed this will just output steps that will be executed; like a dry run
-5. --help / -h : Help on how to use the tool
-6. --logfile / -lf : file location to dump the logs. 
-7. --index-sync-rebuild / -sr: Whether or not synchronously rebuild the indexes; default rebuild asynchronous
+| *Parameter*                | *Description*                                  | *only in version* |
+|----------------------------|------------------------------------------------|-----------|
+|-o,--operation              |*upgrade* or *rollback* (mandatory)             ||
+|-tb,--tables                |*[table1,table2,table3]* (-tb or -f mandatory)  ||
+|-f,--file                   |Csv file with above format (-tb or -f mandatory)||
+|-d,--dry-run                |If passed this will just output steps that will be executed; like a dry run||
+|-h,--help                   |Help on how to use the tool                     ||
+|-lf,--logfile	             |File location to dump the logs                  ||
+|-sr,--index-sync-rebuild    |whether or not synchronously rebuild the indexes; default rebuild asynchronous|4.15|
+|-rb,--index-rebuild         |Rebuild the indexes. Set -tool to pass options to IndexTool|4.16+, 5.1+|
+|-tool,--index-tool          |Options to pass to indexTool when rebuilding indexes|4.16+, 5.1+|
 
+	${HBASE_HOME}/bin/hbase org.apache.phoenix.mapreduce.index.IndexUpgradeTool -o [upgrade/rollback] -tb [table_name]
+	-lf [/tmp/index-upgrade-tool.log]
 
-${HBASE_HOME}/bin/hbase org.apache.phoenix.mapreduce.index.IndexUpgradeTool -o [upgrade/rollback] -tb [table_name]
- -lf [/tmp/index-upgrade-tool.log]
+For 4.16+/5.1+ either specifying the -rb option, or manually rebuilding the indexes with IndexTool after the upgrade is recommended, otherwise the first access of every index row will trigger an index row repair.
 
 Depending on whether index is mutable, it will remove *Indexer* coprocessor from a data table and load new coprocessor *IndexRegionObserver*. For both immutable and mutable, it will load *GlobalIndexChecker* coprocessor on Index table. During this process, data table and index table are *disabled-loaded/unloaded with coproc-enabled* within short time span. At the end, it does an asynchronous index rebuilds. Index reads are not blocked while index-rebuild is still ongoing, however, they may be a bit slower for rows written prior to upgrade.
 
 IndexUpgradeTool doesn't make any distinction between view-index and table-index. When a table is passed, it will perform the upgrade-operation on all the 'children' indexes of the given table. 
 
 
-### Limitations
-* If rows are actively being updated or deleted while the scrutiny is running, the tool may give you false positives for inconsistencies ([PHOENIX-4277](https://issues.apache.org/jira/browse/PHOENIX-4277)).
-* Snapshot reads are not supported by the scrutiny tool ([PHOENIX-4270](https://issues.apache.org/jira/browse/PHOENIX-4270)).
-
 ## Resources
 There have been several presentations given on how secondary indexing works in Phoenix that have a more in-depth look at how indexing works (with pretty pictures!):
 
-* [San Francisco HBase Meetup](http://files.meetup.com/1350427/PhoenixIndexing-SF-HUG_09-26-13.pptx) - Sept. 26, 2013
+* [Slides for Strongly Consistent Global Indexes for Apache Phoenix, 2019 Distributed SQL Summit](https://www.slideshare.net/YugabyteDB/strongly-consistent-global-indexes-for-apache-phoenix-176863877)
+* [Recording of Strongly Consistent Global Indexes for Apache Phoenix, 2019 Distributed SQL Summit](https://vimeo.com/362358494)
+* [Slides for Local Secondary Indexes in Apache Phoenix, 2017 PhoenixCon](https://www.slideshare.net/rajeshbabuchintaguntla/local-secondary-indexes-in-apache-phoenix)
+
+These older resources refer to obsolete implementations in some cases
+
 * [Los Anglees HBase Meetup](http://www.slideshare.net/jesse_yates/phoenix-secondary-indexing-la-hug-sept-9th-2013) - Sept, 4th, 2013
 * [Local Indexes](https://github.com/Huawei-Hadoop/hindex/blob/master/README.md#how-it-works) by Huawei
 * [PHOENIX-938](https://issues.apache.org/jira/browse/PHOENIX-938) and [HBASE-11513](https://issues.apache.org/jira/browse/HBASE-11513) for deadlock prevention during global index maintenance.
