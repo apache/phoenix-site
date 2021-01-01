@@ -99,7 +99,7 @@
             <item href="http://docs.aws.amazon.com/ElasticMapReduce/latest/ReleaseGuide/emr-phoenix.html" name="Phoenix on Amazon EMR"/>
             <item href="http://python-phoenixdb.readthedocs.io/en/latest" name="Phoenix Adapter for Python"/>
             <item href="phoenix_orm.html" name="Phoenix ORM Library"/>
-            <item href="https://prestosql.io/docs/current/connector/phoenix.html" name="Phoenix Connector for Presto"/>
+            <item href="https://trino.io/docs/current/connector/phoenix.html" name="Phoenix Connector for Trino"/>
             <item href="omid.html" name="Apache Phoenix Omid Transaction Manager"/>
             <item href="tephra.html" name="Apache Phoenix Tephra Transaction Manager"/>
         </menu>
