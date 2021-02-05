@@ -65,7 +65,8 @@ addRelease('4.14.0-cdh5.13.2','09/jun/2018');
 addRelease('4.14.0-cdh5.12.2','09/jun/2018');
 addRelease('4.14.0-cdh5.11.2','09/jun/2018');
 addPhoenixdbRelease('1.0.0','18/sep/2020');
-addPhoenixThirdpartyRelease('1.0.0','26/okt/2020');
+addPhoenixThirdpartyRelease('1.0.0','26/oct/2020');
+addPhoenixThirdpartyRelease('1.1.0','01/feb/2021');
 addPhoenixOmidRelease('1.0.2','23/nov/2020');
 addPhoenixTephraRelease('0.16.0','04/dec/2020');
 

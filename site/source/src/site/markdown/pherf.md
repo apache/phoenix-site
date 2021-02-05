@@ -12,9 +12,7 @@ Pherf is a standalone tool that can perform performance and functional testing t
 
 * Edit the config/env.sh to include the required property values.
 * `bin/pherf-standalone.py -h`
-* To use libraries included with HBase deployment on a cluster: `bin/pherf-cluster.py -h`
-* Example: `bin/pherf-cluster.py -drop all -l -q -z [zookeeper] -schemaFile .*user_defined_schema.sql -scenarioFile .*user_defined_scenario.xml`
-HBASE_CONF_DIR, HBASE_DIR environment variable needs to be set to use against a cluster deployment
+* Example: `bin/pherf-standalone.py -drop all -l -q -z [zookeeper] -schemaFile .*user_defined_schema.sql -scenarioFile .*user_defined_scenario.xml`
 
 ## Example run commands.
 
