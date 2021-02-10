@@ -50,6 +50,7 @@ Jan Fernando | Salesforce | jfernando@apache.org | Committer
 Kadir Ozdemir | Salesforce | kadir@apache.org | Committer
 Kevin Liew | Simba Technologies | kliew@apache.org | Committer
 Mihir Monani | Salesforce | mihir6692@apache.org | Committer
+Richard Antal | Cloudera | richardantal@apache.org | Committer
 Swaroopa Kadam | Salesforce | skadam@apache.org | Committer
 Ohad Shacham | Yahoo Research, Oath | ohads@apache.org | Committer
 Xinyi Yan | Salesforce | yanxinyi@apache.org | Committer
