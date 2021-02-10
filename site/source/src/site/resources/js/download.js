@@ -29,6 +29,36 @@ function addRelease(version, date) {
     document.getElementById('core-releases').appendChild(tr);
 }
 
+function addRelease2(version, date) {
+    var tr = document.createElement('tr');
+    var parcelsHtml = version.includes('-cdh') ? parcelFolderHtml(version) : ''
+    var phoenixBinariesHtml = '';
+    for (var i=2; i < arguments.length; i++) {
+        phoenixBinariesHtml += phoenixBinaryHtml(version, arguments[i]);
+    }
+    tr.innerHTML =
+        '<td>' + version + '</td>' +
+        '<td>' + date + '</td>' +
+        '<td><ul><li>' +
+          '<a href="' + dynUrl + 'phoenix-' + version + '/phoenix-' + version + '-src.tar.gz">src</a> ' +
+          '&nbsp;&nbsp;' +
+          '[ <a href="' + apacheUrlHttps + 'phoenix-' + version + '/phoenix-' + version + '-src.tar.gz.sha512">sha512</a>' +
+          ' | <a href="' + apacheUrlHttps + 'phoenix-' + version + '/phoenix-' + version + '-src.tar.gz.asc">asc</a> ]' +
+        '</li>' + phoenixBinariesHtml +
+        '</ul></td>';
+    document.getElementById('core-releases').appendChild(tr);
+}
+
+function phoenixBinaryHtml(version, hbaseVersion) {
+  return '<li>' +
+          '<a href="' + dynUrl + 'phoenix-' + version + '/phoenix-hbase-'+hbaseVersion + '-' + version + '-bin.tar.gz">hbase-'+hbaseVersion+'-bin</a> ' +
+          '&nbsp;&nbsp;' +
+          '[ <a href="' + apacheUrlHttps + '/phoenix-hbase-'+hbaseVersion + '-' + version + '-bin.tar.gz.sha512">sha512</a>' +
+          ' | <a href="' + apacheUrlHttps + '/phoenix-hbase-'+hbaseVersion + '-' + version + '-bin.tar.gz.asc">asc</a> ]' +
+        '</li>';
+}
+
+
 function addPhoenixdbRelease(version, date) {
     var tr = document.createElement('tr');
     tr.innerHTML =
