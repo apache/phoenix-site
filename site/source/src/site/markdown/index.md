@@ -21,26 +21,8 @@
 <a href="source.html" title="Sync and build Phoenix source code"><img src="images/scode.png"/></a>
 <br/><font size="2">Sync and build Apache Phoenix from source code</font>
 </td>
-<!--td width="25%"><br/>
-<img title="Search Phoenix JIRAs, web-site, user/dev. email list, source code and javadocs." src="images/search.png"/>
-<form action="http://search-hadoop.com/?" method="get">
-<input value="Phoenix" name="fc_project" type="hidden"/>
-<input placeholder="Search Phoenix" required="required" style="width:180px" size="18" name="q" id="query" type="search"/>
-</form>
-</td-->
 </tr>
 </table>
-<!--table class="showtable">
-<tr>
-<td><br/>
-<form action="http://search-hadoop.com/?" method="get">
-<img title="Search Phoenix JIRAs, web-site, user/dev. email list, source code and javadocs." src="images/search-small.png"/>
-<input value="Phoenix" name="fc_project" type="hidden"/>
-<input placeholder="Search Phoenix" required="required" style="width:180px" size="18" name="q" id="query" type="search"/>
-</form>
-</td>
-</tr>
-</table-->
 </span>
 
 <span id="alerts" style="background-color:#ffc; text-align: center;display: block;padding:10px; border-bottom: solid 1px #cc9">

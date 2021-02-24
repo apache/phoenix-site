@@ -48,9 +48,6 @@
     </brand>
     <skinAttribution>false</skinAttribution>
     <breadcrumbs>true</breadcrumbs>
-      <bottomDescription quote="false">
-        <![CDATA[<form action="http://search-hadoop.com/?" method="get"><input value="Phoenix" name="fc_project" type="hidden"><input placeholder="Search Phoenix&hellip;" required="required" style="width:170px;" size="18" name="q" id="query" type="search"></form>]]>
-      </bottomDescription>
     </reflowSkin>
   </custom>
     <body>
