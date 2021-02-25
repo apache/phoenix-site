@@ -59,7 +59,7 @@
             <item href="news.html" name="News"/>
             <item href="performance.html" name="Performance"/>
             <item href="team.html" name="Team"/>
-            <item href="techtalks.html" name="Tech Talks"/>
+            <item href="tech_talks.html" name="Tech Talks"/>
             <item href="resources.html" name="Presentations"/>
             <item href="mailing_list.html" name="Mailing Lists"/>
             <item href="source.html" name="Source Repository"/>
