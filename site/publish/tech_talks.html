@@ -8,7 +8,7 @@
 
 	<head>
 		<meta charset="UTF-8" />
-		<title>Table Sampling | Apache Phoenix</title>
+		<title>Tech Talks | Apache Phoenix</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="description" content="" />
 		<meta http-equiv="content-language" content="en" />
@@ -34,7 +34,7 @@
 
 	</head>
 
-	<body class="page-tablesample project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
+	<body class="page-tech_talks project-phoenix-site" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
 
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
@@ -121,7 +121,7 @@
 									<li ><a href="paged.html" title="Paged Queries">Paged Queries</a></li>
 									<li ><a href="salted.html" title="Salted Tables">Salted Tables</a></li>
 									<li ><a href="skip_scan.html" title="Skip Scan">Skip Scan</a></li>
-									<li class="active"><a href="" title="Table Sampling">Table Sampling</a></li>
+									<li ><a href="tablesample.html" title="Table Sampling">Table Sampling</a></li>
 									<li class="divider"/>
 									<li ><a href="views.html" title="Views">Views</a></li>
 									<li ><a href="multi-tenancy.html" title="Multi tenancy">Multi tenancy</a></li>
@@ -167,65 +167,52 @@
 		<div class="span12">
 			<div class="body-content">
 <div class="page-header">
- <h1>Table Sampling</h1>
+ <h1>Tech Talks</h1>
 </div> 
-<p>To support table sampling, similar to the Postgresql and T-SQL syntax, a TABLESAMPLE clause has been encorporated into the table aliases ref as of Phoenix 4.12. The general syntax is described <a href="language/index.html#aliased_table_ref">here</a>. This feature limits the number of rows returned from a table to a PERCENT of rows. See <a class="externalLink" href="https://issues.apache.org/jira/browse/PHOENIX-153">PHOENIX-153</a> for implementation details.</p> 
-<p>This feature is implmented with a Bernoulli trial, a consistent-hashing based tablesampler, to achieve a Bernoulli sampling on a given population (rows). When executed, given a sampling rate, it leverages Phoenix’s stats as well HBase’s region distribution to perform a table sampling.</p> 
-<p>As part of the <a href="update_statistics.html">statistics collection</a>, a guide post (a row referrence) is created for rows at equidistant bytes from each other. When sampling is required, a Bernoulli trial process is applied repeatedly on each guide post on each region with a probability that porportional to the sampling rate. A included guide post will result in all the rows in between this and next guide post being included into sample population.</p> 
+<p>The monthly tech talks is to bring the Phoenix community together to have technical discussions, share knowledge, and initiate further collaborations, innovations and improvements. </p> 
+<p>The topics can be any technical subject related to Phoenix, including its internals, interfaces, operational aspects, and use cases, and technologies that it leverages, and can possibly leverage or adapt.</p> 
+<p><b>When:</b> First Thursday of each month at 9AM PST<br /><b>Duration:</b> 90 minutes (to allow the audience to participate and ask questions)<br /><b>Meeting Link:</b> To attend the meetings, please use the video conference link to be provided here later<br /><b>Suggest Topics:</b> To suggest a topic to present in an upcoming meeting, please <a class="externalLink" href="mailto:user@phoenix.apache.org,dev@phoenix.apache.org">send an email to the user and dev list</a></p> 
 <div class="section"> 
- <div class="section"> 
-  <div class="section"> 
-   <h4 id="Performance">Performance</h4> 
-   <p>Sampling on a table with a sampling rate = 100% will cost same amount of computational resource as a query without sampling. This resouces consumption quicky fall off when a smaller sampling rate is choosing. In general, the amortized complexity for sampling process is <tt>O(k + mn)</tt> , with n being the number of the regions of the sampled hbase table, m being the number of guide posts, and k being the size of sampled population.</p> 
-  </div> 
-  <div class="section"> 
-   <h4 id="Repeatable">Repeatable</h4> 
-   <p>Repeatable means it guarantees that the repeated sampling on the same table will resulted in the same sampled result.</p> 
-   <p>Repeatable feature is made possible by a consistent-hashing process applied on the binary representation of the start rowkey of each guideposts of each region when sampling process is in action. During hashing, a FNV1 implementation with lazy mod method is adopted by default. see <a class="externalLink" href="http://www.isthe.com/chongo/tech/comp/fnv/">FNV1</a>.</p> 
-  </div> 
- </div> 
-</div> 
-<div class="section"> 
- <h2 id="Examples">Examples</h2> 
- <p>For example, to tablesample a table , you would execute the following command. Please note, the sampling rate is a numeric value between 0 and 100, inclusive.</p> 
- <div class="source"> 
-  <pre>select * from PERSON TABLESAMPLE(12.08);
-</pre> 
- </div> 
- <p>Some more examples:</p> 
- <div class="source"> 
-  <pre>select * from PERSON TABLESAMPLE (12.08) where ADDRESS = 'CA' OR name&gt;'aaa';
-select count( * ) from PERSON TABLESAMPLE (12.08) LIMIT 2
-select count( * ) from (select NAME from PERSON TABLESAMPLE (49) limit 20)
-select * from (select /+NO_INDEX/ * from PERSON tablesample (10) where Name &gt; 'tina10') where ADDRESS = 'CA'
-select * from PERSON1, PERSON2 tablesample (70) where PERSON1.Name = PERSON2.NAME
-select /+NO_INDEX/ count( * ) from PERSON tableSample (19), US_POPULATION tableSample (28) where PERSON.Name &gt; US_POPULATION.STATE
-upsert into personbig(ID, ADDRESS) select id, address from personbig tablesample (1);
-</pre> 
- </div> 
- <p>To use it in aggregation:</p> 
- <div class="source"> 
-  <pre>select count( * ) from PERSON TABLESAMPLE (49) LIMIT 2
-select count( * ) from (select NAME from PERSON TABLESAMPLE (49) limit 20)
-</pre> 
- </div> 
- <p>To explain the query:</p> 
- <div class="source"> 
-  <pre>explain select count( * ) from PERSON TABLESAMPLE (49) LIMIT 2)
-</pre> 
- </div> 
+ <h2 id="Upcoming_Tech_Talks">Upcoming Tech Talks</h2> 
+ <table border="0" class="bodyTable table table-striped table-hover"> 
+  <thead> 
+   <tr class="a"> 
+    <th>Title </th> 
+    <th>Abstract </th> 
+    <th>When </th> 
+    <th>Calendar</th> 
+   </tr> 
+  </thead> 
+  <tbody> 
+   <tr class="b"> 
+    <td>Strongly Consistent Global Secondary Indexes </td> 
+    <td>Global secondary indexing, which enables efficient queries on non-primary key fields, is central to many use cases. Phoenix implements global secondary indexing by pairing a data table (the table that holds the entire user data) with physically separate (index) tables that are indexed on a different set of columns. Some use cases demand strong consistency between the data table and its indexes, meaning that regardless of whether a given query is served from a data table or an index table, the same result is returned. This talk presents the secondary indexing design to meet this strong consistency requirement </td> 
+    <td>9:00 AM PST March 04, 2021 </td> 
+    <td><a class="externalLink" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;dates=20210304T170000Z%2F20210304T183000Z&amp;text=Strongly%20Consistent%20Global%20Secondary%20Indexes">Google</a> - <a class="externalLink" href="https://outlook.live.com/calendar/0/deeplink/compose?enddt=2021-03-04T18%3A30%3A00%2B00%3A00&amp;path=%2Fcalendar%2Faction%2Fcompose&amp;rru=addevent&amp;startdt=2021-03-04T17%3A00%3A00%2B00%3A00&amp;subject=Strongly%20Consistent%20Global%20Secondary%20Indexes">Outlook</a></td> 
+   </tr> 
+  </tbody> 
+ </table> 
 </div> 
 <div class="section"> 
- <h2 id="Tuning">Tuning</h2> 
- <ul> 
-  <li> <p>Due to sampling process, the TABLESAMPLE clause should be used with some caution. For example, a join of two tables is likely to return a match for each row in both tables; however, when tablesampling process is applied on either one or both of the two tables, the joining may not match the expectation when without sampling.</p></li> 
-  <li> <p>The stats needs to be collected in order to achieve the best sampling accuracy. To turn on statistics collection, refer to <a href="update_statistics.html">Statistics Collection</a>.</p></li> 
- </ul> 
- <p></p> 
- <div> 
-  <pre>  ALTER TABLE my_table SET GUIDE_POSTS_WIDTH = 10000000  </pre> 
- </div> * A denser guide post setting improves the sampling accuracy, but reduces the performance at the same time. A comparison is experimented as fig below: 
- <p><img src="images/sampling_accuracy_perf.jpg" alt="table samping performance" /></p> 
+ <h2 id="Previous_Tech_Talks">Previous Tech Talks</h2> 
+ <table border="0" class="bodyTable table table-striped table-hover"> 
+  <thead> 
+   <tr class="a"> 
+    <th>Title </th> 
+    <th>Resources </th> 
+    <th>Recording </th> 
+    <th>When </th> 
+   </tr> 
+  </thead> 
+  <tbody> 
+   <tr class="b"> 
+    <td> </td> 
+    <td> </td> 
+    <td> </td> 
+    <td> </td> 
+   </tr> 
+  </tbody> 
+ </table> 
 </div>
 			</div>
 		</div>
@@ -402,8 +389,8 @@ select count( * ) from (select NAME from PERSON TABLESAMPLE (49) limit 20)
 						<li >
 							<a href="skip_scan.html" title="Skip Scan">Skip Scan</a>
 						</li>
-						<li class="active">
-							<a href="#" title="Table Sampling">Table Sampling</a>
+						<li >
+							<a href="tablesample.html" title="Table Sampling">Table Sampling</a>
 						</li>
 						<li >
 							<a href="http:divider" title=""></a>
