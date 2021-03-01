@@ -6,7 +6,7 @@ The topics can be any technical subject related to Phoenix, including its intern
 
 **When:** First Thursday of each month at 9AM PST  
 **Duration:** 90 minutes (to allow the audience to participate and ask questions)    
-**Meeting Link:** To attend the meetings, please use the video conference link to be provided here later  
+**Meeting Link:** To attend the meetings, please use the video conference [link](https://salesforce.zoom.us/j/81690397850?pwd=ZW11MllDcjluanNRcFBaU0QrYkxtZz09)  
 **Suggest Topics:** To suggest a topic to present in an upcoming meeting, please [send an email to the user and dev list](mailto:user@phoenix.apache.org,dev@phoenix.apache.org)
 
 ## Upcoming Tech Talks
