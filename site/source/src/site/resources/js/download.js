@@ -53,8 +53,8 @@ function phoenixBinaryHtml(version, hbaseVersion) {
   return '<li>' +
           '<a href="' + dynUrl + 'phoenix-' + version + '/phoenix-hbase-'+hbaseVersion + '-' + version + '-bin.tar.gz">hbase-'+hbaseVersion+'-bin</a> ' +
           '&nbsp;&nbsp;' +
-          '[ <a href="' + apacheUrlHttps + '/phoenix-hbase-'+hbaseVersion + '-' + version + '-bin.tar.gz.sha512">sha512</a>' +
-          ' | <a href="' + apacheUrlHttps + '/phoenix-hbase-'+hbaseVersion + '-' + version + '-bin.tar.gz.asc">asc</a> ]' +
+          '[ <a href="' + apacheUrlHttps + 'phoenix-' + version + '/phoenix-hbase-'+hbaseVersion + '-' + version + '-bin.tar.gz.sha512">sha512</a>' +
+          ' | <a href="' + apacheUrlHttps + 'phoenix-' + version + '/phoenix-hbase-'+hbaseVersion + '-' + version + '-bin.tar.gz.asc">asc</a> ]' +
         '</li>';
 }
 
