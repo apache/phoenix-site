@@ -12,7 +12,7 @@ The topics can be any technical subject related to Phoenix, including its intern
 ## Upcoming Tech Talks
 | Title |  Abstract | When |
 |-------|-----------|------|
-|Phoenix Query Server, PhoenixDB, and Hue|PhoenixDB is a new project which is a Python library for interacting with Phoenix with Phoenix Query Server (PQS). Hue is an open source SQL assistant for databases and data warehouses. In this talk, we give an overview of PQS, and recently completed and planned improvements for it, and introduce the PhoenixDB project. Then, we present Hue, touch on the integration of PhoenixDB into Hue. Finally, we present a live demo of using PhoenixDB within Hue|9AM PST April 01, 2021|
+|Phoenix Query Server, PhoenixDB, and Hue|PhoenixDB is a new project which is a Python library for interacting with Phoenix with Phoenix Query Server (PQS). Hue is an open source SQL assistant for databases and data warehouses. In this talk, we give an overview of PQS, and recently completed and planned improvements for it, and introduce the PhoenixDB project. Then, we present Hue, and touch on the integration of PhoenixDB into Hue. Finally, we present a live demo of using PhoenixDB within Hue|9AM PST April 01, 2021|
 
 ## Previous Tech Talks
 | Title |  Abstract | Resources | Recording | When |
