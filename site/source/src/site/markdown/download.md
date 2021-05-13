@@ -77,6 +77,7 @@ addPhoenixThirdpartyRelease('1.0.0','26/oct/2020');
 addPhoenixThirdpartyRelease('1.1.0','01/feb/2021');
 addPhoenixOmidRelease('1.0.2','23/nov/2020');
 addPhoenixTephraRelease('0.16.0','04/dec/2020');
+addPhoenixTephraRelease('0.16.1','13/may/2021');
 
 //]]>
 </script>
