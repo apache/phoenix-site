@@ -6,7 +6,7 @@ See our installation instructions [here](installation.html), our release notes [
 and a list of fixes and new features [here](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12334393&projectId=12315120).
 Follow [Verify the Integrity of the Files](https://www.apache.org/dyn/closer.cgi#verify) for how to verify your mirrored downloads.
 
-Current release 4.16.0 can run on Apache HBase 1.3, 1.4, 1.5 and 1.6.
+Current release 4.16.1 can run on Apache HBase 1.3, 1.4, 1.5 and 1.6.
 Current release 5.1.1 can run on Apache HBase 2.1, 2.2, 2.3 and 2.4
 CDH HBase 5.11, 5.12, 5.13 and 5.14 is supported by 4.14.0.  
 Apache HBase 2.0 is supported by 5.0.0.  
@@ -59,9 +59,10 @@ If you are looking for an old release that is not present here or on the mirror,
 <script src="/js/download.js"></script> 
 <script>
 //<![CDATA[
-addRelease2('4.16.0','23/feb/2021','1.3','1.4','1.5','1.6' );
-addRelease2('5.1.1','25/mar/2021','2.1','2.2','2.3','2.4','2.4.0' );
-addRelease2('5.1.0','10/feb/2021','2.1','2.2','2.3','2.4' );
+addRelease2('4.16.0', '23/feb/2021', '1.3', '1.4', '1.5', '1.6');
+addRelease2('4.16.1', '21/may/2021', '1.3', '1.4', '1.5', '1.6');
+addRelease2('5.1.1', '25/mar/2021', '2.1', '2.2', '2.3', '2.4', '2.4.0');
+addRelease2('5.1.0', '10/feb/2021', '2.1', '2.2', '2.3', '2.4');
 addRelease('5.0.0-HBase-2.0','04/jul/2018');
 addRelease('4.15.0-HBase-1.5','20/dec/2019');
 addRelease('4.15.0-HBase-1.4','20/dec/2019');
