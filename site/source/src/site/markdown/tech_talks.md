@@ -12,7 +12,7 @@ The topics can be any technical subject related to Phoenix, including its intern
 ## Upcoming Tech Talks
 | Title |  Presenters | Abstract | When |
 |-------|-------------|----------|------|
-|TDB|||9AM PST June 03, 2021|
+|TDB|||9AM PST July 01, 2021|
 
 ## Previous Tech Talks
 | Title |  Presenters | Abstract | Resources | Recording | When |
