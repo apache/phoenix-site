@@ -6,13 +6,13 @@ The topics can be any technical subject related to Phoenix, including its intern
 
 **When:** First Thursday of each month at 9AM PST  
 **Duration:** 90 minutes (to allow the audience to participate and ask questions)    
-**Meeting Link:** To attend the meetings, please use the video conference link to be provided here  
+**Meeting Link:** To attend the meetings, please use the video conference [link]( https://salesforce.zoom.us/j/89205670836?pwd=NWdwTG9DQTBqRlBtUWRFUFBXNWYxQT09)   
 **Suggest Topics:** To suggest a topic to present in an upcoming meeting, please [send an email to the user and dev list](mailto:user@phoenix.apache.org,dev@phoenix.apache.org) 
 
 ## Upcoming Tech Talks
 | Title |  Presenters | Abstract | When |
 |-------|-------------|----------|------|
-|TDB|||9AM PST July 01, 2021|
+|Phoenix High Availability|Mingliang Liu, Daniel Wong, and Abhishek Singh Chouhan|This talk introduces Phoenix High Availability (HA) feature which allows Phoenix users to interact with multiple Phoenix/HBase clusters in order to achieve additional availability compared to a single cluster. In particular we target the common deployment configuration of two HBase clusters with master/master asynchronous replication enabled between the queried tables, but with consideration to future extensions in use cases, replication, and number of clusters.|9AM PST July 01, 2021|
 
 ## Previous Tech Talks
 | Title |  Presenters | Abstract | Resources | Recording | When |
