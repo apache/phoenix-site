@@ -1,6 +1,18 @@
 # Apache Phoenix News
 <br/>
 <hr/>
+#### [Phoenix 5.1.2 released](https://phoenix.apache.org/download.html) (June 7, 2021)
+<hr/>
+#### [Phoenix 4.16.1 released](https://phoenix.apache.org/download.html) (May 21, 2021)
+<hr/>
+#### [Monthly Tech Talks started](https://phoenix.apache.org/tech_talks.html) (March 4, 2021)
+<hr/>
+#### [Phoenix 5.1.1 released](https://phoenix.apache.org/download.html) (March 1, 2021)
+<hr/>
+#### [Phoenix 4.16.0 released](https://phoenix.apache.org/download.html) (February 23, 2020)
+<hr/>
+#### [Phoenix 5.1.0 released](https://phoenix.apache.org/download.html) (February 10, 2020)
+<hr/>
 #### [NoSQL Day 2019 in Washington, DC](https://blogs.apache.org/phoenix/entry/nosql-day-2019) (February 28, 2019)
 <hr/>
 #### [Announcing Phoenix 5.0.0 released](https://blogs.apache.org/phoenix/entry/apache-phoenix-releases-next-major) (July 4, 2018)
