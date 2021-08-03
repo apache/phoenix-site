@@ -7,7 +7,7 @@ and a list of fixes and new features [here](https://issues.apache.org/jira/secur
 Follow [Verify the Integrity of the Files](https://www.apache.org/dyn/closer.cgi#verify) for how to verify your mirrored downloads.
 
 Current release 4.16.1 can run on Apache HBase 1.3, 1.4, 1.5 and 1.6.
-Current release 5.1.1 can run on Apache HBase 2.1, 2.2, 2.3 and 2.4
+Current release 5.1.2 can run on Apache HBase 2.1, 2.2, 2.3 and 2.4
 CDH HBase 5.11, 5.12, 5.13 and 5.14 is supported by 4.14.0.  
 Apache HBase 2.0 is supported by 5.0.0.  
 
@@ -41,6 +41,14 @@ Please follow the appropriate link depending on your HBase version.
 <table id="phoenix-tephra-releases">
 <tr>
     <th width='180'>Phoenix Tephra Version</th>
+    <th width='100'>Release Date</th>
+    <th>Download</th>
+</tr>
+</table>
+
+<table id="phoenix-queryserver-releases">
+<tr>
+    <th width='180'>Phoenix Query Server Version</th>
     <th width='100'>Release Date</th>
     <th>Download</th>
 </tr>
@@ -81,6 +89,7 @@ addPhoenixThirdpartyRelease('1.1.0','01/feb/2021');
 addPhoenixOmidRelease('1.0.2','23/nov/2020');
 addPhoenixTephraRelease('0.16.0','04/dec/2020');
 addPhoenixTephraRelease('0.16.1','13/may/2021');
+addPhoenixQueryServerRelease('6.0.0','03/aug/2021');
 
 //]]>
 </script>

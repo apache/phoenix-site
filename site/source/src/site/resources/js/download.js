@@ -14,13 +14,11 @@ function addRelease(version, date) {
         '<td>' + date + '</td>' +
         '<td><ul><li>' +
           '<a href="' + dynUrl + 'apache-phoenix-' + version + '/bin/apache-phoenix-' + version + '-bin.tar.gz">bin</a> ' +
-          // '<a href="' + apacheUrlHttps + 'apache-phoenix-' + version + '/bin/apache-phoenix-' + version + '-bin.tar.gz.sha256">sha256</a> ' +
           '&nbsp;&nbsp;' +
           '[ <a href="' + apacheUrlHttps + 'apache-phoenix-' + version + '/bin/apache-phoenix-' + version + '-bin.tar.gz.sha512">sha512</a>' +
           ' | <a href="' + apacheUrlHttps + 'apache-phoenix-' + version + '/bin/apache-phoenix-' + version + '-bin.tar.gz.asc">asc</a> ]' +
         '</li><li>' +
           '<a href="' + dynUrl + 'apache-phoenix-' + version + '/src/apache-phoenix-' + version + '-src.tar.gz">src</a> ' +
-          // '<a href="' + apacheUrlHttps + 'apache-phoenix-' + version + '/src/apache-phoenix-' + version + '-src.tar.gz.sha256">sha256</a> ' +
           '&nbsp;&nbsp;' +
           '[ <a href="' + apacheUrlHttps + 'apache-phoenix-' + version + '/src/apache-phoenix-' + version + '-src.tar.gz.sha512">sha512</a>' +
           ' | <a href="' + apacheUrlHttps + 'apache-phoenix-' + version + '/src/apache-phoenix-' + version + '-src.tar.gz.asc">asc</a> ]' +
@@ -117,4 +115,25 @@ function addPhoenixTephraRelease(version, date) {
         '</li>' +
         '</ul></td>';
     document.getElementById('phoenix-tephra-releases').appendChild(tr);
+}
+
+function addPhoenixQueryServerRelease(version, date) {
+    var tr = document.createElement('tr');
+    var parcelsHtml = version.includes('-cdh') ? parcelFolderHtml(version) : ''
+    tr.innerHTML =
+        '<td>' + version + '</td>' +
+        '<td>' + date + '</td>' +
+        '<td><ul><li>' +
+          '<a href="' + dynUrl + 'phoenix-queryserver-' + version + '/phoenix-queryserver-' + version + '-bin.tar.gz">bin</a> ' +
+          '&nbsp;&nbsp;' +
+          '[ <a href="' + apacheUrlHttps + 'phoenix-queryserver-' + version + '/phoenix-queryserver-' + version + '-bin.tar.gz.sha512">sha512</a>' +
+          ' | <a href="' + apacheUrlHttps + 'phoenix-queryserver-' + version + '/phoenix-queryserver-' + version + '-bin.tar.gz.asc">asc</a> ]' +
+        '</li><li>' +
+          '<a href="' + dynUrl + 'phoenix-queryserver-' + version + '/phoenix-queryserver-' + version + '-src.tar.gz">src</a> ' +
+          '&nbsp;&nbsp;' +
+          '[ <a href="' + apacheUrlHttps + 'phoenix-queryserver-' + version + '/phoenix-queryserver-' + version + '-src.tar.gz.sha512">sha512</a>' +
+          ' | <a href="' + apacheUrlHttps + 'phoenix-queryserver-' + version + '/phoenix-queryserver-' + version + '-src.tar.gz.asc">asc</a> ]' +
+        '</li>' +  parcelsHtml +
+        '</ul></td>';
+    document.getElementById('phoenix-queryserver-releases').appendChild(tr);
 }
