@@ -1,20 +1,17 @@
 # Phoenix Query Server
 
 The Phoenix Query Server provides an alternative means for interaction with
-Phoenix and HBase. Soon this will enable access from environments other than
-the JVM.
+Phoenix and HBase. 
+
 
 ## Overview
 
 Phoenix 4.4 introduces a stand-alone server that exposes Phoenix to "thin"
 clients. It is based on the [Avatica](https://calcite.apache.org/avatica) component of
 [Apache Calcite](https://calcite.apache.org). The query server is comprised of a Java server that
-manages Phoenix Connections on the clients' behalf. The client implementation
-is currently a JDBC driver with minimal dependencies. Two transport mechanisms
-are current supported: JSON and Protocol Buffers (available as of Phoenix 4.7
-as the default). There's also a sqlline script that uses the thin client.
+manages Phoenix Connections on the clients' behalf. 
 
-Avatica is still relatively early in its life-cycle. With the introduction of the
+With the introduction of the
 Protobuf transport, Avatica is moving towards backwards compatibility with the
 provided thin JDBC driver. There are no such backwards compatibility guarantees
 for the JSON API.
@@ -23,18 +20,49 @@ To repeat, there is no guarantee of backwards compatibility with the JSON transp
 however, compatibility with the Protobuf transport is stabilizing (although, not
 tested thoroughly enough to be stated as "guaranteed").
 
+### Clients
+
+The primary client implementation
+is currently a JDBC driver with minimal dependencies. The default and
+primary transport mechanism since Phoenix 4.7 is Protobuf, the older JSON mechanism can still
+be enabled.
+The distribution includes the sqlline-thin.py CLI client that uses the JDBC thin client.
+
+The Phoenix project also maintains the Python driver
+[phoenixdb](https://phoenix.apache.org/python.html).
+
+The Avatica [Go client](https://calcite.apache.org/avatica/docs/go_client_reference.html)
+can also be used.
+
+Proprietary ODBC drivers are also available for Windows and Linux.
+
+
 ## Installation
 
-In the 4.x and 5.0 releases the query server and its JDBC client are part of the standard Phoenix
-distribution. They require no additional dependencies.
+In the 4.4-4.14 and 5.0 releases the query server and its JDBC client are part of the standard Phoenix
+distribution. They require no additional dependencies or installation.
 
-After the 5.0 release, the query server has been unbundled into the phoenix-queryserver
-repository, and its version number has been reset to 1.0. At the time of writing
-there is no released version of the standalone query server.
+After the 4.15 and 5.1 release, the query server has been unbundled into the phoenix-queryserver
+repository, and its version number has been reset to 6.0.
+
+Download the latest source or binary release from the 
+[Download page](https://phoenix.apache.org/download.html), 
+or check out the development version from
+[github](https://github.com/apache/phoenix-queryserver)
+
+Either unpack the binary distribution, or build it from source. See BUILDING.md
+in the source distribution on how to build.
 
 ## Usage
 
 ### Server
+
+The standalone Query Server distribution does not contain the necessary
+Phoenix (thick) client library by default.
+
+If using the standalone library you will either need to rebuild it from source to include the
+client library (See BUILDING.md), or manually copy the phoenix thick client library
+into the installation directory.
 
 The server component is managed through `bin/queryserver.py`. Its usage is as
 follows
@@ -51,14 +79,14 @@ process, if it exists.
 Any subsequent arguments are passed to the main class for interpretation.
 
 The server is packaged in a standalone jar,
-`phoenix-server-<version>-runnable.jar`. This jar and `HBASE_CONF_DIR` on the
+`phoenix-queryserver-<version>.jar`. This jar, the phoenix-client.jar and `HBASE_CONF_DIR` on the
 classpath are all that is required to launch the server.
 
 ### Client
 
 Phoenix provides two mechanisms for interacting with the query server. A JDBC
 driver is provided in the standalone
-`phoenix-<version>-thin-client.jar`. The script
+`phoenix-queryserver-client-<version>.jar`. The script
 `bin/sqlline-thin.py` is available for the command line.
 
 The JDBC connection string is composed as follows:
@@ -170,8 +198,7 @@ configuration.
       <td colspan="3"><b>Configurations relating to HTTPS.</b></td>
 	</tr>	
 	<tr>
-      <td colspan="3"><em>HTTPS support is only available in the unbundled phoenix-queryserver 1.0.0-SNAPSHOT 
-version at the time of writing.</em></td>
+      <td colspan="3"><em>HTTPS support is only available in the unbundled phoenix-queryserver versions.</em></td>
     </tr>
     <tr><td><b>Property</b></td><td><b>Description</b></td><td><b>Default</b></td></tr>
     <tr>
