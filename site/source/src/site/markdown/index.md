@@ -37,9 +37,8 @@ Apache Phoenix enables OLTP and operational analytics in Hadoop for low latency 
 
 Apache Phoenix is fully integrated with other Hadoop products such as Spark, Hive, Pig, Flume, and Map Reduce.
 
-<p align="center">
-<br/>Who is using Apache Phoenix? Read more <a href="who_is_using.html">here...</a><br/>
-<img src="images/using/all.png"/>
+<p>
+Who is using Apache Phoenix? Read more <a href="who_is_using.html">here...</a>
 </p>
 ## Mission
 Become the trusted data platform for OLTP and operational analytics for Hadoop through well-defined, industry standard APIs.
