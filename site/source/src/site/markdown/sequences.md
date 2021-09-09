@@ -4,7 +4,7 @@ Sequences are a standard SQL feature that allow for generating monotonically inc
 
     CREATE SEQUENCE my_schema.my_sequence;
 
-This will create a sequence named <code>my_schema.my_sequence</code> with the an initial sequence value of 1, incremented by 1 each time, with no cycle, minimum value or maximum value, and 100 sequence values cached on your session (determined by the <code>phoenix.sequence.cacheSize</code> config parameter). The complete syntax of <code>CREATE SEQUENCE</code> may be found [here](http://phoenix.apache.org/language/index.html#create_sequence).
+This will create a sequence named <code>my_schema.my_sequence</code> with the an initial sequence value of 1, incremented by 1 each time, with no cycle, minimum value or maximum value, and 100 sequence values cached on your session (determined by the <code>phoenix.sequence.cacheSize</code> config parameter). The complete syntax of <code>CREATE SEQUENCE</code> may be found [here](language/index.html#create_sequence).
 
 Caching sequence values on your session improves performance, as we don't need to ask the server for more sequence values until we run out of cached values. The tradeoff is that you may end up with gaps in your sequence values when other sessions also use the same sequence.
 

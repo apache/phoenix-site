@@ -175,11 +175,11 @@ The implementation uses a shadow column to track the status of index rows:
   2. Delete the data table rows
   3. Delete index table rows
 
-See [resources](http://phoenix.apache.org/secondary_indexing.html#Resources) for more in-depth information.
+See [resources](secondary_indexing.html#Resources) for more in-depth information.
 
 All newly created tables use the new indexing algorithm.
 
-Indexes created with older Phoenix versions will continue to use the old implementation, until upgraded with [IndexUpgradeTool](http://phoenix.apache.org/secondary_indexing.html#Index_Upgrade_Tool)
+Indexes created with older Phoenix versions will continue to use the old implementation, until upgraded with [IndexUpgradeTool](secondary_indexing.html#Index_Upgrade_Tool)
 
 #### Mutable table indexes for 4.14 (and 5.0) and older versions
 
@@ -246,7 +246,7 @@ at which the failure occurred to go back when a partial rebuild is performed. Th
 ##### Disable mutable index on write failure with manual rebuild required
 This is the lowest level of consistency for mutable secondary indexes. In this case, when a write to a secondary
 index fails, the index will be marked as disabled with a manual
-[rebuild of the index](http://phoenix.apache.org/language/index.html#alter_index) required to enable it to be used
+[rebuild of the index](language/index.html#alter_index) required to enable it to be used
 once again by queries.
 
 The following server-side configurations controls this behavior:
@@ -337,7 +337,7 @@ The following configuration changes are also required to the server-side hbase-s
 The above properties are required to use local indexing.
 
 ### Upgrading Local Indexes created before 4.8.0
-While upgrading the Phoenix to 4.8.0+ version at server remove above three local indexing related configurations from `hbase-site.xml` if present. From client we are supporting both online(while initializing the connection from phoenix client of 4.8.0+ versions) and offline(using psql tool) upgrade of local indexes created before 4.8.0. As part of upgrade we  recreate the local indexes in ASYNC mode. After upgrade user need to build the indexes using [IndexTool](http://phoenix.apache.org/secondary_indexing.html#Index_Population)
+While upgrading the Phoenix to 4.8.0+ version at server remove above three local indexing related configurations from `hbase-site.xml` if present. From client we are supporting both online(while initializing the connection from phoenix client of 4.8.0+ versions) and offline(using psql tool) upgrade of local indexes created before 4.8.0. As part of upgrade we  recreate the local indexes in ASYNC mode. After upgrade user need to build the indexes using [IndexTool](secondary_indexing.html#Index_Population)
 
 Following client side configuration used in the upgrade.
 

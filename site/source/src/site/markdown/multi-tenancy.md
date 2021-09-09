@@ -36,7 +36,7 @@ For example, a tenant-specific view may be defined as follows:
     SELECT * FROM base.event
     WHERE event_type='L';
 
-The tenant_id column is neither visible nor accessible to a tenant-specific view. Any reference to it will cause a ColumnNotFoundException. Just like any other Phoenix view, whether or not this view is updatable is based on the rules explained [here](views.html#Updatable_Views). In addition, indexes may be added to tenant-specific views just like to regular tables and views (with [these](http://phoenix.apache.org/views.html#Limitations) limitations).
+The tenant_id column is neither visible nor accessible to a tenant-specific view. Any reference to it will cause a ColumnNotFoundException. Just like any other Phoenix view, whether or not this view is updatable is based on the rules explained [here](views.html#Updatable_Views). In addition, indexes may be added to tenant-specific views just like to regular tables and views (with [these](views.html#Limitations) limitations).
 
 ### Tenant Data Isolation
 Any DML or query that is performed on multi-tenant tables using a tenant-specific connections is automatically constrained to only operate on the tenant’s data. For the upsert operation, this means that Phoenix automatically populates the tenantId column with the tenant’s id specified at connection-time. For querying and delete, a where clause is transparently added to constrain the operations to only see data belonging to the current tenant.

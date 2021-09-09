@@ -29,7 +29,7 @@ be enabled.
 The distribution includes the sqlline-thin.py CLI client that uses the JDBC thin client.
 
 The Phoenix project also maintains the Python driver
-[phoenixdb](https://phoenix.apache.org/python.html).
+[phoenixdb](python.html).
 
 The Avatica [Go client](https://calcite.apache.org/avatica/docs/go_client_reference.html)
 can also be used.
@@ -46,7 +46,7 @@ After the 4.15 and 5.1 release, the query server has been unbundled into the pho
 repository, and its version number has been reset to 6.0.
 
 Download the latest source or binary release from the 
-[Download page](https://phoenix.apache.org/download.html), 
+[Download page](/download.html), 
 or check out the development version from
 [github](https://github.com/apache/phoenix-queryserver)
 
@@ -153,7 +153,7 @@ Phoenix release lines, we recommend additional testing by the user to verify tha
 ## Metrics
 
 By default, the Phoenix Query Server exposes various Phoenix global client metrics via JMX (for HBase versions 1.3 and up).
-The list of metrics are available [here](https://phoenix.apache.org/metrics.html).
+The list of metrics are available [here](metrics.html).
 
 PQS Metrics use [Hadoop Metrics 2](https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/Metrics.html) internally for metrics publishing. Hence it publishes various JVM related metrics. Metrics can be filtered based on certain tags, which can be configured by the property specified in hbase-site.xml on the classpath. Further details are provided in Configuration section.
 

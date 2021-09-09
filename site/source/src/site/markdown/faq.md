@@ -17,12 +17,11 @@
 
 ### I want to get started. Is there a Phoenix _Hello World_?
 
-*Pre-requisite:* Download latest Phoenix from [here](download.html)
-and copy phoenix-*.jar to HBase lib folder and restart HBase.
+*Pre-requisite:* [Download](download.html) and [install](installation.html) the latest Phoenix.
 
 **1. Using console**
 
-1. Start Sqlline: `$ sqlline.py [zookeeper]`
+1. Start Sqlline: `$ sqlline.py [zookeeper quorum hosts]`
 2. Execute the following statements when Sqlline connects: 
 
 ```
@@ -62,7 +61,7 @@ public class test {
 		Statement stmt = null;
 		ResultSet rset = null;
 		
-		Connection con = DriverManager.getConnection("jdbc:phoenix:[zookeeper]");
+		Connection con = DriverManager.getConnection("jdbc:phoenix:[zookeeper quorum hosts]");
 		stmt = con.createStatement();
 		
 		stmt.executeUpdate("create table test (mykey integer not null primary key, mycolumn varchar)");
@@ -98,7 +97,7 @@ You should get the following output
 
 The Phoenix (Thick) Driver JDBC URL syntax is as follows (where elements in square brackets are optional):
 
-`jdbc:phoenix:[comma-separated ZooKeeper Quorum [:port [:hbase root znode [:kerberos_principal [:path to kerberos keytab] ] ] ]`
+`jdbc:phoenix:[comma-separated ZooKeeper Quorum Hosts [: ZK port [:hbase root znode [:kerberos_principal [:path to kerberos keytab] ] ] ]`
 
 The simplest URL is:
 
@@ -197,7 +196,7 @@ Example:
 
 Note: Ideally for a 16 region server cluster with quad-core CPUs, choose salt buckets between 32-64 for optimal performance.
 
-* **Per-split** table
+* **Pre-split** table
 Salting does automatic table splitting but in case you want to exactly control where table split occurs with out adding extra byte or change row key order then you can pre-split a table. 
 
 Example: 
@@ -254,7 +253,7 @@ Mutable table: `create table test (mykey varchar primary key, col1 varchar, col2
 
 Upsert rows in this test table and Phoenix query optimizer will choose correct index to use. You can see in [explain plan](language/index.html#explain) if Phoenix is using the index table. You can also give a [hint](language/index.html#hint) in Phoenix query to use a specific index.
 
-
+See [Secondary Indexing](secondary_indexing.html) for further information
 
 ### Why isn't my secondary index being used?
 
@@ -266,6 +265,7 @@ Query: DDL `select id, firstname, lastname from usertable where firstname = 'foo
 
 Index would not be used in this case as lastname is not part of indexed or covered column. This can be verified by looking at the explain plan. To fix this create index that has either lastname part of index or covered column. Example: `create idx_name on usertable (firstname) include (lastname);`
 
+You can force Phoenix to use secondary for uncovered columns by specifying an [index hint](index.html#index_hint)
 
 ### How fast is Phoenix? Why is it so fast?
 
@@ -279,13 +279,19 @@ Why is Phoenix fast even when doing full scan:
 
 
 ### How do I connect to secure HBase cluster?
-Check out excellent post by Anil Gupta 
-http://bigdatanoob.blogspot.com/2013/09/connect-phoenix-to-secure-hbase-cluster.html
+
+Specify the principal and corresponding keytab in the JDBC URL as show above.
+For ancient Phoenix versions heck out the excellent [post](http://bigdatanoob.blogspot.com/2013/09/connect-phoenix-to-secure-hbase-cluster.html) by Anil Gupta 
 
 
+### What HBase and Hadoop versions are supported ?
 
-### How do I connect with HBase running on Hadoop-2?
-Hadoop-2 profile exists in Phoenix pom.xml. 
+Phoenix 4.x supports HBase 1.x running on Hadoop 2
+
+Phoenix 5.x supports HBase 2.x running on Hadoop 3
+
+See the release notes and BULDING.md in recent releases for the exact versions supported,
+and on how to build Phoenix for specific HBase and Hadoop versions
 
 
 ### Can phoenix work on tables with arbitrary timestamp as flexible as HBase API?

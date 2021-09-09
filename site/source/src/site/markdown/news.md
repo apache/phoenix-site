@@ -1,23 +1,23 @@
 # Apache Phoenix News
 <br/>
 <hr/>
-#### [Phoenix 5.1.2 released](https://phoenix.apache.org/download.html) (June 7, 2021)
+#### [Phoenix 5.1.2 released](download.html) (June 7, 2021)
 <hr/>
-#### [Phoenix 4.16.1 released](https://phoenix.apache.org/download.html) (May 21, 2021)
+#### [Phoenix 4.16.1 released](download.html) (May 21, 2021)
 <hr/>
-#### [Monthly Tech Talks started](https://phoenix.apache.org/tech_talks.html) (March 4, 2021)
+#### [Monthly Tech Talks started](tech_talks.html) (March 4, 2021)
 <hr/>
-#### [Phoenix 5.1.1 released](https://phoenix.apache.org/download.html) (March 1, 2021)
+#### [Phoenix 5.1.1 released](download.html) (March 1, 2021)
 <hr/>
-#### [Phoenix 4.16.0 released](https://phoenix.apache.org/download.html) (February 23, 2020)
+#### [Phoenix 4.16.0 released](download.html) (February 23, 2020)
 <hr/>
-#### [Phoenix 5.1.0 released](https://phoenix.apache.org/download.html) (February 10, 2020)
+#### [Phoenix 5.1.0 released](download.html) (February 10, 2020)
 <hr/>
 #### [NoSQL Day 2019 in Washington, DC](https://blogs.apache.org/phoenix/entry/nosql-day-2019) (February 28, 2019)
 <hr/>
 #### [Announcing Phoenix 5.0.0 released](https://blogs.apache.org/phoenix/entry/apache-phoenix-releases-next-major) (July 4, 2018)
 <hr/>
-#### [PhoenixCon 2018 announced for June 18th, 2018](https://phoenix.apache.org/phoenixcon-2018) (March 24, 2018)
+#### [PhoenixCon 2018 announced for June 18th, 2018](phoenixcon-2018) (March 24, 2018)
 <hr/>
 #### [Announcing CDH-compatible Phoenix 4.13.2 released](https://blogs.apache.org/phoenix/entry/announcing-cdh-compatible-phoenix-4) (January 22, 2018)
 <hr/>
@@ -39,7 +39,7 @@
 <hr/>
 #### [Announcing first ever Phoenix conference on Wed, May 25th 9am-1pm](http://www.meetup.com/SF-Bay-Area-Apache-Phoenix-Meetup/events/230545182/) (April 21, 2016)
 <hr/>
-#### [Announcing transaction support in 4.7.0 release](http://phoenix.apache.org/transactions.html) (March 10, 2016)
+#### [Announcing transaction support in 4.7.0 release](transactions.html) (March 10, 2016)
 <hr/>
 #### [Announcing time series optimization in Phoenix 4.6 released](https://blogs.apache.org/phoenix/entry/new_optimization_for_time_series) (Oct 23, 2015)
 <hr/>

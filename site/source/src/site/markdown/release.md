@@ -108,7 +108,7 @@ Check that these are present.
     mvn versions:set -DnewVersion=4.16.0-HBase-1.3-SNAPSHOT -DgenerateBackupPoms=false
     </pre>
 9. If releasing Phoenix (core) Create a JIRA to update PHOENIX_MAJOR_VERSION, PHOENIX_MINOR_VERSION and PHOENIX_PATCH_NUMBER in MetaDataProtocol.java appropriately to next version (4, 16, 0 respectively in this case) and compatible_client_versions.json file with the client versions that are compatible against the next version ( In this case 4.14.3 and 4.15.0 would be the backward compatible clients for 4.16.0 ). This Jira should be committed/marked with fixVersion of the next release candidate.
-10. Add documentation of released version to the [downloads page](http://phoenix.apache.org/download.html) and [wiki](https://en.wikipedia.org/wiki/Apache_Phoenix).
+10. Add documentation of released version to the [downloads page](download.html) and [wiki](https://en.wikipedia.org/wiki/Apache_Phoenix).
 11. Send out an announcement email. See example [here](https://www.mail-archive.com/dev@phoenix.apache.org/msg54764.html).
 12. Bulk close Jiras that were marked for the release fixVersion.  
 

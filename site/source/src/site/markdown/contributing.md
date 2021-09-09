@@ -12,6 +12,10 @@ The general process for contributing code to Phoenix works as follows:
 
 These steps are explained in greater detail below.
 
+Note that the instructions below are for the main Phoenix project.
+Use the corresponding [repository](source.html) for the other subprojects.
+Tephra and Omid also have their own [JIRA project](issues.html)
+
 ### Discuss on the mailing list
 
 It's often best to discuss a change on the public mailing lists before creating and submitting a patch.

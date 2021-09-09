@@ -27,7 +27,7 @@ be significantly improved.
 ###<u>Phoenix-4.8.0 Release Notes</u>
 
 [PHOENIX-3164](https://issues.apache.org/jira/browse/PHOENIX-3164) is a relatively serious
-bug that affects the [Phoenix Query Server](http://phoenix.apache.org/server.html)
+bug that affects the [Phoenix Query Server](server.html)
 deployed with "security enabled" (Kerberos or Active Directory). Due to another late-game
 change in the 4.8.0 release as well as an issue with the use of Hadoop's UserGroupInformation
 class, every "client session" to the Phoenix Query Server with security enabled will

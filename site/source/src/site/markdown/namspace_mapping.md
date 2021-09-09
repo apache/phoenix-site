@@ -18,11 +18,11 @@ Parameters to enable namespace mapping:-
 ## Grammer Available
 Following DDL statements can be used to interact with schema.
 
-* [CREATE SCHEMA](https://phoenix.apache.org/language/index.html#create_schema)
+* [CREATE SCHEMA](language/index.html#create_schema)
 
-* [USE SCHEMA](https://phoenix.apache.org/language/index.html#use)
+* [USE SCHEMA](language/index.html#use)
 
-* [DROP SCHEMA](https://phoenix.apache.org/language/index.html#drop_schema) 
+* [DROP SCHEMA](language/index.html#drop_schema) 
 
 
 ##F.A.Q

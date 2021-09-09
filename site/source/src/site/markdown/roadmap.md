@@ -1,5 +1,9 @@
 # Roadmap
 
+<span id="alerts" style="background-color:#ffc; text-align: center;display: block;padding:10px; border-bottom: solid 1px #cc9">
+This page hasn't been updated recently, and may not reflect the current state of the project</span>
+
+
 Our roadmap is driven by our user community. Below, in prioritized order, is the current plan for Phoenix:
 
 1. **[Stress and chaos testing](https://issues.apache.org/jira/browse/PHOENIX-3146)**. Open source and automate the running of stress and chaos tests that exercise Phoenix and HBase under high load and failure conditions.

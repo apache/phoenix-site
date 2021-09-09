@@ -476,7 +476,7 @@ val firstCol = rdd.first()("COL1").asInstanceOf[String]
 #### Saving RDDs to Phoenix
 
 `saveToPhoenix` is an implicit method on RDD[Product], or an RDD of Tuples. The data types must
-correspond to the Java types Phoenix supports (http://phoenix.apache.org/language/datatypes.html)
+correspond to the Java types Phoenix supports (language/datatypes.html)
 
 Given a Phoenix table with the following DDL:
 

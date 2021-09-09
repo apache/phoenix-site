@@ -44,7 +44,7 @@ Who is using Apache Phoenix? Read more <a href="who_is_using.html">here...</a>
 Become the trusted data platform for OLTP and operational analytics for Hadoop through well-defined, industry standard APIs.
 
 ## Quick Start
-Tired of reading already and just want to get started? Take a look at our [FAQs](faq.html), listen to the Apache Phoenix talk from [Hadoop Summit 2015](https://www.youtube.com/watch?v=XGa0SyJMH94), review the [overview presentation](http://phoenix.apache.org/presentations/OC-HUG-2014-10-4x3.pdf), and jump over to our quick start guide [here](Phoenix-in-15-minutes-or-less.html).
+Tired of reading already and just want to get started? Take a look at our [FAQs](faq.html), listen to the Apache Phoenix talk from [Hadoop Summit 2015](https://www.youtube.com/watch?v=XGa0SyJMH94), review the [overview presentation](/presentations/OC-HUG-2014-10-4x3.pdf), and jump over to our quick start guide [here](Phoenix-in-15-minutes-or-less.html).
 
 ## SQL Support
 Apache Phoenix takes your SQL query, compiles it into a series of HBase scans, and orchestrates the running of those scans to produce regular JDBC result sets. Direct use of the HBase API, along with coprocessors and custom filters, results in [performance](performance.html) on the order of milliseconds for small queries, or seconds for tens of millions of rows.

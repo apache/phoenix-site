@@ -41,7 +41,7 @@ The following sections provide a few general tips for different access scenarios
     * When specifying machines for HBase, do not skimp on cores; HBase needs them.
 * For write-heavy data:
     * Pre-split the table. It can be helpful to split the table into pre-defined regions, or if the keys are monotonically increasing use salting to to avoid creating write hotspots on a small number of nodes. Use real data types rather than raw byte data.
-    * Create local indexes. Reads from local indexes have a performance penalty, so it's important to do performance testing. See the [Pherf](https://phoenix.apache.org/pherf.html) tool.
+    * Create local indexes. Reads from local indexes have a performance penalty, so it's important to do performance testing. See the [Pherf](pherf.html) tool.
 
 
 
@@ -54,21 +54,21 @@ The following sections provide a few general tips for different access scenarios
 
 ### Can the data be append-only (immutable)?
 
-* If the data is immutable or append-only, declare the table and its indexes as immutable using the `IMMUTABLE_ROWS` [option](http://phoenix.apache.org/language/index.html#options) at creation time to reduce the write-time cost. If you need to make an existing table immutable, you can do so with `ALTER TABLE trans.event SET IMMUTABLE_ROWS=true` after creation time.
-    * If speed is more important than data integrity, you can use the `DISABLE_WAL` [option](http://phoenix.apache.org/language/index.html#options). Note: it is possible to lose data with `DISABLE_WAL` if a region server fails. 
-* Set the `UPDATE_CACHE_FREQUENCY` [option](http://phoenix.apache.org/language/index.html#options) to 15 minutes or so if your metadata doesn't change very often. This property determines how often an RPC is done to ensure you're seeing the latest schema.
+* If the data is immutable or append-only, declare the table and its indexes as immutable using the `IMMUTABLE_ROWS` [option](language/index.html#options) at creation time to reduce the write-time cost. If you need to make an existing table immutable, you can do so with `ALTER TABLE trans.event SET IMMUTABLE_ROWS=true` after creation time.
+    * If speed is more important than data integrity, you can use the `DISABLE_WAL` [option](language/index.html#options). Note: it is possible to lose data with `DISABLE_WAL` if a region server fails. 
+* Set the `UPDATE_CACHE_FREQUENCY` [option](language/index.html#options) to 15 minutes or so if your metadata doesn't change very often. This property determines how often an RPC is done to ensure you're seeing the latest schema.
 * If the data is not sparse (over 50% of the cells have values), use the SINGLE_CELL_ARRAY_WITH_OFFSETS data encoding scheme introduced in Phoenix 4.10, which obtains faster performance by reducing the size of the data. For more information, see “[Column Mapping and Immutable Data Encoding](https://blogs.apache.org/phoenix/entry/column-mapping-and-immutable-data)” on the Apache Phoenix blog.
 
 ### Is the table very large?
 
 * Use the `ASYNC` keyword with your `CREATE INDEX` call to create the index asynchronously via MapReduce job.  You'll need to manually start the job; see https://phoenix.apache.org/secondary_indexing.html#Index_Population for details. 
-* If the data is too large to scan the table completely, use primary keys to create an underlying composite row key that makes it easy to return a subset of the data or facilitates [skip-scanning](https://phoenix.apache.org/skip_scan.html)—Phoenix can jump directly to matching keys when the query includes key sets in the predicate.
+* If the data is too large to scan the table completely, use primary keys to create an underlying composite row key that makes it easy to return a subset of the data or facilitates [skip-scanning](skip_scan.html)—Phoenix can jump directly to matching keys when the query includes key sets in the predicate.
 
 ### Is transactionality required?
 
 A transaction is a data operation that is atomic—that is, guaranteed to succeed completely or not at all. For example, if you need to make cross-row updates to a data table, then you should consider your data transactional.
 
-* If you need transactionality, use the `TRANSACTIONAL` [option](http://phoenix.apache.org/language/index.html#options). (See also http://phoenix.apache.org/transactions.html.)
+* If you need transactionality, use the `TRANSACTIONAL` [option](language/index.html#options). (See also http://phoenix.apache.org/transactions.html.)
 
 ### Block Encoding
 
@@ -93,7 +93,7 @@ Phoenix creates a relational data model on top of HBase, enforcing a PRIMARY KEY
 
 ## Column Families
 
-If some columns are accessed more frequently than others, [create multiple column families](https://phoenix.apache.org/faq.html#Are_there_any_tips_for_optimizing_Phoenix) to separate the frequently-accessed columns from rarely-accessed columns. This improves performance because HBase reads only the column families specified in the query.
+If some columns are accessed more frequently than others, [create multiple column families](faq.html#Are_there_any_tips_for_optimizing_Phoenix) to separate the frequently-accessed columns from rarely-accessed columns. This improves performance because HBase reads only the column families specified in the query.
 
 
 
@@ -111,25 +111,25 @@ Here are a few tips that apply to columns in general, whether they are indexed o
 A Phoenix index  is a physical table that stores a pivoted copy of some or all of the data in the main table, to serve specific kinds of queries. When you issue a query, Phoenix selects the best index for the query automatically. The primary index is created automatically based on the primary keys you select. You can create secondary indexes, specifying which columns are included based on the anticipated queries the index will support.
 
 See also: 
-[Secondary Indexing](https://phoenix.apache.org/secondary_indexing.html)
+[Secondary Indexing](secondary_indexing.html)
 
 ## Secondary indexes
 
-Secondary indexes can improve read performance by turning what would normally be a full table scan into a point lookup (at the cost of storage space and write speed). Secondary indexes can be added or removed after table creation and don't require changes to existing queries – queries simply run faster. A small number of secondary indexes is often sufficient. Depending on your needs, consider creating *[covered](http://phoenix.apache.org/secondary_indexing.html#Covered_Indexes)* indexes or *[functional](http://phoenix.apache.org/secondary_indexing.html#Functional_Indexes)* indexes, or both.
+Secondary indexes can improve read performance by turning what would normally be a full table scan into a point lookup (at the cost of storage space and write speed). Secondary indexes can be added or removed after table creation and don't require changes to existing queries – queries simply run faster. A small number of secondary indexes is often sufficient. Depending on your needs, consider creating *[covered](secondary_indexing.html#Covered_Indexes)* indexes or *[functional](secondary_indexing.html#Functional_Indexes)* indexes, or both.
 
 If your table is large, use the `ASYNC` keyword with `CREATE INDEX` to create the index asynchronously. In this case, the index will be built through MapReduce, which means that the client going up or down won't impact index creation and the job is retried automatically if necessary. You'll need to manually start the job, which you can then monitor just as you would any other MapReduce job.
 
 Example:
 `create index if not exists event_object_id_idx_b on trans.event (object_id) ASYNC UPDATE_CACHE_FREQUENCY=60000;`
 
-See [Index Population](https://phoenix.apache.org/secondary_indexing.html#Index_Population) for details.
+See [Index Population](secondary_indexing.html#Index_Population) for details.
 
 If you can't create the index asynchronously for some reason, then  increase the query timeout (`phoenix.query.timeoutMs`) to be larger than the time it'll take to build the index. If the `CREATE INDEX` call times out or the client goes down before it's finished, then the index build will stop  and must be run again. You can monitor the index table as it is created—you'll see new regions created as splits occur. You can query the `SYSTEM.STATS` table, which gets populated as splits and compactions happen. You can also run a `count(*)` query directly against the index table, though that puts more load on your system because requires a full table scan.
 
 Tips:
 
-* Create [local](https://phoenix.apache.org/secondary_indexing.html#Local_Indexes) indexes for write-heavy use cases.
-* Create global indexes for read-heavy use cases. To save read-time overhead, consider creating [covered](https://phoenix.apache.org/secondary_indexing.html#Covered_Indexes) indexes.
+* Create [local](secondary_indexing.html#Local_Indexes) indexes for write-heavy use cases.
+* Create global indexes for read-heavy use cases. To save read-time overhead, consider creating [covered](secondary_indexing.html#Covered_Indexes) indexes.
 * If the primary key is monotonically increasing, create salt buckets. The salt buckets can't be changed later, so design them to handle future growth. Salt buckets help avoid write hotspots, but can decrease overall throughput due to the additional scans needed on read.
 * Set up a cron job to build indexes. Use `ASYNC` with `CREATE INDEX` to avoid blocking.
 * Only create the indexes you need.
@@ -175,7 +175,7 @@ Hints let you override default query processing behavior and specify such factor
 * If necessary, you can do bigger joins with the `/*+ USE_SORT_MERGE_JOIN */` hint, but a big join will be an expensive operation over huge numbers of rows.
 * If the overall size of all right-hand-side tables would exceed the memory size limit, use the `/*+ NO_STAR_JOIN */ `hint.
 
-See also: [Hint](https://phoenix.apache.org/language/#hint).
+See also: [Hint](language/#hint).
 
 ### Explain Plans
 
@@ -183,7 +183,7 @@ An `EXPLAIN` plan tells you a lot about how a query will be run. To generate an 
 
 ### Parallelization
 
-You can improve parallelization with the [UPDATE STATISTICS](https://phoenix.apache.org/update_statistics.html) command. This command subdivides each region by determining keys called *guideposts* that are equidistant from each other, then uses these guideposts to break up queries into multiple parallel scans.
+You can improve parallelization with the [UPDATE STATISTICS](update_statistics.html) command. This command subdivides each region by determining keys called *guideposts* that are equidistant from each other, then uses these guideposts to break up queries into multiple parallel scans.
 Statistics are turned on by default. With Phoenix 4.9, the user can set guidepost width for each table. Optimal guidepost width depends on a number of factors such as cluster size, cluster usage, number of cores per node, table size, and disk I/O.
 
 In Phoenix 4.12, we have added a new configuration <code>phoenix.use.stats.parallelization</code> that controls whether statistics should be used for driving parallelization. Note that one can still run stats collection. The information collected is used to surface estimates on number of bytes and rows a query will scan when an EXPLAIN is generated for it. 

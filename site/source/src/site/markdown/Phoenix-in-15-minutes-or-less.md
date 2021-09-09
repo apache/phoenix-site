@@ -12,9 +12,6 @@ Actually, no. Phoenix achieves as good or likely better [performance](performanc
 * bringing the computation to the data by
   * pushing the predicates in your where clause to a server-side filter
   * executing aggregate queries through server-side hooks (called co-processors)
-
-In addition to these items, we've got some interesting enhancements in the works to further optimize performance:
-
 * secondary indexes to improve performance for queries on non row key columns 
 * stats gathering to improve parallelization and guide choices between optimizations 
 * skip scan filter to optimize IN, LIKE, and OR queries
@@ -33,14 +30,14 @@ Didn't make it to the last HBase Meetup did you? SQL is just a way of expressing
 *<strong>Blah, blah, blah - I just want to get started!</strong>*<br/>
 Ok, great! Just follow our [install instructions](installation.html):
 
-* [download](download.html) and expand our installation tar
-* copy the phoenix server jar that is compatible with your HBase installation into the lib directory of every region server
-* restart the region servers
-* add the phoenix client jar to the classpath of your HBase client
-* download and [setup SQuirrel](installation.html#SQL_Client) as your SQL client so you can issue adhoc SQL against your HBase cluster
+* [download](download.html) and expand our installation binary tar corresponding to your HBase version
+* copy the phoenix server jar into the lib directory of every region server and master
+* restart HBase
+* add the phoenix client jar to the classpath of your JDBC client or application
+ * We have detailed instructions for [setting up SQuirreL SQL](installation.html#SQL_Client) as your SQL client
 
 *<strong>I don't want to download and setup anything else!</strong>*<br/>
-Ok, fair enough - you can create your own SQL scripts and execute them using our command line tool instead. Let's walk through an example now. Begin by navigating to the `bin/` directory of your Phoenix install location.
+Ok, fair enough - you can create your own SQL scripts and execute them using our command line tools instead. Let's walk through an example now. Begin by navigating to the `bin/` directory of your Phoenix install location.
 
 * First, let's create a `us_population.sql` file, containing a table definition:
 
@@ -66,19 +63,25 @@ TX,Dallas,1213825
 CA,San Jose,912332
 ```
 
-* And finally, let's create a `us_population_queries.sql` file containing a query we'd like to run on that data.
+* Execute the following command from a command terminal to create and populate the table
+
+```
+./psql.py <your_zookeeper_quorum> us_population.sql us_population.csv
+```
+
+* Start the interactive sql client
+
+```
+./sqlline.py <your_zookeeper_quorum>
+```
+
+and issue a query 
 
 ```
 SELECT state as "State",count(city) as "City Count",sum(population) as "Population Sum"
 FROM us_population
 GROUP BY state
 ORDER BY sum(population) DESC;
-```
-
-* Execute the following command from a command terminal
-
-```
-./psql.py <your_zookeeper_quorum> us_population.sql us_population.csv us_population_queries.sql
 ```
 
 Congratulations! You've just created your first Phoenix table, inserted data into it, and executed an aggregate query with just a few lines of code in 15 minutes or less! 

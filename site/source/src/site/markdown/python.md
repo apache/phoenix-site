@@ -20,9 +20,9 @@ pip3 install --user phoenixdb
 
 ### From source
 
-You can build phoenixdb from the official source [release](https://phoenix.apache.org/download.html), 
+You can build phoenixdb from the official source [release](.html), 
 or you can use the latest development version from the soure
-[repository](https://phoenix.apache.org/source.html). The pythondb source
+[repository](source.html). The pythondb source
 lives in the `python-phoenixdb` direcory of the python-queryserver
 repository.
 

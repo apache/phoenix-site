@@ -1,5 +1,8 @@
 # Performance
 
+<span id="alerts" style="background-color:#ffc; text-align: center;display: block;padding:10px; border-bottom: solid 1px #cc9">
+This page hasn't been updated recently, and may not reflect the current state of the project</span>
+
 Phoenix follows the philosophy of **bringing the computation to the data** by using:
 
 * **coprocessors** to perform operations on the server-side thus minimizing client/server data transfer

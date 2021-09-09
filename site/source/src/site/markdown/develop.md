@@ -2,6 +2,7 @@
 Below are the steps necessary to setup your development environment so that you may contribute to Apache Phoenix.
 
 * [Getting Started](#gettingStarted)
+* [Other Phoenix subprojects](#otherProjects)
 * [Setup local Git Repository](#localGit)
 * [Eclipse](#eclipse)
     * [Get Settings and Preferences Correct](#eclipsePrefs)
@@ -34,6 +35,13 @@ Below are the steps necessary to setup your development environment so that you 
     export M2_HOME={patch to maven}
     export PATH=$M2_HOME/bin:$PATH
     </pre>
+
+<a id='otherProjects'></a>
+## Other Phoenix Subprojects
+
+The instructions here are for the main Phoenix project. For the other subprojects, use the corresponding [repository](source.html) and [JIRA project](issues.html).
+
+The Eclipse and IntelliJ setup instructions may not necessarily work well for the other projects.
 
 <a id='localGit'></a>
 ## Setup Local Git Repository
