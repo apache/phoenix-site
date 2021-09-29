@@ -6,13 +6,13 @@ The topics can be any technical subject related to Phoenix, including its intern
 
 **When:** First Thursday of each month at 9AM PST  
 **Duration:** 90 minutes (to allow the audience to participate and ask questions)    
-**Meeting Link:** To attend the meetings, please use the video conference link to be provided here   
+**Meeting Link:** To attend the meetings, please use the video conference [link](https://salesforce.zoom.us/j/86245666611?pwd=MXFNTkYrUzFoRFkxYnlybnlwNnc4UT09)  
 **Suggest Topics:** To suggest a topic to present in an upcoming meeting, please [send an email to the user and dev list](mailto:user@phoenix.apache.org,dev@phoenix.apache.org) 
 
 ## Upcoming Tech Talks
 | Title |  Presenters | Abstract | When |
 |-------|-------------|----------|------|
-|TBD|||9AM PST August 05, 2021|
+|Online Data Format Change in Phoenix|Gokcen Iskender|Phoenix lets the users to make certain changes to the table/index schemas via ALTER TABLE and ALTER INDEX. Some schema changes such as changing the row key (primary keys), the type of a column, the table storage format, the column encoding, etc. requires table/index rows to be re-written. This talk introduces Online Data Format change feature which will let Phoenix users to make those changes with no service interruption. The focus will be on changing column encoding and table storage format.|9AM PST Oct 07, 2021|
 
 ## Previous Tech Talks
 | Title |  Presenters | Abstract | Resources | Recording | When |
