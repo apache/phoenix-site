@@ -39,6 +39,7 @@ Simon Toens | Salesforce | stoens@apache.org | PMC
 Steven Noels | NGDATA | stevenn@apache.org | PMC
 Thomas D'Silva | Salesforce | tdsilva@apache.org | PMC
 Vincent Poon | Salesforce | vincentpoon@apache.org | PMC
+Xinyi Yan | Salesforce | yanxinyi@apache.org | PMC
 Abhishek Singh Chouhan | Salesforce | achouhan@apache.org | Committer
 Akshita Malhotra | Salesforce | akshitamalhotra@apache.org | Committer
 Cody Marcel | Salesforce | codymarcel@apache.org | Committer
@@ -53,4 +54,3 @@ Mihir Monani | Salesforce | mihir6692@apache.org | Committer
 Richard Antal | Cloudera | richardantal@apache.org | Committer
 Swaroopa Kadam | Salesforce | skadam@apache.org | Committer
 Ohad Shacham | Yahoo Research, Oath | ohads@apache.org | Committer
-Xinyi Yan | Salesforce | yanxinyi@apache.org | Committer
