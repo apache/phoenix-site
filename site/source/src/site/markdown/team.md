@@ -54,3 +54,4 @@ Mihir Monani | Salesforce | mihir6692@apache.org | Committer
 Richard Antal | Cloudera | richardantal@apache.org | Committer
 Swaroopa Kadam | Salesforce | skadam@apache.org | Committer
 Ohad Shacham | Yahoo Research, Oath | ohads@apache.org | Committer
+Gokcen Iskender | Salesforce | gokcen@apache.org | Committer
