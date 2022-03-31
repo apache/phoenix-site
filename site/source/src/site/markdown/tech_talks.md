@@ -6,13 +6,13 @@ The topics can be any technical subject related to Phoenix, including its intern
 
 **When:** First Thursday of each month at 9AM PST  
 **Duration:** 90 minutes (to allow the audience to participate and ask questions)    
-**Meeting Link:** To attend the meetings, please use the video conference link to be provided here   
+**Meeting Link:** To attend the meetings, please use [the video conference link](https://salesforce.zoom.us/j/84383596313?pwd=RlZ0OWhlZk1DQ1NhZDg0cDFFeUdvdz09)  
 **Suggest Topics:** To suggest a topic to present in an upcoming meeting, please [send an email to the user and dev list](mailto:user@phoenix.apache.org,dev@phoenix.apache.org) 
 
 ## Upcoming Tech Talks
 | Title |  Presenters | Abstract | When |
 |-------|-------------|----------|------|
-|TBD|||9AM PST Nov 04, 2021|
+|JSON Support for Apache Phoenix|Gokcen Iskender|JSON is a popular data format that is used for exchanging data in many applications. Many RESTful services return or accept data formatted as JSON. Also several databases support JSON as their primary data format. This talk proposes changes which will introduce JSON support in Phoenix to better support our customers.|9AM PST April 07, 2022|
 
 ## Previous Tech Talks
 | Title |  Presenters | Abstract | Resources | Recording | When |
