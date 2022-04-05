@@ -17,6 +17,8 @@ Please follow the appropriate link depending on your HBase version.
     <th width='180'>Phoenix Version</th>
     <th width='100'>Release Date</th>
     <th>Download</th>
+    <th>Release Notes</th> 
+    <th>Changes</th> 
 </tr>
 </table>
 
@@ -25,6 +27,8 @@ Please follow the appropriate link depending on your HBase version.
     <th width='180'>Phoenix Thirdparty Version</th>
     <th width='100'>Release Date</th>
     <th>Download</th>
+    <th>Release Notes</th> 
+    <th>Changes</th> 
 </tr>
 </table>
 
@@ -33,6 +37,8 @@ Please follow the appropriate link depending on your HBase version.
     <th width='180'>Phoenix Omid Version</th>
     <th width='100'>Release Date</th>
     <th>Download</th>
+    <th>Release Notes</th> 
+    <th>Changes</th> 
 </tr>
 </table>
 
@@ -41,6 +47,8 @@ Please follow the appropriate link depending on your HBase version.
     <th width='180'>Phoenix Tephra Version</th>
     <th width='100'>Release Date</th>
     <th>Download</th>
+    <th>Release Notes</th> 
+    <th>Changes</th> 
 </tr>
 </table>
 
@@ -49,6 +57,8 @@ Please follow the appropriate link depending on your HBase version.
     <th width='180'>Phoenix Query Server Version</th>
     <th width='100'>Release Date</th>
     <th>Download</th>
+    <th>Release Notes</th> 
+    <th>Changes</th> 
 </tr>
 </table>
 

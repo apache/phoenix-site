@@ -42,8 +42,14 @@ function addRelease2(version, date) {
           '&nbsp;&nbsp;' +
           '[ <a href="' + apacheUrlHttps + 'phoenix-' + version + '/phoenix-' + version + '-src.tar.gz.sha512">sha512</a>' +
           ' | <a href="' + apacheUrlHttps + 'phoenix-' + version + '/phoenix-' + version + '-src.tar.gz.asc">asc</a> ]' +
-        '</li>' + phoenixBinariesHtml +
-        '</ul></td>';
+        '</li>' + phoenixBinariesHtml + 
+        '</ul></td>' + 
+        '<td><ul><li>' + 
+           '<a href="' + apacheUrlHttps + 'phoenix-' + version + '/RELEASENOTES.md">Release Notes</a>' + 
+        '</li></ul></td>' +
+        '<td><ul><li>' + 
+           '<a href="' + apacheUrlHttps + 'phoenix-' + version + '/CHANGES.md">Changes</a>' + 
+        '</li></ul></td>';
     document.getElementById('core-releases').appendChild(tr);
 }
 
@@ -83,7 +89,13 @@ function addPhoenixThirdpartyRelease(version, date) {
           '[ <a href="' + apacheUrlHttps + 'phoenix-thirdparty-' + version + '/phoenix-thirdparty-' + version + '-src.tar.gz.sha512">sha512</a>' +
           ' | <a href="' + apacheUrlHttps + 'phoenix-thirdparty-' + version + '/phoenix-thirdparty-' + version + '-src.tar.gz.asc">asc</a> ]' +
         '</li>' +
-        '</ul></td>';
+        '</ul></td>' + 
+        '<td><ul><li>' + 
+           '<a href="' + apacheUrlHttps + 'phoenix-thirdparty-' + version + '/RELEASENOTES.md">Release Notes</a>' + 
+        '</li></ul></td>' +
+        '<td><ul><li>' + 
+           '<a href="' + apacheUrlHttps + 'phoenix-thirdparty-' + version + '/CHANGES.md">Changes</a>' + 
+        '</li></ul></td>';
     document.getElementById('phoenix-thirdparty-releases').appendChild(tr);
 }
 
@@ -98,7 +110,13 @@ function addPhoenixOmidRelease(version, date) {
           '[ <a href="' + apacheUrlHttps + 'phoenix-omid-' + version + '/phoenix-omid-' + version + '-src.tar.gz.sha512">sha512</a>' +
           ' | <a href="' + apacheUrlHttps + 'phoenix-omid-' + version + '/phoenix-omid-' + version + '-src.tar.gz.asc">asc</a> ]' +
         '</li>' +
-        '</ul></td>';
+        '</ul></td>' + 
+        '<td><ul><li>' + 
+           '<a href="' + apacheUrlHttps + 'phoenix-omid-' + version + '/RELEASENOTES.md">Release Notes</a>' + 
+        '</li></ul></td>' +
+        '<td><ul><li>' + 
+           '<a href="' + apacheUrlHttps + 'phoenix-omid-' + version + '/CHANGES.md">Changes</a>' + 
+        '</li></ul></td>';
     document.getElementById('phoenix-omid-releases').appendChild(tr);
 }
 
@@ -113,7 +131,13 @@ function addPhoenixTephraRelease(version, date) {
           '[ <a href="' + apacheUrlHttps + 'phoenix-tephra-' + version + '/phoenix-tephra-' + version + '-src.tar.gz.sha512">sha512</a>' +
           ' | <a href="' + apacheUrlHttps + 'phoenix-tephra-' + version + '/phoenix-tephra-' + version + '-src.tar.gz.asc">asc</a> ]' +
         '</li>' +
-        '</ul></td>';
+        '</ul></td>' + 
+        '<td><ul><li>' + 
+           '<a href="' + apacheUrlHttps + 'phoenix-tephra-' + version + '/RELEASENOTES.md">Release Notes</a>' + 
+        '</li></ul></td>' +
+        '<td><ul><li>' + 
+           '<a href="' + apacheUrlHttps + 'phoenix-tephra-' + version + '/CHANGES.md">Changes</a>' + 
+        '</li></ul></td>';
     document.getElementById('phoenix-tephra-releases').appendChild(tr);
 }
 
@@ -134,6 +158,12 @@ function addPhoenixQueryServerRelease(version, date) {
           '[ <a href="' + apacheUrlHttps + 'phoenix-queryserver-' + version + '/phoenix-queryserver-' + version + '-src.tar.gz.sha512">sha512</a>' +
           ' | <a href="' + apacheUrlHttps + 'phoenix-queryserver-' + version + '/phoenix-queryserver-' + version + '-src.tar.gz.asc">asc</a> ]' +
         '</li>' +  parcelsHtml +
-        '</ul></td>';
+        '</ul></td>' + 
+        '<td><ul><li>' + 
+           '<a href="' + apacheUrlHttps + 'phoenix-queryserver-' + version + '/RELEASENOTES.md">Release Notes</a>' + 
+        '</li></ul></td>' +
+        '<td><ul><li>' + 
+           '<a href="' + apacheUrlHttps + 'phoenix-queryserver-' + version + '/CHANGES.md">Changes</a>' + 
+        '</li></ul></td>';
     document.getElementById('phoenix-queryserver-releases').appendChild(tr);
 }
