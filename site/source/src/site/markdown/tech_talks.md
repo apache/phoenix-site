@@ -6,17 +6,17 @@ The topics can be any technical subject related to Phoenix, including its intern
 
 **When:** First Thursday of each month at 9AM PST  
 **Duration:** 90 minutes (to allow the audience to participate and ask questions)    
-**Meeting Link:** To attend the meetings, please use [the video conference link](https://salesforce.zoom.us/j/84383596313?pwd=RlZ0OWhlZk1DQ1NhZDg0cDFFeUdvdz09)  
+**Meeting Link:** To attend the meetings, please use the video conference link to be provided here  
 **Suggest Topics:** To suggest a topic to present in an upcoming meeting, please [send an email to the user and dev list](mailto:user@phoenix.apache.org,dev@phoenix.apache.org) 
 
 ## Upcoming Tech Talks
 | Title |  Presenters | Abstract | When |
 |-------|-------------|----------|------|
-|JSON Support for Apache Phoenix|Gokcen Iskender|JSON is a popular data format that is used for exchanging data in many applications. Many RESTful services return or accept data formatted as JSON. Also several databases support JSON as their primary data format. This talk proposes changes which will introduce JSON support in Phoenix to better support our customers.|9AM PST April 07, 2022|
-
+| TBD | | | |
 ## Previous Tech Talks
 | Title |  Presenters | Abstract | Resources | Recording | When |
 |-------|-------------|----------|-----------|-----------|------|
+|JSON Support for Apache Phoenix|Gokcen Iskender|JSON is a popular data format that is used for exchanging data in many applications. Many RESTful services return or accept data formatted as JSON. Also several databases support JSON as their primary data format. This talk proposes changes which will introduce JSON support in Phoenix to better support our customers.|[Slides](https://drive.google.com/file/d/1Sa9rxuB8Qjq4rQAEkV4XSTbbe27Ss_vJ/view?usp=sharing)|[Recording](https://drive.google.com/file/d/1jOIocoiXMWviwrfdX5llDqX4FUMcOutp/view?usp=sharing)|April 07, 2022|
 |Online Data Format Change in Phoenix|Gokcen Iskender|Phoenix lets the users to make certain changes to the table/index schemas via ALTER TABLE and ALTER INDEX. Some schema changes such as changing the row key (primary keys), the type of a column, the table storage format, the column encoding, etc. requires table/index rows to be re-written. This talk introduces Online Data Format change feature which will let Phoenix users to make those changes with no service interruption. The focus will be on changing column encoding and table storage format.|[Slides](https://drive.google.com/file/d/1f5he_2VT3CjDSZNUIEvf2L8r9fwLBiP2/view?usp=sharing)|[Recording](https://drive.google.com/file/d/1YGBu9ItddSu4P7wMSAU33areEfkYmTyd/view?usp=sharing)|Oct 07, 2021|
 |Phoenix High Availability|Mingliang Liu, Daniel Wong, and Abhishek Singh Chouhan|This talk introduces Phoenix High Availability (HA) feature which allows Phoenix users to interact with multiple Phoenix/HBase clusters in order to achieve additional availability compared to a single cluster. In particular we target the common deployment configuration of two HBase clusters with master/master asynchronous replication enabled between the queried tables, but with consideration to future extensions in use cases, replication, and number of clusters.|[Slides](https://drive.google.com/file/d/1D1x5VCPFSWCesIu_XM5xyABEebslYxcE/view?usp=sharing)|[Recording](https://drive.google.com/file/d/1rKvoib-l98OEM_zHLJ4qtzev1HF_X76o/view?usp=sharing)|July 01, 2021|
 |Atomic Upserts in Phoenix|Tanuj Khurana|Atomic upserts are supported for tables without global indexes. The current design of atomic upserts cannot be expanded to support tables with global indexes since doing index table updates results in cluster wide deadlocks. This talk covers how atomic upserts can be used, details around how it is implemented today, its limitations and how we can leverage the new global secondary indexing design to support atomic upserts on tables with global indexes.|[Slides](https://drive.google.com/file/d/1K_S0sVzBbDiENE80DQWNwO96h-7bM_cd/view?usp=sharing)|[Recording](https://drive.google.com/file/d/1SypY1Tg6BanQO1HlOnAukcqjCnK5hyFK/view?usp=sharing)|May 06, 2021|
