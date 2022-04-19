@@ -78,7 +78,7 @@ If you are looking for an old release that is not present here or on the mirror,
 addRelease2('5.1.2', '07/jun/2021', '2.1', '2.2', '2.3', '2.4', '2.4.0');
 addRelease2('4.16.1', '21/may/2021', '1.3', '1.4', '1.5', '1.6');
 addPhoenixdbRelease('1.1.0','27/aug/2021');
-addPhoenixThirdpartyRelease('1.1.0','01/feb/2021');
+addPhoenixThirdpartyRelease('2.0.0','19/apr/2022');
 addPhoenixOmidRelease('1.0.2','23/nov/2020');
 addPhoenixTephraRelease('0.16.1','13/may/2021');
 addPhoenixQueryServerRelease('6.0.0','03/aug/2021');
