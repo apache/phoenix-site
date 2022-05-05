@@ -56,3 +56,5 @@ Richard Antal | Cloudera | richardantal@apache.org | Committer
 Swaroopa Kadam | Salesforce | skadam@apache.org | Committer
 Ohad Shacham | Yahoo Research, Oath | ohads@apache.org | Committer
 Gokcen Iskender | Salesforce | gokcen@apache.org | Committer
+Jacob Isaac | Salesforce | jisaac@apache.org | Committer
+
