@@ -23,6 +23,7 @@ Jeffrey Zhong | Elementum | jeffreyz@apache.org | PMC
 Jesse Yates | Tesla | jyates@apache.org | PMC
 Josh Elser | Hortonworks | elserj@apache.org | PMC
 Josh Mahonin | Interset | jmahonin@apache.org | PMC
+Kadir Ozdemir | Salesforce | kadir@apache.org | PMC
 Karan Mehta | Salesforce | karanmehta93@apache.org | PMC
 Lars Hofhansl | Salesforce | larsh@apache.org | PMC
 Maryann Xue | Databricks | maryannxue@apache.org | PMC
@@ -49,7 +50,6 @@ Ethan Wang | Facebook | ewang@apache.org | Committer
 Gerald Sangudi | 23andme | sangudi@apache.org | Committer
 Jaanai Zhang | Alibaba | jaanai@apache.org | Committer
 Jan Fernando | Salesforce | jfernando@apache.org | Committer
-Kadir Ozdemir | Salesforce | kadir@apache.org | Committer
 Kevin Liew | Simba Technologies | kliew@apache.org | Committer
 Mihir Monani | Salesforce | mihir6692@apache.org | Committer
 Richard Antal | Cloudera | richardantal@apache.org | Committer
