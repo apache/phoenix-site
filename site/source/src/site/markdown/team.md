@@ -38,10 +38,11 @@ Samarth Jain | Netflix | samarth@apache.org | PMC
 Sergey Soldatov | Hortonworks | ssa@apache.org | PMC
 Simon Toens | Salesforce | stoens@apache.org | PMC
 Steven Noels | NGDATA | stevenn@apache.org | PMC
-Thomas D'Silva | Salesforce | tdsilva@apache.org | PMC
+Thomas D'Silva | Twilio | tdsilva@apache.org | PMC
 Vincent Poon | Salesforce | vincentpoon@apache.org | PMC
 Viraj Jasani | Salesforce | vjasani@apache.org | PMC
 Xinyi Yan | Salesforce | yanxinyi@apache.org | PMC
+Gokcen Iskender | Cruise | gokcen@apache.org | PMC
 Abhishek Singh Chouhan | Salesforce | achouhan@apache.org | Committer
 Akshita Malhotra | Salesforce | akshitamalhotra@apache.org | Committer
 Cody Marcel | Salesforce | codymarcel@apache.org | Committer
@@ -53,8 +54,7 @@ Jan Fernando | Salesforce | jfernando@apache.org | Committer
 Kevin Liew | Simba Technologies | kliew@apache.org | Committer
 Mihir Monani | Salesforce | mihir6692@apache.org | Committer
 Richard Antal | Cloudera | richardantal@apache.org | Committer
-Swaroopa Kadam | Salesforce | skadam@apache.org | Committer
+Swaroopa Kadam | Twilio | skadam@apache.org | Committer
 Ohad Shacham | Yahoo Research, Oath | ohads@apache.org | Committer
-Gokcen Iskender | Salesforce | gokcen@apache.org | Committer
 Jacob Isaac | Salesforce | jisaac@apache.org | Committer
 
