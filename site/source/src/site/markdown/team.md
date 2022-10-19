@@ -34,6 +34,7 @@ Pedro Boado | Datadog | pboado@apache.org | PMC
 Rajeshbabu Chintaguntla | Hortonworks | rajeshbabu@apache.org | PMC
 Ramkrishna Vasudevan | Intel | ramkrishna@apache.org | PMC
 Ravi Magham | Elementum | ravimagham@apache.org | PMC
+Richard Antal | Cloudera | richardantal@apache.org | PMC
 Samarth Jain | Netflix | samarth@apache.org | PMC
 Sergey Soldatov | Hortonworks | ssa@apache.org | PMC
 Simon Toens | Salesforce | stoens@apache.org | PMC
@@ -53,7 +54,6 @@ Jaanai Zhang | Alibaba | jaanai@apache.org | Committer
 Jan Fernando | Salesforce | jfernando@apache.org | Committer
 Kevin Liew | Simba Technologies | kliew@apache.org | Committer
 Mihir Monani | Salesforce | mihir6692@apache.org | Committer
-Richard Antal | Cloudera | richardantal@apache.org | Committer
 Swaroopa Kadam | Twilio | skadam@apache.org | Committer
 Ohad Shacham | Yahoo Research, Oath | ohads@apache.org | Committer
 Jacob Isaac | Salesforce | jisaac@apache.org | Committer
