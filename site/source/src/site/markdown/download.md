@@ -7,7 +7,7 @@ and a list of fixes and new features [here](https://issues.apache.org/jira/secur
 Follow [Verify the Integrity of the Files](https://www.apache.org/dyn/closer.cgi#verify) for how to verify your mirrored downloads.
 
 Current release 4.16.1 can run on Apache HBase 1.3, 1.4, 1.5 and 1.6.  
-Current release 5.1.2 can run on Apache HBase 2.1, 2.2, 2.3 and 2.4
+Current release 5.1.3 can run on Apache HBase 2.1, 2.2, 2.3, 2.4 and 2.5.
 
 Please follow the appropriate link depending on your HBase version. 
  
@@ -75,7 +75,7 @@ If you are looking for an old release that is not present here or on the mirror,
 <script src="/js/download.js"></script> 
 <script>
 //<![CDATA[
-addRelease2('5.1.2', '07/jun/2021', '2.1', '2.2', '2.3', '2.4', '2.4.0');
+addRelease2('5.1.3', '30/dec/2022', '2.1', '2.2', '2.3', '2.4', '2.4.0', '2.5');
 addRelease2('4.16.1', '21/may/2021', '1.3', '1.4', '1.5', '1.6');
 addPhoenixdbRelease('1.2.1','25/oct/2022');
 addPhoenixThirdpartyRelease('2.0.0','19/apr/2022');
