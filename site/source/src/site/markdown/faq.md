@@ -95,13 +95,15 @@ You should get the following output
 
 #### Thick Driver
 
+**See [Using the Phoenix JDBC Driver](classpath_and_url.html#The_Phoenix_JDBC_URL) for a more up-to-date description**
+
 The Phoenix (Thick) Driver JDBC URL syntax is as follows (where elements in square brackets are optional):
 
 `jdbc:phoenix:[comma-separated ZooKeeper Quorum Hosts [: ZK port [:hbase root znode [:kerberos_principal [:path to kerberos keytab] ] ] ]`
 
 The simplest URL is:
 
-`jdbc:phoenix:localhost`
+`jdbc:phoenix`
 
 Whereas the most complicated URL is:
 

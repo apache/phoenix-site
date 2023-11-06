@@ -78,6 +78,7 @@
             <item href="faq.html" name="F.A.Q."/>
             <item href="Phoenix-in-15-minutes-or-less.html" name="Quick Start"/>
             <item href="building.html" name="Building"/>
+            <item href="classpath_and_url.html" name="Client classpath and JDBC URL"/>
             <item href="tuning_guide.html" name="Tuning"/>
             <item href="explainplan.html" name="Explain Plan"/>
             <item href="tuning.html" name="Configuration"/>
