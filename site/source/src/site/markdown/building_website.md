@@ -1,3 +1,10 @@
+# Prerequisites
+
+The Website build script has severely bit-rotted see [PHOENIX-6867](https://issues.apache.org/jira/browse/PHOENIX-6867)
+
+ - The maven site.xml must have proxy set for the `http://conjars.org` org repo
+ - The mvn command must be configured to use Java 1.8. Newer versions won't work.
+
 # Building Phoenix Project Web Site
 
 1. Make a local copy of source markdown files and html web pages
