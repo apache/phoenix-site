@@ -80,6 +80,7 @@ addRelease2('4.16.1', '21/may/2021', '1.3', '1.4', '1.5', '1.6');
 addPhoenixdbRelease('1.2.1','25/oct/2022');
 addPhoenixThirdpartyRelease('2.1.0','20/dec/2023');
 addPhoenixThirdpartyRelease('2.0.0','19/apr/2022');
+addPhoenixOmidRelease('1.1.2','24/mar/2024');
 addPhoenixOmidRelease('1.1.1','08/feb/2024');
 addPhoenixOmidRelease('1.1.0','17/oct/2022');
 addPhoenixTephraRelease('0.16.1','13/may/2021');
