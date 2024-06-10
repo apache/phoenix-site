@@ -9,6 +9,8 @@ Follow [Verify the Integrity of the Files](https://www.apache.org/dyn/closer.cgi
 Current release 4.16.1 can run on Apache HBase 1.3, 1.4, 1.5 and 1.6.  
 Current release 5.1.3 can run on Apache HBase 2.1, 2.2, 2.3, 2.4 and 2.5.
 
+Current release 5.2.0 can run on Apache HBase 2.4 and 2.5 versions.
+
 Please follow the appropriate link depending on your HBase version. 
  
 
@@ -75,9 +77,10 @@ If you are looking for an old release that is not present here or on the mirror,
 <script src="/js/download.js"></script> 
 <script>
 //<![CDATA[
+addRelease2('5.2.0', '16/apr/2024', '2.4', '2.5.0', '2.5');
 addRelease2('5.1.3', '30/dec/2022', '2.1', '2.2', '2.3', '2.4', '2.4.0', '2.5');
 addRelease2('4.16.1', '21/may/2021', '1.3', '1.4', '1.5', '1.6');
-addPhoenixdbRelease('1.2.1','25/oct/2022');
+addPhoenixdbRelease('1.2.2','7/jun/2024');
 addPhoenixThirdpartyRelease('2.1.0','20/dec/2023');
 addPhoenixThirdpartyRelease('2.0.0','19/apr/2022');
 addPhoenixOmidRelease('1.1.2','24/mar/2024');
