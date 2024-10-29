@@ -7,6 +7,7 @@ The create-release scripts are in the master branch phoenix repo, in the dev/cre
 ## Pre-Reqs
 1. Make sure that the JIRAs included in the release have their fix-version and release notes fields set correctly, and are resolved.
 The script will query them, and create the CHANGES and RELEASE_NOTES files from that information.
+Use the `dev/misc_utils/git_jira_fix_version_check.py` script to find the discrepancies between the commits and the JIRAs.
 2. Make sure you have set up your user for release signing. Details http://www.apache.org/dev/release-signing.html.
 3. Make sure you have set up maven for deploying to the ASF repo.  Details https://infra.apache.org/publishing-maven-artifacts.html
 4. Clone the phoenix master branch locally (the script will download the actual repo to release itself)
@@ -107,9 +108,11 @@ Check that these are present.
     <pre>
     mvn versions:set -DnewVersion=4.16.0-HBase-1.3-SNAPSHOT -DgenerateBackupPoms=false
     </pre>
+
 9. If releasing Phoenix (core) Create a JIRA to update PHOENIX_MAJOR_VERSION, PHOENIX_MINOR_VERSION and PHOENIX_PATCH_NUMBER in MetaDataProtocol.java appropriately to next version (4, 16, 0 respectively in this case) and compatible_client_versions.json file with the client versions that are compatible against the next version ( In this case 4.14.3 and 4.15.0 would be the backward compatible clients for 4.16.0 ). This Jira should be committed/marked with fixVersion of the next release candidate.
 10. Add documentation of released version to the [downloads page](download.html) and [wiki](https://en.wikipedia.org/wiki/Apache_Phoenix).
-11. Send out an announcement email. See example [here](https://www.mail-archive.com/dev@phoenix.apache.org/msg54764.html).
-12. Bulk close Jiras that were marked for the release fixVersion.  
+11. Update the [Apache Committee Report Helper DB](https://reporter.apache.org/addrelease.html?phoenix)
+12. Send out an announcement email. See example [here](https://www.mail-archive.com/dev@phoenix.apache.org/msg54764.html).
+13. Bulk close Jiras that were marked for the release fixVersion.  
 
 **Congratulations!**

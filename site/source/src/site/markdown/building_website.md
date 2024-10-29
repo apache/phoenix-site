@@ -29,4 +29,11 @@ cd site/publish
 python -m SimpleHTTPServer 8000
 ```
 
+NOTE: If working with  python3, use below command to spin up a simple Python web server
+
+```
+python3 -m http.server 8000
+```
+
 Now you can access the website at `http://localhost:8000/` and your changes are available with a page refresh.
+
