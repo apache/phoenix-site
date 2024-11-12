@@ -77,6 +77,7 @@ If you are looking for an old release that is not present here or on the mirror,
 <script src="/js/download.js"></script> 
 <script>
 //<![CDATA[
+addRelease2('5.2.1', '12/nov/2024', '2.4', '2.5.0', '2.5', '2.6');
 addRelease2('5.2.0', '16/apr/2024', '2.4', '2.5.0', '2.5');
 addRelease2('5.1.3', '30/dec/2022', '2.1', '2.2', '2.3', '2.4', '2.4.0', '2.5');
 addRelease2('4.16.1', '21/may/2021', '1.3', '1.4', '1.5', '1.6');
