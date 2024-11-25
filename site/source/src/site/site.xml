@@ -24,9 +24,9 @@
  <publishDate position="none"/>
  <version position="none"/>
   <skin>
-    <groupId>lt.velykis.maven.skins</groupId>
+    <groupId>io.github.devacfr.maven.skins</groupId>
     <artifactId>reflow-maven-skin</artifactId>
-    <version>1.1.0</version>
+    <version>2.3.3</version>
   </skin>
 
   <custom>
