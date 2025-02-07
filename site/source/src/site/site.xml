@@ -31,23 +31,27 @@
 
   <custom>
     <reflowSkin>
-    <protocolRelativeURLs>true</protocolRelativeURLs>
-    <smoothScroll>true</smoothScroll>
-    <bottomNav maxSpan="9" >
-        <column>About</column>
-        <column>Using</column>
-        <column>Features</column>
-        <column>Reference</column>
-    </bottomNav>
-    <theme>bootswatch-flatly</theme>
-    <highlightJs>true</highlightJs>
-    <titleTemplate>%2$s | %1$s</titleTemplate>
-    <brand>
-        <name><![CDATA[<div class="xtoplogo"></div>]]></name>
-      <href>index.html</href>
-    </brand>
-    <skinAttribution>false</skinAttribution>
-    <breadcrumbs>true</breadcrumbs>
+        <protocolRelativeURLs>true</protocolRelativeURLs>
+        <smoothScroll>true</smoothScroll>
+        <bottomNav>
+            <column>About</column>
+            <column>Using</column>
+            <column>Features</column>
+            <column>Reference</column>
+        </bottomNav>
+        <theme>bootswatch-flatly</theme>
+        <highlightJs>true</highlightJs>
+        <titleTemplate>%2$s | %1$s</titleTemplate>
+        <brand>
+            <name><![CDATA[<div class="xtoplogo"></div>]]></name>
+            <href>index.html</href>
+        </brand>
+        <navbar theme="dark"
+                background="primary"></navbar>
+        <skinAttribution>false</skinAttribution>
+        <breadcrumbs>true</breadcrumbs>
+        <localResources>true</localResources>
+        <absoluteResourceURL></absoluteResourceURL>
     </reflowSkin>
   </custom>
     <body>

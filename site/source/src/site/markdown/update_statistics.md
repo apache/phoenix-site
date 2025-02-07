@@ -10,7 +10,7 @@ Statistics are also automatically collected during major compactions and region 
 manually running this command may not be necessary.
 
 
-##Parallelization
+## Parallelization
 Phoenix breaks up queries into multiple scans and runs them in parallel to reduce latency.
 Parallelization in Phoenix is driven by the statistics related configuration parameters. 
 Each chunk of data between guideposts will be run in parallel in a separate scan to improve
@@ -53,7 +53,7 @@ To remove the guidepost width, set the property to null:
 
     ALTER TABLE my_table SET GUIDE_POSTS_WIDTH = null
 
-##Known issues
+## Known issues
 
 * <code>**Duplicated records** (SQL count shows more rows than HBase row_count) for Phoenix versions earlier than **4.12** </code>
 
@@ -71,7 +71,7 @@ The configuration parameters controlling statistics collection include:
       chunks which must be merged on the client side.
     * The default value is 104857600 (100 MB).
 2.  <code>phoenix.stats.updateFrequency</code>
-    * A server-side paramater that determines the frequency in milliseconds for which statistics
+    * A server-side parameter that determines the frequency in milliseconds for which statistics
       will be refreshed from the statistics table and subsequently used by the client.
     * The default value is 900000 (15 mins)
 3.  <code>phoenix.stats.minUpdateFrequency</code>

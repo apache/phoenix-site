@@ -1,4 +1,4 @@
-#Tech Talks
+# Tech Talks
 The monthly tech talks is to bring the Phoenix community together to have technical discussions, share knowledge, and initiate further collaborations, innovations and improvements.   
 
 The topics can be any technical subject related to Phoenix, including its internals, interfaces, operational aspects, and use cases, and technologies that it leverages, and can possibly leverage or adapt.

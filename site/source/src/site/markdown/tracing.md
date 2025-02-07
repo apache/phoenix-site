@@ -15,7 +15,7 @@ There are two key configuration files that you will need to update.
 
 They contain the properties you need to set on the client and server, respectively, as well as information on how the metrics2 system uses the configuation files.
 
-Put these filse on their respective classpaths and restart the process to pick-up the new configurations.
+Put these files on their respective classpaths and restart the process to pick-up the new configurations.
 
 ### hadoop-metrics2-phoenix.properties
 

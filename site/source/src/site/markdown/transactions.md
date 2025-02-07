@@ -81,11 +81,11 @@ An external Tephra transaction that has already been started can be used with Ph
 
 <pre>setTransactionContext(TransactionContext txContext)</pre>
 
-##Limitations
+## Limitations
 
 1. Starting a transaction on a connection with an SCN set is not allowed. 
 2. Setting the maximum number of versions property while creating a transactional table limits the number of snapshots available for concurrent transactions. 
 3. When a transaction times out or if it cannot be rolled back by the client, it is added to an invalid list. This list can potentially grow if there are a lot of failed or timed out transactions. 
-For now, an adminstrator can manually clear transactions from this list after a major compaction has occurred. [TEPHRA-35](https://issues.cask.co/browse/TEPHRA-35) describes ongoing work to automatically remove transactions from the invalid list once all data associated with the transaction has been removed.
+For now, an administrator can manually clear transactions from this list after a major compaction has occurred. [TEPHRA-35](https://issues.cask.co/browse/TEPHRA-35) describes ongoing work to automatically remove transactions from the invalid list once all data associated with the transaction has been removed.
 4. If adding an index asynchronously to an existing transactional table, make sure to run a major compaction before issuing the CREATE INDEX ASYNC command as otherwise invalid and/or uncommitted transactions may appear in your index [PHOENIX-2154](https://issues.apache.org/jira/browse/PHOENIX-2154).
 

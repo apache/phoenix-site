@@ -1,8 +1,8 @@
-#Apache Pig Integration
+# Apache Pig Integration
 
 Pig integration may be divided into two parts: a **StoreFunc** as a means to generate Phoenix-encoded data through Pig, and a **Loader** which enables Phoenix-encoded data to be read by Pig.
 
-##Pig StoreFunc
+## Pig StoreFunc
 
 The StoreFunc allows users to write data in Phoenix-encoded format to HBase tables using Pig scripts. This is a nice way to bulk upload data from a MapReduce job in parallel to a Phoenix table in HBase. All you need to specify is the endpoint address, HBase table name and a batch size. For example:
 
@@ -14,12 +14,12 @@ The above reads a file 'testdata' and writes the elements to a table “CORE.ENT
 
 Note that Pig types must be in sync with the target Phoenix data types. This StoreFunc tries best to cast based on input Pig types and target Phoenix data types, but it is recommended to provide an appropriate schema.
 
-###Gotchas
+### Gotchas
 It is advised that the upsert operation be idempotent. That is, trying to re-upsert data should not cause any inconsistencies. This is important in the case when a Pig job fails in process of writing to a Phoenix table. There is no notion of rollback (due to lack of transactions in HBase), and re-trying the upsert with PhoenixHBaseStorage must result in the same data in HBase table.
 
 For example, let’s assume we are writing records n1...n10 to HBase. If the job fails in the middle of this process, we are left in an inconsistent state where n1...n7 made it to the phoenix tables but n8...n10 were missed. If we retry the same operation, n1...n7 would be re-upserted and n8...n10 would be upserted this time.
 
-##Pig Loader
+## Pig Loader
 A Pig data loader allows users to read data from Phoenix backed HBase tables within a Pig script. 
 
 The Load func provides two alternative ways to load data.
@@ -46,7 +46,7 @@ In both the cases, the zookeeper quorum should be passed to the PhoenixHBaseLoad
   
 The Loadfunc makes best effort to map Phoenix Data Types to Pig datatype. You can have a look at org.apache.phoenix.pig.util.TypeUtil to see how each of Phoenix data type is mapped to Pig data type.
   
-###Example
+### Example
 Determine the number of users by a CLIENT ID
   
 **Ddl**
@@ -60,7 +60,7 @@ Determine the number of users by a CLIENT ID
     cnt = FOREACH grpd GENERATE group AS CLIENT,COUNT(raw);
     DUMP cnt;  
 
-###Future Work
+### Future Work
   1. Support for ARRAY data type. 
   2. Usage of expressions within the SELECT clause when providing a full query.
 	 

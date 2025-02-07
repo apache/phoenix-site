@@ -40,11 +40,6 @@
            <artifactId>reflow-velocity-tools</artifactId>
            <version>2.3.3</version>
          </dependency>
-         <dependency>
-           <groupId>org.apache.velocity.tools</groupId>
-           <artifactId>velocity-tools-generic</artifactId>
-           <version>3.1</version>
-         </dependency>
        </dependencies>
        <configuration>
           <outputDirectory>${basedir}/../publish</outputDirectory>
@@ -67,6 +62,38 @@
          </execution>
        </executions>
       </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+                <execution>
+                    <id>unpack</id>
+                    <phase>pre-site</phase>
+                    <goals>
+                        <goal>unpack</goal>
+                    </goals>
+                    <configuration>
+                        <artifactItems>
+                            <artifactItem>
+                                <groupId>io.github.devacfr.maven.skins</groupId>
+                                <artifactId>reflow-default-webdeps</artifactId>
+                                <version>2.3.3</version>
+                                <type>jar</type>
+                                <overWrite>true</overWrite>
+                                <includes>
+                                    **/css/fontawesome/**/*,
+                                    **/css/themes/flatly/bootstrap.min.css,
+                                    **/js/*.js,
+                                    **/js/languages/*,
+                                    **/js/styles/default.min.css
+                                </includes>
+                            </artifactItem>
+                        </artifactItems>
+                        <outputDirectory>${basedir}/../publish</outputDirectory>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
     </plugins>
   </build>
 

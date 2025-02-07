@@ -6,7 +6,7 @@ Apache Kafka™ is a distributed, partitioned, replicated commit log service. It
 
 So, at a high level, producers send messages over the network to the Kafka cluster which in turn serves them up to consumers like this:
 
-#![alt text](https://kafka.apache.org/090/images/producer_consumer.png "Kafka Producer and Consumer")
+# ![alt text](https://kafka.apache.org/090/images/producer_consumer.png "Kafka Producer and Consumer")
 
 We are providing **PhoenixConsumer** to recieves the messages from **Kafka Producer**.
 

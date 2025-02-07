@@ -87,3 +87,20 @@ line-height: 1.45;
 position: relative;
 color: #287898;
 }
+
+/** Fix horizontal scrollbar (skin issue). */
+.main-body {
+    margin: 0 15px;
+}
+
+/** Restore earlier code block styles. */
+pre {
+    background-color: #f5f5f5;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    padding: 10px;
+}
+
+footer {
+    margin-top: 70px;
+}

@@ -59,7 +59,7 @@ The built-in function ALL checks if all the elements in the array satisfies the 
 
 
 
-###Limitations
+### Limitations
 * Only one dimensional arrays are currently supported
 * For an array of fixed width types, null elements occurring in the middle of an array are not tracked.
 * The declaration of an array length at DDL time is not enforced currently, but maybe in the future. Note that it is persisted with the table metadata.

@@ -57,5 +57,5 @@ print(cursor.fetchone()['USERNAME'])
 * None presently known.
 
 ## Resources <a id="Resources"></a>
-* [PHOENIX-4636] (https://issues.apache.org/jira/browse/PHOENIX-4636) : Initial landing of the driver into Apache Phoenix.
-* [PHOENIX-4688] (https://issues.apache.org/jira/browse/PHOENIX-4688) : Implementation of Kerberos authentication via SPNEGO.
+* [PHOENIX-4636](https://issues.apache.org/jira/browse/PHOENIX-4636) : Initial landing of the driver into Apache Phoenix.
+* [PHOENIX-4688](https://issues.apache.org/jira/browse/PHOENIX-4688) : Implementation of Kerberos authentication via SPNEGO.

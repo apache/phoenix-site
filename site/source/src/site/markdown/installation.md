@@ -38,7 +38,7 @@ In addition, you can use the bin/psql.py to load CSV data or execute SQL scripts
 Other alternatives include:
 
 * Using our [map-reduce based CSV loader](bulk_dataload.html) for bigger data sets
-* [Mapping an existing HBase table to a Phoenix table](index.html#Mapping-to-an-Existing-HBase-Table) and using the [UPSERT SELECT](language/index.html#upsert_select) command to populate a new table.
+* [Mapping an existing HBase table to a Phoenix table](index.html#mapping) and using the [UPSERT SELECT](language/index.html#upsert_select) command to populate a new table.
 * Populating the table through our [UPSERT VALUES](language/index.html#upsert_values) command.
 
 <h4>SQuirreL SQL Client</h4>

@@ -80,21 +80,21 @@ This will cause the v2 column value to be copied into the index and kept in sync
     </pre>
 Unlike global indexes, local indexes *will* use an index even when all columns referenced in the query are not contained in the index. This is done by default for local indexes because we know that the table and index data coreside on the same region server thus ensuring the lookup is local.
 
-##Index Removal
+## Index Removal
 To drop an index, you'd issue the following statement:
 
     DROP INDEX my_index ON my_table
 
 If an indexed column is dropped in the data table, the index will automatically be dropped. In addition, if a covered column is dropped in the data table, it will be automatically dropped from the index as well.
 
-##Index Properties
+## Index Properties
 Just like with the <code>CREATE TABLE</code> statement, the <code>CREATE INDEX</code> statement may pass through properties to apply to the underlying HBase table, including the ability to salt it:
 
     CREATE INDEX my_index ON my_table (v2 DESC, v1) INCLUDE (v3)
         SALT_BUCKETS=10, DATA_BLOCK_ENCODING='NONE'
 Note that if the primary table is salted, then the index is automatically salted in the same way for global indexes. In addition, the MAX_FILESIZE for the index is adjusted down, relative to the size of the primary versus index table. For more on salting see [here](salted.html). With local indexes, on the other hand, specifying SALT_BUCKETS is not allowed.
 
-##<a id="Consistency"/> Consistency Guarantees
+## <a id="Consistency"/> Consistency Guarantees
 On successful return to the client after a commit, all data is guaranteed to be written to all interested indexes and the
 primary table. In other words, index updates are synchronous with the same strong consistency guarantees provided by HBase.
 

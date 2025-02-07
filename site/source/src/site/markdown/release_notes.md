@@ -1,10 +1,10 @@
-#Release Notes
+# Release Notes
 
 Release notes provide details on issues and their fixes which may have an impact on prior
 Phoenix behavior. For some issues an upgrade may be required to be performed for a fix to
-take affect. See below for directions specific to a particular release.
+take effect. See below for directions specific to a particular release.
 
-###<u>Phoenix 5.0.0-alpha Release Notes</u>
+### <u>Phoenix 5.0.0-alpha Release Notes</u>
 
 Phoenix 5.0.0-alpha is a "preview" release. This release is the first
 version of Phoenix which is compatible with Apache Hadoop 3.0.x and Apache
@@ -17,14 +17,14 @@ Known issues:
 
 * The Apache Hive integration is known to be non-functional (PHOENIX-4423)
 * Split/Merge logic with Phoenix local indexes are broken (PHOENIX-4440)
-* Apache Tepha integration/transactional tables are non-functional (PHOENIX-4580)
+* Apache Teprha integration/transactional tables are non-functional (PHOENIX-4580)
 * Point-in-time queries and tools that look at "old" cells are broken, e.g. IndexScrutiny (PHOENIX-4378)
 
 The developers would like to encourage users to test this release out and
 report any observed issues so that the official 5.0.0 release quality may
 be significantly improved.
 
-###<u>Phoenix-4.8.0 Release Notes</u>
+### <u>Phoenix-4.8.0 Release Notes</u>
 
 [PHOENIX-3164](https://issues.apache.org/jira/browse/PHOENIX-3164) is a relatively serious
 bug that affects the [Phoenix Query Server](server.html)
@@ -63,7 +63,7 @@ related configurations from `hbase-site.xml` and run upgrade steps mentioned
 </property>
 ```
  
-###<u>Phoenix-4.5.0 Release Notes</u>
+### <u>Phoenix-4.5.0 Release Notes</u>
 Both [PHOENIX-2067](https://issues.apache.org/jira/browse/PHOENIX-2067) and
 [PHOENIX-2120](https://issues.apache.org/jira/browse/PHOENIX-2120) cause rows to not be ordered
 correctly for the following types of columns:

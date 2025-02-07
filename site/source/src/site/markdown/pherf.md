@@ -108,7 +108,7 @@ Results are written real time in _results_ directory. Open the result that is sa
 visualization. Results are written using DataModelResult objects, which are modified over the course of each Pherf
 run.
 
-###XML results
+### XML results
 Pherf XML results have a similar format to the corresponding scenario.xml file used for the Pherf run, but also include
 additional information, such as the execution time of queries, whether queries timed out, and result row count.
 
@@ -122,7 +122,7 @@ additional information, such as the execution time of queries, whether queries t
 </queryResults>
 ```
 
-###CSV results
+### CSV results
 Each row in a CSV result file represents a single execution of a query and provides details about a query execution's
 runtime, timeout status, result row count, and more. The header file format can be found in Header.java.
 

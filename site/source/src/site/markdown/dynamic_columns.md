@@ -18,5 +18,5 @@ Where you may have defined only a subset of your event columns at create time, s
 
 To upsert a row with dynamic columns:
 
-   UPSERT INTO EventLog (eventId, eventTime, eventType, lastGCTime TIME, usedMemory BIGINT, maxMemory BIGINT)
-      VALUES(1, CURRENT_TIME(), 'abc', CURRENT_TIME(), 512, 1024);
+    UPSERT INTO EventLog (eventId, eventTime, eventType, lastGCTime TIME, usedMemory BIGINT, maxMemory BIGINT)
+        VALUES(1, CURRENT_TIME(), 'abc', CURRENT_TIME(), 512, 1024);

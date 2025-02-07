@@ -29,6 +29,7 @@
 <strong><a href="news.html">News</a>:</strong>
 &nbsp;<strong>Phoenix 5.2.1 </strong> has been released and is available for download <a href='download.html'><span style="color:red;text-decoration:underline"><b>here</b></span></a>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
 <a href='https://twitter.com/ApachePhoenix'><img title="Follow Apache Phoenix on Twitter" src="images/follow.png"/></a></span>
+
 ## Overview
 Apache Phoenix enables OLTP and operational analytics in Hadoop for low latency applications by combining the best of both worlds:
 
@@ -40,6 +41,7 @@ Apache Phoenix is fully integrated with other Hadoop products such as Spark, Hiv
 <p>
 Who is using Apache Phoenix? Read more <a href="who_is_using.html">here...</a>
 </p>
+
 ## Mission
 Become the trusted data platform for OLTP and operational analytics for Hadoop through well-defined, industry standard APIs.
 
@@ -56,7 +58,7 @@ Here's a list of what is currently **not** supported:
 * **Relational operators**. Intersect, Minus.
 * **Miscellaneous built-in functions**. These are easy to add - read this [blog](http://phoenix-hbase.blogspot.com/2013/04/how-to-add-your-own-built-in-function.html) for step by step instructions.
 
-###<a id="connStr"></a>Connection
+### <a id="connStr"></a>Connection
 Use JDBC to get a connection to an HBase cluster like this:
 
 <pre><code>Connection conn = DriverManager.getConnection("jdbc:phoenix:server1,server2:3333",props);</code></pre>
@@ -81,12 +83,12 @@ Please read the relevant [FAQ entry](faq.html#What_is_the_Phoenix_JDBC_URL_synta
 
 Phoenix now also supports [Connecting to HBase without Zookeeper](classpath_and_url.html#The_Phoenix_JDBC_URL)
 
-##<a id="transactions"></a>Transactions
+## <a id="transactions"></a>Transactions
 To enable full ACID transactions, a beta feature available in the 4.7.0 release, set the <code>phoenix.transactions.enabled</code> property to true. In this case, you'll also need to run the transaction manager that's included in the distribution. Once enabled, a table may optionally be declared as transactional (see [here](transactions.html) for directions). Commits over transactional tables will have an all-or-none behavior - either all data will be committed (including any updates to secondary indexes) or none of it will (and an exception will be thrown). Both cross table and cross row transactions are supported. In addition, transactional tables will see their own uncommitted data when querying. An optimistic concurrency model is used to detect row level conflicts with first commit wins semantics. The later commit would produce an exception indicating that a conflict was detected. A transaction is started implicitly when a transactional table is referenced in a statement, at which point you will not see updates from other connections until either a commit or rollback occurs.
 
 Non transactional tables have no guarantees above and beyond the HBase guarantee of row level atomicity (see [here](https://hbase.apache.org/acid-semantics.html)). In addition, non transactional tables will not see their updates until after a commit has occurred. The DML commands of Apache Phoenix, UPSERT VALUES, UPSERT SELECT and DELETE, batch pending changes to HBase tables on the client side. The changes are sent to the server when the transaction is committed and discarded when the transaction is rolled back. If auto commit is turned on for a connection, then Phoenix will, whenever possible, execute the entire DML command through a coprocessor on the server-side, so performance will improve.
 
-####Timestamps
+#### Timestamps
 Most commonly, an application will let HBase manage timestamps. However, under some circumstances, an application needs to control the
 timestamps itself. In this case, the [CurrentSCN](faq.html#Can_phoenix_work_on_tables_with_arbitrary_timestamp_as_flexible_as_HBase_API) 
 property may be specified at connection time to control timestamps for any DDL, DML, or query. This capability may be used to run snapshot
@@ -94,10 +96,10 @@ queries against prior row values, since Phoenix uses the value of this connectio
 
 Timestamps may not be controlled for transactional tables. Instead, the transaction manager assigns timestamps which become the HBase cell timestamps after a commit. Timestamps still correspond to wall clock time, however they are multiplied by 1,000,000 to ensure enough granularity for uniqueness across the cluster.
 
-##<a id="schema"></a>Schema
+## <a id="schema"></a>Schema
 Apache Phoenix supports table creation and versioned incremental alterations through DDL commands. The table metadata is stored in an HBase table and versioned, such that snapshot queries over prior versions will automatically use the correct schema. 
 
-A Phoenix table is created through the [CREATE TABLE](language/index.html#create) command and can either be:
+A Phoenix table is created through the [CREATE TABLE](language/index.html#create_table) command and can either be:
 
 1. **built from scratch**, in which case the HBase table and column families will be created automatically.
 2. **mapped to an existing HBase table**, by creating either a read-write TABLE or a read-only VIEW, with the caveat that the binary representation of the row key and key values must match that of the Phoenix data types (see [Data Types reference](language/datatypes.html) for the detail on the binary representation).
@@ -107,7 +109,7 @@ A Phoenix table is created through the [CREATE TABLE](language/index.html#create
 All schema is versioned (with up to 1000 versions being kept). Snapshot queries over older data will pick up and use the correct schema based on
 the time at which you've connected (based on the [CurrentSCN](faq.html#Can_phoenix_work_on_tables_with_arbitrary_timestamp_as_flexible_as_HBase_API) property).
 
-####Altering
+#### Altering
 A Phoenix table may be altered through the [ALTER  TABLE](language/index.html#alter) command. When a SQL statement is run which references
 a table, Phoenix will by default check with the server to ensure it has the most up to date table metadata and statistics. This RPC may not be
 necessary when you know in advance that the structure of a table may never change. The UPDATE_CACHE_FREQUENCY property was added in
@@ -124,18 +126,18 @@ to the table or its statistics every 15 minutes:
 CREATE TABLE FOO (k BIGINT PRIMARY KEY, v VARCHAR) UPDATE_CACHE_FREQUENCY=900000;
 </code>
 
-####Views
+#### Views
 Phoenix supports updatable views on top of tables with the unique feature leveraging the schemaless capabilities of HBase of being able to
 add columns to them. All views all share the same underlying physical HBase table and may even be indexed independently. For more read [here](views.html). 
 
-####Multi-tenancy
+#### Multi-tenancy
 Built on top of view support, Phoenix also supports [multi-tenancy](multi-tenancy.html). Just as with views, a multi-tenant view may add columns which are defined solely for that user.
 
-####Schema at Read-time
+#### Schema at Read-time
 Another schema-related feature allows columns to be defined dynamically at query time. This is useful in situations where you don't know in advance all of the columns at create time. You'll find more details on this feature [here](dynamic_columns.html).
 
-####<a id="mapping"></a>Mapping to an Existing HBase Table
-Apache Phoenix supports mapping to an existing HBase table through the [CREATE TABLE](language/index.html#create) and [CREATE VIEW](language/index.html#create) DDL statements. In both cases, the HBase metadata is left as-is, except for with CREATE TABLE the [KEEP_DELETED_CELLS](http://hbase.apache.org/book/cf.keep.deleted.html) option is enabled to allow for flashback queries to work correctly. For CREATE TABLE, any HBase metadata (table, column families) that doesn't already exist will be created. Note that the table and column family names are case sensitive, with Phoenix upper-casing all names. To make a name case sensitive in the DDL statement, surround it with double quotes as shown below:
+#### <a id="mapping"></a>Mapping to an Existing HBase Table
+Apache Phoenix supports mapping to an existing HBase table through the [CREATE TABLE](language/index.html#create_table) and [CREATE VIEW](language/index.html#create_view) DDL statements. In both cases, the HBase metadata is left as-is, except for with CREATE TABLE the [KEEP_DELETED_CELLS](http://hbase.apache.org/book/cf.keep.deleted.html) option is enabled to allow for flashback queries to work correctly. For CREATE TABLE, any HBase metadata (table, column families) that doesn't already exist will be created. Note that the table and column family names are case sensitive, with Phoenix upper-casing all names. To make a name case sensitive in the DDL statement, surround it with double quotes as shown below:
       <pre><code>CREATE VIEW "MyTable" ("a".ID VARCHAR PRIMARY KEY)</code></pre>
 
 For CREATE TABLE, an empty key value will also be added for each row so that queries behave as expected (without requiring all columns to
@@ -149,10 +151,10 @@ single-byte characters and the UNSIGNED types expect values greater than or equa
 Our composite row keys are formed by simply concatenating the values together, with a zero byte character used as a separator after a
 variable length type. For more information on our type system, see the [Data Type](language/datatypes.html).
 
-####Salting
+#### Salting
 A table could also be declared as salted to prevent HBase region hot spotting. You just need to declare how many salt buckets your table has, and Phoenix will transparently manage the salting for you. You'll find more detail on this feature [here](salted.html), along with a nice comparison on write throughput between salted and unsalted tables [here](performance.html#salting).
 
-####APIs
+#### APIs
 The catalog of tables, their columns, primary keys, and types may be retrieved via the java.sql metadata interfaces: `DatabaseMetaData`,
 `ParameterMetaData`, and `ResultSetMetaData`. For retrieving schemas, tables, and columns through the DatabaseMetaData interface, the schema
 pattern, table pattern, and column pattern are specified as in a LIKE expression (i.e. % and _ are wildcards escaped through the \ character).

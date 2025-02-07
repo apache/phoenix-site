@@ -9,13 +9,13 @@
 * [Why isn't my secondary index being used?](#Why_isnt_my_secondary_index_being_used)
 * [How fast is Phoenix? Why is it so fast?](#How_fast_is_Phoenix_Why_is_it_so_fast)
 * [How do I connect to secure HBase cluster?](#How_do_I_connect_to_secure_HBase_cluster)
-* [How do I connect with HBase running on Hadoop-2?](#How_do_I_connect_with_HBase_running_on_Hadoop-2)
+* [What HBase and Hadoop versions are supported?](#What_HBase_and_Hadoop_versions_are_supported?)
 * [Can phoenix work on tables with arbitrary timestamp as flexible as HBase API?](#Can_phoenix_work_on_tables_with_arbitrary_timestamp_as_flexible_as_HBase_API)
 * [Why isn't my query doing a RANGE SCAN?](#Why_isnt_my_query_doing_a_RANGE_SCAN)
 * [Should I pool Phoenix JDBC Connections?](#Should_I_pool_Phoenix_JDBC_Connections)
 * [Why does Phoenix add an empty or dummy KeyValue when doing an upsert?](#Why_empty_key_value)
 
-### I want to get started. Is there a Phoenix _Hello World_?
+### <a id="I_want_to_get_started_Is_there_a_Phoenix_Hello_World"></a>I want to get started. Is there a Phoenix _Hello World_?
 
 *Pre-requisite:* [Download](download.html) and [install](installation.html) the latest Phoenix.
 
@@ -91,7 +91,7 @@ You should get the following output
 `Hello`
 `World!`
 
-### What is the Phoenix JDBC URL syntax?
+### <a id="What_is_the_Phoenix_JDBC_URL_syntax"></a>What is the Phoenix JDBC URL syntax?
 
 #### Thick Driver
 
@@ -134,7 +134,7 @@ Where as very complicated URL is:
 Please refer to the [Apache Avatica documentation](https://calcite.apache.org/avatica/docs/client_reference.html) for a full list of supported options in the Thin client JDBC URL,
 or see the [Query Server documentation](server.html)
 
-### Is there a way to bulk load in Phoenix?
+### <a id="Is_there_a_way_to_bulk_load_in_Phoenix"></a>Is there a way to bulk load in Phoenix?
 
 **Map Reduce**
 
@@ -153,7 +153,7 @@ Upsert CSV bulk data
 
 
 
-### How I map Phoenix table to an existing HBase table?
+### <a id="How_I_map_Phoenix_table_to_an_existing_HBase_table"></a>How I map Phoenix table to an existing HBase table?
 
 You can create both a Phoenix table or view through the CREATE TABLE/CREATE VIEW DDL statement on a pre-existing HBase table. In both cases, we'll leave the HBase metadata as-is. For CREATE TABLE, we'll create any metadata (table, column families) that doesn't already exist. We'll also add an empty key value for each row so that queries behave as expected (without requiring all columns to be projected during scans).
 
@@ -187,7 +187,7 @@ Or if you're creating new HBase tables, just let Phoenix do everything for you l
 
 
 
-### Are there any tips for optimizing Phoenix?
+### <a id="Are_there_any_tips_for_optimizing_Phoenix"></a>Are there any tips for optimizing Phoenix?
 
 * Use **Salting** to increase read/write performance
 Salting can significantly increase read/write performance by pre-splitting the data into multiple regions. Although Salting will yield better performance in most scenarios. 
@@ -233,7 +233,7 @@ See [tuning.html](tuning.html)
 
 
 
-### How do I create Secondary Index on a table?
+### <a id="How_do_I_create_Secondary_Index_on_a_table"></a>How do I create Secondary Index on a table?
 
 Starting with Phoenix version 2.1, Phoenix supports index over mutable and immutable data. Note that Phoenix 2.0.x only supports Index over immutable data. Index write performance index with immutable table is slightly faster than mutable table however data in immutable table cannot be updated.
 
@@ -257,7 +257,7 @@ Upsert rows in this test table and Phoenix query optimizer will choose correct i
 
 See [Secondary Indexing](secondary_indexing.html) for further information
 
-### Why isn't my secondary index being used?
+### <a id="Why_isnt_my_secondary_index_being_used"></a>Why isn't my secondary index being used?
 
 The secondary index won't be used unless all columns used in the query are in it ( as indexed or covered columns). All columns making up the primary key of the data table will automatically be included in the index.
 
@@ -269,7 +269,7 @@ Index would not be used in this case as lastname is not part of indexed or cover
 
 You can force Phoenix to use secondary for uncovered columns by specifying an [index hint](index.html#index_hint)
 
-### How fast is Phoenix? Why is it so fast?
+### <a id="How_fast_is_Phoenix_Why_is_it_so_fast"></a>How fast is Phoenix? Why is it so fast?
 
 Phoenix is fast. Full table scan of 100M rows usually completes in 20 seconds (narrow table on a medium sized cluster). This time come down to few milliseconds if query contains filter on key columns. For filters on non-key columns or non-leading key columns, you can add index on these columns which leads to performance equivalent to filtering on key column by making copy of table with indexed column(s) part of key.
 
@@ -280,13 +280,13 @@ Why is Phoenix fast even when doing full scan:
 
 
 
-### How do I connect to secure HBase cluster?
+### <a id="How_do_I_connect_to_secure_HBase_cluster"></a>How do I connect to secure HBase cluster?
 
 Specify the principal and corresponding keytab in the JDBC URL as show above.
 For ancient Phoenix versions heck out the excellent [post](http://bigdatanoob.blogspot.com/2013/09/connect-phoenix-to-secure-hbase-cluster.html) by Anil Gupta 
 
 
-### What HBase and Hadoop versions are supported ?
+### <a id="What_HBase_and_Hadoop_versions_are_supported"></a>What HBase and Hadoop versions are supported?
 
 Phoenix 4.x supports HBase 1.x running on Hadoop 2
 
@@ -296,7 +296,7 @@ See the release notes and BULDING.md in recent releases for the exact versions s
 and on how to build Phoenix for specific HBase and Hadoop versions
 
 
-### Can phoenix work on tables with arbitrary timestamp as flexible as HBase API?
+### <a id="Can_phoenix_work_on_tables_with_arbitrary_timestamp_as_flexible_as_HBase_API"></a>Can phoenix work on tables with arbitrary timestamp as flexible as HBase API?
 By default, Phoenix let's HBase manage the timestamps and just shows you the latest values for everything. However, Phoenix also allows arbitrary timestamps to be supplied by the user. To do that you'd specify a "CurrentSCN" at connection time, like this:
 
     Properties props = new Properties();
@@ -313,7 +313,7 @@ By specifying a CurrentSCN, you're telling Phoenix that you want everything for 
 Keep in mind that creating a new connection is *not* an expensive operation. The same underlying HConnection is used for all connections to the same cluster, so it's more or less like instantiating a few objects.
 
 
-### Why isn't my query doing a RANGE SCAN?
+### <a id="Why_isnt_my_query_doing_a_RANGE_SCAN"></a>Why isn't my query doing a RANGE SCAN?
 
 `DDL: CREATE TABLE TEST (pk1 char(1) not null, pk2 char(1) not null, pk3 char(1) not null, non-pk varchar CONSTRAINT PK PRIMARY KEY(pk1, pk2, pk3));`
 
@@ -326,7 +326,7 @@ FULL SCAN means that all rows of the table will be scanned over (potentially wit
 SKIP SCAN means that either a subset or all rows in your table will be scanned over, however it will skip large groups of rows depending on the conditions in your filter. See [this](http://phoenix-hbase.blogspot.com/2013/05/demystifying-skip-scan-in-phoenix.html) blog for more detail. We don't do a SKIP SCAN if you have no filter on the leading primary key columns, but you can force a SKIP SCAN by using the /*+ SKIP_SCAN */ hint. Under some conditions, namely when the cardinality of your leading primary key columns is low, it will be more efficient than a FULL SCAN.
 
 
-### Should I pool Phoenix JDBC Connections?
+### <a id="Should_I_pool_Phoenix_JDBC_Connections"></a>Should I pool Phoenix JDBC Connections?
 
 No, it is not necessary to pool Phoenix JDBC Connections.
 
