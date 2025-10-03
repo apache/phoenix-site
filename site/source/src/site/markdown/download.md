@@ -7,9 +7,10 @@ and a list of fixes and new features [here](https://issues.apache.org/jira/secur
 Follow [Verify the Integrity of the Files](https://www.apache.org/dyn/closer.cgi#verify) for how to verify your mirrored downloads.
 
 Current release 4.16.1 can run on Apache HBase 1.3, 1.4, 1.5 and 1.6.  
-Current release 5.1.3 can run on Apache HBase 2.1, 2.2, 2.3, 2.4 and 2.5.
 
-Current release 5.2.1 can run on Apache HBase 2.4, 2.5 and 2.6 versions.
+Current release 5.1.3 can run on Apache HBase 2.1, 2.2, 2.3, 2.4 and 2.5.  
+Current release 5.2.1 can run on Apache HBase 2.4, 2.5 and 2.6 versions.  
+Current release 5.3.0 can run on Apache HBase 2.5 and 2.6 versions.  
 
 Please follow the appropriate link depending on your HBase version. 
  
@@ -77,6 +78,7 @@ If you are looking for an old release that is not present here or on the mirror,
 <script src="/js/download.js"></script> 
 <script>
 //<![CDATA[
+addRelease2('5.3.0', '2/oct/2025', '2.5.0', '2.5', '2.6');
 addRelease2('5.2.1', '12/nov/2024', '2.4', '2.5.0', '2.5', '2.6');
 addRelease2('5.2.0', '16/apr/2024', '2.4', '2.5.0', '2.5');
 addRelease2('5.1.3', '30/dec/2022', '2.1', '2.2', '2.3', '2.4', '2.4.0', '2.5');
