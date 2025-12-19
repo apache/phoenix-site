@@ -2,7 +2,7 @@
 current_dir=$(cd $(dirname $0);pwd)
 cd $current_dir
 DOC_SRC="../../../../../phoenix-docs/docs/html"
-SITE_TARGET="../../../../publish"
+SITE_TARGET="../../../../../output"
 java -jar merge.jar $DOC_SRC/index.html $SITE_TARGET/language/index.html
 java -jar merge.jar $DOC_SRC/functions.html $SITE_TARGET/language/functions.html
 java -jar merge.jar $DOC_SRC/datatypes.html $SITE_TARGET/language/datatypes.html
