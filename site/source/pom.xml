@@ -42,7 +42,7 @@
          </dependency>
        </dependencies>
        <configuration>
-          <outputDirectory>${basedir}/../publish</outputDirectory>
+          <outputDirectory>${basedir}/../../output</outputDirectory>
        </configuration>
      </plugin>
      <plugin>
@@ -89,7 +89,7 @@
                                 </includes>
                             </artifactItem>
                         </artifactItems>
-                        <outputDirectory>${basedir}/../publish</outputDirectory>
+                        <outputDirectory>${basedir}/../../output</outputDirectory>
                     </configuration>
                 </execution>
             </executions>
