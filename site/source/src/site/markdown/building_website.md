@@ -16,7 +16,7 @@ The Website build script has severely bit-rotted see [PHOENIX-6867](https://issu
 2. Edit/Add source markdown files in `site/source/src/site/markdown` directory.
 2. Edit `phoenix-docs/src/docsrc/help/phoenix.csv` to update Reference pages, adding any missing new words to `phoenix-docs/src/tools/org/h2/build/doc/dictionary.txt`.
 3. Run `build.sh` located at root to generate/update html web pages in `output` directory
-4. `svn commit` source markdown files and html web pages then `git commit` and `git push`
+4. `git commit` source markdown files and html web pages then `git commit` and `git push`
 5. Create a pull request in GitHub for the [mirror of the Phoenix Site Git repository](https://github.com/apache/phoenix-site). Similarly to the GitHub workflow mentioned in the [contributing](contributing.html) page.
 
 # Local Testing During Development
