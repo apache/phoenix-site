@@ -1,0 +1,152 @@
+//
+// Licensed to the Apache Software Foundation (ASF) under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  The ASF licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+import { useTreeContext, useTreePath } from "fumadocs-ui/contexts/tree";
+import { type FC, type ReactNode, useMemo, Fragment } from "react";
+import type * as PageTree from "fumadocs-core/page-tree";
+import type * as Base from "./base";
+import { BookOpen, CircleHelp, Rocket, Wrench } from "lucide-react";
+
+export interface SidebarPageTreeComponents {
+  Item: FC<{ item: PageTree.Item }>;
+  Folder: FC<{ item: PageTree.Folder; children: ReactNode }>;
+  Separator: FC<{ item: PageTree.Separator }>;
+}
+
+type InternalComponents = Pick<
+  typeof Base,
+  | "SidebarSeparator"
+  | "SidebarFolder"
+  | "SidebarFolderLink"
+  | "SidebarFolderContent"
+  | "SidebarFolderTrigger"
+  | "SidebarItem"
+>;
+
+export function createPageTreeRenderer({
+  SidebarFolder,
+  SidebarFolderContent,
+  SidebarFolderLink,
+  SidebarFolderTrigger,
+  SidebarSeparator,
+  SidebarItem
+}: InternalComponents) {
+  function renderIcon(icon: ReactNode) {
+    if (typeof icon !== "string") return icon;
+
+    switch (icon) {
+      case "Rocket":
+      case "RocketIcon":
+        return <Rocket />;
+      case "CircleQuestionMark":
+      case "CircleQuestionMarkIcon":
+        return <CircleHelp />;
+      case "Wrench":
+      case "WrenchIcon":
+        return <Wrench />;
+      case "BookOpen":
+      case "BookOpenIcon":
+        return <BookOpen />;
+      default:
+        return icon;
+    }
+  }
+
+  function PageTreeFolder({
+    item,
+    children
+  }: {
+    item: PageTree.Folder;
+    children: ReactNode;
+  }) {
+    const path = useTreePath();
+
+    return (
+      <SidebarFolder
+        active={path.includes(item)}
+        defaultOpen={item.defaultOpen}
+      >
+        {item.index ? (
+          <SidebarFolderLink
+            href={item.index.url}
+            external={item.index.external}
+          >
+            {renderIcon(item.icon)}
+            {item.name}
+          </SidebarFolderLink>
+        ) : (
+          <SidebarFolderTrigger>
+            {renderIcon(item.icon)}
+            {item.name}
+          </SidebarFolderTrigger>
+        )}
+        <SidebarFolderContent>{children}</SidebarFolderContent>
+      </SidebarFolder>
+    );
+  }
+
+  /**
+   * Render sidebar items from page tree
+   */
+  return function SidebarPageTree(
+    components: Partial<SidebarPageTreeComponents>
+  ) {
+    const { root } = useTreeContext();
+    const { Separator, Item, Folder = PageTreeFolder } = components;
+
+    return useMemo(() => {
+      function renderSidebarList(items: PageTree.Node[]) {
+        return items.map((item, i) => {
+          if (item.type === "separator") {
+            if (Separator) return <Separator key={i} item={item} />;
+            return (
+              <SidebarSeparator key={i}>
+                {renderIcon(item.icon)}
+                {item.name}
+              </SidebarSeparator>
+            );
+          }
+
+          if (item.type === "folder") {
+            return (
+              <Folder key={i} item={item}>
+                {renderSidebarList(item.children)}
+              </Folder>
+            );
+          }
+
+          if (Item) return <Item key={item.url} item={item} />;
+          return (
+            <SidebarItem
+              key={item.url}
+              href={item.url}
+              external={item.external}
+              icon={renderIcon(item.icon)}
+            >
+              {item.name}
+            </SidebarItem>
+          );
+        });
+      }
+
+      return (
+        <Fragment key={root.$id}>{renderSidebarList(root.children)}</Fragment>
+      );
+    }, [Folder, Item, Separator, root]);
+  };
+}

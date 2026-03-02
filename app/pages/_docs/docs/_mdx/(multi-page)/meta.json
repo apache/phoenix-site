@@ -1,0 +1,27 @@
+{
+  "title": "Multi-Page Documentation",
+  "description": "Split across multiple pages",
+  "root": true,
+  "pages": [
+    "---Getting Started---",
+    "index",
+    "quick-start",
+    "installation",
+    "faq",
+    "---Development---",
+    "fundamentals",
+    "features",
+    "integrations",
+    "addons",
+    "contributing",
+    "---Reference---",
+    "grammar",
+    "functions",
+    "datatypes",
+    "array-type",
+    "sequences",
+    "joins",
+    "subqueries",
+    "explain-plan"
+  ]
+}

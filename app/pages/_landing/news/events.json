@@ -1,0 +1,213 @@
+[
+  {
+    "date": "June 7, 2021",
+    "title": "Phoenix 5.1.2 released",
+    "location": "",
+    "url": "/downloads",
+    "registrationOpen": false
+  },
+  {
+    "date": "May 21, 2021",
+    "title": "Phoenix 4.16.1 released",
+    "location": "",
+    "url": "/downloads",
+    "registrationOpen": false
+  },
+  {
+    "date": "March 4, 2021",
+    "title": "Monthly Tech Talks started",
+    "location": "",
+    "url": "/tech-talks",
+    "registrationOpen": false
+  },
+  {
+    "date": "March 1, 2021",
+    "title": "Phoenix 5.1.1 released",
+    "location": "",
+    "url": "/downloads",
+    "registrationOpen": false
+  },
+  {
+    "date": "February 23, 2020",
+    "title": "Phoenix 4.16.0 released",
+    "location": "",
+    "url": "/downloads",
+    "registrationOpen": false
+  },
+  {
+    "date": "February 10, 2020",
+    "title": "Phoenix 5.1.0 released",
+    "location": "",
+    "url": "/downloads",
+    "registrationOpen": false
+  },
+  {
+    "date": "February 28, 2019",
+    "title": "NoSQL Day 2019 in Washington, DC",
+    "location": "",
+    "url": "https://blogs.apache.org/phoenix/entry/nosql-day-2019",
+    "registrationOpen": false
+  },
+  {
+    "date": "July 4, 2018",
+    "title": "Announcing Phoenix 5.0.0 released",
+    "location": "",
+    "url": "https://blogs.apache.org/phoenix/entry/apache-phoenix-releases-next-major",
+    "registrationOpen": false
+  },
+  {
+    "date": "March 24, 2018",
+    "title": "PhoenixCon 2018 announced for June 18th, 2018",
+    "location": "",
+    "url": "/phoenixcon-2018",
+    "registrationOpen": false
+  },
+  {
+    "date": "January 22, 2018",
+    "title": "Announcing CDH-compatible Phoenix 4.13.2 released",
+    "location": "",
+    "url": "https://blogs.apache.org/phoenix/entry/announcing-cdh-compatible-phoenix-4",
+    "registrationOpen": false
+  },
+  {
+    "date": "November 9, 2017",
+    "title": "Announcing Phoenix 4.13 released",
+    "location": "",
+    "url": "https://blogs.apache.org/phoenix/entry/announcing-phoenix-4-13-released",
+    "registrationOpen": false
+  },
+  {
+    "date": "October 9, 2017",
+    "title": "Announcing Phoenix 4.12 released",
+    "location": "",
+    "url": "https://blogs.apache.org/phoenix/entry/announcing-phoenix-4-12-released",
+    "registrationOpen": false
+  },
+  {
+    "date": "June 20, 2017",
+    "title": "Announcing Phoenix 4.11 released",
+    "location": "",
+    "url": "https://blogs.apache.org/phoenix/entry/announcing-phoenix-4-11-released",
+    "registrationOpen": false
+  },
+  {
+    "date": "June 13, 2017",
+    "title": "RSVP for PhoenixCon 2017",
+    "location": "",
+    "url": "https://www.eventbrite.com/e/phoenixcon-2017-tickets-32872245772",
+    "registrationOpen": false
+  },
+  {
+    "date": "March 23, 2017",
+    "title": "Announcing Phoenix 4.10 released",
+    "location": "",
+    "url": "https://blogs.apache.org/phoenix/entry/announcing-phoenix-4-10-released",
+    "registrationOpen": false
+  },
+  {
+    "date": "December 1, 2016",
+    "title": "Announcing Phoenix 4.9 released",
+    "location": "",
+    "url": "https://blogs.apache.org/phoenix/entry/announcing_phoenix_4_9_released",
+    "registrationOpen": false
+  },
+  {
+    "date": "August 10, 2016",
+    "title": "Announcing Phoenix 4.8 released",
+    "location": "",
+    "url": "https://blogs.apache.org/phoenix/entry/announcing_phoenix_4_8_released",
+    "registrationOpen": false
+  },
+  {
+    "date": "June 2, 2016",
+    "title": "Announcing support for latest Phoenix in Amazon EMR",
+    "location": "",
+    "url": "http://docs.aws.amazon.com/ElasticMapReduce/latest/ReleaseGuide/emr-phoenix.html",
+    "registrationOpen": false
+  },
+  {
+    "date": "April 21, 2016",
+    "title": "Announcing first ever Phoenix conference on Wed, May 25th 9am-1pm",
+    "location": "",
+    "url": "http://www.meetup.com/SF-Bay-Area-Apache-Phoenix-Meetup/events/230545182/",
+    "registrationOpen": false
+  },
+  {
+    "date": "March 10, 2016",
+    "title": "Announcing transaction support in 4.7.0 release",
+    "location": "",
+    "url": "/docs/features/transactions",
+    "registrationOpen": false
+  },
+  {
+    "date": "Oct 23, 2015",
+    "title": "Announcing time series optimization in Phoenix 4.6 released",
+    "location": "",
+    "url": "https://blogs.apache.org/phoenix/entry/new_optimization_for_time_series",
+    "registrationOpen": false
+  },
+  {
+    "date": "July 29, 2015",
+    "title": "Announcing Phoenix 4.5 released",
+    "location": "",
+    "url": "https://blogs.apache.org/phoenix/entry/announcing_phoenix_4_5_released",
+    "registrationOpen": false
+  },
+  {
+    "date": "June 29, 2015",
+    "title": "Blog on Spark Integration in Apache Phoenix",
+    "location": "",
+    "url": "https://blogs.apache.org/phoenix/entry/spark_integration_in_apache_phoenix",
+    "registrationOpen": false
+  },
+  {
+    "date": "June 25, 2015",
+    "title": "O'Reilly Webcast on Apache Phoenix",
+    "location": "",
+    "url": "http://www.oreilly.com/pub/e/3443",
+    "registrationOpen": false
+  },
+  {
+    "date": "Apr 24, 2015",
+    "title": "TPC in Apache Phoenix",
+    "location": "",
+    "url": "https://blogs.apache.org/phoenix/entry/tpc_in_apache_phoenix",
+    "registrationOpen": false
+  },
+  {
+    "date": "Feb 24, 2015",
+    "title": "Announcing Phoenix 4.3 released",
+    "location": "",
+    "url": "https://blogs.apache.org/phoenix/entry/announcing_phoenix_4_3_released",
+    "registrationOpen": false
+  },
+  {
+    "date": "Jan 20, 2015",
+    "title": "Who is using Apache Phoenix?",
+    "location": "",
+    "url": "/who-is-using",
+    "registrationOpen": false
+  },
+  {
+    "date": "Dec 10, 2014",
+    "title": "Announcing Phoenix 4.2.2 released",
+    "location": "",
+    "url": "https://blogs.apache.org/phoenix/entry/announcing_phoenix_4_2_2",
+    "registrationOpen": false
+  },
+  {
+    "date": "",
+    "title": "For additional news and information, see our blog",
+    "location": "",
+    "url": "https://blogs.apache.org/phoenix",
+    "registrationOpen": false
+  },
+  {
+    "date": "",
+    "title": "Download the latest release here",
+    "location": "",
+    "url": "/downloads",
+    "registrationOpen": false
+  }
+]
+

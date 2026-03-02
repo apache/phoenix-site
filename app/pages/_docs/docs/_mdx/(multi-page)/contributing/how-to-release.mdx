@@ -1,0 +1,131 @@
+---
+title: "How to Release"
+description: "Apache Phoenix release process, release candidates, and voting workflow."
+---
+
+## How to Release [#contributing-how-to-release]
+
+Phoenix has several repos: `phoenix-thirdparty`, `phoenix-omid`, `phoenix-tephra`, `phoenix`, `phoenix-connectors`, and `phoenix-queryserver`.
+The create-release scripts provide a unified script to handle the release from each repo.
+The create-release scripts are in the `master` branch of the `phoenix` repo, in the `dev/create-release` directory.
+
+## Pre-Reqs
+
+1. Make sure that the JIRAs included in the release have their fix-version and release notes fields set correctly, and are resolved.  
+   The script will query them and create the `CHANGES` and `RELEASE_NOTES` files from that information.  
+   Use `dev/misc_utils/git_jira_fix_version_check.py` to find discrepancies between commits and JIRAs.
+2. Make sure you have set up your user for release signing. Details: http://www.apache.org/dev/release-signing.html.
+3. Make sure you have set up Maven for deploying to the ASF repo. Details: https://infra.apache.org/publishing-maven-artifacts.html.
+4. Clone the Phoenix `master` branch locally (the script will download the actual repo to release itself).
+5. Make sure Docker is running locally.
+
+Note that Docker Desktop for Mac works, but will be slow (several hours for a Phoenix core release). Running on a native Linux machine is much faster because you avoid filesystem translation layer overhead.
+
+## Do a dry run
+
+Read `/dev/create_release/README.txt` to understand what the script does and how to set up `gpg-agent` for signing.
+
+Run the `dev/create-release/do-release-docker.sh -d <workdir> -p <project>` command, where
+
+- `<project>` is the repo name you're releasing from (i.e. phoenix)
+- `<workdir>` is any existing directory that can be deleted
+
+The script will ask a number of questions. Some of them will have intelligent default, but make sure you check them all:
+
+```text
+  [stoty@IstvanToth-MBP15:~/workspaces/apache-phoenix/phoenix (PHOENIX-6307)$]dev/create-release/do-release-docker.sh -p phoenix -d ~/x/phoenix-build/
+  Output directory already exists. Overwrite and continue? [y/n] y
+  ========================
+  === Gathering release details.
+
+  PROJECT [phoenix]:
+  GIT_BRANCH []: master
+  Current branch VERSION is 5.1.0-SNAPSHOT.
+  RELEASE_VERSION [5.1.0]:
+  RC_COUNT [0]:
+  RELEASE_TAG [5.1.0RC0]:
+  This is a dry run. If tag does not actually exist, please confirm the ref that will be built for testing.
+  GIT_REF [5.1.0RC0]:
+  ASF_USERNAME [stoty]:
+  GIT_NAME [Istvan Toth]:
+  GPG_KEY [stoty@apache.org]:
+  We think the key 'stoty@apache.org' corresponds to the key id '0x77E592D4'. Is this correct [y/n]? y
+  ================
+  Release details:
+  GIT_BRANCH:      master
+  RELEASE_VERSION: 5.1.0
+  RELEASE_TAG:     5.1.0RC0
+  API_DIFF_TAG:
+  ASF_USERNAME:    stoty
+  GPG_KEY:         0x77E592D4
+  GIT_NAME:        Istvan Toth
+  GIT_EMAIL:       stoty@apache.org
+  DRY_RUN:         yes
+  ================
+```
+
+- `PROJECT`: the repo to release (default specified by `-p` on the command line)
+- `GIT_BRANCH`: the git branch to use for release. This can be `master`, or a pre-created release branch.
+- `RC_COUNT`: the RC number, starting from 0
+- `RELEASE_TAG`: the git tag the script will tag the RC commit with.
+- `ASF_USERNAME`: your ASF username, for publishing the release artifacts.
+- `ASF_PASSWORD`: your ASF password, only for non-dry runs
+- `GIT_NAME`/`GIT_EMAIL`: will be used for the RC commit
+- `GPG_KEY`: ID for your GPG key. The script will offer a GPG secret key from your key ring, double-check that it is your code-signing key, and correct it if it is not.
+
+The dry-run will generate the signed release files into `<workdir>/output` directory.
+The Maven artifacts will be in `<workdir>/output/phoenix-repo-XXXX` local Maven repo, in the usual structure.
+
+## Create real RC
+
+If the dry-run release artifacts (source, binary, and Maven) check out, then publish a real RC to ASF.
+
+Repeat the dry run process, but add the `-f` switch to the `do-release-docker.sh` command.
+
+The script will upload the source and binary release artifacts to a directory under `https://dist.apache.org/repos/dist/dev/phoenix/`.
+The script will also deploy the Maven artifacts to `https://repository.apache.org/#stagingRepositories`.
+Check that these are present.
+
+### Close the staging repository
+
+The published staging repository is in the "open" state. Open staging repositories
+are aggressively cleaned up, and may be removed by the time the vote passes.
+To avoid this, [close](https://central.sonatype.org/publish/release/#locate-and-examine-your-staging-repository)
+(but DO NOT release) the staging repository immediately after deployment.
+
+## Voting
+
+1. Initiate the vote email. See example [here](https://www.mail-archive.com/dev@phoenix.apache.org/msg41202.html), or use the `<workdir>/output/vote.txt` template generated by the script.
+2. In case the RC (Release Candidate) is rejected via the vote, you will have to repeat the above process and re-initiate the vote for the next RC (RC0, RC1, etc.).
+
+## Release
+
+1. Once voting is successful (say for RC1), copy artifacts to `https://dist.apache.org/repos/dist/release/phoenix`:
+
+   ```shell
+   svn mv https://dist.apache.org/repos/dist/dev/phoenix/apache-phoenix-4.15.0-HBase-1.3-rc1 \
+          https://dist.apache.org/repos/dist/release/phoenix/apache-phoenix-4.15.0-HBase-1.3
+   ```
+
+2. Set release tag and commit:
+
+   ```shell
+   git tag -a v4.15.0-HBase-1.3 v4.15.0-HBase-1.3-rc1 -m "Phoenix v4.15.0-HBase-1.3 release"
+   ```
+
+3. Remove any obsolete releases on `https://dist.apache.org/repos/dist/release/phoenix` given the current release.
+4. Go to `https://repository.apache.org/#stagingRepositories` and release the staged artifacts (this takes a while so you may need to refresh multiple times).
+5. Create new branch based on current release if needed, for ex: 4.15 branches in this case.
+6. Set version to the upcoming `SNAPSHOT` and commit:
+
+   ```shell
+   mvn versions:set -DnewVersion=4.16.0-HBase-1.3-SNAPSHOT -DgenerateBackupPoms=false
+   ```
+
+7. If releasing Phoenix (core) Create a JIRA to update `PHOENIX_MAJOR_VERSION`, `PHOENIX_MINOR_VERSION` and `PHOENIX_PATCH_NUMBER` in `MetaDataProtocol.java` appropriately to next version (4, 16, 0 respectively in this case) and `compatible_client_versions.json` file with the client versions that are compatible against the next version (in this case 4.14.3 and 4.15.0 would be the backward compatible clients for 4.16.0). This JIRA should be committed/marked with fixVersion of the next release candidate.
+8. Add documentation of released version to the [downloads page](/downloads) and [wiki](https://en.wikipedia.org/wiki/Apache_Phoenix).
+9. Update the [Apache Committee Report Helper DB](https://reporter.apache.org/addrelease.html?phoenix)
+10. Send out an announcement email. See example [here](https://www.mail-archive.com/dev@phoenix.apache.org/msg54764.html).
+11. Bulk close JIRAs that were marked for the release fixVersion.
+
+**Congratulations!**

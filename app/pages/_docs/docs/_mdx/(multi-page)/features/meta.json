@@ -1,0 +1,25 @@
+{
+  "title": "Features",
+  "pages": [
+    "transactions",
+    "user-defined-functions",
+    "secondary-indexes",
+    "storage-formats",
+    "atomic-upsert",
+    "namespace-mapping",
+    "statistics-collection",
+    "row-timestamp-column",
+    "paged-queries",
+    "salted-tables",
+    "skip-scan",
+    "table-sampling",
+    "views",
+    "multi-tenancy",
+    "dynamic-columns",
+    "bulk-loading",
+    "query-server",
+    "metrics",
+    "tracing",
+    "cursor"
+  ]
+}

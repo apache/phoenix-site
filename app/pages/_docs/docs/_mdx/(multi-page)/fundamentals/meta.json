@@ -1,0 +1,12 @@
+{
+  "title": "Fundamentals",
+  "pages": [
+    "building",
+    "client-classpath-and-jdbc-url",
+    "tuning-guide",
+    "configuration",
+    "backward-compatibility",
+    "performance",
+    "performance-testing"
+  ]
+}

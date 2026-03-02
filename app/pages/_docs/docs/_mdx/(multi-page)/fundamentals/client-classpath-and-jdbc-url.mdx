@@ -1,0 +1,152 @@
+---
+title: "Client Classpath and JDBC URL"
+description: "Configure Phoenix thick-client classpath and JDBC URLs."
+---
+
+## Using the Phoenix JDBC Driver
+
+This page is about using the Phoenix thick client.
+
+The thin client for Phoenix Query Server is described on its own [page](/docs/features/query-server).
+
+## The Phoenix classpath
+
+To use Phoenix, both the JDBC driver JAR and `hbase-site.xml` must be added to the application classpath.
+
+### Phoenix driver JAR
+
+The Phoenix JDBC client is built on top of the HBase client, and has an unusually high number of dependencies.
+To make this manageable, Phoenix provides a single shaded uberjar that can be added to the classpath.
+
+Phoenix uses some private and semi-public HBase APIs, which may change between HBase versions, and provides separate binary distributions for different HBase versions.
+
+Choose the [binary distribution](/downloads) or Maven artifact corresponding to the HBase version on your cluster.
+
+<Steps>
+
+<Step>
+Copy the driver JAR from the binary distribution.
+
+Copy the corresponding `phoenix-client-embedded-hbase-[hbase.profile]-[phoenix.version].jar` to the application classpath.
+
+</Step>
+
+<Step>
+Add the dependency via Maven.
+
+```xml
+<dependencies>
+  <dependency>
+    <groupId>org.apache.phoenix</groupId>
+    <artifactId>phoenix-client-embedded-hbase-[hbase.profile]</artifactId>
+    <version>[phoenix.version]</version>
+  </dependency>
+</dependencies>
+```
+
+</Step>
+
+<Step>Add `hbase-site.xml` from your target cluster to the classpath.</Step>
+
+<Step>Verify your config is current after cluster changes.</Step>
+
+</Steps>
+
+### HBase / Hadoop configuration files
+
+As Phoenix is built on top of the HBase client, it needs the HBase configuration files for correct operation.
+For some configurations, it may also need other Hadoop / HDFS config files like core-site.xml.
+
+Download the correct `hbase-site.xml` (the client one, usually in `/etc/hbase/conf`) from the cluster, and copy it to a directory on the classpath.
+It is important to add the **directory containing `hbase-site.xml`**, and not the full file path, to the classpath.
+
+Alternatively, package `hbase-site.xml` into the root directory of a JAR file and add that JAR to the classpath.
+
+If `hbase-site.xml` changes on the cluster, make sure to copy the updated file to your application classpath.
+
+For some development clusters that use default configuration Phoenix may work without this, but not having the correct `hbase-site.xml` on the
+classpath is almost guaranteed to cause problems.
+
+## The Phoenix JDBC URL
+
+The Phoenix URL contains two main parts. The first describes the connection to HBase; the second specifies extra Phoenix options.
+
+```text
+jdbc:<protocol variant>[:<server list>[:<port>[:<zk root node>[:<principal>[:<keytab file>]]]]][;<option>=<value>]*
+```
+
+- `protocol variant`: The HBase connection registry to use (details below).
+- `server list`: A comma-separated list of hostnames or IPv4 addresses.
+  It is also possible to specify per-host ports, as defined in [HBASE-12706](https://issues.apache.org/jira/browse/HBASE-12706). In this case `:` characters must be escaped with `\`. You may need to escape again in Java source strings.
+- `port`: An integer port number. Ports specified in `server list` take precedence.
+- `zk root node`: The root znode for HBase. Must be empty for non-ZK registries.
+- `principal`: The Kerberos principal used for authentication.  
+  If only `principal` is specified, this defines a distinct user identity with its own dedicated HBase connection (`HConnection`) and allows multiple differently configured connections in the same JVM.
+- `keytab`: Kerberos keytab used for authentication. Must be specified together with `principal`.
+- `option`: A connection option.
+- `value`: A connection option value.
+
+Parameters from end of the connection definition can be omitted.
+Use empty strings for missing parameters in the middle of the URL.
+For example, the `jdbc:phoenix::::principal:/home/user/keytab` URL can be used to specify the kerberos principal and keytab, while using the default connection specified in hbase-site.xml.
+
+### Default connection
+
+The underlying HBase client identifies the cluster based on parameters in `hbase-site.xml`.
+While Phoenix allows overriding this, it is usually best to use the cluster definition from `hbase-site.xml`.
+The only time the connection should be directly specified is when switching between otherwise identically configured HBase instances, like a production and a disaster recovery cluster.
+
+To use the defaults from hbase-site.xml, use the `jdbc:phoenix` URL or `jdbc:phoenix;option=value` if additional options are needed.
+
+See HBase documentation for how each registry is configured in `hbase-site.xml`.
+
+### The `jdbc:phoenix:` protocol variant
+
+If this protocol variant is specified, Phoenix will select the registry based on the value of `hbase.client.registry.impl`.
+
+If `hbase.client.registry.impl` is not defined, Phoenix chooses a default based on the HBase client version it includes.
+
+### The `jdbc:phoenix+zk:` protocol variant
+
+This uses the original ZooKeeper-based HBase connection registry. The `server list` and `port` specify the ZK quorum. [HBASE-12706](https://issues.apache.org/jira/browse/HBASE-12706) is supported; `:` characters must be escaped with `\`.
+
+Examples:
+
+- `jdbc:phoenix+zk:localhost:2181:/hbase:principal:keytab` - fully specified
+- `jdbc:phoenix+zk:host1\:2181,host1\:2182,host2\:2183` - heterogeneous ports, default ZK root node
+- `jdbc:phoenix+zk` - use default ZK parameters from `hbase-site.xml` (using `jdbc:phoenix` is preferred in most cases)
+
+### The `jdbc:phoenix+master:` protocol variant
+
+This uses the Master based connection registry added in [HBASE-18095](https://issues.apache.org/jira/browse/HBASE-18095), and is available from HBase 2.3.0.
+The **zk root node** parameter **must** never be specified.
+
+Examples:
+
+- `jdbc:phoenix+master:master1\:16001,master2\:16002::principal:/path/to/keytab` - fully specified
+- `jdbc:phoenix+master:master1,master2` - use default master port for both hosts
+
+### The `jdbc:phoenix+rpc:` protocol variant
+
+This uses the Master based connection registry added in [HBASE-26150](https://issues.apache.org/jira/browse/HBASE-26150), and is available from HBase 2.5.0.
+This is very similar to the `phoenix+master` variant, but also allows specifying RegionServers in the host list.
+There is no built-in default port for this registry, the port must always be specified together with the host list.
+
+Examples:
+
+- `jdbc:phoenix+rpc:server1\:16001,server2\:16002::principal:/path/to/keytab` - fully specified
+- `jdbc:phoenix+rpc` - use values from `hbase-site.xml`
+
+## Notes [#client-classpath-and-jdbc-url-notes]
+
+<Callout type="warning">
+  Support for `master` and `rpc` registries is only available in Phoenix 5.1.4+
+  and 5.2.0+.
+</Callout>
+
+Earlier versions support only the `jdbc:phoenix:` protocol variant implementing the original HBase ZooKeeper connection registry.
+
+Support for registry variants is only available for HBase versions that support them.
+Phoenix will throw an error if a variant that the HBase client version doesn't support is specified.
+
+Phoenix 5.2 also supports High Availability connections. Documentation for that is only available in the [JIRA ticket](https://issues.apache.org/jira/browse/PHOENIX-6491).

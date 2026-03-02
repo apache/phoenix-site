@@ -1,0 +1,34 @@
+---
+title: "Salted Tables"
+description: "Use SALT_BUCKETS to reduce HBase hotspotting and understand scan, split, and ordering behavior for salted tables."
+---
+
+Sequential writes in HBase may suffer from region server hotspotting if your row key is monotonically increasing. Salting the row key helps mitigate this problem. See [this article](http://blog.sematext.com/2012/04/09/hbasewd-avoid-regionserver-hotspotting-despite-writing-records-with-sequential-keys/) for details.
+
+Phoenix provides a way to transparently salt the row key with a salting byte for a table. Specify this at table creation time with the `SALT_BUCKETS` table property, using a value from 1 to 256:
+
+```sql
+CREATE TABLE table (a_key VARCHAR PRIMARY KEY, a_col VARCHAR) SALT_BUCKETS = 20;
+```
+
+There are some behavior differences and cautions to be aware of when using a salted table.
+
+## Sequential scan
+
+Since a salted table does not store data in natural key sequence, a strict sequential scan does not return data in natural sorted order. Clauses that force sequential scan behavior (for example, `LIMIT`) may return rows differently compared to a non-salted table.
+
+## Splitting
+
+If no split points are specified, a salted table is pre-split on salt-byte boundaries to ensure load distribution across region servers, including during initial table growth. If split points are provided manually, they must include the salt byte.
+
+## Row key ordering
+
+Pre-splitting also ensures that entries in each region start with the same salt byte and are therefore locally sorted. During a parallel scan across regions, Phoenix can use this property to perform a client-side merge sort. The resulting scan can still be returned sequentially, as if from a normal table.
+
+This row-key ordered scan can be enabled by setting `phoenix.query.rowKeyOrderSaltedTable=true` in `hbase-site.xml`. When enabled, user-specified split points on salted tables are disallowed to ensure each bucket contains only entries with the same salt byte. With this property enabled, a salted table behaves more like a normal table for scans and returns items in row-key order.
+
+## Performance [#salted-tables-performance]
+
+Using salted tables with pre-splitting helps distribute write workload uniformly across region servers, which improves write performance. Our [performance evaluation](/docs/fundamentals/performance#performance-salting) shows that salted tables can achieve up to 80% higher write throughput than non-salted tables.
+
+Reads from salted tables can also benefit from more uniform data distribution. Our [performance evaluation](/docs/fundamentals/performance#performance-salting) shows improved read performance for queries focused on subsets of data.

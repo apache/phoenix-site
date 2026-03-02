@@ -1,0 +1,186 @@
+---
+title: "Developing Phoenix"
+description: "Set up a local Apache Phoenix development environment, IDE preferences, and contribution workflow."
+---
+
+## Getting Started [#develop-getting-started]
+
+1. Review the [How to Contribute](/docs/contributing) documentation.
+1. Sign up for a [GitHub](https://github.com/) account if you do not have one.
+1. Go to the [Phoenix GitHub repository](https://github.com/apache/phoenix) and create a fork, which creates `{username}/phoenix`.
+1. Set up Git locally.
+   - [Instructions](https://help.github.com/articles/set-up-git/)
+   - [Download](https://git-scm.com/downloads)
+1. Make sure you have a JDK (Phoenix historically required [JDK 7](https://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html)).
+1. Make sure you have [Maven 3+](https://maven.apache.org/download.cgi) installed.
+1. Add the following to your `.bashrc` or equivalent to ensure Maven and Java are configured correctly for command-line usage.
+
+```shell
+export JAVA_HOME={path to jdk}
+export JDK_HOME={path to jdk}
+export M2_HOME={path to maven}
+export PATH=$M2_HOME/bin:$PATH
+```
+
+## Other Phoenix Subprojects
+
+The instructions here are for the main Phoenix project. For the other subprojects, use the corresponding [repository](/source-repository) and [JIRA project](/issues-tracking).
+
+The Eclipse and IntelliJ setup instructions may not necessarily work well for the other projects.
+
+## Setup Local Git Repository
+
+You may find it easier to clone from your IDE of choice, especially with IntelliJ.
+
+1. Create a local clone of your new forked repository
+
+   ```shell
+   git clone https://github.com/{username}/phoenix.git
+   ```
+
+2. Configure your local repository to be able to sync with the apache/phoenix repository
+
+   ```shell
+   cd {repository}
+   git remote add upstream https://github.com/apache/phoenix.git
+   ```
+
+3. Setup your development environment
+
+## For Eclipse IDE for Java Developers (Luna)
+
+1. [Download Eclipse](https://eclipse.org/downloads/packages/eclipse-ide-java-developers/lunar)
+   - You will want 'Eclipse IDE for Java Developers' unless you want to install the following tools by hand
+     - [m2e](http://download.eclipse.org/technology/m2e/releases/)
+     - [egit](http://www.eclipse.org/egit/download/)
+1. Configure Eclipse to handle Maven Issues appropriately so you don't see unnecessary errors.
+   - Window -> Preferences -> Maven -> Errors/Warnings
+   - Choose Ignore option for 'Plugin execution not covered by lifecycle configuration' -> Ok
+1. Add the local Git repository to Eclipse
+   - Window -> Show View -> Other... -> Git | Git Repositories -> Ok
+   - Click 'Add an existing local Git Repository to this view'
+   - Search for appropriate git repository
+   - Finish
+1. Import Maven Projects
+   - File -> Import -> Maven -> Existing Maven Projects
+   - Choose Root directory where phoenix git repository is located
+   - Select All
+   - Finish
+1. Generate Lexer and Parser Files
+   - Select phoenix-core project
+   - Run -> Run As -> Maven generate-sources
+1. Make sure you are setup to develop now.
+   - Open IndexUtilTest.Java
+   - Run -> Run As -> JUnit Test
+
+### Get Settings and Preferences Correct
+
+1. Import General Preferences
+   - File -> Import... -> General -> Preferences
+   - From - `{repository}/dev/eclipse_prefs_phoenix.epf`
+   - Import All
+   - Finish
+1. Import Code Templates
+   - Window -> Preferences -> Java -> Code Style -> Code Templates -> Import...
+   - Navigate to `{repository}/dev/PhoenixCodeTemplate.xml` -> Ok
+1. Import Formatter
+   - Window -> Preferences -> Java -> Code Style -> Formatter-> Import...
+   - Navigate to `{repository}/dev/PhoenixCodeTemplate.xml` -> Ok
+1. Import correct import order settings
+   - Window -> Preferences -> Java -> Code Style -> Organize Imports -> Import...
+   - Navigate to `{repository}/dev/phoenix.importorder` -> Ok
+1. Make sure you use space for tabs
+   - Window -> Preferences -> General -> Editors -> Text Editors
+   - Select 'Insert Spaces for tabs' -> Ok
+
+### Connecting to Jira
+
+1. Install Connector for Jira
+   - Help -> Install New Software -> Add
+   - Location - https://update.atlassian.com/atlassian-eclipse-plugin/rest/e3.7 -> Atlassian Connector
+   - Finish
+1. Add Task Repository
+   - Window -> Show View -> Mylyn -> Task Repositories -> Add Task Repository
+   - JIRA -> Next -> Server - https://issues.apache.org/jira -> Validate Settings
+   - Finish
+1. Add Filter Of All JIRAs assigned to you
+   - Right Click on Repository You added -> New Query... -> Predefined Filter
+   - Select Phoenix Project -> Select Assigned to me
+   - Finish
+
+### Commit
+
+1. Commit Changes and Push to Github with appropriate Message
+   - CTRL-# -> Set Commit message to include jira number at beginning PHOENIX-####
+   - Commit and Push
+
+## For Intellij
+
+- [Download IntelliJ](https://www.jetbrains.com/idea/download/)
+
+### If you don't have a local git repository setup
+
+This will automatically create the local clone of your repository for you. You will still want to add the remote upstream repository from above afterwards.
+
+1. Clone Github project and Import Maven Projects to IDE
+   - Check out from Version Control -> GitHub -> Enter your GitHub Login Info
+   - `https://github.com/{username}/phoenix.git` -> Check out from Version Control | Yes
+1. Generate Parser and Lexer Files
+   - Maven Projects -> Phoenix Core -> Lifecycle -> compile
+1. Compile Project
+   - Build -> Make Project
+1. Make sure you are setup to develop now.
+   - Open IndexUtilTest.Java -> Run -> Run IndexUtilTest
+
+### If you already have a local git repository setup
+
+1. Import Projects
+   - Import Project
+   - Select Directory of your local repository -> Next
+   - Import project from external model -> Maven -> Next
+   - Select 'Import Maven project automatically'
+   - Select 'Create IntelliJ IDEA modules for aggregator projects'
+   - Select 'Keep source and test folders on reimport'
+   - Select 'Exclude build directory'
+   - Select 'Use Maven output directories' -> Next
+   - Select maven-3 -> Next
+   - Next a whole bunch
+1. Generate Parser and Lexer Files
+   - Maven Projects -> Phoenix Core -> Lifecycle -> compile
+1. Compile Project
+   - Build -> Make Project
+1. Make sure you are setup to develop now.
+   - Open IndexUtilTest.Java -> Run -> Run IndexUtilTest
+
+### Get Settings and Preferences Correct
+
+1. Import Settings from eclipse profile
+   - File -> Settings -> Editor -> Code Style -> Java
+   - Set From... -> Import... -> Eclipse XML Profile -> `{repository}/dev/PhoenixCodeTemplate.xml`
+
+### Connecting to Jira
+
+1. Create Connection to Apache Jira
+   - Tools -> Tasks and Contexts -> Configure Servers -> + -> Jira ->
+   - Server Url: `https://issues.apache.org/jira`
+   - Query: 'project=Phoenix and ...'
+1. Switch Easily between Tasks
+   - Tools-> Tasks and Contexts -> Open Task->PHOENIX-####
+   - Select Create branch PHOENIX-#### from master->OK
+
+### Commit
+
+1. Commit Changes and Push to Github with appropriate Message
+   - VCS -> Commit -> Set Commit message to include jira number PHOENIX-####
+   - Commit and Push
+
+## Contributing finished work
+
+### Create pull request
+
+1. Review the [How to Contribute](/docs/contributing) documentation.
+1. Navigate to branch: `https://github.com/{username}/phoenix/tree/{branchname}`
+1. Click Pull Request
+1. Confirm that you see `apache:master ... {username}:{branchname}`
+1. Make sure the pull request title begins with the JIRA key, for example `PHOENIX-####`.
+1. Click Create pull request.

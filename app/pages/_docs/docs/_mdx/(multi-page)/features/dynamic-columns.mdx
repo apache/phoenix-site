@@ -1,0 +1,39 @@
+---
+title: "Dynamic Columns"
+description: "Define and query late-bound dynamic columns in Phoenix when full schema cannot be declared upfront."
+---
+
+Sometimes defining a static schema up front is not feasible. Instead, a subset of columns may be specified at table [create](/docs/grammar#create-table) time while the rest are specified at [query](/docs/grammar#select) time. As of Phoenix 1.2, dynamic columns are supported by allowing column definitions in parentheses after the table name in the `FROM` clause of a `SELECT` statement. Although this is not standard SQL, it is useful for leveraging the late-binding capability of HBase.
+
+For example:
+
+```sql
+SELECT eventTime, lastGCTime, usedMemory, maxMemory
+FROM EventLog(lastGCTime TIME, usedMemory BIGINT, maxMemory BIGINT)
+WHERE eventType = 'OOM' AND lastGCTime < eventTime - 1;
+```
+
+You might define only a subset of event columns at create time, because each event type can have different properties:
+
+```sql
+CREATE TABLE EventLog (
+    eventId BIGINT NOT NULL,
+    eventTime TIME NOT NULL,
+    eventType CHAR(3),
+    CONSTRAINT pk PRIMARY KEY (eventId, eventTime)
+);
+```
+
+To upsert a row with dynamic columns:
+
+```sql
+UPSERT INTO EventLog (
+    eventId,
+    eventTime,
+    eventType,
+    lastGCTime TIME,
+    usedMemory BIGINT,
+    maxMemory BIGINT
+)
+VALUES (1, CURRENT_TIME(), 'abc', CURRENT_TIME(), 512, 1024);
+```

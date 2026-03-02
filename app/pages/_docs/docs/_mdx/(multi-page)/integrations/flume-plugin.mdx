@@ -1,0 +1,49 @@
+---
+title: "Flume Plugin"
+description: "Configure Apache Flume to ingest events into Phoenix tables."
+---
+
+The plugin enables reliable and efficient streaming of large amounts of data/logs into HBase using the Phoenix API. The custom Phoenix sink and event serializer must be configured in the Flume agent configuration file. Currently, the only supported event serializer is `RegexEventSerializer`, which parses the Flume event body using a configured regex.
+
+## Prerequisites [#flume-plugin-prerequisites]
+
+- Phoenix v3.0.0-SNAPSHOT+
+- Flume 1.4.0+
+
+## Installation and Setup [#flume-plugin-installation-and-setup]
+
+1. Download and build Phoenix v3.0.0-SNAPSHOT.
+2. Follow the instructions [here](/docs/fundamentals/building) to build the project, as the Flume plugin is still under beta.
+3. Create a `plugins.d` directory within `$FLUME_HOME`. Within that, create sub-directory `phoenix-sink/lib`.
+4. Copy generated `phoenix-3.0.0-SNAPSHOT-client.jar` to `$FLUME_HOME/plugins.d/phoenix-sink/lib`.
+
+## Configuration [#flume-plugin-configuration]
+
+| Property Name           | Default | Description                                                                                                                                                                                    |
+| ----------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type`                  |         | `org.apache.phoenix.flume.sink.PhoenixSink`                                                                                                                                                    |
+| `batchSize`             | `100`   | Default number of events per transaction.                                                                                                                                                      |
+| `zookeeperQuorum`       |         | ZooKeeper quorum of the HBase cluster.                                                                                                                                                         |
+| `table`                 |         | Name of the table in HBase to write to.                                                                                                                                                        |
+| `ddl`                   |         | The `CREATE TABLE` query for the HBase table where events will be upserted. If specified, the query will be executed. Recommended to include the `IF NOT EXISTS` clause in the DDL.            |
+| `serializer`            | `regex` | Event serializer for processing the Flume event. Currently only `regex` is supported.                                                                                                          |
+| `serializer.regex`      | `(.*)`  | Regular expression for parsing the event.                                                                                                                                                      |
+| `serializer.columns`    |         | Columns extracted from the Flume event for inserting into HBase.                                                                                                                               |
+| `serializer.headers`    |         | Flume event headers included as part of the `UPSERT` query. Data type for these columns is `VARCHAR` by default.                                                                               |
+| `serializer.rowkeyType` |         | A custom row key generator. Can be one of `timestamp`, `date`, `uuid`, `random`, or `nanotimestamp`. Configure this when a custom row key should be auto-generated for the primary key column. |
+
+For an example configuration for ingesting Apache access logs into Phoenix, see [this](https://git-wip-us.apache.org/repos/asf?p=phoenix.git;a=blob_plain;f=config/apache-access-logs.properties;hb=master) property file. It uses UUID as a row key generator for the primary key.
+
+## Starting the agent
+
+```shell
+$ bin/flume-ng agent -f conf/flume-conf.properties -c ./conf -n agent
+```
+
+## Monitoring
+
+To monitor the agent and sink process, enable JMX via `flume-env.sh` (`$FLUME_HOME/conf/flume-env.sh`). Ensure you have the following line uncommented:
+
+```shell
+JAVA_OPTS="-Xms1g -Xmx1g -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=3141 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
+```
