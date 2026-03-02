@@ -1,44 +1,67 @@
 ---
 title: "Building Website"
-description: "Build and test the Apache Phoenix website locally, with current caveats and workflow steps."
+description: "Build and test the Apache Phoenix website locally with the current React + TypeScript workflow."
 ---
 
 ## Prerequisites [#building-website-prerequisites]
 
-The website build script has significantly bit-rotted. See [PHOENIX-6867](https://issues.apache.org/jira/browse/PHOENIX-6867).
-
-- Maven `site.xml` must have a proxy set for the `http://conjars.org` repository.
-- The `mvn` command must be configured to use Java 1.8. Newer versions do not work.
+- Node.js 22.x (minimum `22.12.0`)
+- npm (bundled with Node.js)
 
 ## Building Phoenix Project Website
 
-1. Make a local copy of source Markdown files and HTML pages.
+1. Clone the repository:
 
 ```shell
 git clone git@github.com:apache/phoenix-site.git
+cd phoenix-site
 ```
 
-2. Edit/Add source markdown files in `site/source/src/site/markdown` directory.
-3. Edit `phoenix-docs/src/docsrc/help/phoenix.csv` to update reference pages, adding any missing words to `phoenix-docs/src/tools/org/h2/build/doc/dictionary.txt`.
-4. Run `build.sh` at the repo root to generate/update HTML pages in the `output` directory.
-5. Commit source Markdown files and generated HTML pages, then push your branch.
-6. Create a pull request in GitHub for the [mirror of the Phoenix Site repository](https://github.com/apache/phoenix-site), following the GitHub workflow on the [contributing](/docs/contributing) page.
+2. Install dependencies:
+
+```shell
+npm ci
+```
+
+3. Generate language reference pages and Fumadocs metadata:
+
+```shell
+npm run generate-language
+npm run fumadocs-init
+```
+
+4. Build the production website:
+
+```shell
+npm run build
+```
+
+The generated site is under `build/client/`.
+
+For CI-style validation (lint, typecheck, unit/e2e tests, and build), run:
+
+```shell
+npm run ci
+```
+
+On Linux runners, you can use the root `build.sh` script, which bootstraps Node via `nvm` when needed, runs `npm ci`, and then runs `npm run ci`.
 
 ## Local Testing During Development
 
-The site uses protocol-relative URLs for included assets to support `http` as well as `https`. This can cause assets to fail to load when working locally if not using a web server. The root cause is that locally opened files use the `file:` protocol, but some assets live on remote servers thus requiring the `http:` or `https:` protocol.
-
-For best results when testing locally, spin up a simple Python web server after generating the site.
+Start the development server with hot reload:
 
 ```shell
-cd output
-python -m SimpleHTTPServer 8000
+npm run dev
 ```
 
-If using Python 3, run:
+By default, the website is available at:
 
 ```shell
-python3 -m http.server 8000
+http://localhost:5173
 ```
 
-Now you can access the website at [http://localhost:8000](http://localhost:8000) and your changes are available with a page refresh.
+To test the production build locally:
+
+```shell
+npm run start
+```
