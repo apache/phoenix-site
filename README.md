@@ -29,6 +29,7 @@ Examples:
 - `app/pages/_landing/team/developers.json` - JSON data for the team page
 - `app/pages/_landing/news/events.json` - JSON data for news/events
 - `app/pages/_docs/docs/_mdx/(multi-page)/...` - MDX content for documentation
+- `phoenix-version.ts` - Shared Phoenix version constant used in docs/PDF cover
 
 ---
 
@@ -130,6 +131,7 @@ phoenix-site/
 ├── scripts/                           # Helper scripts (e.g. generate-language.ts)
 ├── e2e-tests/                         # Playwright tests
 ├── unit-tests/                        # Vitest tests
+├── phoenix-version.ts                 # Shared Phoenix version constant
 └── package.json                       # Scripts and dependencies
 ```
 
@@ -258,6 +260,8 @@ The project uses [Vitest](https://vitest.dev/) for unit testing and [Playwright]
 The docs PDF export is implemented as a Playwright e2e test in `e2e-tests/export-pdf.spec.ts`. It renders single-page docs in both light and dark themes to produce static PDF assets.
 
 The export quality depends heavily on print styles in `app/app.css` (`@media print` rules).
+
+The displayed Phoenix version on the PDF cover is sourced from `phoenix-version.ts` (`PHOENIX_VERSION`) and consumed by `app/pages/_docs/docs/index.tsx`.
 
 Manual command:
 

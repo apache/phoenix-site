@@ -37,6 +37,7 @@ import { RailroadDiagram } from "@/components/docs/language/railroad-diagram";
 import { Link } from "@/components/link";
 import type { MDXComponents } from "mdx/types";
 import type { TOCItemType } from "fumadocs-core/toc";
+import { PHOENIX_VERSION } from "../../../../phoenix-version";
 
 // Extend default MDX components to include Steps globally
 // Note: We'll override the 'a' component in the renderer to handle route-specific logic
@@ -224,7 +225,9 @@ const renderer = toClientRenderer(
               <h1 className="text-4xl font-semibold tracking-wide">
                 Apache Phoenix Reference Guide
               </h1>
-              <p className="text-fd-muted-foreground text-sm">Version 5.3.0</p>
+              <p className="text-fd-muted-foreground text-sm">
+                Version {PHOENIX_VERSION}
+              </p>
               <p className="text-fd-muted-foreground text-base">
                 Apache Phoenix Team
               </p>
