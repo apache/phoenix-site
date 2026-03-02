@@ -41,9 +41,9 @@ echo "node $(node --version), npm $(npm --version) -- OK"
 echo ""
 
 # ---------------------------------------------------------------------------
-echo "INSTALLING DEPENDENCIES"
+echo "INSTALLING DEPENDENCIES (clean install)"
 echo "==========================="
-npm install
+npm ci
 echo ""
 
 # ---------------------------------------------------------------------------
