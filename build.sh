@@ -50,3 +50,12 @@ echo ""
 echo "RUNNING CI (lint, typecheck, tests, build)"
 echo "==========================="
 npm run ci
+echo ""
+
+# ---------------------------------------------------------------------------
+echo "PUBLISHING BUILD OUTPUT"
+echo "==========================="
+rm -rf ./output
+mkdir -p ./output
+cp -R ./build/client/. ./output/
+echo "Copied build/client -> output"
