@@ -344,6 +344,17 @@ The `output/` content (generated from `build/client/`) can be served from any st
 
 ### Troubleshooting
 
+#### Tests Fail When Running `npm run ci`
+
+If tests fail unexpectedly, try removing the `output/` directory before running `npm run ci`:
+
+```bash
+rm -rf output/
+npm run ci
+```
+
+The root cause is unknown, but a stale `output/` directory has been observed to cause intermittent e2e tests failures.
+
 #### TypeScript Types Are Broken
 
 If you see type errors related to React Router `+types`, regenerate them:
