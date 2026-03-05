@@ -17,34 +17,42 @@ git clone git@github.com:apache/phoenix-site.git
 cd phoenix-site
 ```
 
-2. Install dependencies:
+2. During development, install dependencies:
 
 ```shell
 npm ci
 ```
 
-3. Generate language reference pages and Fumadocs metadata:
-
-```shell
-npm run generate-language
-npm run fumadocs-init
-```
-
-4. Build the production website:
-
-```shell
-npm run build
-```
-
-The generated site is under `build/client/`.
-
-For CI-style validation (lint, typecheck, unit/e2e tests, and build), run:
+3. For local iteration, run checks/build directly when needed:
 
 ```shell
 npm run ci
 ```
 
-On Linux runners, you can use the root `build.sh` script, which bootstraps Node via `nvm` when needed, runs `npm ci`, and then runs `npm run ci`.
+4. Before opening a pull request, run the mandatory build script:
+
+```shell
+./build.sh
+```
+
+`build.sh` is required for all contributors. It:
+
+- ensures Node/npm are available
+- runs a clean install (`npm ci`)
+- runs full validation/build (`npm run ci`)
+- copies `build/client/` into `output/`
+
+There is no remote CI/CD runner currently executing this script. The generated `output/` directory is a build artifact that must be committed and pushed with your PR.
+
+## Publishing Website Artifact
+
+Current publishing flow:
+
+1. Run `./build.sh` locally
+2. Commit both source changes and updated `output/`
+3. Push your branch and open a PR
+
+After merge, `output/` is used as the website artifact for deployment.
 
 ## Local Testing During Development
 

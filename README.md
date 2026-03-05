@@ -127,6 +127,7 @@ phoenix-site/
 │   └── app.css                        # Global styles
 │
 ├── build/                             # Generated files (do not edit)
+├── output/                            # Committed website artifact for publishing
 ├── public/                            # Static files copied to build output
 ├── scripts/                           # Helper scripts (e.g. generate-language.ts)
 ├── e2e-tests/                         # Playwright tests
@@ -290,13 +291,26 @@ npm run test:e2e:ui
 
 ### Building for Production
 
-Before merging or deploying, run the full CI pipeline:
+During local development, running CI checks is usually enough:
 
 ```bash
 npm run ci
 ```
 
-Current CI sequence:
+Before opening a pull request, you must run the full website build script:
+
+```bash
+./build.sh
+```
+
+`build.sh` is the required pre-PR build step for all contributors (not just Linux users). It:
+
+1. Ensures Node/npm are available (bootstraps via `nvm` when needed)
+2. Runs a clean dependency install (`npm ci`)
+3. Runs the complete CI pipeline (`npm run ci`)
+4. Copies `build/client/` into `output/`
+
+Current CI sequence used by `npm run ci`:
 
 1. `npm run generate-language`
 2. `npm run fumadocs-init`
@@ -307,15 +321,21 @@ Current CI sequence:
 7. `npm run test:e2e`
 8. `npm run build`
 
-For Linux runners, `./build.sh` can bootstrap Node/npm with nvm and then execute the full CI flow.
-
-Generated files are located under the `build/` directory.
+There is currently no remote CI/CD runner executing `build.sh` for this repository. The `output/` artifact is produced locally and must be included in your pull request.
 
 ### Deployment
 
 #### Static Hosting
 
-Since this site uses SSG, deploy `build/client/` to any static host:
+The published website artifact is the committed `output/` directory. The expected publishing workflow is:
+
+1. Run `./build.sh` locally
+2. Commit source changes and updated `output/`
+3. Push your branch and open a PR
+
+After merge, `output/` can be deployed to static hosting.
+
+The `output/` content (generated from `build/client/`) can be served from any static host:
 
 - Apache HTTP Server
 - Nginx
