@@ -49,6 +49,7 @@ echo ""
 # ---------------------------------------------------------------------------
 echo "RUNNING CI (lint, typecheck, tests, build)"
 echo "==========================="
+rm -rf ./output
 npm run ci
 echo ""
 

@@ -51,17 +51,5 @@ export default defineConfig({
       "@": resolve(__dirname, "app")
     }
   },
-  server: {
-    watch: {
-      // Keep dev server/playwright startup stable when committed artifacts exist.
-      ignored: [
-        "**/output/**",
-        "**/build/**",
-        "**/playwright-report/**",
-        "**/test-results/**",
-        "**/blob-report/**"
-      ]
-    }
-  },
   customLogger: logger
 });
