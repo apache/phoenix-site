@@ -1,0 +1,1 @@
+const t="Fundamentals",a=["building","client-classpath-and-jdbc-url","tuning-guide","configuration","backward-compatibility","performance","performance-testing"],n={title:t,pages:a};export{n as default,a as pages,t as title};
