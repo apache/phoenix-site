@@ -346,7 +346,7 @@ The `output/` content (generated from `build/client/`) can be served from any st
 
 #### E2E Test Fails
 
-Depending on your machine, it's theoretically possible that the E2E tests can fail due to a timeout. For the E2E tests to start working, it has to warm up the entire application first. The documentation is quite heavy, so it takes time. On slower machines the current timeout (120 secs) might not be sufficient. Therefore, you might want to extend it locally in `playwright.config.ts`
+Depending on your machine, it's theoretically possible that the E2E tests can fail due to a timeout. For the E2E tests to start working, it has to warm up the entire application first. The documentation is quite heavy, so it takes time. On slower machines the current timeout (60 secs) might not be sufficient. Therefore, you might want to extend it locally in `playwright.config.ts`
 
 #### TypeScript Types Are Broken
 

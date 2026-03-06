@@ -123,7 +123,8 @@ export default defineConfig([
     "prettier.config.js",
     "react-router.config.ts",
     ".react-router",
-    ".source"
+    ".source",
+    "output"
   ]),
   {
     files: ["**/*.{ts,tsx}"],

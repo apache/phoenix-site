@@ -17,6 +17,10 @@
  */
 
 @import "tailwindcss";
+
+/* Force Tailwind to ignore your committed build artifacts */
+@source not "../output/**";
+
 @import "tw-animate-css";
 @import "fumadocs-ui/css/shadcn.css";
 @import "fumadocs-ui/css/preset.css";

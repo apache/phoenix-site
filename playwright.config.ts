@@ -59,12 +59,11 @@ export default defineConfig({
       use: { ...devices["Desktop Safari"] }
     }
   ],
-  timeout: 120_000,
 
   webServer: {
     command: "npm run dev -- --port 5178",
     url: "http://localhost:5178",
     reuseExistingServer: false,
-    timeout: 120_000
+    timeout: 60_000
   }
 });
