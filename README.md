@@ -344,16 +344,9 @@ The `output/` content (generated from `build/client/`) can be served from any st
 
 ### Troubleshooting
 
-#### Tests Fail When Running `npm run ci`
+#### E2E Test Fails
 
-If tests fail unexpectedly, try removing the `output/` directory before running `npm run ci`:
-
-```bash
-rm -rf output/
-npm run ci
-```
-
-The root cause is unknown, but a stale `output/` directory has been observed to cause intermittent e2e tests failures.
+Depending on your machine, it's theoretically possible that the E2E tests can fail due to a timeout. For the E2E tests to start working, it has to warm up the entire application first. The documentation is quite heavy, so it takes time. On slower machines the current timeout (120 secs) might not be sufficient. Therefore, you might want to extend it locally in `playwright.config.ts`
 
 #### TypeScript Types Are Broken
 
