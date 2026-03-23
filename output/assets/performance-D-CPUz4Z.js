@@ -54,7 +54,7 @@ Query: \`SELECT COUNT(1)\` from a table over 1M and 5M rows. Data has 3 narrow c
 
 ### Essential Column Family
 
-The Phoenix 1.2 query filter leverages the [HBase Filter Essential Column Family feature](http://hbase.apache.org/apidocs/org/apache/hadoop/hbase/filter/SingleColumnValueFilter.html#isFamilyEssential\\(byte\\[]\\)). This improves performance when Phoenix filters data split across multiple column families (CFs) by loading only essential CFs first. In a second pass, all CFs are loaded as needed.
+The Phoenix 1.2 query filter leverages the [HBase Filter Essential Column Family feature](https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/filter/SingleColumnValueFilter.html#isFamilyEssential\\(byte\\[]\\)). This improves performance when Phoenix filters data split across multiple column families (CFs) by loading only essential CFs first. In a second pass, all CFs are loaded as needed.
 
 Consider the following schema in which data is split into two CFs:
 \`CREATE TABLE t (k VARCHAR NOT NULL PRIMARY KEY, a.c1 INTEGER, b.c2 VARCHAR, b.c3 VARCHAR, b.c4 VARCHAR)\`.
@@ -68,7 +68,7 @@ The following chart shows in-memory query performance for the query above with 1
 
 ### Skip Scan
 
-Skip Scan Filter leverages HBase filter \`SEEK_NEXT_USING_HINT\` ([docs](http://hbase.apache.org/apidocs/org/apache/hadoop/hbase/filter/Filter.ReturnCode.html#SEEK_NEXT_USING_HINT)). It significantly improves point queries over key columns.
+Skip Scan Filter leverages HBase filter \`SEEK_NEXT_USING_HINT\` ([docs](https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/filter/Filter.ReturnCode.html#SEEK_NEXT_USING_HINT)). It significantly improves point queries over key columns.
 
 Consider the following schema in which data is split into two CFs:
 \`CREATE TABLE t (k VARCHAR NOT NULL PRIMARY KEY, a.c1 INTEGER, b.c2 VARCHAR, b.c3 VARCHAR)\`.
@@ -107,7 +107,7 @@ The following chart shows in-memory query time for a Top-N query over 10M rows u
 \`select core from t order by core desc limit 10\`
 
 <img alt="Phoenix vs Hive" src={__img6} placeholder="blur" />
-`,g={title:"Performance",description:"Historical Phoenix performance comparisons and feature-level improvements for scans, salting, and query execution."},x=[{href:"http://phoenix-bin.github.io/client/performance/latest.htm"},{href:"http://phoenix-bin.github.io/client/performance/"},{href:"http://hbase.apache.org/apidocs/org/apache/hadoop/hbase/filter/SingleColumnValueFilter.html#isFamilyEssential(byte[])"},{href:"http://hbase.apache.org/apidocs/org/apache/hadoop/hbase/filter/Filter.ReturnCode.html#SEEK_NEXT_USING_HINT"},{href:"/docs/features/salted-tables"}],w={contents:[{heading:void 0,content:"type: warning"},{heading:void 0,content:`This page has not been updated recently and may not reflect the current state
+`,g={title:"Performance",description:"Historical Phoenix performance comparisons and feature-level improvements for scans, salting, and query execution."},x=[{href:"http://phoenix-bin.github.io/client/performance/latest.htm"},{href:"http://phoenix-bin.github.io/client/performance/"},{href:"https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/filter/SingleColumnValueFilter.html#isFamilyEssential(byte[])"},{href:"https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/filter/Filter.ReturnCode.html#SEEK_NEXT_USING_HINT"},{href:"/docs/features/salted-tables"}],w={contents:[{heading:void 0,content:"type: warning"},{heading:void 0,content:`This page has not been updated recently and may not reflect the current state
 of the project.`},{heading:void 0,content:"Phoenix follows the philosophy of bringing the computation to the data by using:"},{heading:void 0,content:"coprocessors to perform operations on the server-side thus minimizing client/server data transfer"},{heading:void 0,content:"custom filters to prune data as close to the source as possible."},{heading:void 0,content:"In addition, to minimize startup costs, Phoenix uses native HBase APIs rather than going through the MapReduce framework."},{heading:"phoenix-vs-related-products",content:"Below are charts showing relative performance between Phoenix and some other related products."},{heading:"phoenix-vs-hive-running-over-hdfs-and-hbase",content:`Query: SELECT COUNT(1) from a table over 10M and 100M rows. Data has 5 narrow columns. Number of region
 servers: 4 (HBase heap: 10GB, processor: 6 cores @ 3.3GHz Xeon).`},{heading:"phoenix-vs-impala-running-over-hbase",content:"Query: SELECT COUNT(1) from a table over 1M and 5M rows. Data has 3 narrow columns. Number of region servers: 1 (virtual machine, HBase heap: 2GB, processor: 2 cores @ 3.3GHz Xeon)."},{heading:"latest-automated-performance-run",content:`Latest Automated Performance Run |
 Automated Performance Runs History`},{heading:"essential-column-family",content:"The Phoenix 1.2 query filter leverages the HBase Filter Essential Column Family feature. This improves performance when Phoenix filters data split across multiple column families (CFs) by loading only essential CFs first. In a second pass, all CFs are loaded as needed."},{heading:"essential-column-family",content:`Consider the following schema in which data is split into two CFs:
@@ -140,7 +140,7 @@ servers: 4 (HBase heap: 10GB, processor: 6 cores @ 3.3GHz Xeon).`]}),`
 `,e.jsx(n.hr,{}),`
 `,e.jsx(n.h2,{id:"performance-improvements-in-phoenix-12",children:"Performance improvements in Phoenix 1.2"}),`
 `,e.jsx(n.h3,{id:"essential-column-family",children:"Essential Column Family"}),`
-`,e.jsxs(n.p,{children:["The Phoenix 1.2 query filter leverages the ",e.jsx(n.a,{href:"http://hbase.apache.org/apidocs/org/apache/hadoop/hbase/filter/SingleColumnValueFilter.html#isFamilyEssential(byte%5B%5D)",children:"HBase Filter Essential Column Family feature"}),". This improves performance when Phoenix filters data split across multiple column families (CFs) by loading only essential CFs first. In a second pass, all CFs are loaded as needed."]}),`
+`,e.jsxs(n.p,{children:["The Phoenix 1.2 query filter leverages the ",e.jsx(n.a,{href:"https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/filter/SingleColumnValueFilter.html#isFamilyEssential(byte%5B%5D)",children:"HBase Filter Essential Column Family feature"}),". This improves performance when Phoenix filters data split across multiple column families (CFs) by loading only essential CFs first. In a second pass, all CFs are loaded as needed."]}),`
 `,e.jsxs(n.p,{children:[`Consider the following schema in which data is split into two CFs:
 `,e.jsx(n.code,{children:"CREATE TABLE t (k VARCHAR NOT NULL PRIMARY KEY, a.c1 INTEGER, b.c2 VARCHAR, b.c3 VARCHAR, b.c4 VARCHAR)"}),"."]}),`
 `,e.jsxs(n.p,{children:[`Running a query similar to the following shows significant performance gains when a subset of rows matches the filter:
@@ -148,7 +148,7 @@ servers: 4 (HBase heap: 10GB, processor: 6 cores @ 3.3GHz Xeon).`]}),`
 `,e.jsxs(n.p,{children:["The following chart shows in-memory query performance for the query above with 10M rows on 4 region servers, when 10% of rows match the filter. Note: ",e.jsx(n.code,{children:"cf-a"})," is approximately 8 bytes and ",e.jsx(n.code,{children:"cf-b"})," is approximately 400 bytes wide."]}),`
 `,e.jsx(n.p,{children:e.jsx(n.img,{alt:"Ess. CF",src:a,placeholder:"blur"})}),`
 `,e.jsx(n.h3,{id:"performance-skip-scan",children:"Skip Scan"}),`
-`,e.jsxs(n.p,{children:["Skip Scan Filter leverages HBase filter ",e.jsx(n.code,{children:"SEEK_NEXT_USING_HINT"})," (",e.jsx(n.a,{href:"http://hbase.apache.org/apidocs/org/apache/hadoop/hbase/filter/Filter.ReturnCode.html#SEEK_NEXT_USING_HINT",children:"docs"}),"). It significantly improves point queries over key columns."]}),`
+`,e.jsxs(n.p,{children:["Skip Scan Filter leverages HBase filter ",e.jsx(n.code,{children:"SEEK_NEXT_USING_HINT"})," (",e.jsx(n.a,{href:"https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/filter/Filter.ReturnCode.html#SEEK_NEXT_USING_HINT",children:"docs"}),"). It significantly improves point queries over key columns."]}),`
 `,e.jsxs(n.p,{children:[`Consider the following schema in which data is split into two CFs:
 `,e.jsx(n.code,{children:"CREATE TABLE t (k VARCHAR NOT NULL PRIMARY KEY, a.c1 INTEGER, b.c2 VARCHAR, b.c3 VARCHAR)"}),"."]}),`
 `,e.jsxs(n.p,{children:[`Running a query similar to the following shows significant performance gains when a subset of rows matches the filter:

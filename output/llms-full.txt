@@ -1700,7 +1700,7 @@ CREATE TABLE t1 ( pk VARCHAR PRIMARY KEY, val VARCHAR )
   See [How do I connect to secure HBase cluster?](#how-do-i-connect-to-secure-hbase-cluster)
 
 * **Optimize cluster** parameters
-  See [http://hbase.apache.org/book/performance.html](http://hbase.apache.org/book/performance.html)
+  See [https://hbase.apache.org/docs/performance](https://hbase.apache.org/docs/performance)
 
 * **Optimize Phoenix** parameters
   See [Configuration](/docs/fundamentals/configuration)
@@ -1953,7 +1953,7 @@ The CSV MapReduce loader is launched using the `hadoop` command with the Phoenix
 hadoop jar phoenix-<version>-client.jar org.apache.phoenix.mapreduce.CsvBulkLoadTool --table EXAMPLE --input /data/example.csv
 ```
 
-When using Phoenix 4.0 and above, there is a known HBase issue ("Notice to MapReduce users of HBase 0.96.1 and above" in the [HBase Reference Guide](https://hbase.apache.org/book.html)). You should use:
+When using Phoenix 4.0 and above, there is a known HBase issue ("Notice to MapReduce users of HBase 0.96.1 and above" in the [HBase Reference Guide](https://hbase.apache.org/docs)). You should use:
 
 ```shell
 HADOOP_CLASSPATH=$(hbase mapredcp):/path/to/hbase/conf hadoop jar phoenix-<version>-client.jar org.apache.phoenix.mapreduce.CsvBulkLoadTool --table EXAMPLE --input /data/example.csv
@@ -2370,7 +2370,7 @@ $ bin/psql.py <zookeeper> -m <schema_name>.<table_name>
 
 Users must have `admin` permission in HBase to execute `CREATE SCHEMA` and `DROP SCHEMA`, since these commands internally create or delete namespaces.
 
-Details for ACL management in HBase can be found [here](http://hbase.apache.org/book.html#hbase.accesscontrol.configuration).
+Details for ACL management in HBase can be found [here](https://hbase.apache.org/docs/security/data-access#how-it-works).
 
 ### How are schemas mapped for different table types
 
@@ -2395,7 +2395,7 @@ A namespace is a logical grouping of tables, analogous to a database in relation
 * Namespace Security Administration - Provide another level of security administration for tenants.
 * Region server groups - A namespace/table can be pinned to a subset of RegionServers, guaranteeing a coarse level of isolation.
 
-Details about namespace management can be read [here](http://hbase.apache.org/book.html#_namespace).
+Details about namespace management can be read [here](https://hbase.apache.org/docs/datamodel#namespace).
 
 ## Resources
 
@@ -3267,7 +3267,7 @@ All the following parameters must be set in `hbase-site.xml` - they are true for
    * **Default: 1050**
 10. `org.apache.phoenix.regionserver.index.handler.count`
     * Number of threads to use when serving index write requests for global index maintenance.
-    * Though the actual number of threads is dictated by the Max(number of call queues, handler count), where the number of call queues is determined by standard HBase configuration. To further tune the queues, you can adjust the standard rpc queue length parameters (currently, there are no special knobs for the index queues), specifically `ipc.server.max.callqueue.length` and `ipc.server.callqueue.handler.factor`. See the [HBase Reference Guide](http://hbase.apache.org/book.html) for more details.
+    * Though the actual number of threads is dictated by the Max(number of call queues, handler count), where the number of call queues is determined by standard HBase configuration. To further tune the queues, you can adjust the standard rpc queue length parameters (currently, there are no special knobs for the index queues), specifically `ipc.server.max.callqueue.length` and `ipc.server.callqueue.handler.factor`. See the [HBase Reference Guide](https://hbase.apache.org/docs) for more details.
     * **Default: 30**
 
 ## Performance
@@ -5746,7 +5746,7 @@ Phoenix 5.2 also supports High Availability connections. Documentation for that 
 # Configuration (/docs/fundamentals/configuration)
 ## Configuration
 
-Phoenix provides many different knobs and dials to configure and tune the system to run more optimally on your cluster. The configuration is done through a series of Phoenix-specific properties specified both on client and server-side `hbase-site.xml` files. In addition to these properties, there are of course all the [HBase configuration](http://hbase.apache.org/book/config.files.html) properties with the most important ones documented [here](http://hbase.apache.org/book/important_configurations.html).
+Phoenix provides many different knobs and dials to configure and tune the system to run more optimally on your cluster. The configuration is done through a series of Phoenix-specific properties specified both on client and server-side `hbase-site.xml` files. In addition to these properties, there are of course all the [HBase configuration](https://hbase.apache.org/docs/configuration/default#hbase-sitexml-and-hbase-defaultxml) properties with the most important ones documented [here](https://hbase.apache.org/docs/configuration/important).
 
 The table below outlines the full set of Phoenix-specific configuration properties and their defaults.
 
@@ -6015,7 +6015,7 @@ Query: `SELECT COUNT(1)` from a table over 1M and 5M rows. Data has 3 narrow col
 
 ### Essential Column Family
 
-The Phoenix 1.2 query filter leverages the [HBase Filter Essential Column Family feature](http://hbase.apache.org/apidocs/org/apache/hadoop/hbase/filter/SingleColumnValueFilter.html#isFamilyEssential\(byte\[]\)). This improves performance when Phoenix filters data split across multiple column families (CFs) by loading only essential CFs first. In a second pass, all CFs are loaded as needed.
+The Phoenix 1.2 query filter leverages the [HBase Filter Essential Column Family feature](https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/filter/SingleColumnValueFilter.html#isFamilyEssential\(byte\[]\)). This improves performance when Phoenix filters data split across multiple column families (CFs) by loading only essential CFs first. In a second pass, all CFs are loaded as needed.
 
 Consider the following schema in which data is split into two CFs:
 `CREATE TABLE t (k VARCHAR NOT NULL PRIMARY KEY, a.c1 INTEGER, b.c2 VARCHAR, b.c3 VARCHAR, b.c4 VARCHAR)`.
@@ -6029,7 +6029,7 @@ The following chart shows in-memory query performance for the query above with 1
 
 ### Skip Scan
 
-Skip Scan Filter leverages HBase filter `SEEK_NEXT_USING_HINT` ([docs](http://hbase.apache.org/apidocs/org/apache/hadoop/hbase/filter/Filter.ReturnCode.html#SEEK_NEXT_USING_HINT)). It significantly improves point queries over key columns.
+Skip Scan Filter leverages HBase filter `SEEK_NEXT_USING_HINT` ([docs](https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/filter/Filter.ReturnCode.html#SEEK_NEXT_USING_HINT)). It significantly improves point queries over key columns.
 
 Consider the following schema in which data is split into two CFs:
 `CREATE TABLE t (k VARCHAR NOT NULL PRIMARY KEY, a.c1 INTEGER, b.c2 VARCHAR, b.c3 VARCHAR)`.
@@ -6303,7 +6303,7 @@ If using 4.8, consider using local indexes to minimize the write time. In this c
 
 ## Further tuning
 
-For advice about tuning the underlying HBase and JVM layers, see [Operational and Performance Configuration Options](https://hbase.apache.org/book.html#schema.ops) in the Apache HBase™ Reference Guide.
+For advice about tuning the underlying HBase and JVM layers, see [Operational and Performance Configuration Options](https://hbase.apache.org/docs/regionserver-sizing#operational-and-performance-configuration-options) in the Apache HBase™ Reference Guide.
 
 ## Special Cases
 
@@ -6952,7 +6952,7 @@ DROP SCHEMA my_schema
 
 Grant permissions at table, schema or user level. Permissions are managed by HBase in hbase:acl table, hence access controls need to be enabled. This feature will be available from Phoenix 4.14 version onwards.
 
-Possible permissions are R - Read, W - Write, X - Execute, C - Create and A - Admin. To enable/disable access controls, see [https://hbase.apache.org/book.html#hbase.accesscontrol.configuration](https://hbase.apache.org/book.html#hbase.accesscontrol.configuration)
+Possible permissions are R - Read, W - Write, X - Execute, C - Create and A - Admin. To enable/disable access controls, see [https://hbase.apache.org/docs/security/data-access#how-it-works](https://hbase.apache.org/docs/security/data-access#how-it-works)
 
 Permissions should be granted on base tables. It will be propagated to all its indexes and views. Group permissions are applicable to all users in the group and schema permissions are applicable to all tables with that schema. Grant statements without table/schema specified are assigned at GLOBAL level.
 
@@ -6978,7 +6978,7 @@ GRANT 'A' ON SCHEMA my_schema TO 'User3'
 
 Revoke permissions at table, schema or user level. Permissions are managed by HBase in hbase:acl table, hence access controls need to be enabled. This feature will be available from Phoenix 4.14 version onwards.
 
-To enable/disable access controls, see [https://hbase.apache.org/book.html#hbase.accesscontrol.configuration](https://hbase.apache.org/book.html#hbase.accesscontrol.configuration)
+To enable/disable access controls, see [https://hbase.apache.org/docs/security/data-access#how-it-works](https://hbase.apache.org/docs/security/data-access#how-it-works)
 
 Group permissions are applicable to all users in the group and schema permissions are applicable to all tables with that schema. Permissions should be revoked on base tables. It will be propagated to all its indexes and views. Revoke statements without table/schema specified are assigned at GLOBAL level.
 
@@ -7967,7 +7967,7 @@ To enable full ACID transactions (beta in 4.7.0), set `phoenix.transactions.enab
 
 Commits over transactional tables are all-or-none: either all data is committed (including secondary index updates) or none is committed (and an exception is thrown). Both cross-table and cross-row transactions are supported. Transactional tables also see their own uncommitted data when querying. An optimistic concurrency model is used to detect row-level conflicts with first-commit-wins semantics.
 
-Non-transactional tables have no guarantees beyond HBase row-level atomicity (see [HBase ACID semantics](https://hbase.apache.org/acid-semantics.html)). Also, non-transactional tables do not see updates until commit occurs.
+Non-transactional tables have no guarantees beyond HBase row-level atomicity (see [HBase ACID semantics](https://hbase.apache.org/acid-semantics)). Also, non-transactional tables do not see updates until commit occurs.
 
 Phoenix DML commands (`UPSERT VALUES`, `UPSERT SELECT`, `DELETE`) batch pending changes on the client side. Changes are sent to server on commit and discarded on rollback. If auto-commit is enabled, Phoenix will execute the entire DML command server-side via coprocessors whenever possible for better performance.
 
@@ -8016,7 +8016,7 @@ Another schema-related feature allows columns to be defined dynamically at query
 
 #### Mapping to an Existing HBase Table
 
-Phoenix supports mapping to an existing HBase table through [`CREATE TABLE`](/docs/grammar#create-table) and [`CREATE VIEW`](/docs/grammar#create-view). In both cases, HBase metadata remains as-is, except that with `CREATE TABLE`, [KEEP\_DELETED\_CELLS](http://hbase.apache.org/book/cf.keep.deleted.html) is enabled so flashback queries work correctly.
+Phoenix supports mapping to an existing HBase table through [`CREATE TABLE`](/docs/grammar#create-table) and [`CREATE VIEW`](/docs/grammar#create-view). In both cases, HBase metadata remains as-is, except that with `CREATE TABLE`, [KEEP\_DELETED\_CELLS](https://hbase.apache.org/docs/regionserver-sizing#keeping-deleted-cells) is enabled so flashback queries work correctly.
 
 For `CREATE TABLE`, missing HBase metadata (table/column families) is created if needed. Table and column family names are case-sensitive at HBase level; Phoenix uppercases names by default. To preserve case sensitivity, wrap names in double quotes:
 
@@ -10153,7 +10153,7 @@ To enable full ACID transactions (beta in 4.7.0), set `phoenix.transactions.enab
 
 Commits over transactional tables are all-or-none: either all data is committed (including secondary index updates) or none is committed (and an exception is thrown). Both cross-table and cross-row transactions are supported. Transactional tables also see their own uncommitted data when querying. An optimistic concurrency model is used to detect row-level conflicts with first-commit-wins semantics.
 
-Non-transactional tables have no guarantees beyond HBase row-level atomicity (see [HBase ACID semantics](https://hbase.apache.org/acid-semantics.html)). Also, non-transactional tables do not see updates until commit occurs.
+Non-transactional tables have no guarantees beyond HBase row-level atomicity (see [HBase ACID semantics](https://hbase.apache.org/acid-semantics)). Also, non-transactional tables do not see updates until commit occurs.
 
 Phoenix DML commands (`UPSERT VALUES`, `UPSERT SELECT`, `DELETE`) batch pending changes on the client side. Changes are sent to server on commit and discarded on rollback. If auto-commit is enabled, Phoenix will execute the entire DML command server-side via coprocessors whenever possible for better performance.
 
@@ -10202,7 +10202,7 @@ Another schema-related feature allows columns to be defined dynamically at query
 
 #### Mapping to an Existing HBase Table
 
-Phoenix supports mapping to an existing HBase table through [`CREATE TABLE`](/docs/grammar#create-table) and [`CREATE VIEW`](/docs/grammar#create-view). In both cases, HBase metadata remains as-is, except that with `CREATE TABLE`, [KEEP\_DELETED\_CELLS](http://hbase.apache.org/book/cf.keep.deleted.html) is enabled so flashback queries work correctly.
+Phoenix supports mapping to an existing HBase table through [`CREATE TABLE`](/docs/grammar#create-table) and [`CREATE VIEW`](/docs/grammar#create-view). In both cases, HBase metadata remains as-is, except that with `CREATE TABLE`, [KEEP\_DELETED\_CELLS](https://hbase.apache.org/docs/regionserver-sizing#keeping-deleted-cells) is enabled so flashback queries work correctly.
 
 For `CREATE TABLE`, missing HBase metadata (table/column families) is created if needed. Table and column family names are case-sensitive at HBase level; Phoenix uppercases names by default. To preserve case sensitivity, wrap names in double quotes:
 
@@ -10622,7 +10622,7 @@ CREATE TABLE t1 ( pk VARCHAR PRIMARY KEY, val VARCHAR )
   See [How do I connect to secure HBase cluster?](#how-do-i-connect-to-secure-hbase-cluster)
 
 * **Optimize cluster** parameters
-  See [http://hbase.apache.org/book/performance.html](http://hbase.apache.org/book/performance.html)
+  See [https://hbase.apache.org/docs/performance](https://hbase.apache.org/docs/performance)
 
 * **Optimize Phoenix** parameters
   See [Configuration](/docs/fundamentals/configuration)
@@ -11193,7 +11193,7 @@ If using 4.8, consider using local indexes to minimize the write time. In this c
 
 ## Further tuning
 
-For advice about tuning the underlying HBase and JVM layers, see [Operational and Performance Configuration Options](https://hbase.apache.org/book.html#schema.ops) in the Apache HBase™ Reference Guide.
+For advice about tuning the underlying HBase and JVM layers, see [Operational and Performance Configuration Options](https://hbase.apache.org/docs/regionserver-sizing#operational-and-performance-configuration-options) in the Apache HBase™ Reference Guide.
 
 ## Special Cases
 
@@ -11332,7 +11332,7 @@ The best place to see samples are in our unit tests under src/test/java. The one
 
 ## Configuration
 
-Phoenix provides many different knobs and dials to configure and tune the system to run more optimally on your cluster. The configuration is done through a series of Phoenix-specific properties specified both on client and server-side `hbase-site.xml` files. In addition to these properties, there are of course all the [HBase configuration](http://hbase.apache.org/book/config.files.html) properties with the most important ones documented [here](http://hbase.apache.org/book/important_configurations.html).
+Phoenix provides many different knobs and dials to configure and tune the system to run more optimally on your cluster. The configuration is done through a series of Phoenix-specific properties specified both on client and server-side `hbase-site.xml` files. In addition to these properties, there are of course all the [HBase configuration](https://hbase.apache.org/docs/configuration/default#hbase-sitexml-and-hbase-defaultxml) properties with the most important ones documented [here](https://hbase.apache.org/docs/configuration/important).
 
 The table below outlines the full set of Phoenix-specific configuration properties and their defaults.
 
@@ -11490,7 +11490,7 @@ Query: `SELECT COUNT(1)` from a table over 1M and 5M rows. Data has 3 narrow col
 
 ### Essential Column Family
 
-The Phoenix 1.2 query filter leverages the [HBase Filter Essential Column Family feature](http://hbase.apache.org/apidocs/org/apache/hadoop/hbase/filter/SingleColumnValueFilter.html#isFamilyEssential\(byte\[]\)). This improves performance when Phoenix filters data split across multiple column families (CFs) by loading only essential CFs first. In a second pass, all CFs are loaded as needed.
+The Phoenix 1.2 query filter leverages the [HBase Filter Essential Column Family feature](https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/filter/SingleColumnValueFilter.html#isFamilyEssential\(byte\[]\)). This improves performance when Phoenix filters data split across multiple column families (CFs) by loading only essential CFs first. In a second pass, all CFs are loaded as needed.
 
 Consider the following schema in which data is split into two CFs:
 `CREATE TABLE t (k VARCHAR NOT NULL PRIMARY KEY, a.c1 INTEGER, b.c2 VARCHAR, b.c3 VARCHAR, b.c4 VARCHAR)`.
@@ -11504,7 +11504,7 @@ The following chart shows in-memory query performance for the query above with 1
 
 ### Skip Scan
 
-Skip Scan Filter leverages HBase filter `SEEK_NEXT_USING_HINT` ([docs](http://hbase.apache.org/apidocs/org/apache/hadoop/hbase/filter/Filter.ReturnCode.html#SEEK_NEXT_USING_HINT)). It significantly improves point queries over key columns.
+Skip Scan Filter leverages HBase filter `SEEK_NEXT_USING_HINT` ([docs](https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/filter/Filter.ReturnCode.html#SEEK_NEXT_USING_HINT)). It significantly improves point queries over key columns.
 
 Consider the following schema in which data is split into two CFs:
 `CREATE TABLE t (k VARCHAR NOT NULL PRIMARY KEY, a.c1 INTEGER, b.c2 VARCHAR, b.c3 VARCHAR)`.
@@ -13839,7 +13839,7 @@ All the following parameters must be set in `hbase-site.xml` - they are true for
    * **Default: 1050**
 10. `org.apache.phoenix.regionserver.index.handler.count`
     * Number of threads to use when serving index write requests for global index maintenance.
-    * Though the actual number of threads is dictated by the Max(number of call queues, handler count), where the number of call queues is determined by standard HBase configuration. To further tune the queues, you can adjust the standard rpc queue length parameters (currently, there are no special knobs for the index queues), specifically `ipc.server.max.callqueue.length` and `ipc.server.callqueue.handler.factor`. See the [HBase Reference Guide](http://hbase.apache.org/book.html) for more details.
+    * Though the actual number of threads is dictated by the Max(number of call queues, handler count), where the number of call queues is determined by standard HBase configuration. To further tune the queues, you can adjust the standard rpc queue length parameters (currently, there are no special knobs for the index queues), specifically `ipc.server.max.callqueue.length` and `ipc.server.callqueue.handler.factor`. See the [HBase Reference Guide](https://hbase.apache.org/docs) for more details.
     * **Default: 30**
 
 ## Performance
@@ -14138,7 +14138,7 @@ $ bin/psql.py <zookeeper> -m <schema_name>.<table_name>
 
 Users must have `admin` permission in HBase to execute `CREATE SCHEMA` and `DROP SCHEMA`, since these commands internally create or delete namespaces.
 
-Details for ACL management in HBase can be found [here](http://hbase.apache.org/book.html#hbase.accesscontrol.configuration).
+Details for ACL management in HBase can be found [here](https://hbase.apache.org/docs/security/data-access#how-it-works).
 
 ### How are schemas mapped for different table types
 
@@ -14163,7 +14163,7 @@ A namespace is a logical grouping of tables, analogous to a database in relation
 * Namespace Security Administration - Provide another level of security administration for tenants.
 * Region server groups - A namespace/table can be pinned to a subset of RegionServers, guaranteeing a coarse level of isolation.
 
-Details about namespace management can be read [here](http://hbase.apache.org/book.html#_namespace).
+Details about namespace management can be read [here](https://hbase.apache.org/docs/datamodel#namespace).
 
 ## Resources
 
@@ -14770,7 +14770,7 @@ The CSV MapReduce loader is launched using the `hadoop` command with the Phoenix
 hadoop jar phoenix-<version>-client.jar org.apache.phoenix.mapreduce.CsvBulkLoadTool --table EXAMPLE --input /data/example.csv
 ```
 
-When using Phoenix 4.0 and above, there is a known HBase issue ("Notice to MapReduce users of HBase 0.96.1 and above" in the [HBase Reference Guide](https://hbase.apache.org/book.html)). You should use:
+When using Phoenix 4.0 and above, there is a known HBase issue ("Notice to MapReduce users of HBase 0.96.1 and above" in the [HBase Reference Guide](https://hbase.apache.org/docs)). You should use:
 
 ```shell
 HADOOP_CLASSPATH=$(hbase mapredcp):/path/to/hbase/conf hadoop jar phoenix-<version>-client.jar org.apache.phoenix.mapreduce.CsvBulkLoadTool --table EXAMPLE --input /data/example.csv
@@ -16183,7 +16183,7 @@ DROP SCHEMA my_schema
 
 Grant permissions at table, schema or user level. Permissions are managed by HBase in hbase:acl table, hence access controls need to be enabled. This feature will be available from Phoenix 4.14 version onwards.
 
-Possible permissions are R - Read, W - Write, X - Execute, C - Create and A - Admin. To enable/disable access controls, see [https://hbase.apache.org/book.html#hbase.accesscontrol.configuration](https://hbase.apache.org/book.html#hbase.accesscontrol.configuration)
+Possible permissions are R - Read, W - Write, X - Execute, C - Create and A - Admin. To enable/disable access controls, see [https://hbase.apache.org/docs/security/data-access#how-it-works](https://hbase.apache.org/docs/security/data-access#how-it-works)
 
 Permissions should be granted on base tables. It will be propagated to all its indexes and views. Group permissions are applicable to all users in the group and schema permissions are applicable to all tables with that schema. Grant statements without table/schema specified are assigned at GLOBAL level.
 
@@ -16209,7 +16209,7 @@ GRANT 'A' ON SCHEMA my_schema TO 'User3'
 
 Revoke permissions at table, schema or user level. Permissions are managed by HBase in hbase:acl table, hence access controls need to be enabled. This feature will be available from Phoenix 4.14 version onwards.
 
-To enable/disable access controls, see [https://hbase.apache.org/book.html#hbase.accesscontrol.configuration](https://hbase.apache.org/book.html#hbase.accesscontrol.configuration)
+To enable/disable access controls, see [https://hbase.apache.org/docs/security/data-access#how-it-works](https://hbase.apache.org/docs/security/data-access#how-it-works)
 
 Group permissions are applicable to all users in the group and schema permissions are applicable to all tables with that schema. Permissions should be revoked on base tables. It will be propagated to all its indexes and views. Revoke statements without table/schema specified are assigned at GLOBAL level.
 
