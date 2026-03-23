@@ -45,7 +45,7 @@ Query: `SELECT COUNT(1)` from a table over 1M and 5M rows. Data has 3 narrow col
 
 ### Essential Column Family
 
-The Phoenix 1.2 query filter leverages the [HBase Filter Essential Column Family feature](<http://hbase.apache.org/apidocs/org/apache/hadoop/hbase/filter/SingleColumnValueFilter.html#isFamilyEssential(byte[])>). This improves performance when Phoenix filters data split across multiple column families (CFs) by loading only essential CFs first. In a second pass, all CFs are loaded as needed.
+The Phoenix 1.2 query filter leverages the [HBase Filter Essential Column Family feature](<https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/filter/SingleColumnValueFilter.html#isFamilyEssential(byte[])>). This improves performance when Phoenix filters data split across multiple column families (CFs) by loading only essential CFs first. In a second pass, all CFs are loaded as needed.
 
 Consider the following schema in which data is split into two CFs:
 `CREATE TABLE t (k VARCHAR NOT NULL PRIMARY KEY, a.c1 INTEGER, b.c2 VARCHAR, b.c3 VARCHAR, b.c4 VARCHAR)`.
@@ -59,7 +59,7 @@ The following chart shows in-memory query performance for the query above with 1
 
 ### Skip Scan [#performance-skip-scan]
 
-Skip Scan Filter leverages HBase filter `SEEK_NEXT_USING_HINT` ([docs](http://hbase.apache.org/apidocs/org/apache/hadoop/hbase/filter/Filter.ReturnCode.html#SEEK_NEXT_USING_HINT)). It significantly improves point queries over key columns.
+Skip Scan Filter leverages HBase filter `SEEK_NEXT_USING_HINT` ([docs](https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/filter/Filter.ReturnCode.html#SEEK_NEXT_USING_HINT)). It significantly improves point queries over key columns.
 
 Consider the following schema in which data is split into two CFs:
 `CREATE TABLE t (k VARCHAR NOT NULL PRIMARY KEY, a.c1 INTEGER, b.c2 VARCHAR, b.c3 VARCHAR)`.

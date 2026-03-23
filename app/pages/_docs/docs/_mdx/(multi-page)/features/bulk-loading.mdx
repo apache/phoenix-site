@@ -62,7 +62,7 @@ The CSV MapReduce loader is launched using the `hadoop` command with the Phoenix
 hadoop jar phoenix-<version>-client.jar org.apache.phoenix.mapreduce.CsvBulkLoadTool --table EXAMPLE --input /data/example.csv
 ```
 
-When using Phoenix 4.0 and above, there is a known HBase issue ("Notice to MapReduce users of HBase 0.96.1 and above" in the [HBase Reference Guide](https://hbase.apache.org/book.html)). You should use:
+When using Phoenix 4.0 and above, there is a known HBase issue ("Notice to MapReduce users of HBase 0.96.1 and above" in the [HBase Reference Guide](https://hbase.apache.org/docs)). You should use:
 
 ```shell
 HADOOP_CLASSPATH=$(hbase mapredcp):/path/to/hbase/conf hadoop jar phoenix-<version>-client.jar org.apache.phoenix.mapreduce.CsvBulkLoadTool --table EXAMPLE --input /data/example.csv

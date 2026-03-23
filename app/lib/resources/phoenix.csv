@@ -377,7 +377,7 @@ GRANT {permissionString} [ON { {SCHEMA schemaName} | tableRef}] TO [GROUP] userS
 Grant permissions at table, schema or user level. Permissions are managed by HBase in hbase:acl table, hence access controls need to be enabled. This feature will be available from Phoenix 4.14 version onwards.
 
 Possible permissions are R - Read, W - Write, X - Execute, C - Create and A - Admin.
-To enable/disable access controls, see https://hbase.apache.org/book.html#hbase.accesscontrol.configuration
+To enable/disable access controls, see https://hbase.apache.org/docs/security/data-access#how-it-works
 
 Permissions should be granted on base tables. It will be propagated to all its indexes and views.
 Group permissions are applicable to all users in the group and schema permissions are applicable to all tables with that schema.
@@ -402,7 +402,7 @@ REVOKE [ON { {SCHEMA schemaName} | tableRef}] FROM [GROUP] userString
 ","
 Revoke permissions at table, schema or user level. Permissions are managed by HBase in hbase:acl table, hence access controls need to be enabled. This feature will be available from Phoenix 4.14 version onwards.
 
-To enable/disable access controls, see https://hbase.apache.org/book.html#hbase.accesscontrol.configuration
+To enable/disable access controls, see https://hbase.apache.org/docs/security/data-access#how-it-works
 
 Group permissions are applicable to all users in the group and schema permissions are applicable to all tables with that schema.
 Permissions should be revoked on base tables. It will be propagated to all its indexes and views.

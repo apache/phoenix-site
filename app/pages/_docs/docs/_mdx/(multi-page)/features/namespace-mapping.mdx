@@ -54,7 +54,7 @@ $ bin/psql.py <zookeeper> -m <schema_name>.<table_name>
 
 Users must have `admin` permission in HBase to execute `CREATE SCHEMA` and `DROP SCHEMA`, since these commands internally create or delete namespaces.
 
-Details for ACL management in HBase can be found [here](http://hbase.apache.org/book.html#hbase.accesscontrol.configuration).
+Details for ACL management in HBase can be found [here](https://hbase.apache.org/docs/security/data-access#how-it-works).
 
 ### How are schemas mapped for different table types
 
@@ -79,7 +79,7 @@ A namespace is a logical grouping of tables, analogous to a database in relation
 - Namespace Security Administration - Provide another level of security administration for tenants.
 - Region server groups - A namespace/table can be pinned to a subset of RegionServers, guaranteeing a coarse level of isolation.
 
-Details about namespace management can be read [here](http://hbase.apache.org/book.html#_namespace).
+Details about namespace management can be read [here](https://hbase.apache.org/docs/datamodel#namespace).
 
 ## Resources [#namespace-mapping-resources]
 

@@ -435,7 +435,7 @@ All the following parameters must be set in `hbase-site.xml` - they are true for
    - **Default: 1050**
 10. `org.apache.phoenix.regionserver.index.handler.count`
     - Number of threads to use when serving index write requests for global index maintenance.
-    - Though the actual number of threads is dictated by the Max(number of call queues, handler count), where the number of call queues is determined by standard HBase configuration. To further tune the queues, you can adjust the standard rpc queue length parameters (currently, there are no special knobs for the index queues), specifically `ipc.server.max.callqueue.length` and `ipc.server.callqueue.handler.factor`. See the [HBase Reference Guide](http://hbase.apache.org/book.html) for more details.
+    - Though the actual number of threads is dictated by the Max(number of call queues, handler count), where the number of call queues is determined by standard HBase configuration. To further tune the queues, you can adjust the standard rpc queue length parameters (currently, there are no special knobs for the index queues), specifically `ipc.server.max.callqueue.length` and `ipc.server.callqueue.handler.factor`. See the [HBase Reference Guide](https://hbase.apache.org/docs) for more details.
     - **Default: 30**
 
 ## Performance [#secondary-indexes-performance]
