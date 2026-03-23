@@ -180,7 +180,7 @@ Another schema-related feature allows columns to be defined dynamically at query
 
 #### Mapping to an Existing HBase Table
 
-Phoenix supports mapping to an existing HBase table through [`CREATE TABLE`](/docs/grammar#create-table) and [`CREATE VIEW`](/docs/grammar#create-view). In both cases, HBase metadata remains as-is, except that with `CREATE TABLE`, [KEEP_DELETED_CELLS](https://hbase.apache.org/docs/regionserver-sizing#keeping-deleted-cells ) is enabled so flashback queries work correctly.
+Phoenix supports mapping to an existing HBase table through [`CREATE TABLE`](/docs/grammar#create-table) and [`CREATE VIEW`](/docs/grammar#create-view). In both cases, HBase metadata remains as-is, except that with `CREATE TABLE`, [KEEP_DELETED_CELLS](https://hbase.apache.org/docs/regionserver-sizing#keeping-deleted-cells) is enabled so flashback queries work correctly.
 
 For `CREATE TABLE`, missing HBase metadata (table/column families) is created if needed. Table and column family names are case-sensitive at HBase level; Phoenix uppercases names by default. To preserve case sensitivity, wrap names in double quotes:
 

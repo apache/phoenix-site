@@ -61,7 +61,7 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: "npm run dev -- --port 5178",
+    command: "npx serve build/client -l 5178",
     url: "http://localhost:5178",
     reuseExistingServer: false,
     timeout: 60_000

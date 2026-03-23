@@ -24,7 +24,7 @@
     "export-pdf": "playwright test e2e-tests/export-pdf.spec.ts --project=chromium --workers=1",
     "generate-language": "tsx scripts/generate-language.ts",
     "fumadocs-init": "fumadocs-mdx",
-    "ci": "npm run generate-language && npm run fumadocs-init && npm run lint && npm run typecheck && npm run test:unit:run && npx playwright install && npm run test:e2e && npm run build"
+    "ci": "npm run generate-language && npm run fumadocs-init && npm run lint && npm run typecheck && npm run build && npm run test:unit:run && npx playwright install && npm run test:e2e"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

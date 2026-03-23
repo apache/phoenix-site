@@ -262,6 +262,8 @@ npm run lint:fix
 
 The project uses [Vitest](https://vitest.dev/) for unit testing and [Playwright](https://playwright.dev/) for e2e testing.
 
+Playwright runs against the production build by serving `build/client/` locally on port 5178.
+
 #### Export Documentation PDF
 
 The docs PDF export is implemented as a Playwright e2e test in `e2e-tests/export-pdf.spec.ts`. It renders single-page docs in both light and dark themes to produce static PDF assets.
@@ -322,10 +324,10 @@ Current CI sequence used by `npm run ci`:
 2. `npm run fumadocs-init`
 3. `npm run lint`
 4. `npm run typecheck`
-5. `npm run test:unit:run`
-6. `npx playwright install`
-7. `npm run test:e2e`
-8. `npm run build`
+5. `npm run build`
+6. `npm run test:unit:run`
+7. `npx playwright install`
+8. `npm run test:e2e`
 
 There is currently no remote CI/CD runner executing `build.sh` for this repository. The `output/` artifact is produced locally and must be included in your pull request.
 
