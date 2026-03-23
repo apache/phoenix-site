@@ -243,7 +243,6 @@ Add a UI component:
 Update the 404 page:
 
 - Edit the content in `app/routes/404.tsx`.
-- The wildcard route is wired through `app/routes/_catchall.tsx`.
 - Apache 404 handling lives in `public/.htaccess` (uses `ErrorDocument 404 /404`).
 
 Check code quality:
