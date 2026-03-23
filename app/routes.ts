@@ -38,7 +38,9 @@ export default [
     route("issues-tracking", "routes/_landing/issues-tracking.tsx"),
     route("source-repository", "routes/_landing/source-repository.tsx"),
     route("tech-talks", "routes/_landing/tech-talks.tsx"),
-    route("presentations", "routes/_landing/presentations.tsx")
+    route("presentations", "routes/_landing/presentations.tsx"),
+    route("404", "routes/404.tsx"),
+    route("*", "routes/_catchall.tsx")
   ]),
   // Docs
   layout("./pages/_docs/docs-layout.tsx", [
