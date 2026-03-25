@@ -22,6 +22,8 @@
     "sequences",
     "joins",
     "subqueries",
-    "explain-plan"
+    "explain-plan",
+    "---Miscellaneous---",
+    "external:[All docs for LLMs](/llms-full.txt)"
   ]
 }
