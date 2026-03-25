@@ -280,7 +280,7 @@ const renderer = toClientRenderer(
 
         {route !== undefined && (
           <a
-            href={`https://github.com/apache/phoenix/${baseGithubPath}${mdxFileRoute}`}
+            href={`https://github.com/apache/phoenix-site/${baseGithubPath}${mdxFileRoute}`}
             rel="noreferrer noopener"
             target="_blank"
             className="text-fd-secondary-foreground bg-fd-secondary hover:text-fd-accent-foreground hover:bg-fd-accent w-fit rounded-xl border p-2 text-sm font-medium transition-colors"

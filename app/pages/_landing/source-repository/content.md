@@ -50,4 +50,4 @@ Related: [Building](/docs/fundamentals/building)
 
 ### Site source access
 
-Source for the Apache Phoenix website is kept in ASF SVN in https://svn.apache.org/repos/asf/phoenix
+Source for the Apache Phoenix website is kept in ASF SVN in https://github.com/apache/phoenix-site

@@ -3361,6 +3361,8 @@ These older resources refer to obsolete implementations in some cases
 
 
 # Skip Scan (/docs/features/skip-scan)
+
+
 Phoenix uses Skip Scan for intra-row scanning which allows for [significant performance improvement](/docs/fundamentals/performance#performance-skip-scan) over Range Scan when rows are retrieved based on a given set of keys.
 
 Skip Scan leverages `SEEK_NEXT_USING_HINT` in HBase filters. It stores information about which key sets or key ranges are being searched for in each column. During filter evaluation, it checks whether a key is in one of the valid combinations or ranges. If not, it computes the next highest key to jump to.
@@ -3385,7 +3387,7 @@ Here, `[[a - b], [d - e]]` represents ranges for `KEY1`, and `[1, 2]` represents
 
 The following diagram illustrates graphically how the skip scan is able to jump around the key space:
 
-<img alt="Skip Scan Example" src="http://4.bp.blogspot.com/-SAFH11n_bPY/UYvaWa0P4bI/AAAAAAAAAu4/rKOuKIaMwF4/s1600/SkipScan.png" width="460" height="329" />
+<img alt="Skip Scan Example" src={__img0} placeholder="blur" />
 
 
 # Statistics Collection (/docs/features/statistics-collection)
@@ -10029,6 +10031,8 @@ In our Phoenix 3.2 and 4.2 releases, the subquery support has the following rest
 
 
 
+
+
 # Overview
 
 import { Bug, Code2, Download } from "lucide-react";
@@ -14462,7 +14466,7 @@ Here, `[[a - b], [d - e]]` represents ranges for `KEY1`, and `[1, 2]` represents
 
 The following diagram illustrates graphically how the skip scan is able to jump around the key space:
 
-<img alt="Skip Scan Example" src="http://4.bp.blogspot.com/-SAFH11n_bPY/UYvaWa0P4bI/AAAAAAAAAu4/rKOuKIaMwF4/s1600/SkipScan.png" width="460" height="329" />
+<img alt="Skip Scan Example" src={__img12} placeholder="blur" />
 
 ***
 
@@ -14533,7 +14537,7 @@ ALTER TABLE my_table SET GUIDE_POSTS_WIDTH = 10000000;
 
 * A denser guidepost setting improves sampling accuracy, but may reduce performance. A comparison is shown below.
 
-<img alt="Table sampling performance" src={__img12} placeholder="blur" />
+<img alt="Table sampling performance" src={__img13} placeholder="blur" />
 
 ***
 
@@ -15470,25 +15474,25 @@ Execute the command below:
 
 The tracing web app for Apache Phoenix includes: feature list, dependency tree, trace count, trace distribution, and timeline.
 
-<img alt="trace-web-app-dashboard" src={__img13} placeholder="blur" />
+<img alt="trace-web-app-dashboard" src={__img14} placeholder="blur" />
 
 ### List
 
 The most recent traces are listed down. The limiting value entered on the textbox is used to determine the trace count displayed. With each trace, there is a link to view either the dependency tree or the timeline.
 
-<img alt="trace-list" src={__img14} placeholder="blur" />
+<img alt="trace-list" src={__img15} placeholder="blur" />
 
 ### Dependency tree
 
 The dependency tree shows traces for a given trace ID in a tree view. Parent-child relationships are displayed clearly. Tooltip data includes host name, parent ID, span ID, start time, end time, description, and duration. Each node is collapsible and expandable. The SQL query is shown for each tree rendering. Clear is used to remove the tree from view.
 
-<img alt="trace-dependency-tree" src={__img15} placeholder="blur" />
+<img alt="trace-dependency-tree" src={__img16} placeholder="blur" />
 
 ### Trace count
 
 The trace list is categorized by description. The trace count chart can be viewed as pie, line, bar, or area chart. The chart selector is collapsible and can be hidden.
 
-<img alt="trace-count-chart" src={__img16} placeholder="blur" />
+<img alt="trace-count-chart" src={__img17} placeholder="blur" />
 
 ### Trace distribution
 
@@ -15498,7 +15502,7 @@ The trace distribution chart shows traces across Phoenix hosts on which they are
 
 The traces can be viewed along the time axis for a given trace id. Traces can be added or cleared from the timeline. There should be a minimum of two traces starting at two different times for the system to draw its timeline. This feature helps the user to easily compare execution times between traces and within the same trace.
 
-<img alt="trace-time-line" src={__img17} placeholder="blur" />
+<img alt="trace-time-line" src={__img18} placeholder="blur" />
 
 ***
 
