@@ -46,7 +46,7 @@ import { Bug, Code2, Download } from "lucide-react";
 
 **OLTP and operational analytics for Apache Hadoop**
 
-<Cards className="mt-4 grid-cols-1 md:grid-cols-3">
+<Cards className="no-print mt-4 grid-cols-1 md:grid-cols-3">
   <Card
     title={
     <span className="inline-flex items-center gap-2">
@@ -10444,7 +10444,7 @@ To avoid this, close
 `,e.jsxs(e.Fragment,{children:[e.jsx(i.img,{src:"/images/logo.svg",alt:"Apache Phoenix logo",className:"w-1/2 dark:hidden"}),`
 `,e.jsx(i.img,{src:"/images/dark-theme-logo.svg",alt:"Apache Phoenix logo",className:"hidden w-1/2 dark:block"}),`
 `,e.jsx(i.p,{children:e.jsx(i.strong,{children:"OLTP and operational analytics for Apache Hadoop"})}),`
-`,e.jsxs(p,{className:"mt-4 grid-cols-1 md:grid-cols-3",children:[e.jsx(c,{title:e.jsxs(i.span,{className:"inline-flex items-center gap-2",children:[e.jsx(R,{className:"text-primary h-5 w-5 shrink-0"}),"Download"]}),href:"/downloads",children:e.jsx(i.p,{children:"Download latest Apache Phoenix binary and source release artifacts"})}),e.jsx(c,{title:e.jsxs(i.span,{className:"inline-flex items-center gap-2",children:[e.jsx(B,{className:"text-primary h-5 w-5 shrink-0"}),"Issues"]}),href:"/issues-tracking",children:e.jsx(i.p,{children:"Browse Apache Phoenix JIRAs"})}),e.jsx(c,{title:e.jsxs(i.span,{className:"inline-flex items-center gap-2",children:[e.jsx(P,{className:"text-primary h-5 w-5 shrink-0"}),"Source"]}),href:"/source-repository",children:e.jsx(i.p,{children:"Sync and build Apache Phoenix from source code"})})]}),`
+`,e.jsxs(p,{className:"no-print mt-4 grid-cols-1 md:grid-cols-3",children:[e.jsx(c,{title:e.jsxs(i.span,{className:"inline-flex items-center gap-2",children:[e.jsx(R,{className:"text-primary h-5 w-5 shrink-0"}),"Download"]}),href:"/downloads",children:e.jsx(i.p,{children:"Download latest Apache Phoenix binary and source release artifacts"})}),e.jsx(c,{title:e.jsxs(i.span,{className:"inline-flex items-center gap-2",children:[e.jsx(B,{className:"text-primary h-5 w-5 shrink-0"}),"Issues"]}),href:"/issues-tracking",children:e.jsx(i.p,{children:"Browse Apache Phoenix JIRAs"})}),e.jsx(c,{title:e.jsxs(i.span,{className:"inline-flex items-center gap-2",children:[e.jsx(P,{className:"text-primary h-5 w-5 shrink-0"}),"Source"]}),href:"/source-repository",children:e.jsx(i.p,{children:"Sync and build Apache Phoenix from source code"})})]}),`
 `,e.jsx(d,{type:"info",children:e.jsxs(i.p,{children:[e.jsxs(i.strong,{children:[e.jsx(i.a,{href:"/news",children:"News"}),":"]})," ",e.jsx(i.strong,{children:"Phoenix 5.3.0"}),` has been released and is available for
 download `,e.jsx(i.a,{href:"/downloads",children:"here"}),`. Follow Apache Phoenix on
 `,e.jsx(i.a,{href:"https://twitter.com/ApachePhoenix",children:"X/Twitter"}),"."]})}),`
