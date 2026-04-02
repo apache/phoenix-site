@@ -1,0 +1,86 @@
+---
+title: "Namespace Mapping"
+description: "Enable Phoenix schema-to-namespace mapping in HBase, including configuration, migration, and behavior by table type."
+---
+
+From v4.8.0 onward, users can map Phoenix schemas to HBase namespaces so that any table created with a schema is created in the corresponding HBase namespace.
+
+Earlier, every table (with or without schema) was created in the default namespace.
+
+## Configuration [#namespace-mapping-configuration]
+
+Parameters to enable namespace mapping:
+
+| Property                                    | Description                                                                                                                                                                                                                                                                                           | Default |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| `phoenix.schema.isNamespaceMappingEnabled`  | If enabled, tables created with a schema are mapped to the corresponding namespace. This must be set on both client and server. Once enabled, it should not be rolled back. Older clients will not work after this property is enabled.                                                               | `false` |
+| `phoenix.schema.mapSystemTablesToNamespace` | This takes effect when `phoenix.schema.isNamespaceMappingEnabled` is also set to `true`. If enabled, existing `SYSTEM` tables are automatically migrated to the `SYSTEM` namespace. If disabled, system tables are created only in the default namespace. This must be set on both client and server. | `true`  |
+
+## Grammar available
+
+The following DDL statements can be used to interact with schemas:
+
+- [CREATE SCHEMA](/docs/grammar#create-schema)
+- [USE SCHEMA](/docs/grammar#use)
+- [DROP SCHEMA](/docs/grammar#drop-schema)
+
+## FAQ [#namespace-mapping-faq]
+
+- [How to migrate existing tables with schema to namespace?](#how-to-migrate-existing-tables-with-schema-to-namespace)
+- [How are system tables migrated?](#how-are-system-tables-migrated)
+- [What permissions are required to CREATE and DROP SCHEMA?](#what-permissions-are-required-to-create-and-drop-schema)
+- [How are schemas mapped for different table types?](#how-are-schemas-mapped-for-different-table-types)
+- [What is a namespace and what are the benefits of mapping tables to namespaces?](#what-is-a-namespace-and-what-are-the-benefits-of-mapping-tables-to-namespaces)
+
+### How to migrate existing tables with schema to namespace
+
+For a Kerberized environment, run with a user that has sufficient permission (`admin`) to create a namespace.
+
+A table is mapped only to a namespace with the same name as the schema (`schema_name`). Currently, migrating an existing table to a different schema or namespace is not supported.
+
+Usage example:
+
+Move `table_name` to the namespace named `schema_name`:
+
+```bash
+$ bin/psql.py <zookeeper> -m <schema_name>.<table_name>
+```
+
+### How are system tables migrated
+
+`SYSTEM` tables are migrated automatically during the first connection after enabling `phoenix.schema.mapSystemTablesToNamespace` along with `phoenix.schema.isNamespaceMappingEnabled`.
+
+### What permissions are required to CREATE and DROP SCHEMA
+
+Users must have `admin` permission in HBase to execute `CREATE SCHEMA` and `DROP SCHEMA`, since these commands internally create or delete namespaces.
+
+Details for ACL management in HBase can be found [here](https://hbase.apache.org/docs/security/data-access#how-it-works).
+
+### How are schemas mapped for different table types
+
+Schema support in Phoenix is similar to other databases.
+
+The table below describes how physical tables map to Phoenix objects:
+
+| DDL                                         | Table Type                                     | Physical Table | Description                                                                        |
+| ------------------------------------------- | ---------------------------------------------- | -------------- | ---------------------------------------------------------------------------------- |
+| `CREATE TABLE S.T (ID INTEGER PRIMARY KEY)` | TABLE                                          | `S:T`          | Table `T` is created in namespace `S`.                                             |
+| `CREATE INDEX IDX ON S.T(ID)`               | INDEX                                          | `S:IDX`        | Indexes inherit schema and namespace from the base table.                          |
+| `CREATE VIEW V AS SELECT * FROM S.T`        | VIEW with default schema                       | `S:T`          | View does not inherit schema from the parent table and can use the default schema. |
+| `CREATE VIEW X.V AS SELECT * FROM S.T`      | VIEW with different schema than physical table | `S:T`          | View uses the parent physical table and can have a different (or same) schema.     |
+| `CREATE VIEW S.V AS SELECT * FROM S.T`      | VIEW with same schema as physical table        | `S:T`          | View uses the parent physical table and can have a different (or same) schema.     |
+| `CREATE INDEX IDX ON S.V(ID)`               | VIEW INDEX                                     | `S:_IDX_T`     | View indexes inherit schema and map to the corresponding namespace.                |
+
+### What is a namespace and what are the benefits of mapping tables to namespaces
+
+A namespace is a logical grouping of tables, analogous to a database in relational database systems. This abstraction lays the groundwork for multi-tenancy-related features:
+
+- Quota Management - Restrict the amount of resources (i.e. regions, tables) a namespace can consume.
+- Namespace Security Administration - Provide another level of security administration for tenants.
+- Region server groups - A namespace/table can be pinned to a subset of RegionServers, guaranteeing a coarse level of isolation.
+
+Details about namespace management can be read [here](https://hbase.apache.org/docs/datamodel#namespace).
+
+## Resources [#namespace-mapping-resources]
+
+- [PHOENIX-1311](https://issues.apache.org/jira/browse/PHOENIX-1311): Implementation details and discussion for the namespace mapping feature.

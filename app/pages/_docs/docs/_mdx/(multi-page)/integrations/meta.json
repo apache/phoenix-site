@@ -1,0 +1,12 @@
+{
+  "title": "Integrations",
+  "pages": [
+    "spark-integration",
+    "apache-hive",
+    "pig-integration",
+    "map-reduce-integration",
+    "flume-plugin",
+    "kafka-plugin",
+    "python-driver"
+  ]
+}

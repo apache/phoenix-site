@@ -1,0 +1,93 @@
+---
+title: "Array Type"
+description: "Use JDBC ARRAY columns in Phoenix, including DDL, inserts, indexing syntax, and built-in array functions."
+---
+
+Apache Phoenix 3.0/4.0 introduced support for the [JDBC ARRAY type](http://docs.oracle.com/javase/tutorial/jdbc/basics/array.html). Any primitive type may be used in an `ARRAY`. Here is an example of declaring an array type when creating a table:
+
+```sql
+CREATE TABLE regions (
+    region_name VARCHAR NOT NULL PRIMARY KEY,
+    zips VARCHAR ARRAY[10]
+);
+```
+
+or alternately:
+
+```sql
+CREATE TABLE regions (
+    region_name VARCHAR NOT NULL PRIMARY KEY,
+    zips VARCHAR[]
+);
+```
+
+Insertion into the array may be done entirely through a SQL statement:
+
+```sql
+UPSERT INTO regions(region_name, zips)
+VALUES ('SF Bay Area', ARRAY['94115', '94030', '94125']);
+```
+
+or programmatically through JDBC:
+
+```java
+PreparedStatement stmt = conn.prepareStatement("UPSERT INTO regions VALUES(?,?)");
+stmt.setString(1, "SF Bay Area");
+String[] zips = new String[] {"94115", "94030", "94125"};
+Array array = conn.createArrayOf("VARCHAR", zips);
+stmt.setArray(2, array);
+stmt.execute();
+```
+
+The entire array may be selected:
+
+```sql
+SELECT zips FROM regions WHERE region_name = 'SF Bay Area';
+```
+
+or an individual element in the array may be accessed via a subscript notation. The subscript is one-based, so the following would select the first element:
+
+```sql
+SELECT zips[1] FROM regions WHERE region_name = 'SF Bay Area';
+```
+
+Use of the array subscript notation is supported in other expressions as well, for example in a WHERE clause:
+
+```sql
+SELECT region_name FROM regions WHERE zips[1] = '94030' OR zips[2] = '94030' OR zips[3] = '94030';
+```
+
+The array length grows dynamically as needed and can be accessed through the built-in `ARRAY_LENGTH` function:
+
+```sql
+SELECT ARRAY_LENGTH(zips) FROM regions;
+```
+
+Attempts to access an array element beyond the current length will evaluate to `null`.
+
+For searching in an array, built-in functions like ANY and ALL are provided. For example,
+
+```sql
+SELECT region_name FROM regions WHERE '94030' = ANY(zips);
+SELECT region_name FROM regions WHERE '94030' = ALL(zips);
+```
+
+The built-in function `ANY` checks if any array element satisfies the condition and is equivalent to an `OR` condition:
+
+```sql
+SELECT region_name FROM regions WHERE zips[1] = '94030' OR zips[2] = '94030' OR zips[3] = '94030';
+```
+
+The built-in function `ALL` checks if all array elements satisfy the condition and is equivalent to an `AND` condition:
+
+```sql
+SELECT region_name FROM regions WHERE zips[1] = '94030' AND zips[2] = '94030' AND zips[3] = '94030';
+```
+
+## Limitations [#array-type-limitations]
+
+- Only one-dimensional arrays are currently supported.
+- For an array of fixed width types, null elements occurring in the middle of an array are not tracked.
+- The declaration of an array length at DDL time is not enforced currently, but maybe in the future. Note that it is persisted with the table metadata.
+- An array may only be used as the last column in a primary key constraint.
+- Partial update of an array is currently not possible. Instead, the array may be manipulated on the client-side and then upserted back in its entirety.

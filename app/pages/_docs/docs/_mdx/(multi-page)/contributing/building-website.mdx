@@ -1,0 +1,75 @@
+---
+title: "Building Website"
+description: "Build and test the Apache Phoenix website locally with the current React + TypeScript workflow."
+---
+
+## Prerequisites [#building-website-prerequisites]
+
+- Node.js 22.x (minimum `22.12.0`)
+- npm (bundled with Node.js)
+
+## Building Phoenix Project Website
+
+1. Clone the repository:
+
+```shell
+git clone git@github.com:apache/phoenix-site.git
+cd phoenix-site
+```
+
+2. During development, install dependencies:
+
+```shell
+npm ci
+```
+
+3. For local iteration, run checks/build directly when needed:
+
+```shell
+npm run ci
+```
+
+4. Before opening a pull request, run the mandatory build script:
+
+```shell
+./build.sh
+```
+
+`build.sh` is required for all contributors. It:
+
+- ensures Node/npm are available
+- runs a clean install (`npm ci`)
+- runs full validation/build (`npm run ci`)
+- copies `build/client/` into `output/`
+
+There is no remote CI/CD runner currently executing this script. The generated `output/` directory is a build artifact that must be committed and pushed with your PR.
+
+## Publishing Website Artifact
+
+Current publishing flow:
+
+1. Run `./build.sh` locally
+2. Commit both source changes and updated `output/`
+3. Push your branch and open a PR
+
+After merge, `output/` is used as the website artifact for deployment.
+
+## Local Testing During Development
+
+Start the development server with hot reload:
+
+```shell
+npm run dev
+```
+
+By default, the website is available at:
+
+```shell
+http://localhost:5173
+```
+
+To test the production build locally:
+
+```shell
+npm run start
+```

@@ -1,0 +1,211 @@
+---
+title: "Overview"
+description: "OLTP and operational analytics for Apache Hadoop."
+icon: BookOpen
+---
+
+import { Bug, Code2, Download } from "lucide-react";
+
+<img
+  src="/images/logo.svg"
+  alt="Apache Phoenix logo"
+  className="w-1/2 dark:hidden"
+/>
+<img
+  src="/images/dark-theme-logo.svg"
+  alt="Apache Phoenix logo"
+  className="hidden w-1/2 dark:block"
+/>
+
+**OLTP and operational analytics for Apache Hadoop**
+
+<Cards className="no-print mt-4 grid-cols-1 md:grid-cols-3">
+  <Card
+    title={
+      <span className="inline-flex items-center gap-2">
+        <Download className="text-primary h-5 w-5 shrink-0" />
+        Download
+      </span>
+    }
+    href="/downloads"
+  >
+    Download latest Apache Phoenix binary and source release artifacts
+  </Card>
+  <Card
+    title={
+      <span className="inline-flex items-center gap-2">
+        <Bug className="text-primary h-5 w-5 shrink-0" />
+        Issues
+      </span>
+    }
+    href="/issues-tracking"
+  >
+    Browse Apache Phoenix JIRAs
+  </Card>
+  <Card
+    title={
+      <span className="inline-flex items-center gap-2">
+        <Code2 className="text-primary h-5 w-5 shrink-0" />
+        Source
+      </span>
+    }
+    href="/source-repository"
+  >
+    Sync and build Apache Phoenix from source code
+  </Card>
+</Cards>
+
+<Callout type="info">
+  **[News](/news):** **Phoenix 5.3.0** has been released and is available for
+  download [here](/downloads). Follow Apache Phoenix on
+  [X/Twitter](https://twitter.com/ApachePhoenix).
+</Callout>
+
+Apache Phoenix enables OLTP and operational analytics in Hadoop for low-latency applications by combining:
+
+- the power of standard SQL and JDBC APIs, with full ACID transaction capabilities
+- the flexibility of late-bound, schema-on-read capabilities from the NoSQL world by leveraging HBase as its backing store
+
+Apache Phoenix is fully integrated with other Hadoop products such as Spark, Hive, Pig, Flume, and MapReduce.
+
+Who is using Apache Phoenix? Read more [here](/who-is-using).
+
+## Mission
+
+Become the trusted data platform for OLTP and operational analytics for Hadoop through well-defined, industry-standard APIs.
+
+## Quick Start [#index-quick-start]
+
+Tired of reading and just want to get started? Take a look at our [FAQs](/docs/faq), listen to the Apache Phoenix talk from [Hadoop Summit 2015](https://www.youtube.com/watch?v=XGa0SyJMH94), review the [overview presentation](/presentations/OC-HUG-2014-10-4x3.pdf), and jump to our quick start guide [here](/docs/quick-start).
+
+## SQL Support
+
+Apache Phoenix takes your SQL query, compiles it into a series of HBase scans, and orchestrates those scans to produce regular JDBC result sets. Direct use of the HBase API, along with coprocessors and custom filters, results in [performance](/docs/fundamentals/performance) on the order of milliseconds for small queries, or seconds for tens of millions of rows.
+
+To see a complete list of what is supported, go to our [language reference](/docs/grammar). All standard SQL query constructs are supported, including `SELECT`, `FROM`, `WHERE`, `GROUP BY`, `HAVING`, `ORDER BY`, etc. It also supports a full set of DML commands, as well as table creation and versioned incremental alterations through DDL commands.
+
+Here is a list of what is currently **not** supported:
+
+- **Relational operators**: `INTERSECT`, `MINUS`
+- **Miscellaneous built-in functions**: these are easy to add — read this [blog](http://phoenix-hbase.blogspot.com/2013/04/how-to-add-your-own-built-in-function.html) for step-by-step instructions.
+
+### Connection
+
+Use JDBC to get a connection to an HBase cluster:
+
+```java
+Connection conn = DriverManager.getConnection("jdbc:phoenix:server1,server2:3333", props);
+```
+
+Where `props` are optional properties that may include Phoenix and HBase configuration values.
+
+The JDBC connection string is composed as:
+
+```text
+jdbc:phoenix[:<zookeeper quorum>[:<port number>[:<root node>[:<principal>[:<keytab file>]]]]]
+```
+
+For omitted parts, values are taken from `hbase-site.xml` (`hbase.zookeeper.quorum`, `hbase.zookeeper.property.clientPort`, and `zookeeper.znode.parent`).
+
+The optional `principal` and `keytab file` may be used to connect to a Kerberos-secured cluster. If only `principal` is specified, each distinct user gets a dedicated HBase connection (`HConnection`), allowing multiple different connections with different configuration properties on the same JVM.
+
+For example, for longer-running queries:
+
+```java
+Connection conn = DriverManager.getConnection("jdbc:phoenix:my_server:longRunning", longRunningProps);
+```
+
+And for shorter-running queries:
+
+```java
+Connection conn = DriverManager.getConnection("jdbc:phoenix:my_server:shortRunning", shortRunningProps);
+```
+
+See the relevant [FAQ entry](/docs/faq#what-is-the-phoenix-jdbc-url-syntax) for example URLs.
+
+Phoenix also supports [connecting to HBase without ZooKeeper](/docs/fundamentals/client-classpath-and-jdbc-url#the-phoenix-jdbc-url).
+
+## Transactions [#index-transactions]
+
+To enable full ACID transactions (beta in 4.7.0), set `phoenix.transactions.enabled=true`. In this case, you also need to run the transaction manager included in the distribution. Once enabled, a table may optionally be declared as transactional (see [transactions](/docs/features/transactions)).
+
+Commits over transactional tables are all-or-none: either all data is committed (including secondary index updates) or none is committed (and an exception is thrown). Both cross-table and cross-row transactions are supported. Transactional tables also see their own uncommitted data when querying. An optimistic concurrency model is used to detect row-level conflicts with first-commit-wins semantics.
+
+Non-transactional tables have no guarantees beyond HBase row-level atomicity (see [HBase ACID semantics](https://hbase.apache.org/acid-semantics)). Also, non-transactional tables do not see updates until commit occurs.
+
+Phoenix DML commands (`UPSERT VALUES`, `UPSERT SELECT`, `DELETE`) batch pending changes on the client side. Changes are sent to server on commit and discarded on rollback. If auto-commit is enabled, Phoenix will execute the entire DML command server-side via coprocessors whenever possible for better performance.
+
+#### Timestamps
+
+Most applications let HBase manage timestamps. In cases where timestamps must be controlled, the [CurrentSCN](/docs/faq#can-phoenix-work-on-tables-with-arbitrary-timestamp-as-flexible-as-hbase-api) property can be set at connection time to control timestamps for DDL, DML, and queries. This also enables snapshot queries against prior row values because Phoenix uses this property as scan max timestamp.
+
+Timestamps cannot be controlled for transactional tables. Instead, the transaction manager assigns timestamps that become HBase cell timestamps on commit. They still correspond to wall-clock time, but are multiplied by 1,000,000 to ensure enough granularity for uniqueness across the cluster.
+
+## Schema
+
+Apache Phoenix supports table creation and versioned incremental alterations through DDL commands. Table metadata is stored in an HBase table and versioned, so snapshot queries over prior versions automatically use the correct schema.
+
+A Phoenix table can be created through [`CREATE TABLE`](/docs/grammar#create-table) and can either be:
+
+1. **Built from scratch**: HBase table and column families are created automatically.
+2. **Mapped to an existing HBase table**: either as a read-write TABLE or a read-only VIEW, with the caveat that row key/key-value binary representation must match Phoenix data types (see [Data Types](/docs/datatypes)).
+   - For a read-write TABLE, column families are created automatically if absent. An empty key value is added to the first column family of each existing row to minimize projection size for queries.
+   - For a read-only VIEW, all column families must already exist. The only change is adding Phoenix coprocessors for query processing. The primary use case is transferring existing data into Phoenix; DML is not allowed on a VIEW, and query performance may be lower than with a TABLE.
+
+All schema is versioned (up to 1000 versions kept). Snapshot queries over older data pick up the correct schema based on connection time via [CurrentSCN](/docs/faq#can-phoenix-work-on-tables-with-arbitrary-timestamp-as-flexible-as-hbase-api).
+
+#### Altering
+
+A Phoenix table may be altered via [`ALTER TABLE`](/docs/grammar#alter). When a SQL statement references a table, Phoenix checks with the server by default to ensure metadata and statistics are up to date.
+
+If table structure is known to be stable, this RPC may be unnecessary. `UPDATE_CACHE_FREQUENCY` (added in 4.7) lets users define how often the server is checked for metadata/statistics updates. Possible values: `ALWAYS` (default), `NEVER`, or a millisecond value.
+
+For example, this DDL creates table `FOO` and tells clients to check for updates every 15 minutes:
+
+```sql
+CREATE TABLE FOO (k BIGINT PRIMARY KEY, v VARCHAR) UPDATE_CACHE_FREQUENCY=900000;
+```
+
+#### Views [#index-views]
+
+Phoenix supports updatable views on top of tables, with the unique capability of adding columns by leveraging HBase schemaless behavior. All views share the same underlying HBase table and may be indexed independently. Read more [here](/docs/features/views).
+
+#### Multi-tenancy [#index-multi-tenancy]
+
+Built on top of view support, Phoenix also supports [multi-tenancy](/docs/features/multi-tenancy). As with views, a multi-tenant view can add columns defined solely for that user.
+
+#### Schema at read time
+
+Another schema-related feature allows columns to be defined dynamically at query time. This is useful when not all columns are known at create time. More details [here](/docs/features/dynamic-columns).
+
+#### Mapping to an Existing HBase Table
+
+Phoenix supports mapping to an existing HBase table through [`CREATE TABLE`](/docs/grammar#create-table) and [`CREATE VIEW`](/docs/grammar#create-view). In both cases, HBase metadata remains as-is, except that with `CREATE TABLE`, [KEEP_DELETED_CELLS](https://hbase.apache.org/docs/regionserver-sizing#keeping-deleted-cells) is enabled so flashback queries work correctly.
+
+For `CREATE TABLE`, missing HBase metadata (table/column families) is created if needed. Table and column family names are case-sensitive at HBase level; Phoenix uppercases names by default. To preserve case sensitivity, wrap names in double quotes:
+
+```sql
+CREATE VIEW "MyTable" ("a".ID VARCHAR PRIMARY KEY);
+```
+
+For `CREATE TABLE`, an empty key value is added per row so queries behave as expected without projecting all columns during scans. For `CREATE VIEW`, this is not done and no HBase metadata is created. Existing HBase metadata must match DDL metadata, or `ERROR 505 (42000): Table is read only` is thrown.
+
+Another caveat: bytes serialized in HBase must match Phoenix serialization expectations.
+
+- For `VARCHAR`, `CHAR`, and `UNSIGNED_*` types, Phoenix uses HBase `Bytes` utility methods.
+- `CHAR` expects only single-byte characters.
+- `UNSIGNED_*` expects non-negative values.
+
+Composite row keys are formed by concatenating values, with a zero byte separator after variable-length types. For more on type system details, see [Data Types](/docs/datatypes).
+
+#### Salting [#index-salting]
+
+Tables can be declared salted to avoid HBase region hotspotting. Declare a salt bucket count and Phoenix manages salting transparently. See details [here](/docs/features/salted-tables), and write-throughput comparison [here](/docs/fundamentals/performance#performance-salting).
+
+#### APIs
+
+Catalog metadata (tables, columns, primary keys, and types) can be retrieved through Java SQL metadata interfaces: `DatabaseMetaData`, `ParameterMetaData`, and `ResultSetMetaData`.
+
+For schema/table/column retrieval via `DatabaseMetaData`, schema pattern, table pattern, and column pattern are LIKE-style expressions (`%` and `_`, escaped by `\`).
+
+In metadata APIs, table catalog argument is used to filter by tenant ID for multi-tenant tables.

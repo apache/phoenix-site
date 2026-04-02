@@ -1,0 +1,56 @@
+---
+title: "Row Timestamp Column"
+description: "Map HBase row timestamps to a Phoenix primary-key column and use ROW_TIMESTAMP in table design and upserts."
+---
+
+Phoenix 4.6 provides a way to map HBase’s native row timestamp to a Phoenix column. This helps you take advantage of HBase optimizations for time ranges in store files, along with query optimizations built into Phoenix.
+
+For a column to be designated as ROW_TIMESTAMP, certain constraints need to be followed:
+
+- Only a primary key column of type `TIME`, `DATE`, `TIMESTAMP`, `BIGINT`, or `UNSIGNED_LONG` can be designated as `ROW_TIMESTAMP`.
+- Only one primary key column can be designated as `ROW_TIMESTAMP`.
+- The column value cannot be `NULL` (because it maps directly to the HBase row timestamp). This also means a column can be declared as `ROW_TIMESTAMP` only when creating the table.
+- A `ROW_TIMESTAMP` column value cannot be negative. For `DATE`/`TIME`/`TIMESTAMP`, the corresponding epoch time in milliseconds cannot be less than zero.
+
+When upserting rows for a table with a row timestamp column (using `UPSERT VALUES` or `UPSERT SELECT`), you can explicitly provide the row timestamp value or let Phoenix set it automatically. When not specified, Phoenix sets the row timestamp column value to server-side time. The value also becomes the timestamp of the corresponding row in HBase.
+
+## Sample schema
+
+```sql
+CREATE TABLE DESTINATION_METRICS_TABLE
+(
+    CREATED_DATE DATE NOT NULL,
+    METRIC_ID CHAR(15) NOT NULL,
+    METRIC_VALUE LONG
+    CONSTRAINT PK PRIMARY KEY (CREATED_DATE ROW_TIMESTAMP, METRIC_ID)
+)
+SALT_BUCKETS = 8;
+```
+
+```sql
+UPSERT INTO DESTINATION_METRICS_TABLE VALUES (?, ?, ?)
+```
+
+This sets `CREATED_DATE` to the value specified in the corresponding bind parameter.
+
+```sql
+UPSERT INTO DESTINATION_METRICS_TABLE (METRIC_ID, METRIC_VALUE) VALUES (?, ?)
+```
+
+This sets `CREATED_DATE` to server-side time.
+
+```sql
+UPSERT INTO DESTINATION_METRICS_TABLE (CREATED_DATE, METRICS_ID, METRIC_VALUE)
+SELECT DATE, METRICS_ID, METRIC_VALUE FROM SOURCE_METRICS_TABLE
+```
+
+This sets `CREATED_DATE` to the `DATE` selected from `SOURCE_METRICS_TABLE`.
+
+```sql
+UPSERT INTO DESTINATION_METRICS_TABLE (METRICS_ID, METRIC_VALUE)
+SELECT METRICS_ID, METRIC_VALUE FROM SOURCE_METRICS_TABLE
+```
+
+This sets `CREATED_DATE` in the destination table to the server timestamp.
+
+When querying with filters on the row timestamp column, Phoenix performs its usual row-key optimizations and can also set scan min/max time ranges appropriately. Using this time range information, HBase can skip store files that do not fall in the target time range, which significantly improves performance, especially for tail-end data queries.

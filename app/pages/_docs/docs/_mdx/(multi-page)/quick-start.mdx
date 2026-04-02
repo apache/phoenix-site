@@ -1,0 +1,127 @@
+---
+title: "Quick Start"
+description: "Phoenix in 15 minutes or less."
+icon: Rocket
+---
+
+## What is this new Phoenix thing I've been hearing about?
+
+Phoenix is an open source SQL skin for HBase. You use the standard JDBC APIs instead of the regular HBase client APIs to create tables, insert data, and query your HBase data.
+
+### Doesn't putting an extra layer between my application and HBase just slow things down?
+
+Actually, no. Phoenix achieves as good or likely better [performance](/docs/fundamentals/performance) than if you hand-coded it yourself (not to mention with a heck of a lot less code) by:
+
+- compiling your SQL queries to native HBase scans
+- determining the optimal start and stop for your scan key
+- orchestrating the parallel execution of your scans
+- bringing the computation to the data by
+  - pushing the predicates in your where clause to a server-side filter
+  - executing aggregate queries through server-side hooks (called co-processors)
+- secondary indexes to improve performance for queries on non row key columns
+- stats gathering to improve parallelization and guide choices between optimizations
+- skip scan filter to optimize IN, LIKE, and OR queries
+- optional salting of row keys to evenly distribute write load
+
+### Ok, so it's fast. But why SQL? It's so 1970s
+
+Well, that's kind of the point: give folks something with which they're already familiar. What better way to spur the adoption of HBase? On top of that, using JDBC and SQL:
+
+- Reduces the amount of code users need to write
+- Allows for performance optimizations transparent to the user
+- Opens the door for leveraging and integrating lots of existing tooling
+
+### But how can SQL support my favorite HBase technique of x,y,z
+
+Didn't make it to the last HBase Meetup did you? SQL is just a way of expressing **_what you want to get_** not **_how you want to get it_**. Check out my [presentation](http://files.meetup.com/1350427/IntelPhoenixHBaseMeetup.ppt) for various existing and to-be-done Phoenix features to support your favorite HBase trick. Have ideas of your own? We'd love to hear about them: file an [issue](/issues-tracking) for us and/or join our [mailing list](/mailing-lists).
+
+## Blah, blah, blah - I just want to get started!
+
+Ok, great! Just follow our [install instructions](/docs/installation):
+
+- [download](/downloads) and expand our installation binary tar corresponding to your HBase version
+- copy the phoenix server jar into the lib directory of every region server and master
+- restart HBase
+- add the phoenix client jar to the classpath of your JDBC client or application
+- We have detailed instructions for [setting up SQuirreL SQL](/docs/installation#squirrel-sql-client) as your SQL client
+
+## I don't want to download and setup anything else!
+
+Ok, fair enough - you can create your own SQL scripts and execute them using our command line tools instead. Let's walk through an example now. Begin by navigating to the `bin/` directory of your Phoenix install location.
+
+<Steps>
+
+<Step>
+
+### First, let's create a `us_population.sql` file, containing a table definition:
+
+```sql
+CREATE TABLE IF NOT EXISTS us_population (
+  state CHAR(2) NOT NULL,
+  city VARCHAR NOT NULL,
+  population BIGINT
+  CONSTRAINT my_pk PRIMARY KEY (state, city)
+);
+```
+
+</Step>
+
+<Step>
+
+### Now let's create a `us_population.csv` file containing some data to put in that table:
+
+```csv
+NY,New York,8143197
+CA,Los Angeles,3844829
+IL,Chicago,2842518
+TX,Houston,2016582
+PA,Philadelphia,1463281
+AZ,Phoenix,1461575
+TX,San Antonio,1256509
+CA,San Diego,1255540
+TX,Dallas,1213825
+CA,San Jose,912332
+```
+
+</Step>
+
+<Step>
+
+### Execute the following command from a command terminal to create and populate the table
+
+```bash
+./psql.py <your_zookeeper_quorum> us_population.sql us_population.csv
+```
+
+</Step>
+
+<Step>
+
+### Start the interactive sql client
+
+```bash
+./sqlline.py <your_zookeeper_quorum>
+```
+
+and issue a query
+
+```sql
+SELECT state as "State",count(city) as "City Count",sum(population) as "Population Sum"
+FROM us_population
+GROUP BY state
+ORDER BY sum(population) DESC;
+```
+
+</Step>
+
+</Steps>
+
+Congratulations! You've just created your first Phoenix table, inserted data into it, and executed an aggregate query with just a few lines of code in 15 minutes or less!
+
+### Big deal - 10 rows! What else you got?
+
+Ok, ok - tough crowd. Check out our `bin/performance.py` script to create as many rows as you want, for any schema you come up with, and run timed queries against it.
+
+### Why is it called Phoenix anyway? Did some other project crash and burn and this is the next generation?
+
+I'm sorry, but we're out of time and space, so we'll have to answer that next time!

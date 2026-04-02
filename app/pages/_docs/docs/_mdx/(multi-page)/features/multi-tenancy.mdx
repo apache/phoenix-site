@@ -1,0 +1,61 @@
+---
+title: "Multi-tenancy"
+description: "Use multi-tenant tables, tenant-specific connections, and tenant views to isolate tenant data in Phoenix."
+---
+
+## Highlights
+
+- Multi-tenancy in Phoenix works via a combination of multi-tenant tables and tenant-specific connections (detailed below).
+- Tenants open tenant-specific connections to Phoenix. These connections can only access data that belongs to the tenant.
+- Tenants only see their own data in multi-tenant tables and can see all data in regular tables.
+- In order to add their own columns, tenants create tenant-specific views on top of multi-tenant tables and add their own columns to the views.
+
+## Multi-tenant tables
+
+Multi-tenant tables in Phoenix are regular tables declared with the `MULTI_TENANT=true` DDL property. They work in conjunction with tenant-specific connections (detailed below) to ensure tenants only see their own data in these tables. The first primary key column of a multi-tenant table identifies the tenant. For example:
+
+```sql
+CREATE TABLE base.event (
+    tenant_id VARCHAR,
+    event_type CHAR(1),
+    created_date DATE,
+    event_id BIGINT
+)
+MULTI_TENANT=true;
+```
+
+The column that identifies the tenant may have any name, but it must be of type `VARCHAR` or `CHAR`. Regular Phoenix connections work with these tables without tenant constraints, including access across tenant boundaries.
+
+## Tenant-specific connections
+
+Tenants are identified by the presence or absence of the `TenantId` property at JDBC connection time. A connection with a non-null `TenantId` is tenant-specific. A connection with an unspecified or null `TenantId` is a regular connection. A tenant-specific connection may query only:
+
+- **all data in non-multi-tenant (global) tables**, that is, tables created with a regular connection without `MULTI_TENANT=true`.
+- **their own data in multi-tenant tables**.
+- **their own schema**, meaning it sees only tenant-specific views created by that tenant (detailed below).
+
+For example, a tenant-specific connection is established like this:
+
+```java
+Properties props = new Properties();
+props.setProperty("TenantId", "Acme");
+Connection conn = DriverManager.getConnection("localhost", props);
+```
+
+## Tenant-specific views (optional)
+
+Tenant-specific views may only be created using tenant-specific connections. They are created the same way as views, however the base table must be a multi-tenant table or another view that eventually points to one. Tenant-specific views are typically used when new columns and/or filter criteria, specific to that tenant, are required. Otherwise the base table may be used directly through a tenant-specific connection as described above.
+
+For example, a tenant-specific view may be defined as follows:
+
+```sql
+CREATE VIEW acme.login_event(acme_user_id CHAR(15)) AS
+SELECT * FROM base.event
+WHERE event_type = 'L';
+```
+
+The `tenant_id` column is neither visible nor accessible from a tenant-specific view. Any reference to it causes a `ColumnNotFoundException`. As with any Phoenix view, whether the view is updatable follows the rules described [here](/docs/features/views#updatable-views). In addition, indexes may be added to tenant-specific views just like regular tables and views (with [these](/docs/features/views#views-limitations) limitations).
+
+## Tenant data isolation
+
+Any DML or query performed on multi-tenant tables using a tenant-specific connection is automatically constrained to that tenant’s data. For `UPSERT`, Phoenix automatically populates the `tenant_id` column with the tenant ID specified at connection time. For query and `DELETE` operations, a `WHERE` clause is transparently added so operations only see data for the current tenant.

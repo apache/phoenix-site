@@ -1,0 +1,88 @@
+---
+title: "Storage Formats"
+description: "Configure Phoenix column mapping and immutable storage encoding for better storage efficiency and performance."
+---
+
+As part of Phoenix 4.10, we have reduced on-disk storage size to improve overall performance by implementing the following enhancements:
+
+- Introduce a layer of indirection between Phoenix column names and the corresponding HBase column qualifiers.
+- Support a new encoding scheme for immutable tables that packs all values into a single cell per column family.
+
+For more details on column mapping and immutable data encoding, see [this blog](https://blogs.apache.org/phoenix/entry/column-mapping-and-immutable-data).
+
+## How to use column mapping
+
+You can set the column mapping property only when creating a table. Before deciding to use column mapping, think about how many columns your table and view hierarchy will require over their lifecycle. The following limits apply for each mapping scheme:
+
+| Config/Property Value | Max # of columns         |
+| --------------------- | ------------------------ |
+| 1                     | 255                      |
+| 2                     | 65535                    |
+| 3                     | 16777215                 |
+| 4                     | 2147483647               |
+| NONE                  | no limit (theoretically) |
+
+For mutable tables, this limit applies to columns in **all** column families. For immutable tables, the limit applies **per** column family. By default, new Phoenix tables use column mapping. These defaults can be overridden by setting the following config value in `hbase-site.xml`.
+
+| Table type        | Default Column mapping | Config                                      |
+| ----------------- | ---------------------- | ------------------------------------------- |
+| Mutable/Immutable | 2 byte qualifiers      | phoenix.default.column.encoded.bytes.attrib |
+
+This config controls global defaults that apply to all tables. If you want a different mapping scheme than the global default, use the `COLUMN_ENCODED_BYTES` table property.
+
+```sql
+CREATE TABLE T
+(
+    a_string varchar not null,
+    col1 integer,
+    CONSTRAINT pk PRIMARY KEY (a_string)
+)
+COLUMN_ENCODED_BYTES = 1;
+```
+
+## How to use immutable data encoding
+
+Like column mapping, immutable data encoding can only be set when creating a table. Through performance testing, `SINGLE_CELL_ARRAY_WITH_OFFSETS` generally provides strong performance and space savings. Below are some scenarios where `ONE_CELL_PER_COLUMN` encoding may be a better fit.
+
+- Data is sparse, i.e. less than 50% of the columns have values.
+- Size of data within a column family gets too big. With default HBase block size of 64K, if data within a column family grows beyond 50K then `SINGLE_CELL_ARRAY_WITH_OFFSETS` is generally not recommended.
+- Immutable tables that are expected to have views on them.
+
+By default, immutable non-multitenant tables are created using two-byte column mapping and `SINGLE_CELL_ARRAY_WITH_OFFSETS` data encoding. Immutable multi-tenant tables are created with two-byte column mapping and `ONE_CELL_PER_COLUMN` data encoding. This is because users often create tenant-specific views on base multi-tenant tables, and as noted above this is more suitable for `ONE_CELL_PER_COLUMN`. Like column mapping, you can change these global defaults by setting the following configs in `hbase-site.xml`.
+
+| Immutable Table type | Immutable storage scheme       | Config                                               |
+| -------------------- | ------------------------------ | ---------------------------------------------------- |
+| Multi-tenant         | ONE_CELL_PER_COLUMN            | phoenix.default.multitenant.immutable.storage.scheme |
+| Non multi-tenant     | SINGLE_CELL_ARRAY_WITH_OFFSETS | phoenix.default.immutable.storage.scheme             |
+
+You can also provide specific immutable storage and column mapping schemes with the `IMMUTABLE_STORAGE_SCHEME` and `COLUMN_ENCODED_BYTES` table properties. For example:
+
+```sql
+CREATE IMMUTABLE TABLE T
+(
+    a_string varchar not null,
+    col1 integer,
+    CONSTRAINT pk PRIMARY KEY (a_string)
+)
+IMMUTABLE_STORAGE_SCHEME = SINGLE_CELL_ARRAY_WITH_OFFSETS,
+COLUMN_ENCODED_BYTES = 1;
+```
+
+You can choose not to use `SINGLE_CELL_ARRAY_WITH_OFFSETS` while still using numeric column mapping. For example:
+
+```sql
+CREATE IMMUTABLE TABLE T
+(
+    a_string varchar not null,
+    col1 integer,
+    CONSTRAINT pk PRIMARY KEY (a_string)
+)
+IMMUTABLE_STORAGE_SCHEME = ONE_CELL_PER_COLUMN,
+COLUMN_ENCODED_BYTES = 1;
+```
+
+When using `SINGLE_CELL_ARRAY_WITH_OFFSETS`, you must use a numeric column mapping scheme. Attempting to use `SINGLE_CELL_ARRAY_WITH_OFFSETS` with `COLUMN_ENCODED_BYTES = NONE` throws an error.
+
+## How to disable column mapping
+
+To disable column mapping across all new tables, set `phoenix.default.column.encoded.bytes.attrib` to `0`. You can also keep it enabled globally and disable it selectively for a table by setting `COLUMN_ENCODED_BYTES = 0` in the `CREATE TABLE` statement.

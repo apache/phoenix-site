@@ -1,0 +1,46 @@
+---
+title: "Cursor"
+description: "Use CURSOR statements in Phoenix to process query results in controlled row batches."
+---
+
+To work on a subset of rows from a query, Phoenix supports a `CURSOR` control structure. The sequence below shows how to use a cursor.
+
+## Using a cursor
+
+1. Define a cursor for a query using the `DECLARE` statement.
+
+   ```java
+   PreparedStatement statement = conn.prepareStatement(
+       "DECLARE empCursor CURSOR FOR SELECT * FROM EMP_TABLE"
+   );
+   statement.execute();
+   ```
+
+2. Open the cursor.
+
+   ```java
+   statement = conn.prepareStatement("OPEN empCursor");
+   statement.execute();
+   ```
+
+3. Fetch a subset of rows to work with.
+
+   ```java
+   statement = conn.prepareStatement("FETCH NEXT 10 ROWS FROM empCursor");
+   ResultSet rset = statement.executeQuery();
+   ```
+
+4. Iterate through the fetched rows and process them as required.
+
+   ```java
+   while (rset.next()) {
+       // ...
+   }
+   ```
+
+5. Fetch additional sets of rows as needed, and close the cursor when done.
+
+   ```java
+   statement = conn.prepareStatement("CLOSE empCursor");
+   statement.execute();
+   ```

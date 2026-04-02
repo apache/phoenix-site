@@ -1,0 +1,302 @@
+[
+  {
+    "name": "Andrew Purtell",
+    "company": "Salesforce",
+    "email": "apurtell@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Ankit Singhal",
+    "company": "Hortonworks",
+    "email": "ankit@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Anoop Sam John",
+    "company": "Intel",
+    "email": "anoopsamjohn@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Cheng Lei",
+    "company": "Sogou",
+    "email": "chenglei@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Chinmay Kulkarni",
+    "company": "Salesforce",
+    "email": "chinmayskulkarni@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Devaraj Das",
+    "company": "Hortonworks",
+    "email": "ddas@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Eli Levine",
+    "company": "Salesforce",
+    "email": "elilevine@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Enis Soztutar",
+    "company": "Hortonworks",
+    "email": "enis@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Gabriel Reid",
+    "company": "NGDATA",
+    "email": "greid@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Geoffrey Jacoby",
+    "company": "Salesforce",
+    "email": "gjacoby@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Istvan Toth",
+    "company": "Cloudera",
+    "email": "stoty@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "James Taylor",
+    "company": "Lyft",
+    "email": "jamestaylor@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Jeffrey Zhong",
+    "company": "Elementum",
+    "email": "jeffreyz@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Jesse Yates",
+    "company": "Tesla",
+    "email": "jyates@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Josh Elser",
+    "company": "Hortonworks",
+    "email": "elserj@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Josh Mahonin",
+    "company": "Interset",
+    "email": "jmahonin@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Kadir Ozdemir",
+    "company": "Salesforce",
+    "email": "kadir@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Karan Mehta",
+    "company": "Salesforce",
+    "email": "karanmehta93@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Lars Hofhansl",
+    "company": "Salesforce",
+    "email": "larsh@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Maryann Xue",
+    "company": "Databricks",
+    "email": "maryannxue@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Michael Stack",
+    "company": "Cloudera",
+    "email": "stack@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Mujtaba Chohan",
+    "company": "Salesforce",
+    "email": "mujtaba@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Nick Dimiduk",
+    "company": "Icebrg",
+    "email": "ndimiduk@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Pedro Boado",
+    "company": "Datadog",
+    "email": "pboado@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Rajeshbabu Chintaguntla",
+    "company": "Hortonworks",
+    "email": "rajeshbabu@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Ramkrishna Vasudevan",
+    "company": "Intel",
+    "email": "ramkrishna@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Ravi Magham",
+    "company": "Elementum",
+    "email": "ravimagham@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Richard Antal",
+    "company": "Cloudera",
+    "email": "richardantal@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Samarth Jain",
+    "company": "Netflix",
+    "email": "samarth@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Sergey Soldatov",
+    "company": "Hortonworks",
+    "email": "ssa@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Simon Toens",
+    "company": "Salesforce",
+    "email": "stoens@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Steven Noels",
+    "company": "NGDATA",
+    "email": "stevenn@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Thomas D'Silva",
+    "company": "Twilio",
+    "email": "tdsilva@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Vincent Poon",
+    "company": "Salesforce",
+    "email": "vincentpoon@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Viraj Jasani",
+    "company": "Salesforce",
+    "email": "vjasani@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Xinyi Yan",
+    "company": "Salesforce",
+    "email": "yanxinyi@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Gokcen Iskender",
+    "company": "Cruise",
+    "email": "gokcen@apache.org",
+    "role": "PMC"
+  },
+  {
+    "name": "Abhishek Singh Chouhan",
+    "company": "Salesforce",
+    "email": "achouhan@apache.org",
+    "role": "Committer"
+  },
+  {
+    "name": "Akshita Malhotra",
+    "company": "Salesforce",
+    "email": "akshitamalhotra@apache.org",
+    "role": "Committer"
+  },
+  {
+    "name": "Cody Marcel",
+    "company": "Salesforce",
+    "email": "codymarcel@apache.org",
+    "role": "Committer"
+  },
+  {
+    "name": "Dumindu Buddhika",
+    "company": "University of Moratuwa",
+    "email": "duminduk@apache.org",
+    "role": "Committer"
+  },
+  {
+    "name": "Ethan Wang",
+    "company": "Facebook",
+    "email": "ewang@apache.org",
+    "role": "Committer"
+  },
+  {
+    "name": "Gerald Sangudi",
+    "company": "23andme",
+    "email": "sangudi@apache.org",
+    "role": "Committer"
+  },
+  {
+    "name": "Jaanai Zhang",
+    "company": "Alibaba",
+    "email": "jaanai@apache.org",
+    "role": "Committer"
+  },
+  {
+    "name": "Jan Fernando",
+    "company": "Salesforce",
+    "email": "jfernando@apache.org",
+    "role": "Committer"
+  },
+  {
+    "name": "Kevin Liew",
+    "company": "Simba Technologies",
+    "email": "kliew@apache.org",
+    "role": "Committer"
+  },
+  {
+    "name": "Mihir Monani",
+    "company": "Salesforce",
+    "email": "mihir6692@apache.org",
+    "role": "Committer"
+  },
+  {
+    "name": "Swaroopa Kadam",
+    "company": "Twilio",
+    "email": "skadam@apache.org",
+    "role": "Committer"
+  },
+  {
+    "name": "Ohad Shacham",
+    "company": "Yahoo Research, Oath",
+    "email": "ohads@apache.org",
+    "role": "Committer"
+  },
+  {
+    "name": "Jacob Isaac",
+    "company": "Salesforce",
+    "email": "jisaac@apache.org",
+    "role": "Committer"
+  }
+]

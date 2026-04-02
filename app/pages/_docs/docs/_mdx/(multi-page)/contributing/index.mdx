@@ -1,0 +1,93 @@
+---
+title: "Contributing"
+description: "Contribution workflow for Apache Phoenix, including JIRA, patch/PR submission, and committer practices."
+---
+
+## General process
+
+The general process for contributing code to Phoenix works as follows:
+
+1. Discuss your changes on the dev mailing list
+2. Create a JIRA issue unless there already is one
+3. Setup your development environment
+4. Prepare a patch containing your changes
+5. Submit the patch
+
+These steps are explained in greater detail below.
+
+Note that the instructions below are for the main Phoenix project.
+Use the corresponding [repository](/source-repository) for the other subprojects.
+Tephra and Omid also have their own [JIRA projects](/issues-tracking).
+
+### Discuss on the mailing list
+
+It's often best to discuss a change on the public mailing lists before creating and submitting a patch.
+
+If you're unsure whether certain behavior in Phoenix is a bug, please send a mail to the [user mailing list](/mailing-lists) to check.
+
+If you're considering adding major new functionality to Phoenix, it's a good idea to first discuss the idea on the [developer mailing list](/mailing-lists) to make sure that your plans are in line with others in the Phoenix community.
+
+### Log a JIRA ticket
+
+The first step is to create a ticket on the [Phoenix JIRA](https://issues.apache.org/jira/browse/PHOENIX).
+
+### Setup development environment
+
+To set up your development environment, see [these directions](/docs/contributing/develop).
+
+### Generate a patch
+
+There are two general approaches for creating and submitting a patch: GitHub pull requests, or manual patch creation with Git. Both are explained below. Please make sure that the patch applies cleanly on all active branches, including **master** and the unified **4.x** branch.
+
+Regardless of which approach is taken, please make sure to follow the Phoenix code conventions (more information below). Whenever possible, unit tests or integration tests should be included with patches.
+
+Please make sure that the patch contains only one commit, then click the "Submit patch" button to automatically trigger tests on the patch.
+
+The commit message should reference the JIRA ticket issue (which has the format
+`PHOENIX-{NUMBER}:{JIRA-TITLE}`).
+
+To effectively get the patch reviewed, please raise the pull request against an appropriate branch.
+
+#### Naming convention for the patch
+
+When generating a patch, make sure the patch name uses the following format:
+`PHOENIX-{NUMBER}.{BRANCH-NAME}.{VERSION}.patch`
+
+Examples: `PHOENIX-4872.master.v1.patch`, `PHOENIX-4872.master.v2.patch`, `PHOENIX-4872.4.x-HBase-1.3.v1.patch`, etc.
+
+#### GitHub workflow
+
+1. Create a pull request in GitHub for the [mirror of the Phoenix Git repository](https://github.com/apache/phoenix).
+2. Generate a patch and attach it to JIRA so Hadoop QA runs automated tests.
+3. If you update the PR, generate a new patch with a different name so patch changes are detected and tests run for the new patch.
+
+#### Local Git workflow
+
+1. Create a local branch:
+   ```shell
+   git checkout -b <branch-name>
+   ```
+2. Make and commit changes
+3. Generate a patch based on the JIRA issue number:
+   ```shell
+   git format-patch --stdout HEAD^ > PHOENIX-{NUMBER}.patch
+   ```
+4. Attach the created patch file to the JIRA ticket.
+
+## Code conventions
+
+The Phoenix code conventions are similar to the [Sun/Oracle Java Code Convention](https://www.oracle.com/technetwork/java/index-135089.html). We use 4 spaces (no tabs) for indentation and limit lines to 100 characters.
+
+Eclipse code formatting settings and import order settings (which can also be imported into Intellij IDEA) are available in the dev directory of the Phoenix codebase.
+
+All new source files should include the Apache license header.
+
+## Committer workflow
+
+In general, the "rebase" workflow should be used with the Phoenix codebase (see [this blog post](http://randyfay.com/content/rebase-workflow-git) for more information on the difference between "merge" and "rebase" workflows in Git).
+
+A patch file can be downloaded from a GitHub pull request by adding `.patch` to the end of the pull request URL, for example: `https://github.com/apache/phoenix/pull/35.patch`.
+
+When applying a user-contributed patch, use `git am` when a fully formatted patch file is available, as this preserves contributor contact information. Otherwise, add the contributor's name to the commit message.
+
+If a single ticket consists of a patch with multiple commits, the commits can be squashed into a single commit using `git rebase`.

@@ -1,0 +1,49 @@
+---
+title: "Building"
+description: "Build Apache Phoenix and add it to Maven-based projects."
+---
+
+## Building the Main Phoenix Project
+
+Phoenix consists of several subprojects.
+
+The core project is `phoenix`, which depends on `phoenix-thirdparty`, `phoenix-omid`, and `phoenix-tephra`.
+
+`phoenix-queryserver` and `phoenix-connectors` are optional packages that also depend on `phoenix`.
+
+Check out the [source](/source-repository) and follow the build instructions in `BUILDING.md` (or `README.md`) in the repository root.
+
+## Using Phoenix in a Maven Project
+
+Phoenix artifacts are published to Apache and Maven Central repositories. Add the dependency below to your `pom.xml`:
+
+```xml
+<dependencies>
+  <dependency>
+    <groupId>org.apache.phoenix</groupId>
+    <artifactId>phoenix-client-hbase-[hbase.profile]</artifactId>
+    <version>[phoenix.version]</version>
+  </dependency>
+</dependencies>
+```
+
+Where:
+
+- `[phoenix.version]` is the Phoenix release version (for example, `5.1.2` or `4.16.1`)
+- `[hbase.profile]` is the compatible HBase profile
+
+See [Downloads](/downloads) for supported release/profile combinations.
+
+## Branches
+
+The main Phoenix project currently has two active branches.
+
+- `4.x` works with HBase 1 and Hadoop 2
+- `5.x` works with HBase 2 and Hadoop 3
+
+See [Downloads](/downloads) and `BUILDING.md` for exact version compatibility by release.
+
+See also:
+
+- [Building Project Website](/docs/contributing/building-website)
+- [How to Release](/docs/contributing/how-to-release)
