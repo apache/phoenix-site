@@ -315,7 +315,7 @@ Before opening a pull request, you must run the full website build script:
 1. Ensures Node/npm are available (bootstraps via `nvm` when needed)
 2. Runs a clean dependency install (`npm ci`)
 3. Runs the complete CI pipeline (`npm run ci`)
-4. Copies `build/client/` into `output/`
+4. Copies `build/client/` into `output/` (including generated SEO artifacts like `sitemap.xml`)
 
 Current CI sequence used by `npm run ci`:
 
@@ -323,7 +323,7 @@ Current CI sequence used by `npm run ci`:
 2. `npm run fumadocs-init`
 3. `npm run lint`
 4. `npm run typecheck`
-5. `npm run build`
+5. `npm run build` (`react-router build` followed by sitemap generation)
 6. `npm run test:unit:run`
 7. `npx playwright install`
 8. `npm run test:e2e`
@@ -337,7 +337,7 @@ There is currently no remote CI/CD runner executing `build.sh` for this reposito
 The published website artifact is the committed `output/` directory. The expected publishing workflow is:
 
 1. Run `./build.sh` locally
-2. Commit source changes and updated `output/`
+2. Commit source changes and updated `output/` (including `sitemap.xml` and `robots.txt`)
 3. Push your branch and open a PR
 
 After merge, `output/` can be deployed to static hosting.
