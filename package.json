@@ -6,7 +6,7 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "build": "react-router build",
+    "build": "react-router build && npm run generate-sitemap",
     "dev": "react-router dev",
     "start": "serve -s build/client -l 5173",
     "typecheck": "react-router typegen && tsc",
@@ -23,6 +23,7 @@
     "test:e2e:debug": "playwright test --debug",
     "export-pdf": "playwright test e2e-tests/export-pdf.spec.ts --project=chromium --workers=1",
     "generate-language": "tsx scripts/generate-language.ts",
+    "generate-sitemap": "tsx scripts/generate-sitemap.ts",
     "fumadocs-init": "fumadocs-mdx",
     "ci": "npm run generate-language && npm run fumadocs-init && npm run lint && npm run typecheck && npm run build && npm run test:unit:run && npx playwright install && npm run test:e2e"
   },
@@ -106,6 +107,7 @@
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.14",
     "serve": "^14.2.5",
+    "sitemap": "^9.0.1",
     "tailwindcss": "^4.1.13",
     "tsx": "^4.21.0",
     "tw-animate-css": "1.3.3",
