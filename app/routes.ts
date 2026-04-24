@@ -27,6 +27,7 @@ export default [
   // Landing
   layout("./pages/_landing/landing-layout.tsx", [
     index("routes/_landing/home.tsx"),
+    route("404", "routes/404.tsx"),
     route("downloads", "routes/_landing/downloads.tsx"),
     route("mailing-lists", "routes/_landing/mailing-lists.tsx"),
     route("news", "routes/_landing/news.tsx"),
