@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /404
 
 Sitemap: https://phoenix.apache.org/sitemap.xml

@@ -28,6 +28,7 @@ const SITE_URL = "https://phoenix.apache.org";
 
 const EXCLUDED_HTML_PATHS = new Set([
   "404.html",
+  "404/index.html",
   "__spa-fallback.html",
   "phoenixcon-2018/index.html",
   "phoenixcon-archives/index.html"
