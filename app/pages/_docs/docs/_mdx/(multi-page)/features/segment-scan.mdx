@@ -1,0 +1,97 @@
+---
+title: "Segment Scan"
+description: "Get N evenly-bucketed key ranges for a Phoenix table so a client can drive a parallel full-table scan."
+---
+
+Segment Scan turns a Phoenix table into _N_ contiguous, non-overlapping key ranges
+that you can hand out to a pool of workers to drive a parallel full-table scan. It is
+the natural primitive for ETL exports, table validation/repair tools, bulk
+re-encoding, and anything else that needs to walk every row as fast as the cluster
+can serve it. Available in Phoenix 5.3.0
+([PHOENIX-7684](https://issues.apache.org/jira/browse/PHOENIX-7684)).
+
+## When to use it [#segment-scan-when]
+
+Reach for Segment Scan when you want to **read every row** and you'd rather have many
+workers do it concurrently than one client streaming sequentially. Typical use cases:
+
+- Snapshot exports to a data lake / warehouse.
+- Backfills or re-encodes (e.g. moving a column from `VARBINARY` to
+  [`VARBINARY_ENCODED`](/docs/features/varbinary-encoded)).
+- Validation/repair scripts that scrub or hash every row.
+- DynamoDB-style parallel scan against a Phoenix-backed table.
+
+If you only want to read _some_ rows (e.g. by a key prefix or an indexed predicate),
+issue a normal SQL query — Segment Scan is for full-table fan-out, not selective
+filtering.
+
+## Basic usage [#segment-scan-usage]
+
+Two helpers — `SCAN_START_KEY()` and `SCAN_END_KEY()` — return the start and end
+row keys of each segment. The `TOTAL_SEGMENTS() = N` predicate in the `WHERE` clause
+is what asks Phoenix to bucket the table into segments instead of running the query
+against the data:
+
+```sql
+SELECT SCAN_START_KEY(), SCAN_END_KEY()
+FROM my_table
+WHERE TOTAL_SEGMENTS() = 16;
+```
+
+You get back one row per segment with two `VARBINARY` columns: the **start key** and
+the **end key** of that range. Either may be empty — an empty start key means
+"from the beginning of the table"; an empty end key means "to the end of the table".
+
+The bytes are HBase-level row key bytes — typically you hand each `(start_key,
+end_key)` pair to a worker that drives a scan via the lower-level scan API (e.g.
+HBase `Scan.setStartRow` / `setStopRow`, or a framework like Phoenix's MapReduce
+input format that accepts byte-range bounds). Each worker scans its slice
+independently, in parallel.
+
+## How many segments you actually get [#segment-scan-count]
+
+The number of segments returned is **`min(N, num_regions)`**:
+
+- If `N <= num_regions`, Phoenix bundles consecutive regions together so you get
+  exactly `N` segments. The grouping is as even as possible — with `r = num_regions
+mod N` segments getting one extra region.
+- If `N > num_regions`, you simply get one segment per region. Phoenix will not
+  split a region's key range into smaller sub-ranges for you, so the **maximum
+  achievable parallelism is bounded by the number of regions in the table**.
+
+If you want more parallelism than your region count permits, pre-split the table or
+salt it; Segment Scan respects whatever the current region layout is.
+
+`N` must be a positive integer. Passing `0` or a negative value returns SQL error
+code `221` ("TOTAL_SEGMENTS() value must be greater than 0").
+
+## How it actually runs [#segment-scan-how]
+
+`TOTAL_SEGMENTS()` is a marker, not a server-side function. The Phoenix planner sees
+it during compilation and replaces the query plan entirely with a client-side plan
+that:
+
+1. Looks up the table's current region locations.
+2. Buckets them into `min(N, num_regions)` contiguous groups.
+3. Returns each group's combined `(start_key, end_key)` as a result row.
+
+No region-server scan is issued for this query — it's a metadata-only operation, so
+it's cheap to call, and it doesn't read or count any of the actual data.
+
+## Things to watch for [#segment-scan-watch]
+
+- **Region layout changes between discovery and scan.** The segments you got back
+  reflect the region layout at the time of the call. If the table splits or merges
+  between segment discovery and your parallel scan, your `(start_key, end_key)`
+  ranges are still valid as byte ranges — they just may not align with current
+  regions. The parallel scan still works; you just lose some of the
+  region-locality benefit.
+- **Each segment can still hold a lot of data.** Segments correspond to one or more
+  whole regions. If your regions are large or unevenly populated, individual
+  workers may end up scanning more than others. Use this with the standard scan
+  controls (paging, batch sizes) rather than relying on Segment Scan to balance row
+  counts.
+- **Segment Scan describes ranges; it doesn't scan.** The parallel scan itself is
+  your responsibility. The typical pattern is a worker pool that takes one
+  `(start_key, end_key)` per task and runs a regular Phoenix query bounded by that
+  range.

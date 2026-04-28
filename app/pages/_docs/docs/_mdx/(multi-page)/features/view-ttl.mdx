@@ -1,0 +1,102 @@
+---
+title: "View TTL"
+description: "Per-view retention on top of a shared base table — different views can age data out on different schedules without splitting the table."
+---
+
+A Phoenix [view](/docs/features/views) is a logical table that shares a single physical
+HBase table with its sibling views. **View TTL** lets each view define its **own** data
+retention policy on top of that shared table. Rows that have outlived their view's TTL
+disappear from queries against that view and are eventually removed in the background —
+without affecting any other view (or the base table). Available in Phoenix 5.3.0
+([PHOENIX-6978](https://issues.apache.org/jira/browse/PHOENIX-6978)).
+
+## When to use it [#view-ttl-when]
+
+The classic case is **multi-tenant retention**: one shared base table, many tenant
+views, each tenant gets a different retention window driven by its plan, region, or
+contract.
+
+| Scenario                                                         | View TTL fit                                          |
+| ---------------------------------------------------------------- | ----------------------------------------------------- |
+| Per-tenant retention windows on one shared base table            | Yes                                                   |
+| Per-use-case retention (e.g., "raw events 7 days, audit 1 year") | Yes                                                   |
+| Same retention for the entire physical table                     | Use a regular table-level `TTL` instead               |
+| Retention based on row content rather than age                   | Use [Conditional TTL](/docs/features/conditional-ttl) |
+| Different schemas per tenant                                     | Use separate tables, not views                        |
+
+If the retention rule is the same for everyone reading the table, set `TTL` on the
+table itself; you don't need View TTL.
+
+## Enable the feature [#view-ttl-enable]
+
+View TTL is **off by default**. Enable it cluster-wide by setting this server-side
+property and restarting region servers:
+
+```text
+phoenix.view.ttl.enabled = true
+```
+
+While the feature is disabled, attempts to declare `TTL` on a view return a SQL error
+explaining the property must be turned on.
+
+## Defining a TTL on a view [#view-ttl-define]
+
+Set `TTL` (in seconds) as a property on `CREATE VIEW`. Different views over the same
+base table can use different values:
+
+```sql
+CREATE TABLE events_base (
+    tenant_id VARCHAR NOT NULL,
+    bucket    VARCHAR NOT NULL,
+    event_id  VARCHAR NOT NULL,
+    payload   VARCHAR,
+    CONSTRAINT pk PRIMARY KEY (tenant_id, bucket, event_id)
+) MULTI_TENANT = true;
+
+-- 7-day retention for tenant 'acme'
+CREATE VIEW acme_events AS
+    SELECT * FROM events_base WHERE tenant_id = 'acme'
+TTL = 604800;
+
+-- 30-day retention on the same base table for tenant 'globex'
+CREATE VIEW globex_events AS
+    SELECT * FROM events_base WHERE tenant_id = 'globex'
+TTL = 2592000;
+```
+
+Adjust the value later, or remove the TTL entirely:
+
+```sql
+ALTER VIEW acme_events SET TTL = 1209600;   -- bump to 14 days
+ALTER VIEW acme_events SET TTL = NONE;       -- remove TTL (rows kept indefinitely)
+```
+
+## Inheritance and child views [#view-ttl-inheritance]
+
+A child view inherits its parent view's TTL. **Child views cannot override** the
+parent's value — the TTL belongs to the view that owns it. If you need different
+retention windows for two slices of the same parent, create them as siblings under a
+common parent rather than nesting.
+
+In multi-tenant mode, each tenant connection sees its own view; setting TTL on a
+tenant view applies retention to that tenant's slice only.
+
+## How it actually expires data [#view-ttl-how]
+
+Two things happen to expired rows:
+
+1. **Read-time filter (immediate).** Whenever a query goes through a view, Phoenix
+   filters out rows whose age exceeds the view's TTL — so as soon as a row is "too
+   old" for a view, it disappears from queries against that view, even before
+   physical deletion.
+2. **Phoenix compaction (eventual).** Expired rows are physically removed by
+   Phoenix's compaction during HBase region compactions. This reclaims disk and
+   stops the rows showing up via lower-level scans. There is no separate cleanup
+   job — physical removal happens whenever the underlying HBase regions compact.
+
+## Combining with Conditional TTL [#view-ttl-conditional]
+
+A view's `TTL` can also be a SQL boolean expression instead of a number, in which
+case it follows the [Conditional TTL](/docs/features/conditional-ttl) rules. This
+unlocks expiry based on row content (e.g. _expire 30 days after `STATUS` becomes
+`'CLOSED'`_), and the strict-vs-relaxed enforcement modes documented there.

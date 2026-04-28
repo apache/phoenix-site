@@ -1,0 +1,212 @@
+---
+title: "Change Data Capture (CDC)"
+description: "Query row-level change events on a Phoenix table using standard SQL — pull pre/post images and change deltas with bounded, resumable reads."
+---
+
+Change Data Capture turns a Phoenix table into a **stream of change events** that
+downstream consumers can read using regular SQL. Once enabled, a CDC object behaves
+like a queryable Phoenix table: every insert, update, and delete on the underlying
+data table produces a row containing the affected primary key, an event timestamp,
+and a JSON payload describing what changed. Available in Phoenix 5.3.0
+([PHOENIX-7001](https://issues.apache.org/jira/browse/PHOENIX-7001)).
+
+## When to use it [#cdc-when]
+
+Reach for CDC when something downstream needs to react to row-level changes:
+
+- Replication or mirroring to another store (Kafka, search index, data warehouse).
+- Audit logs and change history.
+- Cache invalidation and event-driven workflows.
+- Materialized projections / fan-out tables maintained by an external process.
+
+CDC captures the actual mutations as they happen — **including TTL-driven row
+deletes** — so consumers don't need to poll the data table or compute diffs.
+
+## Enabling CDC on a table [#cdc-enable]
+
+Use `CREATE CDC` to enable change capture on an existing table:
+
+```sql
+-- Capture every change scope (default).
+CREATE CDC orders_cdc ON orders;
+
+-- Or restrict the default scopes recorded per event.
+CREATE CDC orders_cdc ON orders INCLUDE (PRE, POST, CHANGE);
+```
+
+The `INCLUDE` clause sets the **default** scopes that appear in the JSON payload.
+Available scopes:
+
+| Scope    | Meaning                          |
+| -------- | -------------------------------- |
+| `PRE`    | Row image before the mutation.   |
+| `POST`   | Row image after the mutation.    |
+| `CHANGE` | Just the changed columns (diff). |
+
+Standard `CREATE INDEX`–style table properties on `CREATE CDC` (`SALT_BUCKETS`,
+`UPDATE_CACHE_FREQUENCY`, `COLUMN_ENCODED_BYTES`, etc.) are forwarded to the
+underlying CDC index.
+
+To remove CDC from a table:
+
+```sql
+DROP CDC orders_cdc ON orders;
+DROP CDC IF EXISTS orders_cdc ON orders;
+```
+
+## Reading change events [#cdc-read]
+
+Each CDC object behaves like a Phoenix table whose columns are:
+
+- The data table's primary-key columns (so you know which row changed).
+- A payload column literally named `"CDC JSON"` (case-sensitive, must be quoted).
+  Project it whenever you need the change payload; omit it for lightweight queries
+  that only care about which rows changed or for topology lookups. `SELECT *`
+  includes it automatically.
+
+Two helpers come along for the ride:
+
+- `PHOENIX_ROW_TIMESTAMP()` — the event's timestamp; use it for ordering and time-
+  bounded reads.
+- `PARTITION_ID()` — the partition the event came from; useful for sharding consumer
+  workers.
+
+A typical read query that wants the full payload looks like this:
+
+```sql
+SELECT /*+ CDC_INCLUDE(POST, CHANGE) */
+       PARTITION_ID(),
+       PHOENIX_ROW_TIMESTAMP() AS event_time,
+       order_id,
+       "CDC JSON"
+FROM orders_cdc
+ORDER BY PHOENIX_ROW_TIMESTAMP() ASC;
+```
+
+The `CDC_INCLUDE(...)` query hint **overrides** the default scopes set at `CREATE
+CDC` time — so the same CDC object can serve different downstream consumers, each
+asking for only the scope they need. Without the hint, the payload uses the
+`INCLUDE` scopes from the `CREATE CDC` statement.
+
+### Time-bounded / incremental reads
+
+Use `PHOENIX_ROW_TIMESTAMP()` predicates to pull only events within a window —
+consumers typically remember the last timestamp they processed and bind it as the
+lower bound on the next call:
+
+```sql
+SELECT /*+ CDC_INCLUDE(POST) */
+       PHOENIX_ROW_TIMESTAMP(), order_id, "CDC JSON"
+FROM orders_cdc
+WHERE PHOENIX_ROW_TIMESTAMP() >= ?
+  AND PHOENIX_ROW_TIMESTAMP() <  ?
+ORDER BY PHOENIX_ROW_TIMESTAMP() ASC;
+```
+
+### Per-partition reads
+
+Partitions track HBase regions of the data table, so you can shard a consumer pool
+across them. Discover partitions with:
+
+```sql
+SELECT DISTINCT PARTITION_ID() FROM orders_cdc;
+```
+
+Then issue per-partition reads:
+
+```sql
+SELECT /*+ CDC_INCLUDE(POST) */ ...
+FROM orders_cdc
+WHERE PARTITION_ID() = ?
+  AND PHOENIX_ROW_TIMESTAMP() >= ?
+  AND PHOENIX_ROW_TIMESTAMP() <  ?
+ORDER BY PHOENIX_ROW_TIMESTAMP() ASC;
+```
+
+## Stream lineage: partitions, splits, and merges [#cdc-lineage]
+
+A CDC stream is logically a **set of partitions**, each carrying a totally-ordered
+sequence of change events. A partition isn't an abstract shard — it corresponds to a
+specific **HBase region of the data table at a point in time**, and it has a finite
+lifetime: it's born when the region is created (or as the result of a split/merge)
+and it's closed when that region itself splits or merges into something new. New
+child partitions take over from there.
+
+Phoenix tracks this topology in `SYSTEM.CDC_STREAM`. The schema makes the lineage
+explicit — every partition row points at its parent partition(s):
+
+| Column                             | Notes                                                                                                               |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `TABLE_NAME`                       | The data table whose changes are streamed.                                                                          |
+| `STREAM_NAME`                      | The CDC stream (each `CREATE CDC` produces a uniquely-named stream).                                                |
+| `PARTITION_ID`                     | This partition's id — same value `PARTITION_ID()` returns on a CDC row.                                             |
+| `PARENT_PARTITION_ID`              | The parent partition's id (empty/null for the initial partitions present when CDC was first enabled).               |
+| `PARTITION_START_TIME`             | When this partition began.                                                                                          |
+| `PARTITION_END_TIME`               | When it was closed (a split or merge ended it). `NULL` while still active.                                          |
+| `PARTITION_START_KEY` / `_END_KEY` | The HBase region's row-key bounds at the time, stored as `VARBINARY_ENCODED`.                                       |
+| `PARENT_PARTITION_START_TIME`      | The parent partition's `PARTITION_START_TIME`, embedded so consumers can walk parent → child without an extra join. |
+
+Two important shapes fall out of this model:
+
+- **A split produces two child rows that share the same `PARENT_PARTITION_ID`** (the
+  region that just split). Their key ranges together cover the parent's range.
+- **A merge produces one child partition with multiple rows in `SYSTEM.CDC_STREAM`** —
+  one row per parent — sharing the same `PARTITION_ID` and differing only in
+  `PARENT_PARTITION_ID`. Together those rows record every parent that fed the merge.
+
+### Consuming events in parent → child order
+
+Because events from a parent partition causally precede events from any of its
+children, a correct consumer must drain the parent before reading children that
+descend from it. The pattern is:
+
+1. **Discover the topology** by reading `SYSTEM.CDC_STREAM` for your table and
+   stream. Build a DAG keyed by `PARTITION_ID`, with edges drawn from
+   `PARENT_PARTITION_ID` → child `PARTITION_ID`. Roots are partitions with no
+   parent (the regions present when CDC was first enabled).
+2. **Process roots first**, then walk forward through the DAG. A child partition is
+   ready to be consumed once **all** of its parents have been fully drained — for
+   merges, that means all rows in `SYSTEM.CDC_STREAM` with the same child
+   `PARTITION_ID` have had their parent partitions processed.
+3. **For each partition**, query the CDC object scoped to that partition and the
+   time window the partition was live:
+
+   ```sql
+   SELECT /*+ CDC_INCLUDE(POST, CHANGE) */
+          PHOENIX_ROW_TIMESTAMP(), <pk_cols>, "CDC JSON"
+   FROM orders_cdc
+   WHERE PARTITION_ID() = ?
+     AND PHOENIX_ROW_TIMESTAMP() >= ?   -- e.g. PARTITION_START_TIME
+     AND PHOENIX_ROW_TIMESTAMP() <  ?   -- e.g. PARTITION_END_TIME (or now() while live)
+   ORDER BY PHOENIX_ROW_TIMESTAMP() ASC;
+   ```
+
+4. **Re-poll the topology periodically.** New rows appear in `SYSTEM.CDC_STREAM`
+   when regions split or merge; consumers refresh their DAG to pick up the new
+   children before existing partitions close.
+
+This is the same shard-lineage model used by DynamoDB Streams — if you're porting a
+DynamoDB Streams consumer, the bookkeeping translates almost directly.
+
+## Special event types [#cdc-special-events]
+
+- **TTL-driven deletes** (rows aged out by [time-based](/docs/features/views) or
+  [conditional](/docs/features/conditional-ttl) TTL) produce CDC events alongside
+  application-issued mutations, so consumers don't have to reconcile retention-driven
+  removals separately.
+- **`ARRAY` and `JSON` columns** in the data table are serialized as simple values
+  inside the `"CDC JSON"` payload.
+- **Case-sensitive identifiers** on the data table and its primary-key columns are
+  preserved end to end in events.
+
+## Operational notes [#cdc-ops]
+
+- When the underlying data table is dropped, its CDC stream metadata in
+  `SYSTEM.CDC_STREAM` is cleaned up automatically — you don't have to drop the CDC
+  object first.
+- The CDC object is internally backed by a partitioned secondary index on the data
+  table, but it's not used to satisfy regular queries against the data table —
+  there's no read penalty on the data table from enabling CDC.
+- Re-creating CDC after a drop produces a distinct stream (the stream name is
+  augmented with creation time), so consumers can detect the boundary and reset
+  their offsets cleanly.
