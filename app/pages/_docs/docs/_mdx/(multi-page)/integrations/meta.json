@@ -3,6 +3,7 @@
   "pages": [
     "spark-integration",
     "apache-hive",
+    "phoenix-dynamodb",
     "pig-integration",
     "map-reduce-integration",
     "flume-plugin",

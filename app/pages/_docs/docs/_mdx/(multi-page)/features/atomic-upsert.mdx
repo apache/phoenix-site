@@ -48,6 +48,59 @@ ON DUPLICATE KEY UPDATE
     ELSE 'VP APPROVAL' END;
 ```
 
+## ON DUPLICATE KEY UPDATE_ONLY [#atomic-upsert-update-only]
+
+`UPDATE_ONLY` is a third variant of the `ON DUPLICATE KEY` clause, available from
+Phoenix 5.3.0 ([PHOENIX-7648](https://issues.apache.org/jira/browse/PHOENIX-7648)).
+Unlike `UPDATE`, the `VALUES` are **not** inserted when the row is missing — the
+statement is a no-op in that case. Use it when an `UPSERT` should behave purely as a
+conditional in-place update.
+
+```sql
+UPSERT INTO inventory(id, qty) VALUES ('sku-42', 0)
+ON DUPLICATE KEY UPDATE_ONLY qty = qty - 1;
+```
+
+If `id = 'sku-42'` already exists, its `qty` is decremented under the row lock.
+If it doesn't, the supplied `VALUES` are discarded and nothing is written.
+
+The three forms compared:
+
+| Clause                             | Row missing                | Row present    |
+| ---------------------------------- | -------------------------- | -------------- |
+| `ON DUPLICATE KEY IGNORE`          | Insert from `VALUES`       | No-op          |
+| `ON DUPLICATE KEY UPDATE ...`      | Insert from `VALUES`       | Run the update |
+| `ON DUPLICATE KEY UPDATE_ONLY ...` | No-op (`VALUES` discarded) | Run the update |
+
+## Returning the affected row [#atomic-upsert-returning]
+
+A single-row `UPSERT` or `DELETE` can append `RETURNING *` to return the affected row
+as a JDBC `ResultSet` in the same round-trip, available from Phoenix 5.3.0
+([PHOENIX-7651](https://issues.apache.org/jira/browse/PHOENIX-7651)). The returned
+row reflects the **server-side state after the mutation** — including any values
+computed by an `ON DUPLICATE KEY UPDATE` clause under the row lock.
+
+This collapses two common patterns into one round-trip:
+
+- **Atomic read-modify-write counters** — increment, then read the new value
+  without a follow-up `SELECT` (and without risking a different writer slipping in
+  between).
+- **Tombstoning / queue consumers** — atomically delete a row and read the payload
+  you just removed, useful for idempotent replay and "claim the next task" patterns.
+
+```sql
+-- Atomic increment that also returns the post-update row.
+UPSERT INTO counters(id, hits) VALUES ('home', 0)
+ON DUPLICATE KEY UPDATE hits = hits + 1
+RETURNING *;
+
+-- Atomic delete returning the row that was removed.
+DELETE FROM tasks WHERE id = ? RETURNING *;
+```
+
+The statement must affect a single row when `RETURNING *` is used. Drivers iterate
+the returned `ResultSet` exactly like the result of a regular `SELECT`.
+
 ## Limitations [#atomic-upsert-limitations]
 
 The following limitations are enforced for the `ON DUPLICATE KEY` clause usage:

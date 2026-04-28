@@ -1440,6 +1440,16 @@ Mapped to `byte[]`.
 VARBINARY
 "
 
+"Data Types","VARBINARY_ENCODED Type","
+VARBINARY_ENCODED
+","
+Variable length byte array that escapes embedded `0x00` bytes so its sort order matches the lexicographic order of the original bytes. Use it anywhere ordering matters: a non-trailing column of a composite primary key, an index key, or a row value constructor over binary data.
+
+Mapped to `byte[]`. See [VARBINARY_ENCODED](/docs/features/varbinary-encoded) for details.
+","
+VARBINARY_ENCODED
+"
+
 "Data Types","ARRAY","
 ARRAY [ '[' [ dimensionInt ] ']' ]
 ","
@@ -1450,6 +1460,16 @@ VARCHAR ARRAY
 CHAR(10) ARRAY [5]
 INTEGER []
 INTEGER [100]
+"
+
+"Data Types","BSON Type","
+BSON
+","
+Native binary JSON document column for schemaless data. Phoenix can read individual fields with `BSON_VALUE`, filter rows with `BSON_CONDITION_EXPRESSION`, and atomically update fields with `BSON_UPDATE_EXPRESSION` — all evaluated server-side.
+
+Stored as BSON bytes; returned as `org.bson.RawBsonDocument`. See [Document Data: BSON](/docs/features/bson) for details.
+","
+BSON
 "
 
 "Functions (Aggregate)","AVG","
