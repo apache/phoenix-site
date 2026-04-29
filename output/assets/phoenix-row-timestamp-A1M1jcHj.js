@@ -48,8 +48,8 @@ WHERE PHOENIX_ROW_TIMESTAMP() >= ?
 ORDER BY PHOENIX_ROW_TIMESTAMP() ASC;
 \`\`\`
 
-Without an index, these predicates require a scan of the table. The next section
-fixes that.
+Without an index, these predicates require a full scan of the table. The next
+section fixes that.
 
 ## Indexing on PHOENIX\\_ROW\\_TIMESTAMP()
 
@@ -101,8 +101,8 @@ without you having to declare or manage a timestamp column yourself. The return
 type is DATE.`},{heading:void 0,content:`It can be used in three places, and the third one is what makes it especially
 powerful:`},{heading:void 0,content:"As a projection in SELECT."},{heading:void 0,content:"As a predicate in WHERE (and JOIN) clauses."},{heading:void 0,content:"As the indexed expression in a functional index, which makes time-bounded reads fast even when the table isn't ordered by time."},{heading:"phoenix-row-timestamp-read",content:"Project it like any other column:"},{heading:"phoenix-row-timestamp-read",content:`The function takes no arguments and is evaluated server-side from the empty cell
 that Phoenix already maintains for every row.`},{heading:"phoenix-row-timestamp-where",content:`Use it to bound queries by mutation time, including incremental "what changed
-since" patterns:`},{heading:"phoenix-row-timestamp-where",content:`Without an index, these predicates require a scan of the table. The next section
-fixes that.`},{heading:"phoenix-row-timestamp-index",content:`Create a functional index
+since" patterns:`},{heading:"phoenix-row-timestamp-where",content:`Without an index, these predicates require a full scan of the table. The next
+section fixes that.`},{heading:"phoenix-row-timestamp-index",content:`Create a functional index
 on the function to make time-bounded reads fast. Phoenix can then seek directly
 on the indexed timestamp instead of scanning the data table:`},{heading:"phoenix-row-timestamp-index",content:`This is the typical recipe for "scan rows changed in the last N minutes" type
 queries on a table whose primary key isn't time-ordered. Pair with
@@ -152,8 +152,8 @@ since" patterns:`}),`
 `,e.jsxs(i.span,{className:"line",children:[e.jsx(i.span,{style:{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},children:"WHERE"}),e.jsx(i.span,{style:{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},children:" PHOENIX_ROW_TIMESTAMP() "}),e.jsx(i.span,{style:{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},children:">="}),e.jsx(i.span,{style:{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},children:" ?"})]}),`
 `,e.jsxs(i.span,{className:"line",children:[e.jsx(i.span,{style:{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},children:"  AND"}),e.jsx(i.span,{style:{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},children:" PHOENIX_ROW_TIMESTAMP() "}),e.jsx(i.span,{style:{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},children:"<"}),e.jsx(i.span,{style:{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},children:"  ?"})]}),`
 `,e.jsxs(i.span,{className:"line",children:[e.jsx(i.span,{style:{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},children:"ORDER BY"}),e.jsx(i.span,{style:{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},children:" PHOENIX_ROW_TIMESTAMP() "}),e.jsx(i.span,{style:{"--shiki-light":"#D73A49","--shiki-dark":"#F97583"},children:"ASC"}),e.jsx(i.span,{style:{"--shiki-light":"#24292E","--shiki-dark":"#E1E4E8"},children:";"})]})]})})}),`
-`,e.jsx(i.p,{children:`Without an index, these predicates require a scan of the table. The next section
-fixes that.`}),`
+`,e.jsx(i.p,{children:`Without an index, these predicates require a full scan of the table. The next
+section fixes that.`}),`
 `,e.jsx(i.h2,{id:"phoenix-row-timestamp-index",children:"Indexing on PHOENIX_ROW_TIMESTAMP()"}),`
 `,e.jsxs(i.p,{children:["Create a ",e.jsx(i.a,{href:"/docs/features/secondary-indexes#functional-indexes",children:"functional index"}),`
 on the function to make time-bounded reads fast. Phoenix can then seek directly

@@ -3130,8 +3130,8 @@ WHERE PHOENIX_ROW_TIMESTAMP() >= ?
 ORDER BY PHOENIX_ROW_TIMESTAMP() ASC;
 ```
 
-Without an index, these predicates require a scan of the table. The next section
-fixes that.
+Without an index, these predicates require a full scan of the table. The next
+section fixes that.
 
 ## Indexing on PHOENIX\_ROW\_TIMESTAMP()
 
@@ -15863,8 +15863,8 @@ WHERE PHOENIX_ROW_TIMESTAMP() >= ?
 ORDER BY PHOENIX_ROW_TIMESTAMP() ASC;
 ```
 
-Without an index, these predicates require a scan of the table. The next section
-fixes that.
+Without an index, these predicates require a full scan of the table. The next
+section fixes that.
 
 ## Indexing on PHOENIX\_ROW\_TIMESTAMP()
 
