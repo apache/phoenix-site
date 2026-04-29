@@ -52,9 +52,10 @@ ON DUPLICATE KEY UPDATE
 
 `UPDATE_ONLY` is a third variant of the `ON DUPLICATE KEY` clause, available from
 Phoenix 5.3.0 ([PHOENIX-7648](https://issues.apache.org/jira/browse/PHOENIX-7648)).
-Unlike `UPDATE`, the `VALUES` are **not** inserted when the row is missing — the
-statement is a no-op in that case. Use it when an `UPSERT` should behave purely as a
-conditional in-place update.
+Unlike `UPDATE`, it **only** runs the update-clause expressions when the row already
+exists — it never inserts. If the row is missing, the supplied `VALUES` are discarded
+and the statement is a no-op. Use it when an `UPSERT` should be able to update an
+existing row but must not create a new one.
 
 ```sql
 UPSERT INTO inventory(id, qty) VALUES ('sku-42', 0)
@@ -100,6 +101,24 @@ DELETE FROM tasks WHERE id = ? RETURNING *;
 
 The statement must affect a single row when `RETURNING *` is used. Drivers iterate
 the returned `ResultSet` exactly like the result of a regular `SELECT`.
+
+### Java JDBC thick-client API
+
+Java applications using the Phoenix thick JDBC client can drive the same
+atomic-return semantics directly through typed methods on `PhoenixStatement` and
+`PhoenixPreparedStatement`, without putting `RETURNING *` in the SQL:
+
+- `executeAtomicUpdateReturnRow` — returns the row state **after** the mutation
+  (or the unchanged row when the statement was a no-op). Equivalent to
+  `RETURNING *` in SQL.
+- `executeAtomicUpdateReturnOldRow` — returns the row state **before** the
+  mutation, regardless of whether the mutation was applied. There is no SQL form
+  for this — only the typed API exposes the pre-image, which is the natural fit
+  for audit logs and compare-and-swap-style flows.
+
+Both return a `Pair<Integer, ResultSet>` where the integer is `1` if the row was
+mutated and `0` for a no-op, so callers know the outcome without having to inspect
+cell contents. Both require an auto-commit connection.
 
 ## Limitations [#atomic-upsert-limitations]
 

@@ -27,10 +27,9 @@ filtering.
 
 ## Basic usage [#segment-scan-usage]
 
-Two helpers — `SCAN_START_KEY()` and `SCAN_END_KEY()` — return the start and end
-row keys of each segment. The `TOTAL_SEGMENTS() = N` predicate in the `WHERE` clause
-is what asks Phoenix to bucket the table into segments instead of running the query
-against the data:
+`TOTAL_SEGMENTS() = N` in the `WHERE` clause asks Phoenix to return _N_ segment
+boundaries instead of running the query against the data. The boundaries are
+projected via the `SCAN_START_KEY()` and `SCAN_END_KEY()` functions:
 
 ```sql
 SELECT SCAN_START_KEY(), SCAN_END_KEY()
@@ -39,14 +38,22 @@ WHERE TOTAL_SEGMENTS() = 16;
 ```
 
 You get back one row per segment with two `VARBINARY` columns: the **start key** and
-the **end key** of that range. Either may be empty — an empty start key means
-"from the beginning of the table"; an empty end key means "to the end of the table".
+the **end key** of that range, as raw HBase row-key bytes. Either may be empty — an
+empty start key means "from the beginning of the table"; an empty end key means
+"to the end of the table".
 
-The bytes are HBase-level row key bytes — typically you hand each `(start_key,
-end_key)` pair to a worker that drives a scan via the lower-level scan API (e.g.
-HBase `Scan.setStartRow` / `setStopRow`, or a framework like Phoenix's MapReduce
-input format that accepts byte-range bounds). Each worker scans its slice
-independently, in parallel.
+To scan a segment, pass each `(start_key, end_key)` pair back into a regular Phoenix
+SQL query, using `SCAN_START_KEY()` and `SCAN_END_KEY()` as predicates with the
+bytes bound as parameters:
+
+```sql
+SELECT pk, v1, v2 FROM my_table
+WHERE SCAN_START_KEY() = ? AND SCAN_END_KEY() = ?;
+```
+
+Phoenix translates these predicates into the underlying HBase scan bounds for you,
+so a worker pool can stay in plain SQL — each worker runs its own query against one
+segment, in parallel.
 
 ## How many segments you actually get [#segment-scan-count]
 
@@ -92,6 +99,6 @@ it's cheap to call, and it doesn't read or count any of the actual data.
   controls (paging, batch sizes) rather than relying on Segment Scan to balance row
   counts.
 - **Segment Scan describes ranges; it doesn't scan.** The parallel scan itself is
-  your responsibility. The typical pattern is a worker pool that takes one
-  `(start_key, end_key)` per task and runs a regular Phoenix query bounded by that
-  range.
+  your responsibility — a worker pool takes one `(start_key, end_key)` per task and
+  runs a regular Phoenix query bounded with `SCAN_START_KEY() = ? AND SCAN_END_KEY()
+= ?`.

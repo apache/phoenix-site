@@ -1913,9 +1913,10 @@ ON DUPLICATE KEY UPDATE
 
 `UPDATE_ONLY` is a third variant of the `ON DUPLICATE KEY` clause, available from
 Phoenix 5.3.0 ([PHOENIX-7648](https://issues.apache.org/jira/browse/PHOENIX-7648)).
-Unlike `UPDATE`, the `VALUES` are **not** inserted when the row is missing — the
-statement is a no-op in that case. Use it when an `UPSERT` should behave purely as a
-conditional in-place update.
+Unlike `UPDATE`, it **only** runs the update-clause expressions when the row already
+exists — it never inserts. If the row is missing, the supplied `VALUES` are discarded
+and the statement is a no-op. Use it when an `UPSERT` should be able to update an
+existing row but must not create a new one.
 
 ```sql
 UPSERT INTO inventory(id, qty) VALUES ('sku-42', 0)
@@ -1961,6 +1962,24 @@ DELETE FROM tasks WHERE id = ? RETURNING *;
 
 The statement must affect a single row when `RETURNING *` is used. Drivers iterate
 the returned `ResultSet` exactly like the result of a regular `SELECT`.
+
+### Java JDBC thick-client API
+
+Java applications using the Phoenix thick JDBC client can drive the same
+atomic-return semantics directly through typed methods on `PhoenixStatement` and
+`PhoenixPreparedStatement`, without putting `RETURNING *` in the SQL:
+
+* `executeAtomicUpdateReturnRow` — returns the row state **after** the mutation
+  (or the unchanged row when the statement was a no-op). Equivalent to
+  `RETURNING *` in SQL.
+* `executeAtomicUpdateReturnOldRow` — returns the row state **before** the
+  mutation, regardless of whether the mutation was applied. There is no SQL form
+  for this — only the typed API exposes the pre-image, which is the natural fit
+  for audit logs and compare-and-swap-style flows.
+
+Both return a `Pair<Integer, ResultSet>` where the integer is `1` if the row was
+mutated and `0` for a no-op, so callers know the outcome without having to inspect
+cell contents. Both require an auto-commit connection.
 
 ## Limitations
 
@@ -4058,10 +4077,9 @@ filtering.
 
 ## Basic usage
 
-Two helpers — `SCAN_START_KEY()` and `SCAN_END_KEY()` — return the start and end
-row keys of each segment. The `TOTAL_SEGMENTS() = N` predicate in the `WHERE` clause
-is what asks Phoenix to bucket the table into segments instead of running the query
-against the data:
+`TOTAL_SEGMENTS() = N` in the `WHERE` clause asks Phoenix to return *N* segment
+boundaries instead of running the query against the data. The boundaries are
+projected via the `SCAN_START_KEY()` and `SCAN_END_KEY()` functions:
 
 ```sql
 SELECT SCAN_START_KEY(), SCAN_END_KEY()
@@ -4070,14 +4088,22 @@ WHERE TOTAL_SEGMENTS() = 16;
 ```
 
 You get back one row per segment with two `VARBINARY` columns: the **start key** and
-the **end key** of that range. Either may be empty — an empty start key means
-"from the beginning of the table"; an empty end key means "to the end of the table".
+the **end key** of that range, as raw HBase row-key bytes. Either may be empty — an
+empty start key means "from the beginning of the table"; an empty end key means
+"to the end of the table".
 
-The bytes are HBase-level row key bytes — typically you hand each `(start_key,
-end_key)` pair to a worker that drives a scan via the lower-level scan API (e.g.
-HBase `Scan.setStartRow` / `setStopRow`, or a framework like Phoenix's MapReduce
-input format that accepts byte-range bounds). Each worker scans its slice
-independently, in parallel.
+To scan a segment, pass each `(start_key, end_key)` pair back into a regular Phoenix
+SQL query, using `SCAN_START_KEY()` and `SCAN_END_KEY()` as predicates with the
+bytes bound as parameters:
+
+```sql
+SELECT pk, v1, v2 FROM my_table
+WHERE SCAN_START_KEY() = ? AND SCAN_END_KEY() = ?;
+```
+
+Phoenix translates these predicates into the underlying HBase scan bounds for you,
+so a worker pool can stay in plain SQL — each worker runs its own query against one
+segment, in parallel.
 
 ## How many segments you actually get
 
@@ -4123,9 +4149,8 @@ it's cheap to call, and it doesn't read or count any of the actual data.
   controls (paging, batch sizes) rather than relying on Segment Scan to balance row
   counts.
 * **Segment Scan describes ranges; it doesn't scan.** The parallel scan itself is
-  your responsibility. The typical pattern is a worker pool that takes one
-  `(start_key, end_key)` per task and runs a regular Phoenix query bounded by that
-  range.
+  your responsibility — a worker pool takes one `(start_key, end_key)` per task and
+  runs a regular Phoenix query bounded with `SCAN_START_KEY() = ? AND SCAN_END_KEY() = ?`.
 
 
 # Skip Scan (/docs/features/skip-scan)
@@ -5045,13 +5070,14 @@ The classic case is **multi-tenant retention**: one shared base table, many tena
 views, each tenant gets a different retention window driven by its plan, region, or
 contract.
 
-| Scenario                                                         | View TTL fit                                          |
-| ---------------------------------------------------------------- | ----------------------------------------------------- |
-| Per-tenant retention windows on one shared base table            | Yes                                                   |
-| Per-use-case retention (e.g., "raw events 7 days, audit 1 year") | Yes                                                   |
-| Same retention for the entire physical table                     | Use a regular table-level `TTL` instead               |
-| Retention based on row content rather than age                   | Use [Conditional TTL](/docs/features/conditional-ttl) |
-| Different schemas per tenant                                     | Use separate tables, not views                        |
+| Scenario                                                                           | View TTL fit                                                   |
+| ---------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| Per-tenant retention windows on one shared base table                              | Yes                                                            |
+| Per-use-case retention (e.g., "raw events 7 days, audit 1 year")                   | Yes                                                            |
+| Per-tenant **extra columns** on top of the shared base table (each tenant's view)  | Yes — views can extend the base schema, View TTL still applies |
+| Same retention for the entire physical table                                       | Use a regular table-level `TTL` instead                        |
+| Retention based on row content rather than age                                     | Use [Conditional TTL](/docs/features/conditional-ttl)          |
+| Different **base-table** schemas per tenant (different PK, different core columns) | Use separate tables — View TTL doesn't apply                   |
 
 If the retention rule is the same for everyone reading the table, set `TTL` on the
 table itself; you don't need View TTL.
@@ -9685,9 +9711,8 @@ Reach for Phoenix-DynamoDB when:
 * You need a REST endpoint in front of a Phoenix cluster that speaks a wire
   protocol most clients already know how to talk to.
 
-For native Phoenix workloads, prefer the standard JDBC driver or the
-[Phoenix Query Server](/docs/features/query-server) — they expose the full SQL
-surface, not just whatever subset the DynamoDB API maps onto.
+For native Phoenix workloads, prefer the standard JDBC driver — it exposes the full
+SQL surface, not just whatever subset the DynamoDB API maps onto.
 
 ## Where to find it
 
@@ -13430,9 +13455,8 @@ Reach for Phoenix-DynamoDB when:
 * You need a REST endpoint in front of a Phoenix cluster that speaks a wire
   protocol most clients already know how to talk to.
 
-For native Phoenix workloads, prefer the standard JDBC driver or the
-[Phoenix Query Server](/docs/features/query-server) — they expose the full SQL
-surface, not just whatever subset the DynamoDB API maps onto.
+For native Phoenix workloads, prefer the standard JDBC driver — it exposes the full
+SQL surface, not just whatever subset the DynamoDB API maps onto.
 
 ## Where to find it
 
@@ -15164,9 +15188,10 @@ ON DUPLICATE KEY UPDATE
 
 `UPDATE_ONLY` is a third variant of the `ON DUPLICATE KEY` clause, available from
 Phoenix 5.3.0 ([PHOENIX-7648](https://issues.apache.org/jira/browse/PHOENIX-7648)).
-Unlike `UPDATE`, the `VALUES` are **not** inserted when the row is missing — the
-statement is a no-op in that case. Use it when an `UPSERT` should behave purely as a
-conditional in-place update.
+Unlike `UPDATE`, it **only** runs the update-clause expressions when the row already
+exists — it never inserts. If the row is missing, the supplied `VALUES` are discarded
+and the statement is a no-op. Use it when an `UPSERT` should be able to update an
+existing row but must not create a new one.
 
 ```sql
 UPSERT INTO inventory(id, qty) VALUES ('sku-42', 0)
@@ -15212,6 +15237,24 @@ DELETE FROM tasks WHERE id = ? RETURNING *;
 
 The statement must affect a single row when `RETURNING *` is used. Drivers iterate
 the returned `ResultSet` exactly like the result of a regular `SELECT`.
+
+### Java JDBC thick-client API
+
+Java applications using the Phoenix thick JDBC client can drive the same
+atomic-return semantics directly through typed methods on `PhoenixStatement` and
+`PhoenixPreparedStatement`, without putting `RETURNING *` in the SQL:
+
+* `executeAtomicUpdateReturnRow` — returns the row state **after** the mutation
+  (or the unchanged row when the statement was a no-op). Equivalent to
+  `RETURNING *` in SQL.
+* `executeAtomicUpdateReturnOldRow` — returns the row state **before** the
+  mutation, regardless of whether the mutation was applied. There is no SQL form
+  for this — only the typed API exposes the pre-image, which is the natural fit
+  for audit logs and compare-and-swap-style flows.
+
+Both return a `Pair<Integer, ResultSet>` where the integer is `1` if the row was
+mutated and `0` for a no-op, so callers know the outcome without having to inspect
+cell contents. Both require an auto-commit connection.
 
 ## Limitations
 
@@ -15637,10 +15680,9 @@ filtering.
 
 ## Basic usage
 
-Two helpers — `SCAN_START_KEY()` and `SCAN_END_KEY()` — return the start and end
-row keys of each segment. The `TOTAL_SEGMENTS() = N` predicate in the `WHERE` clause
-is what asks Phoenix to bucket the table into segments instead of running the query
-against the data:
+`TOTAL_SEGMENTS() = N` in the `WHERE` clause asks Phoenix to return *N* segment
+boundaries instead of running the query against the data. The boundaries are
+projected via the `SCAN_START_KEY()` and `SCAN_END_KEY()` functions:
 
 ```sql
 SELECT SCAN_START_KEY(), SCAN_END_KEY()
@@ -15649,14 +15691,22 @@ WHERE TOTAL_SEGMENTS() = 16;
 ```
 
 You get back one row per segment with two `VARBINARY` columns: the **start key** and
-the **end key** of that range. Either may be empty — an empty start key means
-"from the beginning of the table"; an empty end key means "to the end of the table".
+the **end key** of that range, as raw HBase row-key bytes. Either may be empty — an
+empty start key means "from the beginning of the table"; an empty end key means
+"to the end of the table".
 
-The bytes are HBase-level row key bytes — typically you hand each `(start_key,
-end_key)` pair to a worker that drives a scan via the lower-level scan API (e.g.
-HBase `Scan.setStartRow` / `setStopRow`, or a framework like Phoenix's MapReduce
-input format that accepts byte-range bounds). Each worker scans its slice
-independently, in parallel.
+To scan a segment, pass each `(start_key, end_key)` pair back into a regular Phoenix
+SQL query, using `SCAN_START_KEY()` and `SCAN_END_KEY()` as predicates with the
+bytes bound as parameters:
+
+```sql
+SELECT pk, v1, v2 FROM my_table
+WHERE SCAN_START_KEY() = ? AND SCAN_END_KEY() = ?;
+```
+
+Phoenix translates these predicates into the underlying HBase scan bounds for you,
+so a worker pool can stay in plain SQL — each worker runs its own query against one
+segment, in parallel.
 
 ## How many segments you actually get
 
@@ -15702,9 +15752,8 @@ it's cheap to call, and it doesn't read or count any of the actual data.
   controls (paging, batch sizes) rather than relying on Segment Scan to balance row
   counts.
 * **Segment Scan describes ranges; it doesn't scan.** The parallel scan itself is
-  your responsibility. The typical pattern is a worker pool that takes one
-  `(start_key, end_key)` per task and runs a regular Phoenix query bounded by that
-  range.
+  your responsibility — a worker pool takes one `(start_key, end_key)` per task and
+  runs a regular Phoenix query bounded with `SCAN_START_KEY() = ? AND SCAN_END_KEY() = ?`.
 
 ***
 
@@ -15866,13 +15915,14 @@ The classic case is **multi-tenant retention**: one shared base table, many tena
 views, each tenant gets a different retention window driven by its plan, region, or
 contract.
 
-| Scenario                                                         | View TTL fit                                          |
-| ---------------------------------------------------------------- | ----------------------------------------------------- |
-| Per-tenant retention windows on one shared base table            | Yes                                                   |
-| Per-use-case retention (e.g., "raw events 7 days, audit 1 year") | Yes                                                   |
-| Same retention for the entire physical table                     | Use a regular table-level `TTL` instead               |
-| Retention based on row content rather than age                   | Use [Conditional TTL](/docs/features/conditional-ttl) |
-| Different schemas per tenant                                     | Use separate tables, not views                        |
+| Scenario                                                                           | View TTL fit                                                   |
+| ---------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| Per-tenant retention windows on one shared base table                              | Yes                                                            |
+| Per-use-case retention (e.g., "raw events 7 days, audit 1 year")                   | Yes                                                            |
+| Per-tenant **extra columns** on top of the shared base table (each tenant's view)  | Yes — views can extend the base schema, View TTL still applies |
+| Same retention for the entire physical table                                       | Use a regular table-level `TTL` instead                        |
+| Retention based on row content rather than age                                     | Use [Conditional TTL](/docs/features/conditional-ttl)          |
+| Different **base-table** schemas per tenant (different PK, different core columns) | Use separate tables — View TTL doesn't apply                   |
 
 If the retention rule is the same for everyone reading the table, set `TTL` on the
 table itself; you don't need View TTL.

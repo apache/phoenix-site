@@ -16,13 +16,14 @@ The classic case is **multi-tenant retention**: one shared base table, many tena
 views, each tenant gets a different retention window driven by its plan, region, or
 contract.
 
-| Scenario                                                         | View TTL fit                                          |
-| ---------------------------------------------------------------- | ----------------------------------------------------- |
-| Per-tenant retention windows on one shared base table            | Yes                                                   |
-| Per-use-case retention (e.g., "raw events 7 days, audit 1 year") | Yes                                                   |
-| Same retention for the entire physical table                     | Use a regular table-level `TTL` instead               |
-| Retention based on row content rather than age                   | Use [Conditional TTL](/docs/features/conditional-ttl) |
-| Different schemas per tenant                                     | Use separate tables, not views                        |
+| Scenario                                                                           | View TTL fit                                                   |
+| ---------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| Per-tenant retention windows on one shared base table                              | Yes                                                            |
+| Per-use-case retention (e.g., "raw events 7 days, audit 1 year")                   | Yes                                                            |
+| Per-tenant **extra columns** on top of the shared base table (each tenant's view)  | Yes — views can extend the base schema, View TTL still applies |
+| Same retention for the entire physical table                                       | Use a regular table-level `TTL` instead                        |
+| Retention based on row content rather than age                                     | Use [Conditional TTL](/docs/features/conditional-ttl)          |
+| Different **base-table** schemas per tenant (different PK, different core columns) | Use separate tables — View TTL doesn't apply                   |
 
 If the retention rule is the same for everyone reading the table, set `TTL` on the
 table itself; you don't need View TTL.
