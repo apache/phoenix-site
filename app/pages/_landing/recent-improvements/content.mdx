@@ -1,11 +1,19 @@
 # New Features
 
-<Callout type="warning">
-  This page hasn't been updated recently, and may be missing relevant
-  information for current releases
-</Callout>
+## 5.3.0 [#release-5-3-0]
 
-As items are implemented from our road map, they are moved here to track the progress we've made:
+1. **[Change Data Capture](/docs/features/change-data-capture)**. Stream row-level changes as ordered, partitioned events with configurable pre/post/change scopes. Includes TTL-delete events and partition tracking that survives region splits, merges, and table drops ([PHOENIX-7001](https://issues.apache.org/jira/browse/PHOENIX-7001)).
+1. **[Document Data: BSON](/docs/features/bson)**. First-class Binary JSON column type with `BSON_VALUE`, `BSON_CONDITION_EXPRESSION`, and `BSON_UPDATE_EXPRESSION` functions for projecting, filtering, and atomically mutating individual document fields server-side ([PHOENIX-7330](https://issues.apache.org/jira/browse/PHOENIX-7330)).
+1. **[VARBINARY_ENCODED](/docs/features/varbinary-encoded)**. New variable-length binary type that sorts correctly in any position of a composite primary key, in row value constructors, and in secondary index keys ([PHOENIX-7357](https://issues.apache.org/jira/browse/PHOENIX-7357)).
+1. **[View TTL](/docs/features/view-ttl)**. Each view over a shared base table can age data out on its own retention schedule, with read-time filtering and physical removal during Phoenix compaction ([PHOENIX-6978](https://issues.apache.org/jira/browse/PHOENIX-6978)).
+1. **[Conditional TTL](/docs/features/conditional-ttl)**. Express row expiration as a SQL boolean expression evaluated against the row's own column values ([PHOENIX-7170](https://issues.apache.org/jira/browse/PHOENIX-7170)).
+1. **[Strict vs Relaxed TTL](/docs/features/ttl#strict-vs-relaxed-ttl)**. New `IS_STRICT_TTL` table property applicable to any kind of TTL — relaxed TTL keeps expired rows visible until major compaction (DynamoDB-style) and gives a cheaper write path; strict (default) hides expired rows on every read ([PHOENIX-7667](https://issues.apache.org/jira/browse/PHOENIX-7667)).
+1. **[Segment Scan](/docs/features/segment-scan)**. `TOTAL_SEGMENTS()` SQL function returns _N_ contiguous key ranges for a table, enabling clients to drive parallel full-table scans (DynamoDB-style) ([PHOENIX-7684](https://issues.apache.org/jira/browse/PHOENIX-7684)).
+1. **[`UPSERT/DELETE RETURNING *`](/docs/features/atomic-upsert#atomic-upsert-returning)**. Single-row `UPSERT` and `DELETE` can append `RETURNING *` to return the post-mutation row as a `ResultSet` in the same round-trip ([PHOENIX-7651](https://issues.apache.org/jira/browse/PHOENIX-7651)).
+1. **[`ON DUPLICATE KEY UPDATE_ONLY`](/docs/features/atomic-upsert#atomic-upsert-update-only)**. New atomic-upsert variant that runs the update clause if the row exists and is a **no-op** otherwise — the supplied `VALUES` are never inserted ([PHOENIX-7648](https://issues.apache.org/jira/browse/PHOENIX-7648)).
+1. **[Phoenix-DynamoDB REST Service](/docs/integrations/phoenix-dynamodb)**. DynamoDB-compatible REST front-end for Phoenix, distributed via the [`apache/phoenix-adapters`](https://github.com/apache/phoenix-adapters) repository.
+
+## Earlier releases [#earlier-releases]
 
 1. **[Table Sampling](/docs/features/table-sampling)**. Support the <code>TABLESAMPLE</code> clause by implementing a filter that uses the guideposts established by stats gathering to only return a percentage of the rows. **Available in our 4.12 release**
 1. **[Reduce on disk storage](/docs/features/storage-formats)**. Reduce on disk storage to improve performance by a) packing all values into a single cell per column family and b) provide an indirection between the column name and the column qualifier. **Available in our 4.10 release**

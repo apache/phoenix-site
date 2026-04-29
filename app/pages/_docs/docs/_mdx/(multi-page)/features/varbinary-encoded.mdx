@@ -1,0 +1,94 @@
+---
+title: "VARBINARY_ENCODED"
+description: "A variable-length binary type that sorts correctly anywhere in a composite key — use it for row keys, index keys, and row value constructors that contain binary data."
+---
+
+`VARBINARY_ENCODED` is the safe choice whenever you need a variable-length binary
+column that participates in **ordering**: a non-trailing column of a composite primary
+key, a secondary-index key, or a row value constructor used for paged queries.
+Introduced in Phoenix 5.3.0
+([PHOENIX-7357](https://issues.apache.org/jira/browse/PHOENIX-7357)).
+
+## When to use it [#varbinary-encoded-when]
+
+Pick `VARBINARY_ENCODED` over `VARBINARY` when **any** of the following is true:
+
+- The column is part of a multi-column primary key and is **not** the last PK column.
+- The column is used as part of an index key.
+- You scan with row value constructors (e.g., `WHERE (a, b) > (?, ?)` for keyset
+  pagination) and one of the columns is binary.
+- The binary value can contain `0x00` bytes and you cannot guarantee it never will.
+
+Stick with `VARBINARY` only when the column is purely a payload — i.e. it's never used
+in a `WHERE`, `ORDER BY`, index, or non-trailing PK position.
+
+The reason: `VARBINARY` uses `0x00` as a separator between columns in the encoded row
+key, so an embedded `0x00` byte in an earlier PK column collides with the separator and
+breaks ordering. `VARBINARY_ENCODED` escapes zero bytes during encoding so the
+byte-by-byte sort order of the encoded form matches the lexicographic order of the
+original bytes. The transform is reversed on read, so application code keeps seeing the
+original bytes.
+
+## Defining columns [#varbinary-encoded-defining]
+
+Use it like any other column type — including in any position of a composite key:
+
+```sql
+CREATE TABLE events (
+    bucket       VARBINARY_ENCODED NOT NULL,
+    event_id     VARBINARY_ENCODED NOT NULL,
+    payload      VARBINARY,
+    CONSTRAINT pk PRIMARY KEY (bucket, event_id)
+);
+```
+
+Literals use the standard hex form `x'...'` in both `UPSERT` and `WHERE`:
+
+```sql
+UPSERT INTO events (bucket, event_id, payload)
+VALUES (x'01ff00ab', x'00007fa1', x'deadbeef');
+
+SELECT * FROM events
+WHERE bucket = x'01ff00ab' AND event_id = x'00007fa1';
+```
+
+## Paged scans with row value constructors [#varbinary-encoded-paging]
+
+The intended use case for `VARBINARY_ENCODED` in a composite key is keyset pagination
+that resumes from the last seen row. Because the type orders correctly, you can drive
+this with a row value constructor without any application-level encoding:
+
+```sql
+SELECT bucket, event_id, payload
+FROM events
+WHERE (bucket, event_id) > (?, ?)
+ORDER BY bucket, event_id
+LIMIT 100;
+```
+
+Bind the two parameters to the last row seen by the previous page; Phoenix turns the
+predicate into an efficient seek directly to the resume point. See
+[Paged Queries](/docs/features/paged-queries) for the broader pattern.
+
+## Sizing and storage [#varbinary-encoded-sizing]
+
+The encoded form is at most 1 extra byte per `0x00` byte in the value. For typical
+inputs (random IDs, hashes, opaque tokens) the overhead is effectively zero. Plan a bit
+of headroom only when values are known to contain many zero bytes (e.g. fixed-width
+integers stored raw with a lot of high-order zeros — in which case a fixed-width
+`UNSIGNED_*` type is usually a better choice anyway).
+
+## Migrating from VARBINARY [#varbinary-encoded-migrating]
+
+Phoenix does not support changing a column's type in place via `ALTER TABLE`, so
+moving an existing `VARBINARY` column to `VARBINARY_ENCODED` is a copy-and-switch
+operation:
+
+1. Create a new table with the same schema but with the affected columns declared as
+   `VARBINARY_ENCODED`.
+2. Backfill: `UPSERT INTO new_table SELECT ... FROM old_table;` (Phoenix re-encodes
+   the values into the new physical layout for you).
+3. Cut over reads and writes to the new table, then drop the old one.
+
+For a brand-new column that you're adding to an existing table, you can declare it as
+`VARBINARY_ENCODED` directly with `ALTER TABLE ... ADD ...`.
