@@ -100,4 +100,6 @@ Two things happen to expired rows:
 A view's `TTL` can also be a SQL boolean expression instead of a number, in which
 case it follows the [Conditional TTL](/docs/features/conditional-ttl) rules. This
 unlocks expiry based on row content (e.g. _expire 30 days after `STATUS` becomes
-`'CLOSED'`_), and the strict-vs-relaxed enforcement modes documented there.
+`'CLOSED'`_). The `IS_STRICT_TTL` property described in
+[Strict vs Relaxed TTL](/docs/features/ttl#strict-vs-relaxed-ttl) applies to view
+TTL too.

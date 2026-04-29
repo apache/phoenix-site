@@ -1,6 +1,6 @@
 ---
 title: "Conditional TTL"
-description: "Express row expiration as a SQL boolean expression evaluated against the row itself, with strict and relaxed enforcement modes."
+description: "Express row expiration as a SQL boolean expression evaluated against the row itself."
 ---
 
 Conditional TTL lets you express row expiration as a **SQL boolean expression
@@ -56,44 +56,17 @@ What "expired" means in practice:
    compaction during HBase region compactions. There is no separate cleanup job —
    physical removal happens whenever the underlying regions compact.
 
-## Strict vs Relaxed TTL [#strict-vs-relaxed-ttl]
+## Effect on the write path [#conditional-ttl-write-path]
 
-Conditional TTL has two **enforcement modes**, controlled by the `IS_STRICT_TTL`
-table property. The default is `true` (strict).
+`IS_STRICT_TTL` is a table property that applies to any kind of TTL — see
+[Strict vs Relaxed TTL](/docs/features/ttl#strict-vs-relaxed-ttl) for the full
+description.
 
-### What each mode does
-
-| Path                       | Strict (default)                                                                                                                                                                                                                            | Relaxed (`IS_STRICT_TTL = false`)                                                                           |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| **Reads (region scanner)** | Server-side **masking** is enabled — rows for which the TTL expression is `TRUE` are filtered out of every result set, on every read path.                                                                                                  | Read-time masking is disabled. Expired rows can still surface through scans until compaction reclaims them. |
-| **Atomic UPSERT / DELETE** | The row is **locked** and the TTL expression is **pre-evaluated** against the current row state. If the row is already expired, the mutation behaves as if the row does not exist (e.g. `ON DUPLICATE KEY UPDATE` falls through to insert). | The extra row lock and pre-check are skipped — atomic mutations run without consulting the TTL expression.  |
-
-### Choosing a mode
-
-Start with **strict** (the default). Switch to **relaxed** when relaxed mode's
-cheaper write-path is the right trade-off: no extra lock or pre-check on atomic
-operations makes it a reasonable choice for high-throughput workloads where eventual
-visibility of expired rows is acceptable.
-
-### Setting the mode
-
-```sql
--- Strict (default).
-CREATE TABLE strict_orders (...)
-TTL = 'status = ''CLOSED''',
-IS_STRICT_TTL = true;
-
--- Relaxed: cheaper write path, eventual visibility of expired rows.
-CREATE TABLE relaxed_orders (...)
-TTL = 'status = ''CLOSED''',
-IS_STRICT_TTL = false;
-```
-
-Switch a table between modes later:
-
-```sql
-ALTER TABLE orders SET IS_STRICT_TTL = false;
-```
+The conditional-TTL-specific cost is in the **write path**: with strict (the
+default), every mutation reads the current row state on the server to evaluate the
+TTL expression, which adds latency. With relaxed (`IS_STRICT_TTL = false`), that
+extra row read is skipped — at the cost of expired rows remaining visible to
+readers until major compaction physically removes them.
 
 ## Limitations [#conditional-ttl-limitations]
 

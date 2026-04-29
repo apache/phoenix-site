@@ -15,6 +15,7 @@
     "segment-scan",
     "table-sampling",
     "views",
+    "ttl",
     "view-ttl",
     "conditional-ttl",
     "multi-tenancy",

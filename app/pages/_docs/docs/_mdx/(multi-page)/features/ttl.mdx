@@ -1,0 +1,76 @@
+---
+title: "TTL"
+description: "Phoenix TTL flavors (time-based, view, conditional) and the IS_STRICT_TTL property that controls visibility of expired rows."
+---
+
+Phoenix supports per-row time-to-live (TTL) so that rows can be expired and removed
+without an application-issued `DELETE`. There are three flavors, and one orthogonal
+table property — `IS_STRICT_TTL` — that controls how aggressively expired rows are
+hidden from reads.
+
+## Time-based TTL [#time-based-ttl]
+
+Set a numeric value (in seconds) on the `TTL` table property at `CREATE TABLE` time
+to age every row out a fixed duration after its cell timestamp:
+
+```sql
+CREATE TABLE events (...) TTL = 604800;   -- 7 days
+ALTER TABLE events SET TTL = 2592000;     -- bump to 30 days
+ALTER TABLE events SET TTL = NONE;        -- remove TTL
+```
+
+Rows older than the TTL are removed by Phoenix compaction during HBase region
+compactions. Time-based TTL is the right choice when retention is a flat duration
+that applies uniformly to every row in the table.
+
+## View TTL [#view-ttl-summary]
+
+Each [view](/docs/features/views) over a shared base table can set its own retention
+window, so different tenants or use cases can age data out independently without
+splitting the underlying table. See [View TTL](/docs/features/view-ttl) for the
+full feature.
+
+## Conditional TTL [#conditional-ttl-summary]
+
+Express row expiration as a SQL boolean expression evaluated against the row's own
+column values, instead of a fixed duration. A row is considered expired the moment
+the expression evaluates to `TRUE` for that row. See
+[Conditional TTL](/docs/features/conditional-ttl) for the full feature.
+
+## Strict vs Relaxed TTL [#strict-vs-relaxed-ttl]
+
+`IS_STRICT_TTL` is a table property that controls **how strictly expired rows are
+hidden from reads**. It applies to every flavor of TTL above — time-based, view,
+and conditional. The default is `true` (strict).
+
+| Mode                                         | Behavior                                                                                                                              |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| **Strict** (`IS_STRICT_TTL = true`, default) | Expired rows are filtered out on every read path — they're invisible to queries the moment they expire.                               |
+| **Relaxed** (`IS_STRICT_TTL = false`)        | Expired rows remain **visible to readers until major compaction** physically removes them. Similar to DynamoDB's TTL expiry behavior. |
+
+The trade-off:
+
+- **Strict** gives you a strong "expired = invisible" guarantee. It's the right
+  choice when retention is a correctness or compliance concern.
+- **Relaxed** has a cheaper write path. The largest gain is with
+  [Conditional TTL](/docs/features/conditional-ttl): under strict mode, every
+  mutation reads the current row state to evaluate the TTL expression, which adds
+  latency. Relaxed mode skips that pre-read.
+
+```sql
+-- Strict (default).
+CREATE TABLE strict_events (...) TTL = 604800;
+
+-- Relaxed: cheaper write path, eventual visibility of expired rows.
+CREATE TABLE relaxed_events (...) TTL = 604800, IS_STRICT_TTL = false;
+```
+
+You can also switch a table between modes:
+
+```sql
+ALTER TABLE events SET IS_STRICT_TTL = false;
+```
+
+Start with the default. Switch to relaxed only when the cheaper write path is the
+right trade-off for your workload and eventual visibility of expired rows is
+acceptable for your readers.
