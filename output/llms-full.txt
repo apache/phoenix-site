@@ -3157,6 +3157,12 @@ queries on a table whose primary key isn't time-ordered. Pair with
 [uncovered indexes](/docs/features/secondary-indexes#uncovered-indexes) when you
 don't want to duplicate payload columns into the index.
 
+If your downstream needs a **continuous, ordered stream** of changes rather than
+periodic time-bounded scans — including the actual mutation deltas — reach for
+[Change Data Capture](/docs/features/change-data-capture) instead. The functional
+index pattern here is best suited to ad-hoc time-window reads from the same
+client that issues regular SQL queries.
+
 ## Relationship to ROW\_TIMESTAMP column
 
 Two related concepts share the word "timestamp" — they are not the same:
@@ -15883,6 +15889,12 @@ This is the typical recipe for "scan rows changed in the last N minutes" type
 queries on a table whose primary key isn't time-ordered. Pair with
 [uncovered indexes](/docs/features/secondary-indexes#uncovered-indexes) when you
 don't want to duplicate payload columns into the index.
+
+If your downstream needs a **continuous, ordered stream** of changes rather than
+periodic time-bounded scans — including the actual mutation deltas — reach for
+[Change Data Capture](/docs/features/change-data-capture) instead. The functional
+index pattern here is best suited to ad-hoc time-window reads from the same
+client that issues regular SQL queries.
 
 ## Relationship to ROW\_TIMESTAMP column
 
