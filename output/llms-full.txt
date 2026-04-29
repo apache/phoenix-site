@@ -1994,7 +1994,6 @@ The following limitations are enforced for the `ON DUPLICATE KEY` clause usage:
   does not handle atomicity unless the latest value is being updated.
 * The same column should not be updated more than once in the same statement.
 * No aggregation or references to sequences are allowed within the clause.
-* Global indexes on columns being atomically updated are not supported, as potentially a separate RPC across the wire would be made while the row is under lock to maintain the secondary index.
 
 
 # Document Data: BSON (/docs/features/bson)
@@ -3080,6 +3079,105 @@ LIMIT 10 OFFSET 10
 `OFFSET` reads and skips rows on either the server or client depending on query type, whereas RVC is more effective for queries on the primary key axis because it can start directly from the provided key.
 
 
+# PHOENIX_ROW_TIMESTAMP() (/docs/features/phoenix-row-timestamp)
+`PHOENIX_ROW_TIMESTAMP()` is a built-in SQL function that returns the **timestamp
+of the row's empty column**, which Phoenix updates automatically on every write.
+It's effectively the row's **last-modified time**, available on any Phoenix table
+without you having to declare or manage a timestamp column yourself. The return
+type is `DATE`.
+
+It can be used in three places, and the third one is what makes it especially
+powerful:
+
+1. As a projection in `SELECT`.
+2. As a predicate in `WHERE` (and `JOIN`) clauses.
+3. As the indexed expression in a [functional index](/docs/features/secondary-indexes#functional-indexes), which makes time-bounded reads fast even when the table isn't ordered by time.
+
+## Reading the row timestamp
+
+Project it like any other column:
+
+```sql
+-- Last-modified time of every row.
+SELECT PHOENIX_ROW_TIMESTAMP(), id, payload FROM events;
+
+-- Combine with regular row data.
+SELECT id,
+       PHOENIX_ROW_TIMESTAMP() AS modified_at,
+       payload
+FROM events
+WHERE region = 'us-west-2';
+```
+
+The function takes no arguments and is evaluated server-side from the empty cell
+that Phoenix already maintains for every row.
+
+## In WHERE predicates
+
+Use it to bound queries by mutation time, including incremental "what changed
+since" patterns:
+
+```sql
+-- Rows modified in the last hour.
+SELECT * FROM events
+WHERE PHOENIX_ROW_TIMESTAMP() > CURRENT_DATE() - 1.0 / 24;
+
+-- Pull a window for an incremental consumer.
+SELECT id, payload
+FROM events
+WHERE PHOENIX_ROW_TIMESTAMP() >= ?
+  AND PHOENIX_ROW_TIMESTAMP() <  ?
+ORDER BY PHOENIX_ROW_TIMESTAMP() ASC;
+```
+
+Without an index, these predicates require a full scan of the table. The next
+section fixes that.
+
+## Indexing on PHOENIX\_ROW\_TIMESTAMP()
+
+Create a [functional index](/docs/features/secondary-indexes#functional-indexes)
+on the function to make time-bounded reads fast. Phoenix can then seek directly
+on the indexed timestamp instead of scanning the data table:
+
+```sql
+CREATE INDEX events_by_modified
+    ON events (PHOENIX_ROW_TIMESTAMP())
+    INCLUDE (payload);
+
+-- Phoenix uses the index for this query.
+SELECT id, payload
+FROM events
+WHERE PHOENIX_ROW_TIMESTAMP() >= ?
+  AND PHOENIX_ROW_TIMESTAMP() <  ?
+ORDER BY PHOENIX_ROW_TIMESTAMP() ASC;
+```
+
+This is the typical recipe for "scan rows changed in the last N minutes" type
+queries on a table whose primary key isn't time-ordered. Pair with
+[uncovered indexes](/docs/features/secondary-indexes#uncovered-indexes) when you
+don't want to duplicate payload columns into the index.
+
+If your downstream needs a **continuous, ordered stream** of changes rather than
+periodic time-bounded scans — including the actual mutation deltas — reach for
+[Change Data Capture](/docs/features/change-data-capture) instead. The functional
+index pattern here is best suited to ad-hoc time-window reads from the same
+client that issues regular SQL queries.
+
+## Relationship to ROW\_TIMESTAMP column
+
+Two related concepts share the word "timestamp" — they are not the same:
+
+| Feature                                                       | Direction | What it does                                                                                     |
+| ------------------------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------ |
+| [`ROW_TIMESTAMP` column](/docs/features/row-timestamp-column) | Write     | Designate a primary-key column whose value is *written into* the underlying HBase row timestamp. |
+| `PHOENIX_ROW_TIMESTAMP()` function                            | Read      | Return the underlying HBase row timestamp Phoenix already maintains on every row's empty cell.   |
+
+`PHOENIX_ROW_TIMESTAMP()` works on **any** Phoenix table, regardless of whether
+you've declared a `ROW_TIMESTAMP` column. If you have declared one, both
+mechanisms read/write the same underlying timestamp, so `PHOENIX_ROW_TIMESTAMP()`
+returns the value of the `ROW_TIMESTAMP` column for that row.
+
+
 # Query Server (/docs/features/query-server)
 The Phoenix Query Server provides an alternative means for interaction with
 Phoenix and HBase.
@@ -3412,6 +3510,10 @@ This sets `CREATED_DATE` in the destination table to the server timestamp.
 
 When querying with filters on the row timestamp column, Phoenix performs its usual row-key optimizations and can also set scan min/max time ranges appropriately. Using this time range information, HBase can skip store files that do not fall in the target time range, which significantly improves performance, especially for tail-end data queries.
 
+## See also
+
+The [`PHOENIX_ROW_TIMESTAMP()`](/docs/features/phoenix-row-timestamp) function lets you read the underlying HBase row timestamp on any Phoenix table — even one without a declared `ROW_TIMESTAMP` column — and is indexable for fast time-bounded queries.
+
 
 # Salted Tables (/docs/features/salted-tables)
 Sequential writes in HBase may suffer from region server hotspotting if your row key is monotonically increasing. Salting the row key helps mitigate this problem. See [this article](http://blog.sematext.com/2012/04/09/hbasewd-avoid-regionserver-hotspotting-despite-writing-records-with-sequential-keys/) for details.
@@ -3548,6 +3650,74 @@ SELECT /*+ INDEX(users idx_user_email) */ name, email, created_at
 FROM users
 WHERE email = 'jane@example.com';
 ```
+
+## Partial Indexes
+
+A **partial index** indexes only the rows of the data table that satisfy a SQL
+boolean predicate, supplied at `CREATE INDEX` time via a `WHERE` clause. The
+index is smaller, writes that don't affect the predicate are cheaper, and the
+planner only uses it for queries whose own predicate implies the index's. Added
+in [PHOENIX-7032](https://issues.apache.org/jira/browse/PHOENIX-7032).
+
+### When to choose a partial index
+
+Reach for a partial index when the workload reads a small, well-defined slice of
+a much larger table — and that slice is identifiable by a SQL predicate. Common
+shapes:
+
+* *Open / active records*: `WHERE status IN ('OPEN', 'PENDING')` on a table that
+  also stores closed records.
+* *Recent rows*: `WHERE created_at > DATE '2024-01-01'`.
+* *Hot tier*: `WHERE priority >= 5` for paging / alerting workloads.
+* *Failure investigation*: `WHERE result = 'FAIL'` on a successful-most-of-the-time
+  table.
+
+### Creating a partial index
+
+The DDL is a regular `CREATE INDEX` with a trailing `WHERE` clause. Both
+**covered** and **uncovered** global indexes can be partial:
+
+```sql
+CREATE INDEX idx_open_orders
+    ON orders (customer_id, created_at)
+    INCLUDE (total_amount)
+    WHERE status IN ('OPEN', 'PENDING');
+
+CREATE UNCOVERED INDEX idx_failed_jobs
+    ON jobs (created_at)
+    WHERE result = 'FAIL';
+```
+
+The planner uses the index for any query whose `WHERE` clause implies the
+index's predicate:
+
+```sql
+-- Uses idx_open_orders (status IN ('OPEN','PENDING') is implied).
+SELECT customer_id, total_amount
+FROM orders
+WHERE status = 'OPEN' AND created_at >= ?;
+```
+
+### Mutations that cross the predicate
+
+Partial indexes correctly maintain themselves when a mutation moves a row into
+or out of the predicate, including under `ON DUPLICATE KEY UPDATE`:
+
+* A row that **starts** satisfying the predicate after an update has its index
+  row created.
+* A row that **stops** satisfying the predicate after an update has its index
+  row removed.
+
+This means a partial index stays consistent for a workload like *"close an
+order"* even though that operation flips the row out of the index's covered
+slice.
+
+### Limitations
+
+* **Local partial indexes are not supported** — only global (covered or
+  uncovered) partial indexes work today.
+* The `WHERE` predicate is fixed at `CREATE INDEX` time. To change it, drop and
+  recreate the index.
 
 ## Index Population
 
@@ -14621,6 +14791,74 @@ FROM users
 WHERE email = 'jane@example.com';
 ```
 
+## Partial Indexes
+
+A **partial index** indexes only the rows of the data table that satisfy a SQL
+boolean predicate, supplied at `CREATE INDEX` time via a `WHERE` clause. The
+index is smaller, writes that don't affect the predicate are cheaper, and the
+planner only uses it for queries whose own predicate implies the index's. Added
+in [PHOENIX-7032](https://issues.apache.org/jira/browse/PHOENIX-7032).
+
+### When to choose a partial index
+
+Reach for a partial index when the workload reads a small, well-defined slice of
+a much larger table — and that slice is identifiable by a SQL predicate. Common
+shapes:
+
+* *Open / active records*: `WHERE status IN ('OPEN', 'PENDING')` on a table that
+  also stores closed records.
+* *Recent rows*: `WHERE created_at > DATE '2024-01-01'`.
+* *Hot tier*: `WHERE priority >= 5` for paging / alerting workloads.
+* *Failure investigation*: `WHERE result = 'FAIL'` on a successful-most-of-the-time
+  table.
+
+### Creating a partial index
+
+The DDL is a regular `CREATE INDEX` with a trailing `WHERE` clause. Both
+**covered** and **uncovered** global indexes can be partial:
+
+```sql
+CREATE INDEX idx_open_orders
+    ON orders (customer_id, created_at)
+    INCLUDE (total_amount)
+    WHERE status IN ('OPEN', 'PENDING');
+
+CREATE UNCOVERED INDEX idx_failed_jobs
+    ON jobs (created_at)
+    WHERE result = 'FAIL';
+```
+
+The planner uses the index for any query whose `WHERE` clause implies the
+index's predicate:
+
+```sql
+-- Uses idx_open_orders (status IN ('OPEN','PENDING') is implied).
+SELECT customer_id, total_amount
+FROM orders
+WHERE status = 'OPEN' AND created_at >= ?;
+```
+
+### Mutations that cross the predicate
+
+Partial indexes correctly maintain themselves when a mutation moves a row into
+or out of the predicate, including under `ON DUPLICATE KEY UPDATE`:
+
+* A row that **starts** satisfying the predicate after an update has its index
+  row created.
+* A row that **stops** satisfying the predicate after an update has its index
+  row removed.
+
+This means a partial index stays consistent for a workload like *"close an
+order"* even though that operation flips the row out of the index's covered
+slice.
+
+### Limitations
+
+* **Local partial indexes are not supported** — only global (covered or
+  uncovered) partial indexes work today.
+* The `WHERE` predicate is fixed at `CREATE INDEX` time. To change it, drop and
+  recreate the index.
+
 ## Index Population
 
 By default, when an index is created, it is populated synchronously during the CREATE INDEX call. This may not be feasible depending on the current size of the data table. As of 4.5, initially population of an index may be done asynchronously by including the `ASYNC` keyword in the index creation DDL statement:
@@ -15318,7 +15556,6 @@ The following limitations are enforced for the `ON DUPLICATE KEY` clause usage:
   does not handle atomicity unless the latest value is being updated.
 * The same column should not be updated more than once in the same statement.
 * No aggregation or references to sequences are allowed within the clause.
-* Global indexes on columns being atomically updated are not supported, as potentially a separate RPC across the wire would be made while the row is under lock to maintain the secondary index.
 
 ***
 
@@ -15567,6 +15804,111 @@ SELECT METRICS_ID, METRIC_VALUE FROM SOURCE_METRICS_TABLE
 This sets `CREATED_DATE` in the destination table to the server timestamp.
 
 When querying with filters on the row timestamp column, Phoenix performs its usual row-key optimizations and can also set scan min/max time ranges appropriately. Using this time range information, HBase can skip store files that do not fall in the target time range, which significantly improves performance, especially for tail-end data queries.
+
+## See also
+
+The [`PHOENIX_ROW_TIMESTAMP()`](/docs/features/phoenix-row-timestamp) function lets you read the underlying HBase row timestamp on any Phoenix table — even one without a declared `ROW_TIMESTAMP` column — and is indexable for fast time-bounded queries.
+
+***
+
+# PHOENIX\_ROW\_TIMESTAMP
+
+`PHOENIX_ROW_TIMESTAMP()` is a built-in SQL function that returns the **timestamp
+of the row's empty column**, which Phoenix updates automatically on every write.
+It's effectively the row's **last-modified time**, available on any Phoenix table
+without you having to declare or manage a timestamp column yourself. The return
+type is `DATE`.
+
+It can be used in three places, and the third one is what makes it especially
+powerful:
+
+1. As a projection in `SELECT`.
+2. As a predicate in `WHERE` (and `JOIN`) clauses.
+3. As the indexed expression in a [functional index](/docs/features/secondary-indexes#functional-indexes), which makes time-bounded reads fast even when the table isn't ordered by time.
+
+## Reading the row timestamp
+
+Project it like any other column:
+
+```sql
+-- Last-modified time of every row.
+SELECT PHOENIX_ROW_TIMESTAMP(), id, payload FROM events;
+
+-- Combine with regular row data.
+SELECT id,
+       PHOENIX_ROW_TIMESTAMP() AS modified_at,
+       payload
+FROM events
+WHERE region = 'us-west-2';
+```
+
+The function takes no arguments and is evaluated server-side from the empty cell
+that Phoenix already maintains for every row.
+
+## In WHERE predicates
+
+Use it to bound queries by mutation time, including incremental "what changed
+since" patterns:
+
+```sql
+-- Rows modified in the last hour.
+SELECT * FROM events
+WHERE PHOENIX_ROW_TIMESTAMP() > CURRENT_DATE() - 1.0 / 24;
+
+-- Pull a window for an incremental consumer.
+SELECT id, payload
+FROM events
+WHERE PHOENIX_ROW_TIMESTAMP() >= ?
+  AND PHOENIX_ROW_TIMESTAMP() <  ?
+ORDER BY PHOENIX_ROW_TIMESTAMP() ASC;
+```
+
+Without an index, these predicates require a full scan of the table. The next
+section fixes that.
+
+## Indexing on PHOENIX\_ROW\_TIMESTAMP()
+
+Create a [functional index](/docs/features/secondary-indexes#functional-indexes)
+on the function to make time-bounded reads fast. Phoenix can then seek directly
+on the indexed timestamp instead of scanning the data table:
+
+```sql
+CREATE INDEX events_by_modified
+    ON events (PHOENIX_ROW_TIMESTAMP())
+    INCLUDE (payload);
+
+-- Phoenix uses the index for this query.
+SELECT id, payload
+FROM events
+WHERE PHOENIX_ROW_TIMESTAMP() >= ?
+  AND PHOENIX_ROW_TIMESTAMP() <  ?
+ORDER BY PHOENIX_ROW_TIMESTAMP() ASC;
+```
+
+This is the typical recipe for "scan rows changed in the last N minutes" type
+queries on a table whose primary key isn't time-ordered. Pair with
+[uncovered indexes](/docs/features/secondary-indexes#uncovered-indexes) when you
+don't want to duplicate payload columns into the index.
+
+If your downstream needs a **continuous, ordered stream** of changes rather than
+periodic time-bounded scans — including the actual mutation deltas — reach for
+[Change Data Capture](/docs/features/change-data-capture) instead. The functional
+index pattern here is best suited to ad-hoc time-window reads from the same
+client that issues regular SQL queries.
+
+## Relationship to ROW\_TIMESTAMP column
+
+Two related concepts share the word "timestamp" — they are not the same:
+
+| Feature                                                       | Direction | What it does                                                                                     |
+| ------------------------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------ |
+| [`ROW_TIMESTAMP` column](/docs/features/row-timestamp-column) | Write     | Designate a primary-key column whose value is *written into* the underlying HBase row timestamp. |
+| `PHOENIX_ROW_TIMESTAMP()` function                            | Read      | Return the underlying HBase row timestamp Phoenix already maintains on every row's empty cell.   |
+
+`PHOENIX_ROW_TIMESTAMP()` works on **any** Phoenix table, regardless of whether
+you've declared a `ROW_TIMESTAMP` column. If you have declared one, both
+mechanisms read/write the same underlying timestamp, so `PHOENIX_ROW_TIMESTAMP()`
+returns the value of the `ROW_TIMESTAMP` column for that row.
 
 ***
 
