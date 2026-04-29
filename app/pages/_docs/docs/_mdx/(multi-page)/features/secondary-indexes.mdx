@@ -106,6 +106,74 @@ FROM users
 WHERE email = 'jane@example.com';
 ```
 
+## Partial Indexes [#partial-indexes]
+
+A **partial index** indexes only the rows of the data table that satisfy a SQL
+boolean predicate, supplied at `CREATE INDEX` time via a `WHERE` clause. The
+index is smaller, writes that don't affect the predicate are cheaper, and the
+planner only uses it for queries whose own predicate implies the index's. Added
+in [PHOENIX-7032](https://issues.apache.org/jira/browse/PHOENIX-7032).
+
+### When to choose a partial index [#partial-indexes-when]
+
+Reach for a partial index when the workload reads a small, well-defined slice of
+a much larger table — and that slice is identifiable by a SQL predicate. Common
+shapes:
+
+- _Open / active records_: `WHERE status IN ('OPEN', 'PENDING')` on a table that
+  also stores closed records.
+- _Recent rows_: `WHERE created_at > DATE '2024-01-01'`.
+- _Hot tier_: `WHERE priority >= 5` for paging / alerting workloads.
+- _Failure investigation_: `WHERE result = 'FAIL'` on a successful-most-of-the-time
+  table.
+
+### Creating a partial index [#partial-indexes-usage]
+
+The DDL is a regular `CREATE INDEX` with a trailing `WHERE` clause. Both
+**covered** and **uncovered** global indexes can be partial:
+
+```sql
+CREATE INDEX idx_open_orders
+    ON orders (customer_id, created_at)
+    INCLUDE (total_amount)
+    WHERE status IN ('OPEN', 'PENDING');
+
+CREATE UNCOVERED INDEX idx_failed_jobs
+    ON jobs (created_at)
+    WHERE result = 'FAIL';
+```
+
+The planner uses the index for any query whose `WHERE` clause implies the
+index's predicate:
+
+```sql
+-- Uses idx_open_orders (status IN ('OPEN','PENDING') is implied).
+SELECT customer_id, total_amount
+FROM orders
+WHERE status = 'OPEN' AND created_at >= ?;
+```
+
+### Mutations that cross the predicate [#partial-indexes-mutations]
+
+Partial indexes correctly maintain themselves when a mutation moves a row into
+or out of the predicate, including under `ON DUPLICATE KEY UPDATE`:
+
+- A row that **starts** satisfying the predicate after an update has its index
+  row created.
+- A row that **stops** satisfying the predicate after an update has its index
+  row removed.
+
+This means a partial index stays consistent for a workload like _"close an
+order"_ even though that operation flips the row out of the index's covered
+slice.
+
+### Limitations [#partial-indexes-limitations]
+
+- **Local partial indexes are not supported** — only global (covered or
+  uncovered) partial indexes work today.
+- The `WHERE` predicate is fixed at `CREATE INDEX` time. To change it, drop and
+  recreate the index.
+
 ## Index Population
 
 By default, when an index is created, it is populated synchronously during the CREATE INDEX call. This may not be feasible depending on the current size of the data table. As of 4.5, initially population of an index may be done asynchronously by including the `ASYNC` keyword in the index creation DDL statement:

@@ -9,6 +9,7 @@
     "namespace-mapping",
     "statistics-collection",
     "row-timestamp-column",
+    "phoenix-row-timestamp",
     "paged-queries",
     "salted-tables",
     "skip-scan",

@@ -1,0 +1,95 @@
+---
+title: "PHOENIX_ROW_TIMESTAMP()"
+description: "Read the per-row last-modified timestamp Phoenix maintains automatically — usable in projections, predicates, and indexes for fast time-bounded reads."
+---
+
+`PHOENIX_ROW_TIMESTAMP()` is a built-in SQL function that returns the **timestamp
+of the row's empty column**, which Phoenix updates automatically on every write.
+It's effectively the row's **last-modified time**, available on any Phoenix table
+without you having to declare or manage a timestamp column yourself. The return
+type is `DATE`.
+
+It can be used in three places, and the third one is what makes it especially
+powerful:
+
+1. As a projection in `SELECT`.
+2. As a predicate in `WHERE` (and `JOIN`) clauses.
+3. As the indexed expression in a [functional index](/docs/features/secondary-indexes#functional-indexes), which makes time-bounded reads fast even when the table isn't ordered by time.
+
+## Reading the row timestamp [#phoenix-row-timestamp-read]
+
+Project it like any other column:
+
+```sql
+-- Last-modified time of every row.
+SELECT PHOENIX_ROW_TIMESTAMP(), id, payload FROM events;
+
+-- Combine with regular row data.
+SELECT id,
+       PHOENIX_ROW_TIMESTAMP() AS modified_at,
+       payload
+FROM events
+WHERE region = 'us-west-2';
+```
+
+The function takes no arguments and is evaluated server-side from the empty cell
+that Phoenix already maintains for every row.
+
+## In WHERE predicates [#phoenix-row-timestamp-where]
+
+Use it to bound queries by mutation time, including incremental "what changed
+since" patterns:
+
+```sql
+-- Rows modified in the last hour.
+SELECT * FROM events
+WHERE PHOENIX_ROW_TIMESTAMP() > CURRENT_DATE() - 1.0 / 24;
+
+-- Pull a window for an incremental consumer.
+SELECT id, payload
+FROM events
+WHERE PHOENIX_ROW_TIMESTAMP() >= ?
+  AND PHOENIX_ROW_TIMESTAMP() <  ?
+ORDER BY PHOENIX_ROW_TIMESTAMP() ASC;
+```
+
+Without an index, these predicates require a scan of the table. The next section
+fixes that.
+
+## Indexing on PHOENIX_ROW_TIMESTAMP() [#phoenix-row-timestamp-index]
+
+Create a [functional index](/docs/features/secondary-indexes#functional-indexes)
+on the function to make time-bounded reads fast. Phoenix can then seek directly
+on the indexed timestamp instead of scanning the data table:
+
+```sql
+CREATE INDEX events_by_modified
+    ON events (PHOENIX_ROW_TIMESTAMP())
+    INCLUDE (payload);
+
+-- Phoenix uses the index for this query.
+SELECT id, payload
+FROM events
+WHERE PHOENIX_ROW_TIMESTAMP() >= ?
+  AND PHOENIX_ROW_TIMESTAMP() <  ?
+ORDER BY PHOENIX_ROW_TIMESTAMP() ASC;
+```
+
+This is the typical recipe for "scan rows changed in the last N minutes" type
+queries on a table whose primary key isn't time-ordered. Pair with
+[uncovered indexes](/docs/features/secondary-indexes#uncovered-indexes) when you
+don't want to duplicate payload columns into the index.
+
+## Relationship to ROW_TIMESTAMP column [#phoenix-row-timestamp-vs-row-timestamp]
+
+Two related concepts share the word "timestamp" — they are not the same:
+
+| Feature                                                       | Direction | What it does                                                                                     |
+| ------------------------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------ |
+| [`ROW_TIMESTAMP` column](/docs/features/row-timestamp-column) | Write     | Designate a primary-key column whose value is _written into_ the underlying HBase row timestamp. |
+| `PHOENIX_ROW_TIMESTAMP()` function                            | Read      | Return the underlying HBase row timestamp Phoenix already maintains on every row's empty cell.   |
+
+`PHOENIX_ROW_TIMESTAMP()` works on **any** Phoenix table, regardless of whether
+you've declared a `ROW_TIMESTAMP` column. If you have declared one, both
+mechanisms read/write the same underlying timestamp, so `PHOENIX_ROW_TIMESTAMP()`
+returns the value of the `ROW_TIMESTAMP` column for that row.
