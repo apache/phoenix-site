@@ -323,10 +323,11 @@ Current CI sequence used by `npm run ci`:
 2. `npm run fumadocs-init`
 3. `npm run lint`
 4. `npm run typecheck`
-5. `npm run build` (`react-router build` followed by sitemap generation)
-6. `npm run test:unit:run`
-7. `npx playwright install`
-8. `npm run test:e2e`
+5. `npm run build` (runs `react-router build`)
+6. `npm run generate-sitemap` (writes `sitemap.xml` into `build/client/`)
+7. `npm run test:unit:run`
+8. `npx playwright install`
+9. `npm run test:e2e`
 
 There is currently no remote CI/CD runner executing `build.sh` for this repository. The `output/` artifact is produced locally and must be included in your pull request.
 
