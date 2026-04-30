@@ -1,0 +1,34 @@
+---
+title: "Phoenix-DynamoDB REST Service"
+description: "Run a DynamoDB-compatible REST endpoint on top of Apache Phoenix using the phoenix-dynamodb module from apache/phoenix-adapters."
+---
+
+**Phoenix-DynamoDB** is a REST service that lets applications written against the
+Amazon DynamoDB HTTP API talk to a Phoenix cluster instead. It is distributed as the
+`phoenix-dynamodb` module of
+[`apache/phoenix-adapters`](https://github.com/apache/phoenix-adapters).
+
+This page describes when to choose it and points at the canonical source. Build
+instructions, supported API surface, configuration reference, and deployment
+notes live in the `phoenix-adapters` repo's own README and module documentation.
+
+## When to use it [#phoenix-dynamodb-when]
+
+Reach for Phoenix-DynamoDB when:
+
+- You have an existing application built against the AWS DynamoDB SDK and want to
+  point it at a Phoenix cluster without rewriting the data-access layer.
+- You want to serve DynamoDB-style document workloads from Phoenix and pair the
+  REST front-end with the [BSON document type](/docs/features/bson) for the
+  underlying storage and indexing.
+- You need a REST endpoint in front of a Phoenix cluster that speaks a wire
+  protocol most clients already know how to talk to.
+
+For native Phoenix workloads, prefer the standard JDBC driver — it exposes the full
+SQL surface, not just whatever subset the DynamoDB API maps onto.
+
+## Where to find it [#phoenix-dynamodb-where]
+
+- Source and documentation:
+  [`github.com/apache/phoenix-adapters`](https://github.com/apache/phoenix-adapters)
+- Module: `phoenix-dynamodb`

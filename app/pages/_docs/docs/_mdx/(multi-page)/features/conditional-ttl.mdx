@@ -1,0 +1,78 @@
+---
+title: "Conditional TTL"
+description: "Express row expiration as a SQL boolean expression evaluated against the row itself."
+---
+
+Conditional TTL lets you express row expiration as a **SQL boolean expression
+evaluated against the row's own column values**, instead of a fixed time-since-write
+number. A row is considered expired the moment the expression evaluates to `TRUE` for
+that row. Available in Phoenix 5.3.0
+([PHOENIX-7170](https://issues.apache.org/jira/browse/PHOENIX-7170)).
+
+## When to use it [#conditional-ttl-when]
+
+Conditional TTL fits whenever "expired" is an **application concept**, not just an
+age. Some typical cases:
+
+- _"Delete this row 30 days after `STATUS` becomes `'CLOSED'`."_
+- _"Expire when `RETAIN_UNTIL` has passed."_
+- _"Keep failed records for a week, successful ones for an hour."_
+- _"Expire soft-deleted rows (`is_deleted = TRUE`) after a grace period."_
+
+If retention is a flat duration that applies uniformly to all rows, use the regular
+time-based `TTL` property. If different views over the same shared table need
+different retention rules, look at [View TTL](/docs/features/view-ttl) — it composes
+with conditional TTL.
+
+## Defining a conditional TTL [#conditional-ttl-define]
+
+Pass a SQL boolean expression as the `TTL` table property at `CREATE TABLE` (or
+`CREATE VIEW`) time. The expression may reference any column of the table:
+
+```sql
+CREATE TABLE orders (
+    order_id     BIGINT NOT NULL PRIMARY KEY,
+    status       VARCHAR,
+    closed_at    DATE,
+    retain_until DATE,
+    payload      VARCHAR
+)
+TTL = 'status = ''CLOSED'' AND closed_at < CURRENT_DATE() - 30';
+```
+
+Update or remove the expression later with `ALTER TABLE`:
+
+```sql
+ALTER TABLE orders SET TTL = 'retain_until < CURRENT_DATE()';
+ALTER TABLE orders SET TTL = NONE;
+```
+
+What "expired" means in practice:
+
+1. **Read-time:** any query touching the row evaluates the TTL expression server-side
+   and skips the row if it returns `TRUE`. Rows become invisible the moment they
+   match the predicate, regardless of physical state.
+2. **Phoenix compaction:** expired rows are physically removed by Phoenix's
+   compaction during HBase region compactions. There is no separate cleanup job —
+   physical removal happens whenever the underlying regions compact.
+
+## Effect on the write path [#conditional-ttl-write-path]
+
+`IS_STRICT_TTL` is a table property that applies to any kind of TTL — see
+[Strict vs Relaxed TTL](/docs/features/ttl#strict-vs-relaxed-ttl) for the full
+description.
+
+The conditional-TTL-specific cost is in the **write path**: with strict (the
+default), every mutation reads the current row state on the server to evaluate the
+TTL expression, which adds latency. With relaxed (`IS_STRICT_TTL = false`), that
+extra row read is skipped — at the cost of expired rows remaining visible to
+readers until major compaction physically removes them.
+
+## Limitations [#conditional-ttl-limitations]
+
+- Conditional TTL requires the table to have a **single column family**.
+- The TTL expression must be a valid Phoenix SQL boolean expression and may only
+  reference columns of the same table — no joins, no subqueries.
+- The classic time-based `TTL = N` (seconds) and conditional `TTL = '<expr>'` use the
+  same property; what you pass in determines which mode you get. You can't have both
+  at once.

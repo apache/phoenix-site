@@ -17,6 +17,7 @@
 //
 
 import { Hero } from "@/pages/_landing/home/hero";
+import { WhatsNewSection } from "@/pages/_landing/home/whats-new";
 import { FeaturesSection } from "@/pages/_landing/home/features";
 import { SqlSupportSection } from "@/pages/_landing/home/sql-support";
 import { CommunitySection } from "@/pages/_landing/home/community";
@@ -28,6 +29,7 @@ export function HomePage() {
       <Hero />
       <FeaturesSection />
       <UseCasesSection />
+      <WhatsNewSection />
       <SqlSupportSection />
       <CommunitySection />
     </>

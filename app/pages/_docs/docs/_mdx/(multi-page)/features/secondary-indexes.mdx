@@ -52,6 +52,128 @@ Global indexing targets _read heavy_ uses cases. With global indexes, all the pe
 
 Local indexing targets _write heavy_, _space constrained_ use cases. Just like with global indexes, Phoenix will automatically select whether or not to use a local index at query-time. With local indexes, index data and table data co-reside on same server preventing any network overhead during writes. Local indexes can be used even when the query isn't fully covered (i.e. Phoenix automatically retrieve the columns not in the index through point gets against the data table). Unlike global indexes, all local indexes of a table are stored in a single, separate shared table prior to 4.8.0 version. From 4.8.0 onwards we are storing all local index data in the separate shadow column families in the same data table. At read time when the local index is used, every region must be examined for the data as the exact region location of index data cannot be predetermined. Thus some overhead occurs at read-time.
 
+## Uncovered Indexes [#uncovered-indexes]
+
+A global index is "covered" for a query when every column the query references is in
+the index — either in the index key or in `INCLUDE`. Historically a global index that
+wasn't covered for a query simply wasn't used: Phoenix would fall back to a full
+data-table scan. **Uncovered indexes** lift that restriction — Phoenix can use a
+global index even when the query needs columns that aren't in it, by joining back
+to the data table on the server side to fetch the missing columns
+([PHOENIX-6458](https://issues.apache.org/jira/browse/PHOENIX-6458)).
+
+Local indexes already worked this way (see [Local Indexes](#local-indexes) above);
+the new capability is for **global** indexes.
+
+### When to choose an uncovered index [#uncovered-indexes-when]
+
+Both an `INCLUDE` covered index and an uncovered index let the same query use the
+index. They trade off different costs:
+
+| Approach                       | Index size                 | Read path                                 | Best when                                                               |
+| ------------------------------ | -------------------------- | ----------------------------------------- | ----------------------------------------------------------------------- |
+| `CREATE INDEX ... INCLUDE (c)` | Larger — `c` is duplicated | Index-only scan                           | Column `c` is small, frequently read with the index, and updated rarely |
+| `CREATE UNCOVERED INDEX`       | Smaller — only the key     | Index seek + server-side join to data row | Column is large, rarely read with this access path, or updated often    |
+
+A common pattern is to **leave wide payload columns out of the index** entirely and
+let Phoenix fetch them via the join-back when needed. This keeps the index compact
+and write-cheap, at the cost of a per-matching-row data-table read on the rare query
+that wants the payload.
+
+### Creating and using an uncovered index [#uncovered-indexes-usage]
+
+Declare an uncovered global index with the `UNCOVERED` keyword in the DDL.
+`UNCOVERED` is global-only (cannot be combined with `LOCAL`) and cannot be combined
+with `INCLUDE` — the whole point is to skip duplicating columns:
+
+```sql
+CREATE UNCOVERED INDEX idx_user_email ON users(email);
+
+-- 'name' and 'created_at' are NOT in the index, but Phoenix can still use it
+-- by seeking on email and joining back to the data table for the other columns.
+SELECT name, email, created_at
+FROM users
+WHERE email = 'jane@example.com';
+```
+
+The planner picks an uncovered index automatically when it's the best plan; no
+hint is required. If you want to force it (e.g. to compare plans), use the
+standard index hint:
+
+```sql
+SELECT /*+ INDEX(users idx_user_email) */ name, email, created_at
+FROM users
+WHERE email = 'jane@example.com';
+```
+
+## Partial Indexes [#partial-indexes]
+
+A **partial index** indexes only the rows of the data table that satisfy a SQL
+boolean predicate, supplied at `CREATE INDEX` time via a `WHERE` clause. The
+index is smaller, writes that don't affect the predicate are cheaper, and the
+planner only uses it for queries whose own predicate implies the index's. Added
+in [PHOENIX-7032](https://issues.apache.org/jira/browse/PHOENIX-7032).
+
+### When to choose a partial index [#partial-indexes-when]
+
+Reach for a partial index when the workload reads a small, well-defined slice of
+a much larger table — and that slice is identifiable by a SQL predicate. Common
+shapes:
+
+- _Open / active records_: `WHERE status IN ('OPEN', 'PENDING')` on a table that
+  also stores closed records.
+- _Recent rows_: `WHERE created_at > DATE '2024-01-01'`.
+- _Hot tier_: `WHERE priority >= 5` for paging / alerting workloads.
+- _Failure investigation_: `WHERE result = 'FAIL'` on a successful-most-of-the-time
+  table.
+
+### Creating a partial index [#partial-indexes-usage]
+
+The DDL is a regular `CREATE INDEX` with a trailing `WHERE` clause. Both
+**covered** and **uncovered** global indexes can be partial:
+
+```sql
+CREATE INDEX idx_open_orders
+    ON orders (customer_id, created_at)
+    INCLUDE (total_amount)
+    WHERE status IN ('OPEN', 'PENDING');
+
+CREATE UNCOVERED INDEX idx_failed_jobs
+    ON jobs (created_at)
+    WHERE result = 'FAIL';
+```
+
+The planner uses the index for any query whose `WHERE` clause implies the
+index's predicate:
+
+```sql
+-- Uses idx_open_orders (status IN ('OPEN','PENDING') is implied).
+SELECT customer_id, total_amount
+FROM orders
+WHERE status = 'OPEN' AND created_at >= ?;
+```
+
+### Mutations that cross the predicate [#partial-indexes-mutations]
+
+Partial indexes correctly maintain themselves when a mutation moves a row into
+or out of the predicate, including under `ON DUPLICATE KEY UPDATE`:
+
+- A row that **starts** satisfying the predicate after an update has its index
+  row created.
+- A row that **stops** satisfying the predicate after an update has its index
+  row removed.
+
+This means a partial index stays consistent for a workload like _"close an
+order"_ even though that operation flips the row out of the index's covered
+slice.
+
+### Limitations [#partial-indexes-limitations]
+
+- **Local partial indexes are not supported** — only global (covered or
+  uncovered) partial indexes work today.
+- The `WHERE` predicate is fixed at `CREATE INDEX` time. To change it, drop and
+  recreate the index.
+
 ## Index Population
 
 By default, when an index is created, it is populated synchronously during the CREATE INDEX call. This may not be feasible depending on the current size of the data table. As of 4.5, initially population of an index may be done asynchronously by including the `ASYNC` keyword in the index creation DDL statement:

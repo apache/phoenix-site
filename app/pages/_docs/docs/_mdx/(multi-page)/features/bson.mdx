@@ -1,0 +1,221 @@
+---
+title: "Document Data: BSON"
+description: "Store, query, filter, and atomically update Binary JSON (BSON) documents inside a Phoenix table — without round-tripping the document to the client."
+---
+
+`BSON` is a native column type for storing schemaless document data alongside your
+relational columns. Documents are stored in [Binary JSON](https://bsonspec.org/) — a
+compact, length-prefixed format that is cheap to parse server-side and supports the
+full set of value types (strings, numbers, dates, binary, booleans, nulls, arrays,
+nested objects). Introduced in Phoenix 5.3.0
+([PHOENIX-7330](https://issues.apache.org/jira/browse/PHOENIX-7330)).
+
+The point of the type is not just to _hold_ documents — it's that Phoenix can read,
+filter, and **mutate individual fields** on the server without the client ever
+deserializing the whole document.
+
+## When to reach for BSON [#bson-when]
+
+| Use case                                                                   | Recommended type                                  |
+| -------------------------------------------------------------------------- | ------------------------------------------------- |
+| Schema is well-known and stable                                            | Regular relational columns                        |
+| A few optional/sparse fields on otherwise relational rows                  | [Dynamic Columns](/docs/features/dynamic-columns) |
+| Variable-shape documents per row, server-side reads/filters/updates needed | **`BSON`**                                        |
+| Variable-shape documents but the server never inspects them                | `VARCHAR` (raw JSON) or `VARBINARY`               |
+
+Common cases for `BSON`:
+
+- DynamoDB-style application objects backed by Phoenix.
+- Customer / configuration / preferences documents that vary per row.
+- Event payloads where downstream queries need to filter or project specific fields.
+- Counters and per-field updates that must be atomic without rewriting the whole row.
+
+## Defining a BSON column [#bson-defining]
+
+```sql
+CREATE TABLE customer_profile (
+    customer_id VARCHAR NOT NULL PRIMARY KEY,
+    profile     BSON
+);
+
+UPSERT INTO customer_profile (customer_id, profile) VALUES (
+    'C-1001',
+    '{ "name": "Jane", "age": 34,
+       "addresses": [ {"city": "Seattle", "zip": "98101"} ],
+       "preferences": { "theme": "dark", "marketing": false } }'
+);
+```
+
+You may pass a JSON string literal as shown — Phoenix parses and converts it to BSON on
+write — or bind a pre-built BSON document via JDBC.
+
+A `BSON` column may also serve as a primary-key column. In a composite primary key it
+must be the **last** column of the key (so the row-key encoding stays bounded for the
+preceding columns).
+
+## Field paths [#bson-paths]
+
+All three BSON functions address fields with a small path syntax:
+
+- `name` — top-level field
+- `addresses[0]` — first element of an array
+- `addresses[0].city` — nested field
+- `preferences.theme` — nested field on a sub-document
+
+## Reading fields: `BSON_VALUE` [#bson-value]
+
+`BSON_VALUE(bson_column, field_path, target_type [, default])` projects a single field
+out of a document and returns it as the requested Phoenix data type. Returns `NULL` if
+the path is missing — or the supplied default if you provide one.
+
+```sql
+-- Project specific fields out of the document
+SELECT customer_id,
+       BSON_VALUE(profile, 'name',                'VARCHAR') AS name,
+       BSON_VALUE(profile, 'age',                 'INTEGER') AS age,
+       BSON_VALUE(profile, 'addresses[0].city',   'VARCHAR') AS city,
+       BSON_VALUE(profile, 'preferences.theme',   'VARCHAR', 'light') AS theme
+FROM customer_profile;
+
+-- Filter on a single field
+SELECT customer_id
+FROM customer_profile
+WHERE BSON_VALUE(profile, 'age', 'INTEGER') >= 18;
+```
+
+`BSON_VALUE` can also return a sub-document (use `'BSON'` as the target type) and
+return raw binary fields as `VARBINARY_ENCODED`. A companion function
+`BSON_VALUE_TYPE(bson_column, field_path)` returns the BSON type of the field as a
+string (e.g. `'STRING'`, `'INT32'`, `'DOCUMENT'`, `'ARRAY'`).
+
+## Filtering rows: `BSON_CONDITION_EXPRESSION` [#bson-condition-expression]
+
+`BSON_CONDITION_EXPRESSION(bson_column, expression)` evaluates a boolean expression
+over a document and returns `TRUE` or `FALSE`. Use it in a `WHERE` clause when you
+want to filter on multiple document fields at once, or test for the existence/shape
+of fields, without the verbosity of stacking multiple `BSON_VALUE` calls.
+
+The expression language is intentionally small and DynamoDB-flavored:
+
+- Comparisons: `=`, `<>` (or `!=`), `<`, `<=`, `>`, `>=`
+- Boolean composition: `AND`, `OR`, `NOT`, parentheses
+- Ranges and sets: `BETWEEN ... AND ...`, `IN (...)`, `IS NULL`
+- Field presence: `field_exists(name)`, `field_not_exists(name)`
+- String/array helpers: `begins_with(field, value)`, `contains(field, value)`
+- Type and size: `field_type(field, 'STRING' | 'NUMBER' | ...)`, `size(field)`
+
+```sql
+SELECT customer_id
+FROM customer_profile
+WHERE BSON_CONDITION_EXPRESSION(
+    profile,
+    'age >= 18
+     AND begins_with(name, ''J'')
+     AND field_exists(preferences.theme)'
+);
+```
+
+The expression is evaluated server-side, so rows are filtered before they cross the
+network.
+
+## Atomically updating fields: `BSON_UPDATE_EXPRESSION` [#bson-update-expression]
+
+`BSON_UPDATE_EXPRESSION(bson_column, expression)` returns a new BSON document with
+the requested mutations applied. The intended use is inside an
+[atomic upsert](/docs/features/atomic-upsert) so an entire family of per-field updates
+runs **under the row lock** in a single round-trip:
+
+```sql
+UPSERT INTO customer_profile (customer_id, profile)
+VALUES ('C-1001', '{}')
+ON DUPLICATE KEY UPDATE
+    profile = BSON_UPDATE_EXPRESSION(
+        profile,
+        'SET preferences.theme = ''dark'',
+             age = if_not_exists(age, 0) + 1
+         REMOVE legacy_flag'
+    );
+```
+
+Supported update verbs follow the DynamoDB convention:
+
+- `SET path = value` — write a field (or nested path).
+- `REMOVE path[, path ...]` — delete a field.
+- `ADD path number` — atomic numeric increment / decrement on a single field.
+- `DELETE path value` — remove a value from an array/set field.
+- `if_not_exists(path, default)` — read-then-write helper for conditional defaults.
+
+Because the update runs on the server under the row lock, this is the right primitive
+for things like per-document counters, idempotent flag flips, and DynamoDB-style
+conditional writes (combine with `BSON_CONDITION_EXPRESSION` in a `WHERE` clause).
+
+## Indexing individual fields [#bson-indexing]
+
+To make a BSON-field filter fast, create a **functional index** on the projection:
+
+```sql
+CREATE INDEX idx_profile_email
+    ON customer_profile (BSON_VALUE(profile, 'email', 'VARCHAR'));
+
+-- Phoenix can use the index for this query
+SELECT customer_id
+FROM customer_profile
+WHERE BSON_VALUE(profile, 'email', 'VARCHAR') = 'jane@example.com';
+```
+
+Combine with `INCLUDE (...)` to cover other projected columns, or rely on
+[uncovered indexes](/docs/features/secondary-indexes#uncovered-indexes) when you only
+filter on the indexed field.
+
+## End-to-end example [#bson-end-to-end]
+
+Putting the pieces together — a customer-preferences scenario backed entirely by a
+single BSON column:
+
+```sql
+-- 1. Schema
+CREATE TABLE customer_profile (
+    customer_id VARCHAR NOT NULL PRIMARY KEY,
+    profile     BSON
+);
+
+CREATE INDEX idx_profile_email
+    ON customer_profile (BSON_VALUE(profile, 'email', 'VARCHAR'));
+
+-- 2. Insert / replace
+UPSERT INTO customer_profile VALUES (
+    'C-1001',
+    '{"email":"jane@example.com","age":34,"preferences":{"theme":"light"}}'
+);
+
+-- 3. Lookup by field via the functional index
+SELECT customer_id
+FROM customer_profile
+WHERE BSON_VALUE(profile, 'email', 'VARCHAR') = 'jane@example.com';
+
+-- 4. Filter on multiple fields
+SELECT customer_id
+FROM customer_profile
+WHERE BSON_CONDITION_EXPRESSION(
+    profile,
+    'age >= 18 AND field_exists(preferences.theme)'
+);
+
+-- 5. Atomic per-field update under the row lock
+UPSERT INTO customer_profile (customer_id, profile)
+VALUES ('C-1001', '{}')
+ON DUPLICATE KEY UPDATE
+    profile = BSON_UPDATE_EXPRESSION(
+        profile,
+        'SET preferences.theme = ''dark'', login_count = if_not_exists(login_count, 0) + 1'
+    );
+```
+
+## Limitations [#bson-limitations]
+
+- A `BSON` column in a composite primary key must be the **last** PK column.
+- The condition/update expression language is intentionally a small document-focused
+  DSL, not full SQL. Combine it with regular SQL predicates on relational columns when
+  you need joins, aggregations, or expressions across multiple rows.
+- Functional indexes on `BSON_VALUE(...)` are scoped to one specific path/type pair —
+  you'll typically want an index per hot field rather than a generic "BSON index".

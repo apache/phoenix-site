@@ -54,3 +54,7 @@ SELECT METRICS_ID, METRIC_VALUE FROM SOURCE_METRICS_TABLE
 This sets `CREATED_DATE` in the destination table to the server timestamp.
 
 When querying with filters on the row timestamp column, Phoenix performs its usual row-key optimizations and can also set scan min/max time ranges appropriately. Using this time range information, HBase can skip store files that do not fall in the target time range, which significantly improves performance, especially for tail-end data queries.
+
+## See also
+
+The [`PHOENIX_ROW_TIMESTAMP()`](/docs/features/phoenix-row-timestamp) function lets you read the underlying HBase row timestamp on any Phoenix table — even one without a declared `ROW_TIMESTAMP` column — and is indexable for fast time-bounded queries.

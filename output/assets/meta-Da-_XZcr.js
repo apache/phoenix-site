@@ -1,0 +1,1 @@
+const t="Integrations",e=["spark-integration","apache-hive","phoenix-dynamodb","pig-integration","map-reduce-integration","flume-plugin","kafka-plugin","python-driver"],n={title:t,pages:e};export{n as default,e as pages,t as title};
