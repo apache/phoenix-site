@@ -47,7 +47,7 @@ npm ci
 echo ""
 
 # ---------------------------------------------------------------------------
-echo "RUNNING CI (lint, typecheck, tests, build)"
+echo "RUNNING CI (lint, typecheck, build, sitemap, tests)"
 echo "==========================="
 npm run ci
 echo ""
