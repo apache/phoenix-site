@@ -1,5 +1,99 @@
 ErrorDocument 404 /404/index.html
 
+<IfModule mod_alias.c>
+  # Landing pages
+  Redirect permanent /download.html /downloads/
+  Redirect permanent /mailing_list.html /mailing-lists/
+  Redirect permanent /news.html /news/
+  Redirect permanent /team.html /team/
+  Redirect permanent /who_is_using.html /who-is-using/
+  Redirect permanent /recent.html /recent-improvements/
+  Redirect permanent /roadmap.html /roadmap/
+  Redirect permanent /release_notes.html /release-notes/
+  Redirect permanent /issues.html /issues-tracking/
+  Redirect permanent /source.html /source-repository/
+  Redirect permanent /tech_talks.html /tech-talks/
+  Redirect permanent /resources.html /presentations/
+
+  # Documentation overview and contribution pages
+  Redirect permanent /contributing.html /docs/contributing/
+  Redirect permanent /develop.html /docs/contributing/develop/
+  Redirect permanent /building_website.html /docs/contributing/building-website/
+  Redirect permanent /release.html /docs/contributing/how-to-release/
+  Redirect permanent /faq.html /docs/faq/
+  Redirect permanent /Phoenix-in-15-minutes-or-less.html /docs/quick-start/
+  Redirect permanent /installation.html /docs/installation/
+  Redirect permanent /array_type.html /docs/array-type/
+  Redirect permanent /joins.html /docs/joins/
+  Redirect permanent /sequences.html /docs/sequences/
+  Redirect permanent /subqueries.html /docs/subqueries/
+  Redirect permanent /explainplan.html /docs/explain-plan/
+
+  # Fundamentals
+  Redirect permanent /building.html /docs/fundamentals/building/
+  Redirect permanent /classpath_and_url.html /docs/fundamentals/client-classpath-and-jdbc-url/
+  Redirect permanent /tuning.html /docs/fundamentals/configuration/
+  Redirect permanent /upgrading.html /docs/fundamentals/backward-compatibility/
+  Redirect permanent /performance.html /docs/fundamentals/performance/
+  Redirect permanent /pherf.html /docs/fundamentals/performance-testing/
+  Redirect permanent /tuning_guide.html /docs/fundamentals/tuning-guide/
+
+  # Integrations
+  Redirect permanent /phoenix_spark.html /docs/integrations/spark-integration/
+  Redirect permanent /hive_storage_handler.html /docs/integrations/apache-hive/
+  Redirect permanent /pig_integration.html /docs/integrations/pig-integration/
+  Redirect permanent /phoenix_mr.html /docs/integrations/map-reduce-integration/
+  Redirect permanent /flume.html /docs/integrations/flume-plugin/
+  Redirect permanent /kafka.html /docs/integrations/kafka-plugin/
+  Redirect permanent /python.html /docs/integrations/python-driver/
+
+  # Addons and related pages
+  Redirect permanent /omid.html /docs/addons/phoenix-omid-transaction-manager/
+  Redirect permanent /tephra.html /docs/addons/phoenix-tephra-transaction-manager/
+  Redirect permanent /phoenix_orm.html /docs/addons/phoenix-orm-library/
+  Redirect permanent /phoenix_python.html /docs/integrations/python-driver/
+  Redirect permanent /phoenix_on_emr.html https://docs.aws.amazon.com/ElasticMapReduce/latest/ReleaseGuide/emr-phoenix.html
+
+  # Features
+  Redirect permanent /transactions.html /docs/features/transactions/
+  Redirect permanent /udf.html /docs/features/user-defined-functions/
+  Redirect permanent /secondary_indexing.html /docs/features/secondary-indexes/
+  Redirect permanent /columnencoding.html /docs/features/storage-formats/
+  Redirect permanent /atomic_upsert.html /docs/features/atomic-upsert/
+  Redirect permanent /namspace_mapping.html /docs/features/namespace-mapping/
+  Redirect permanent /update_statistics.html /docs/features/statistics-collection/
+  Redirect permanent /rowtimestamp.html /docs/features/row-timestamp-column/
+  Redirect permanent /paged.html /docs/features/paged-queries/
+  Redirect permanent /salted.html /docs/features/salted-tables/
+  Redirect permanent /skip_scan.html /docs/features/skip-scan/
+  Redirect permanent /tablesample.html /docs/features/table-sampling/
+  Redirect permanent /views.html /docs/features/views/
+  Redirect permanent /multi-tenancy.html /docs/features/multi-tenancy/
+  Redirect permanent /dynamic_columns.html /docs/features/dynamic-columns/
+  Redirect permanent /bulk_dataload.html /docs/features/bulk-loading/
+  Redirect permanent /server.html /docs/features/query-server/
+  Redirect permanent /metrics.html /docs/features/metrics/
+  Redirect permanent /tracing.html /docs/features/tracing/
+  Redirect permanent /cursors.html /docs/features/cursor/
+
+  # SQL language reference
+  Redirect permanent /language/index.html /docs/grammar/
+  Redirect permanent /language/functions.html /docs/functions/
+  Redirect permanent /language/datatypes.html /docs/datatypes/
+
+  # Legacy event pages
+  Redirect permanent /phoenixcon.html /phoenixcon-archives.html
+  Redirect permanent /hbasecon-phoenixcon-2018/index.html /phoenixcon-2018/index.html
+
+  # Legacy Maven-generated report pages
+  Redirect permanent /dependency-info.html /source-repository/
+  Redirect permanent /licenses.html /source-repository/
+  Redirect permanent /plugin-management.html /source-repository/
+  Redirect permanent /plugins.html /source-repository/
+  Redirect permanent /project-info.html /source-repository/
+  Redirect permanent /summary.html /source-repository/
+</IfModule>
+
 <IfModule mod_headers.c>
   Header always set Cache-Control "no-cache, must-revalidate"
 
