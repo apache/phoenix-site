@@ -1,9 +1,6 @@
 ErrorDocument 404 /404.html
 
 <IfModule mod_alias.c>
-  # Legacy Maven-era HTML pages
-  Redirect permanent /index.html /
-
   # Landing pages
   Redirect permanent /download.html /downloads/
   Redirect permanent /mailing_list.html /mailing-lists/
