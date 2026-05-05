@@ -242,8 +242,8 @@ Add a UI component:
 
 Update the 404 page:
 
-- Edit the content in `app/routes/404.tsx`.
-- Apache 404 handling lives in `public/.htaccess` (uses `ErrorDocument 404 /404`).
+- Edit the standalone static page in `public/404.html`.
+- Apache 404 handling lives in `public/.htaccess` (uses `ErrorDocument 404 /404.html`).
 
 Check code quality:
 

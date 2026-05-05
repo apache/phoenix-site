@@ -1,4 +1,4 @@
-ErrorDocument 404 /404/
+ErrorDocument 404 /404.html
 
 <IfModule mod_alias.c>
   # Landing pages
