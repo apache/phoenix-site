@@ -6,11 +6,11 @@ See our installation instructions [here](/docs/installation), our release notes 
 and a list of fixes and new features [here](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12334393&projectId=12315120).
 Follow [Verify the Integrity of the Files](https://www.apache.org/dyn/closer.cgi#verify) for how to verify your mirrored downloads.
 
-Current release 4.16.1 can run on Apache HBase 1.3, 1.4, 1.5 and 1.6.
+Phoenix 4.16.1 runs on Apache HBase 1.3, 1.4, 1.5, and 1.6.
 
-Current release 5.1.3 can run on Apache HBase 2.1, 2.2, 2.3, 2.4 and 2.5.
-Current release 5.2.1 can run on Apache HBase 2.4, 2.5 and 2.6 versions.
-Current release 5.3.0 can run on Apache HBase 2.5 and 2.6 versions.
+Phoenix 5.1.3 runs on Apache HBase 2.1, 2.2, 2.3, 2.4, and 2.5.
+Phoenix 5.2.1 runs on Apache HBase 2.4, 2.5, and 2.6.
+Phoenix 5.3.1 runs on Apache HBase 2.5 and 2.6.
 
 Please follow the appropriate link depending on your HBase version.
 
@@ -18,6 +18,7 @@ Please follow the appropriate link depending on your HBase version.
 
 | Phoenix Version | Release Date | Download                                          | Release Notes                   | Changes                                                                                               |
 | --------------- | ------------ | ------------------------------------------------- | ------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| 5.3.1           | 18 May 2026  | [Download](https://downloads.apache.org/phoenix/) | [Release Notes](/release-notes) | [Changes](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12334393&projectId=12315120) |
 | 5.3.0           | 2 Oct 2025   | [Download](https://downloads.apache.org/phoenix/) | [Release Notes](/release-notes) | [Changes](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12334393&projectId=12315120) |
 | 5.2.1           | 12 Nov 2024  | [Download](https://downloads.apache.org/phoenix/) | [Release Notes](/release-notes) | [Changes](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12334393&projectId=12315120) |
 | 5.2.0           | 16 Apr 2024  | [Download](https://downloads.apache.org/phoenix/) | [Release Notes](/release-notes) | [Changes](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12334393&projectId=12315120) |
