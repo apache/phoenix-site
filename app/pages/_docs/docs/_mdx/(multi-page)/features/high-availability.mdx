@@ -1,0 +1,187 @@
+---
+title: "High Availability"
+description: "Active/active and active/standby Phoenix client wiring across two HBase clusters, with graceful failover that lets in-flight readers drain while writes are blocked."
+---
+
+Phoenix High Availability (HA) lets a JDBC client transparently target a pair
+of HBase clusters that mirror the same Phoenix schema, so an operator-driven
+or fault-driven failover never requires the application to restart, reconnect,
+or rewrite URLs.
+
+Phoenix 5.3.1 adds **graceful failover** — an intermediate `ACTIVE_TO_STANDBY`
+role that lets writes drain while readers keep working — plus support for
+HBase's `MASTER` and `RPC` connection registries
+([PHOENIX-7493](https://issues.apache.org/jira/browse/PHOENIX-7493),
+[PHOENIX-7495](https://issues.apache.org/jira/browse/PHOENIX-7495),
+[PHOENIX-7586](https://issues.apache.org/jira/browse/PHOENIX-7586)).
+
+## Concepts [#ha-concepts]
+
+An **HA group** is a named tuple of two HBase clusters and an HA policy,
+shared by every client that participates. The current role of each cluster
+lives in a JSON record in ZooKeeper, replicated to both clusters' ZK
+ensembles and watched by the client; role changes are picked up
+automatically.
+
+### Cluster roles
+
+| Role                | Clients can connect? | Meaning                                                                                                                               |
+| ------------------- | :------------------: | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `ACTIVE`            |         yes          | Cluster is serving live reads and writes.                                                                                             |
+| `STANDBY`           |         yes          | Cluster is reachable but not the current primary; FAILOVER clients refuse to bind to it.                                              |
+| `ACTIVE_TO_STANDBY` |         yes          | Transitional state during graceful failover: existing readers continue to work; writes may be rejected (see Graceful failover below). |
+| `OFFLINE`           |          no          | Cluster is intentionally taken out of rotation.                                                                                       |
+| `UNKNOWN`           |          no          | Role has not been initialized or the record could not be read.                                                                        |
+
+### HA policies
+
+The policy is part of the HA-group record. Clients do not pick it — operators
+do, when provisioning the group.
+
+- **`FAILOVER`** — exactly one cluster (the `ACTIVE`) serves the connection at
+  any moment. The client transparently re-binds on role change.
+- **`PARALLEL`** — every statement is issued to **both** clusters in parallel,
+  with the faster result returned. Useful when both clusters carry identical
+  data and you want to mask single-cluster tail latency.
+
+### Failover sub-policies (FAILOVER only)
+
+Controls how a FAILOVER connection reacts when its bound cluster transitions
+away from `ACTIVE`:
+
+| `phoenix.ha.failover.policy` | Behavior                                                                                                                              |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `explicit` (default)         | Subsequent operations throw `FailoverSQLException`; the application calls `failover()` to rebind to the new `ACTIVE`.                 |
+| `active`                     | Connection transparently rebinds to the new `ACTIVE` on the next statement, up to `phoenix.ha.failover.count` attempts (default `3`). |
+
+## JDBC URL [#ha-url]
+
+The HA URL is a bracketed pair of per-cluster endpoints separated by `|`,
+optionally followed by a principal:
+
+```
+jdbc:phoenix+zk:[zk1\:2181::/hbase|zk2\:2181::/hbase]:my_principal
+```
+
+The presence of `|` inside the URL is what triggers the HA code path. The two
+URLs inside the brackets are always ZooKeeper quorums — Phoenix uses them to
+read the HA-group record.
+
+The per-cluster connection Phoenix opens underneath may use any of the
+supported HBase registries (`ZK`, `MASTER`, or `RPC`), based on what the
+operator configured in the HA-group record. `RPC` requires HBase 2.5+.
+
+### Connecting
+
+Set the HA group name as a JDBC property and open a connection like any other:
+
+```java
+Properties props = new Properties();
+props.setProperty("phoenix.ha.group.name", "myGroup");
+try (Connection conn = DriverManager.getConnection(
+        "jdbc:phoenix+zk:[zk1\\:2181::/hbase|zk2\\:2181::/hbase]", props)) {
+    // Normal JDBC usage.
+}
+```
+
+The returned `Connection` honors the policy declared in the HA-group record.
+
+## Graceful failover [#ha-graceful]
+
+Graceful failover is a two-step demotion of the `ACTIVE` cluster:
+
+1. **`ACTIVE → ACTIVE_TO_STANDBY`.** The operator flips the source cluster
+   into `ACTIVE_TO_STANDBY`. **Existing connections remain open and in-flight
+   reads complete normally.** On the server side, with
+   `phoenix.cluster.role.based.mutation.block.enabled=true`, new mutations
+   are rejected with `MutationBlockedIOException` so replication to the peer
+   can drain.
+2. **`ACTIVE_TO_STANDBY → STANDBY`.** Once replication has caught up, the
+   operator demotes the source the rest of the way. Phoenix closes all
+   wrapped per-cluster connections to the demoted cluster; the peer is
+   meanwhile promoted to `ACTIVE`. `explicit` clients see
+   `FailoverSQLException` on their next statement; `active` clients
+   transparently rebind to the new `ACTIVE`.
+
+Rolling back is supported: an `ACTIVE → ACTIVE_TO_STANDBY → ACTIVE` sequence
+leaves connections fully intact at every step.
+
+### Enabling server-side write blocking
+
+Graceful failover relies on the source cluster's RegionServers rejecting
+writes while the role is `ACTIVE_TO_STANDBY`. Enable in the source cluster's
+`hbase-site.xml`:
+
+```xml
+<property>
+  <name>phoenix.cluster.role.based.mutation.block.enabled</name>
+  <value>true</value>
+</property>
+```
+
+Default is `false`. Readers are unaffected either way.
+
+## Configuration [#ha-config]
+
+All HA-related keys. All can be set in `hbase-site.xml` on the client and/or
+as JDBC connection properties.
+
+### Required
+
+| Key                     | Notes                                                              |
+| ----------------------- | ------------------------------------------------------------------ |
+| `phoenix.ha.group.name` | Name of the HA group — must match the operator-provisioned record. |
+
+### ZooKeeper tuning (client side)
+
+| Key                                   | Default |
+| ------------------------------------- | ------: |
+| `phoenix.ha.zk.connection.timeout.ms` |  `4000` |
+| `phoenix.ha.zk.session.timeout.ms`    |  `4000` |
+| `phoenix.ha.zk.retry.base.sleep.ms`   |  `1000` |
+| `phoenix.ha.zk.retry.max`             |     `5` |
+| `phoenix.ha.zk.retry.max.sleep.ms`    | `10000` |
+
+### Fallback to a single cluster
+
+| Key                           | Default                                                                                            |
+| ----------------------------- | -------------------------------------------------------------------------------------------------- |
+| `phoenix.ha.fallback.enabled` | `true` — if the HA record cannot be read from either ZK, fall back to a single-cluster connection. |
+| `phoenix.ha.fallback.cluster` | (empty) — JDBC URL of the fallback cluster.                                                        |
+
+### Failover behavior
+
+| Key                                | Default                                                                                |
+| ---------------------------------- | -------------------------------------------------------------------------------------- |
+| `phoenix.ha.transition.timeout.ms` | `300000` (5 min) — time the client gets to close connections during a role transition. |
+| `phoenix.ha.failover.policy`       | `explicit` — or `active` to auto-rebind.                                               |
+| `phoenix.ha.failover.count`        | `3` — max auto-rebind attempts for the `active` sub-policy.                            |
+| `phoenix.ha.failover.timeout.ms`   | `10000` — wait timeout for a single failover operation.                                |
+
+### Server-side write blocking
+
+| Key                                                 | Default                                                                                                     |
+| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `phoenix.cluster.role.based.mutation.block.enabled` | `false` — set `true` in the source cluster's `hbase-site.xml` to block writes while in `ACTIVE_TO_STANDBY`. |
+
+## Operator workflow [#ha-operator-workflow]
+
+A canonical graceful failover from cluster A → cluster B:
+
+1. Confirm `phoenix.cluster.role.based.mutation.block.enabled=true` is set on
+   cluster A and that replication A → B is healthy.
+2. Set A → `ACTIVE_TO_STANDBY`, B remains `STANDBY`. Writes to A start being
+   rejected; existing reads continue.
+3. Wait for A → B replication lag to reach zero.
+4. Promote: A → `STANDBY`, B → `ACTIVE`. `active` clients transparently
+   rebind; `explicit` clients receive `FailoverSQLException` and call
+   `failover()` themselves.
+
+For an unplanned failover, skip step 2 and go directly to step 4. The
+`ACTIVE_TO_STANDBY` role is a graceful-failover convenience, not a
+correctness requirement.
+
+## See also [#ha-see-also]
+
+- [Metrics](/docs/features/metrics) — client metrics are emitted by both
+  wrapped and HA connections.

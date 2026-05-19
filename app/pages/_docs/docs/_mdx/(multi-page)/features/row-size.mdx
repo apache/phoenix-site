@@ -1,0 +1,91 @@
+---
+title: "ROW_SIZE() and RAW_ROW_SIZE()"
+description: "Built-in SQL functions that return the on-the-wire HBase byte footprint of a row — useful for hot-row diagnosis, capacity planning, and finding outliers directly from SQL."
+---
+
+`ROW_SIZE()` and `RAW_ROW_SIZE()` return the HBase byte footprint of the row
+currently being scanned. Both are zero-argument scalar functions that return
+`UNSIGNED_LONG`. Available in Phoenix 5.3.1
+([PHOENIX-7705](https://issues.apache.org/jira/browse/PHOENIX-7705)).
+
+|             | `ROW_SIZE()`                        | `RAW_ROW_SIZE()`                                  |
+| ----------- | ----------------------------------- | ------------------------------------------------- |
+| Arguments   | none                                | none                                              |
+| Return type | `UNSIGNED_LONG`                     | `UNSIGNED_LONG`                                   |
+| Counts      | latest visible version of each cell | all retained cell versions **and** delete markers |
+
+Each cell's contribution is its full HBase footprint — row key, column
+family, qualifier, timestamp, type byte, tags, and value — so the result is
+**not** equal to the sum of user-visible column value lengths.
+
+## Usage [#row-size-usage]
+
+`ROW_SIZE()` is only valid **as an argument to an aggregate** in the `SELECT`
+list, or inside a `WHERE` clause. A bare projection (`SELECT ROW_SIZE() FROM t`)
+is rejected at compile time.
+
+### Total table footprint
+
+```sql
+SELECT SUM(ROW_SIZE()) FROM my_table;
+```
+
+### Per-row size
+
+Group by the primary key so each group is a single row:
+
+```sql
+SELECT SUM(ROW_SIZE()) FROM my_table GROUP BY id;
+```
+
+### Distribution
+
+```sql
+SELECT AVG(ROW_SIZE()), MIN(ROW_SIZE()), MAX(ROW_SIZE()) FROM my_table;
+```
+
+### Find rows whose footprint exceeds a threshold
+
+`ROW_SIZE()` is also valid in `WHERE`:
+
+```sql
+SELECT COUNT(1)
+FROM my_table
+WHERE ROW_SIZE() > 1024 AND status = 'ACTIVE';
+```
+
+### Including delete markers and old versions
+
+```sql
+SELECT organization_id, SUM(RAW_ROW_SIZE())
+FROM my_table
+GROUP BY organization_id;
+```
+
+`RAW_ROW_SIZE()` counts every retained cell version and the bytes of any
+delete-family or delete-column tombstones — useful for measuring the
+post-compaction-debt footprint of a row.
+
+## Limitations and caveats [#row-size-caveats]
+
+- **Wrap in an aggregate.** `SELECT ROW_SIZE() FROM t` is rejected. Use
+  `SUM(ROW_SIZE())` (with `GROUP BY <pk>` for per-row values).
+- **Forces a full row read.** A query using either function reads more bytes
+  per row than the same query without it, because the scan can no longer
+  use empty-column / key-only / encoded-qualifier optimizations. Reach for
+  these functions for diagnostics, not hot-path scans.
+- **`RAW_ROW_SIZE()` reads all versions and tombstones.** Both the byte count
+  and the row count it produces will exceed `ROW_SIZE()` on the same data.
+- **Cell footprint, not user-data size.** Adding a column generally
+  increases `ROW_SIZE()` by more than that column's value byte length.
+- **Measures whatever physical row the planner scans.** If the optimizer
+  chooses a secondary index, `ROW_SIZE()` will measure the index row, not
+  the data row. Pin the plan with a hint (e.g. `/*+ NO_INDEX */`) if you
+  need a specific physical answer.
+
+## See also [#row-size-see-also]
+
+- [Metrics](/docs/features/metrics) — runtime measurements on the client
+  side (scan bytes, mutation bytes, scan latency, etc.).
+- [Statistics Collection](/docs/features/statistics-collection) — aggregate
+  estimates without scanning every row.

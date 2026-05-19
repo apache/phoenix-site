@@ -1,0 +1,159 @@
+---
+title: "PhoenixSyncTable Tool"
+description: "Detect data divergence between a source and a target Phoenix table across two HBase clusters via a chunked hash comparison driven by MapReduce."
+---
+
+`PhoenixSyncTableTool` is a MapReduce-based divergence detector for Phoenix
+tables that are replicated (or migrated) between two HBase clusters. It
+compares chunks of source and target data without transferring full rows over
+the network and records any chunk whose hashes disagree to a Phoenix system
+table for later inspection. Available in Phoenix 5.3.1
+([PHOENIX-7751](https://issues.apache.org/jira/browse/PHOENIX-7751)).
+
+The tool is conceptually similar to HBase's `HashTable`/`SyncTable` pair but
+is Phoenix-aware (respects TTL, `CURRENT_SCN`, tenant id, indexes, and the
+column-encoding scheme) and runs as a **single** MapReduce job with no HDFS
+intermediate. Output is a Phoenix table, queryable with SQL.
+
+`PhoenixSyncTableTool` performs **detection only** in 5.3.1; it does not
+modify the target cluster.
+
+## When to use it [#sync-table-when]
+
+Reach for `PhoenixSyncTableTool` to verify:
+
+- A cluster migration that used HBase snapshots, replication, or both — to
+  confirm the target is byte-for-byte identical after cutover.
+- Long-running HBase replication — to detect cases where a replication peer
+  has silently drifted.
+- DR drills — to confirm the standby is in sync before a planned failover.
+
+For ad-hoc row-count or row-key spot-checks you usually want a small SQL
+query instead; `PhoenixSyncTableTool` is the right choice when you need
+**full-data** confidence with bounded network cost.
+
+## Running the tool [#sync-table-running]
+
+The tool runs through `hbase` (or `hadoop jar`) and takes only two mandatory
+flags — the source table name and the target cluster's ZooKeeper quorum.
+
+```bash
+hbase org.apache.phoenix.mapreduce.PhoenixSyncTableTool \
+  --table-name MY_SCHEMA.MY_TABLE \
+  --target-cluster zk1,zk2,zk3:2181:/hbase \
+  --run-foreground
+```
+
+The source cluster comes from the Hadoop/HBase configuration the job is
+submitted under, so `--target-cluster` is the ZooKeeper quorum of the
+**other** cluster. Accepted quorum formats:
+
+- `host:port:/znode`
+- `h1,h2:port:/znode`
+- `h1:p1,h2:p2:/znode`
+
+### Flags
+
+| Short     | Long                  | Required | Default              | Purpose                                                                                                                  |
+| --------- | --------------------- | :------: | -------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `-tn`     | `--table-name`        |   yes    | —                    | Source table (physical name; index physical names are also accepted).                                                    |
+| `-tc`     | `--target-cluster`    |   yes    | —                    | ZK quorum of the target cluster.                                                                                         |
+| `-s`      | `--schema`            |    no    | —                    | Phoenix schema name.                                                                                                     |
+| `-tenant` | `--tenant-id`         |    no    | —                    | Tenant id for tenant-specific sync.                                                                                      |
+| `-ft`     | `--from-time`         |    no    | `0`                  | Lower bound of the cell-timestamp window, in ms.                                                                         |
+| `-tt`     | `--to-time`           |    no    | `now - 1 hour`       | Upper bound; also used as `CURRENT_SCN`. The 1-hour buffer gives async replication time to catch up.                     |
+| `-cs`     | `--chunk-size`        |    no    | `1073741824` (1 GiB) | Approximate chunk size in bytes. Smaller chunks narrow the divergence search radius at the cost of more checkpoint rows. |
+| `-rs`     | `--raw-scan`          |    no    | `false`              | Include delete markers.                                                                                                  |
+| `-rav`    | `--read-all-versions` |    no    | `false`              | Compare every cell version, not just the latest.                                                                         |
+| `-coal`   | `--coalesce-split`    |    no    | `false`              | Coalesce multiple source regions into one mapper.                                                                        |
+| `-runfg`  | `--run-foreground`    |    no    | `false`              | Block until the job completes (default is fire-and-forget submit).                                                       |
+| `-dr`     | `--dry-run`           |    no    | `false`              | Marker only — reserved for a future auto-repair extension.                                                               |
+| `-h`      | `--help`              |    no    | —                    | Print help and exit.                                                                                                     |
+
+The mapper count is implicitly the number of source-table regions (one
+mapper per region) unless `--coalesce-split` is set.
+
+## Output [#sync-table-output]
+
+### MapReduce counters
+
+When `--run-foreground` is set, the tool logs counters from the
+`PhoenixSyncTableMapper$SyncCounters` group:
+
+- `MAPPERS_VERIFIED`, `MAPPERS_MISMATCHED`
+- `CHUNKS_VERIFIED`, `CHUNKS_MISMATCHED`
+- `SOURCE_ROWS_PROCESSED`, `TARGET_ROWS_PROCESSED`
+
+### `PHOENIX_SYNC_TABLE_CHECKPOINT`
+
+The tool auto-creates a Phoenix system table on the **source** cluster (90-day
+TTL, Snappy compression) with one row per chunk and per region. To list
+divergences from the last run:
+
+```sql
+SELECT START_ROW_KEY, END_ROW_KEY, COUNTERS, EXECUTION_END_TIME
+FROM   PHOENIX_SYNC_TABLE_CHECKPOINT
+WHERE  TABLE_NAME = 'MY_TABLE'
+  AND  TARGET_CLUSTER = 'zk1,zk2,zk3:2181:/hbase'
+  AND  TYPE = 'CHUNK'
+  AND  STATUS = 'MISMATCHED';
+```
+
+Each row carries `STATUS` (`VERIFIED` or `MISMATCHED`), `TYPE` (`CHUNK` or
+`REGION`), the key range, and a comma-separated `COUNTERS` string with
+per-chunk source and target row counts.
+
+### Resumability
+
+A re-run of the same `(table, target, from-time, to-time, tenant)` tuple
+picks up where the previous run left off — already-verified sub-ranges are
+skipped.
+
+## Prerequisites [#sync-table-prereqs]
+
+- **Cross-cluster line of sight.** Mapper YARN nodes need ZooKeeper and RPC
+  reachability to **both** clusters' RegionServers.
+- **Both clusters must run Phoenix 5.3.1+.**
+- **Live read, not snapshot-based.** Both clusters are scanned through the
+  regular Phoenix read path.
+- **Kerberos** delegation tokens for the target cluster are acquired
+  automatically when security is enabled.
+- The submitter principal needs `READ` on the physical HBase tables on both
+  clusters, plus `WRITE` to `PHOENIX_SYNC_TABLE_CHECKPOINT` on the source.
+- Views and logical (not physical) index names are rejected. Pass the
+  physical index table name to validate an index.
+
+## Tuning [#sync-table-tuning]
+
+`--chunk-size` is the main lever:
+
+- Larger chunks (e.g. 4 GiB) reduce checkpoint rows and per-chunk overhead
+  but make every mismatch report a coarser range.
+- Smaller chunks (e.g. 64 MiB) narrow the mismatch search radius and produce
+  more checkpoint rows.
+
+The tool runs at long-scan timescales. Adjust these client-side timeouts
+(set in the Hadoop `Configuration` the job is submitted with) if you see
+scanner timeouts on very large regions:
+
+| Property                                    | Default      |
+| ------------------------------------------- | ------------ |
+| `phoenix.sync.table.query.timeout`          | ~150 minutes |
+| `phoenix.sync.table.rpc.timeout`            | 30 minutes   |
+| `phoenix.sync.table.client.scanner.timeout` | 30 minutes   |
+| `phoenix.sync.table.rpc.retries.counter`    | 5            |
+
+## Limitations [#sync-table-limitations]
+
+- **Detection only.** Mismatched chunks are recorded but not repaired in
+  5.3.1. `--dry-run` is a marker reserved for a future auto-repair pass.
+- **No views.** Only physical tables and index physical names are accepted.
+- The default `--to-time` is `now - 1 hour`. To compare data written less
+  than one hour ago, pass an explicit `--to-time`.
+
+## See also [#sync-table-see-also]
+
+- [Bulk Loading](/docs/features/bulk-loading) — the other heavyweight
+  data-movement MapReduce tool that ships with Phoenix.
+- [Change Data Capture](/docs/features/change-data-capture) — for streaming
+  delta capture instead of post-hoc verification.
