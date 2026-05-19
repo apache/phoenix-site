@@ -1,6 +1,6 @@
 ---
 title: "High Availability"
-description: "Active/active and active/standby Phoenix client wiring across two HBase clusters, with graceful failover that lets in-flight readers drain while writes are blocked."
+description: "Active/active and active/standby Phoenix client wiring across two HBase clusters, with graceful failover that lets writes drain server-side before the peer is promoted."
 ---
 
 Phoenix High Availability (HA) lets a JDBC client transparently target a pair
@@ -9,8 +9,8 @@ or fault-driven failover never requires the application to restart, reconnect,
 or rewrite URLs.
 
 Phoenix 5.3.1 adds **graceful failover** — an intermediate `ACTIVE_TO_STANDBY`
-role that lets writes drain while readers keep working — plus support for
-HBase's `MASTER` and `RPC` connection registries
+role that lets writes drain server-side before the peer is promoted — plus
+support for HBase's `MASTER` and `RPC` connection registries
 ([PHOENIX-7493](https://issues.apache.org/jira/browse/PHOENIX-7493),
 [PHOENIX-7495](https://issues.apache.org/jira/browse/PHOENIX-7495),
 [PHOENIX-7586](https://issues.apache.org/jira/browse/PHOENIX-7586)).
@@ -25,13 +25,13 @@ automatically.
 
 ### Cluster roles
 
-| Role                | Clients can connect? | Meaning                                                                                                                               |
-| ------------------- | :------------------: | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `ACTIVE`            |         yes          | Cluster is serving live reads and writes.                                                                                             |
-| `STANDBY`           |         yes          | Cluster is reachable but not the current primary; FAILOVER clients refuse to bind to it.                                              |
-| `ACTIVE_TO_STANDBY` |         yes          | Transitional state during graceful failover: existing readers continue to work; writes may be rejected (see Graceful failover below). |
-| `OFFLINE`           |          no          | Cluster is intentionally taken out of rotation.                                                                                       |
-| `UNKNOWN`           |          no          | Role has not been initialized or the record could not be read.                                                                        |
+| Role                | Clients can connect? | Meaning                                                                                                                                                              |
+| ------------------- | :------------------: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ACTIVE`            |         yes          | Cluster is serving live reads and writes.                                                                                                                            |
+| `STANDBY`           |         yes          | Cluster is reachable but not the current primary. `FAILOVER` clients refuse to bind; `PARALLEL` clients still bind.                                                  |
+| `ACTIVE_TO_STANDBY` |         yes          | Transitional state during graceful failover. `FAILOVER` connections are closed; `PARALLEL` clients still bind. Writes may be rejected (see Graceful failover below). |
+| `OFFLINE`           |          no          | Cluster is intentionally taken out of rotation.                                                                                                                      |
+| `UNKNOWN`           |          no          | Role has not been initialized or the record could not be read.                                                                                                       |
 
 ### HA policies
 
@@ -91,20 +91,25 @@ The returned `Connection` honors the policy declared in the HA-group record.
 Graceful failover is a two-step demotion of the `ACTIVE` cluster:
 
 1. **`ACTIVE → ACTIVE_TO_STANDBY`.** The operator flips the source cluster
-   into `ACTIVE_TO_STANDBY`. **Existing connections remain open and in-flight
-   reads complete normally.** On the server side, with
+   into `ACTIVE_TO_STANDBY`. `FAILOVER` clients' wrapped connections to the
+   demoting cluster are closed (subsequent statements raise
+   `FailoverSQLException`, or rebind on the next statement under the
+   `active` sub-policy). `PARALLEL` clients continue to operate against
+   both clusters. On the server side, with
    `phoenix.cluster.role.based.mutation.block.enabled=true`, new mutations
-   are rejected with `MutationBlockedIOException` so replication to the peer
-   can drain.
-2. **`ACTIVE_TO_STANDBY → STANDBY`.** Once replication has caught up, the
-   operator demotes the source the rest of the way. Phoenix closes all
-   wrapped per-cluster connections to the demoted cluster; the peer is
-   meanwhile promoted to `ACTIVE`. `explicit` clients see
-   `FailoverSQLException` on their next statement; `active` clients
-   transparently rebind to the new `ACTIVE`.
+   on the demoting cluster are rejected with `MutationBlockedIOException`
+   so replication to the peer can drain. No cluster is `ACTIVE` during
+   this step, so new `FAILOVER` connections cannot be opened until step 2.
+2. **`ACTIVE_TO_STANDBY → STANDBY` (peer promoted to `ACTIVE`).** Once
+   replication has caught up, the operator demotes the source the rest of
+   the way and promotes the peer. New `FAILOVER` connections (and `active`
+   sub-policy retries pending from step 1) now bind to the new `ACTIVE`;
+   `explicit` clients call `failover()` themselves.
 
 Rolling back is supported: an `ACTIVE → ACTIVE_TO_STANDBY → ACTIVE` sequence
-leaves connections fully intact at every step.
+restores the source to `ACTIVE` without further role transitions. `PARALLEL`
+clients remain operational throughout; `FAILOVER` clients reopen connections
+to the restored `ACTIVE` once it returns.
 
 ### Enabling server-side write blocking
 
@@ -171,7 +176,8 @@ A canonical graceful failover from cluster A → cluster B:
 1. Confirm `phoenix.cluster.role.based.mutation.block.enabled=true` is set on
    cluster A and that replication A → B is healthy.
 2. Set A → `ACTIVE_TO_STANDBY`, B remains `STANDBY`. Writes to A start being
-   rejected; existing reads continue.
+   rejected. `FAILOVER` connections to A are closed; `PARALLEL` clients
+   continue to operate against both clusters.
 3. Wait for A → B replication lag to reach zero.
 4. Promote: A → `STANDBY`, B → `ACTIVE`. `active` clients transparently
    rebind; `explicit` clients receive `FailoverSQLException` and call
