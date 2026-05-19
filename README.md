@@ -244,6 +244,9 @@ Update the 404 page:
 
 - Edit the standalone static page in `public/404.html`.
 - Apache 404 handling lives in `public/.htaccess` (uses `ErrorDocument 404 /404.html`).
+- The static 404 page supports dark mode without React: it applies the saved
+  `localStorage.theme` value when present and otherwise falls back to
+  `prefers-color-scheme`.
 
 Check code quality:
 
