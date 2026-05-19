@@ -111,21 +111,6 @@ restores the source to `ACTIVE` without further role transitions. `PARALLEL`
 clients remain operational throughout; `FAILOVER` clients reopen connections
 to the restored `ACTIVE` once it returns.
 
-### Enabling server-side write blocking
-
-Graceful failover relies on the source cluster's RegionServers rejecting
-writes while the role is `ACTIVE_TO_STANDBY`. Enable in the source cluster's
-`hbase-site.xml`:
-
-```xml
-<property>
-  <name>phoenix.cluster.role.based.mutation.block.enabled</name>
-  <value>true</value>
-</property>
-```
-
-Default is `false`. Readers are unaffected either way.
-
 ## Configuration [#ha-config]
 
 All HA-related keys. All can be set in `hbase-site.xml` on the client and/or
@@ -165,9 +150,9 @@ as JDBC connection properties.
 
 ### Server-side write blocking
 
-| Key                                                 | Default                                                                                                     |
-| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `phoenix.cluster.role.based.mutation.block.enabled` | `false` — set `true` in the source cluster's `hbase-site.xml` to block writes while in `ACTIVE_TO_STANDBY`. |
+| Key                                                 | Default                                                                                                                                             |
+| --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `phoenix.cluster.role.based.mutation.block.enabled` | `false` — set `true` in the source cluster's `hbase-site.xml` to reject writes while the cluster is in `ACTIVE_TO_STANDBY`. Readers are unaffected. |
 
 ## Operator workflow [#ha-operator-workflow]
 
