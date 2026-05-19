@@ -132,7 +132,7 @@ actually spent its time
 | `BYTES_READ_FROM_MEMSTORE`   | Bytes read from memstore — un-flushed cells.                            |
 | `BYTES_READ_FROM_BLOCKCACHE` | Bytes served from the HBase block cache — warm reads.                   |
 | `BLOCK_READ_OPS_COUNT`       | Number of HFile blocks read from filesystem (HDFS/S3).                                            |
-| `RPC_SCAN_PROCESSING_TIME`   | Time (ms) the RegionServer spent processing the scan RPC.               |
+| `RPC_SCAN_PROCESSING_TIME`   | Time (ms) the RegionServer spent processing the scan RPC in handler thread.               |
 | `RPC_SCAN_QUEUE_WAIT_TIME`   | Time (ms) the scan RPC spent in the RegionServer's call queue.          |
 
 These are request-level metrics — they appear in the per-table map returned by
@@ -153,12 +153,12 @@ try (ResultSet rs = stmt.executeQuery(sql)) {
 
 They piggyback on `phoenix.trace.read.metrics.enabled` (the existing
 request-level metrics switch, on by default) and require no additional
-configuration. Values originate from HBase 2.6.3+; on older HBase versions
+configuration. Values originate from HBase 2.6.4+; on older HBase versions
 they are silently zero.
 
 ## Top-N slowest parallel scans [#top-n-slowest-scans]
 
-For diagnosing tail-latency on a single statement, Phoenix can retain the
+For diagnosing tail-latency on a single statement issuing multiple HBase scans, Phoenix can retain the
 top-N slowest scan paths it issued while executing a query — useful when a
 query fans out across many regions and you want to find the worst few
 ([PHOENIX-7729](https://issues.apache.org/jira/browse/PHOENIX-7729)).
