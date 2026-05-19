@@ -131,7 +131,7 @@ actually spent its time
 | `BYTES_READ_FROM_FS`         | Bytes read from the filesystem — cold reads that missed HBase block cache.    |
 | `BYTES_READ_FROM_MEMSTORE`   | Bytes read from memstore — un-flushed cells.                            |
 | `BYTES_READ_FROM_BLOCKCACHE` | Bytes served from the HBase block cache — warm reads.                   |
-| `BLOCK_READ_OPS_COUNT`       | Number of HFile block reads.                                            |
+| `BLOCK_READ_OPS_COUNT`       | Number of HFile blocks read from filesystem (HDFS/S3).                                            |
 | `RPC_SCAN_PROCESSING_TIME`   | Time (ms) the RegionServer spent processing the scan RPC.               |
 | `RPC_SCAN_QUEUE_WAIT_TIME`   | Time (ms) the scan RPC spent in the RegionServer's call queue.          |
 
