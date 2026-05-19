@@ -128,7 +128,7 @@ actually spent its time
 | Metric                       | Description                                                             |
 | ---------------------------- | ----------------------------------------------------------------------- |
 | `FS_READ_TIME`               | Time (ms) spent in the underlying filesystem (HDFS/S3) for HFile reads. |
-| `BYTES_READ_FROM_FS`         | Bytes read from the filesystem — cold reads that missed every cache.    |
+| `BYTES_READ_FROM_FS`         | Bytes read from the filesystem — cold reads that missed HBase block cache.    |
 | `BYTES_READ_FROM_MEMSTORE`   | Bytes read from memstore — un-flushed cells.                            |
 | `BYTES_READ_FROM_BLOCKCACHE` | Bytes served from the HBase block cache — warm reads.                   |
 | `BLOCK_READ_OPS_COUNT`       | Number of HFile block reads.                                            |
