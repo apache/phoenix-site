@@ -4,16 +4,31 @@ description: "Detect data divergence between a source and a target Phoenix table
 ---
 
 `PhoenixSyncTableTool` is a MapReduce-based divergence detector for Phoenix
-tables that are replicated (or migrated) between two HBase clusters. It
-compares chunks of source and target data without transferring full rows over
-the network and records any chunk whose hashes disagree to a Phoenix system
-table for later inspection. Available in Phoenix 5.3.1
-([PHOENIX-7751](https://issues.apache.org/jira/browse/PHOENIX-7751)).
+tables that are replicated (or migrated) between two HBase clusters. For each
+region-aligned chunk it computes an SHA-256 hash on both clusters server-side
+and compares only the hashes — full rows never leave their cluster. Chunks
+whose hashes disagree are checkpointed to a Phoenix output table
+(`PHOENIX_SYNC_TABLE_CHECKPOINT`) for later inspection. Available in Phoenix
+5.3.1 ([PHOENIX-7751](https://issues.apache.org/jira/browse/PHOENIX-7751)).
 
 The tool is conceptually similar to HBase's `HashTable`/`SyncTable` pair but
-is Phoenix-aware (respects TTL, `CURRENT_SCN`, tenant id, indexes, and the
-column-encoding scheme) and runs as a **single** MapReduce job with no HDFS
-intermediate. Output is a Phoenix table, queryable with SQL.
+is Phoenix-aware (honors tenant id, indexes, the column-encoding scheme, and
+a bounded time range via `--from-time`/`--to-time`) and runs as a **single**
+MapReduce job, writing results directly to a Phoenix table instead of staging
+hashes in HDFS between two jobs. The output table is queryable with SQL.
+
+Two operational properties differentiate it further from `HashTable`/`SyncTable`:
+
+- **Resumable via checkpointing.** Both mapper-region completion and
+  per-chunk progress are persisted to the checkpoint table during the run.
+  On a failure or re-run with the same `(table, target cluster, from-time,
+to-time)` window, completed mapper regions are filtered out of the input
+  splits and finished chunks are skipped — no need to redo verified work.
+- **Optional split coalescing (`--coalesce-split`).** When enabled, adjacent
+  region splits co-located on the same RegionServer are grouped into a
+  single mapper, reducing mapper count (and target-cluster RPC fan-out) on
+  tables with many small regions. Off by default; enable for wide tables
+  where per-mapper overhead dominates.
 
 `PhoenixSyncTableTool` performs **detection only** in 5.3.1; it does not
 modify the target cluster.
@@ -86,8 +101,8 @@ When `--run-foreground` is set, the tool logs counters from the
 
 ### `PHOENIX_SYNC_TABLE_CHECKPOINT`
 
-The tool auto-creates a Phoenix system table on the **source** cluster (90-day
-TTL, Snappy compression) with one row per chunk and per region. To list
+The tool auto-creates a Phoenix table on the **source** cluster (90-day TTL,
+Snappy compression) with one row per chunk and per region. To list
 divergences from the last run:
 
 ```sql
@@ -146,14 +161,12 @@ scanner timeouts on very large regions:
 ## Limitations [#sync-table-limitations]
 
 - **Detection only.** Mismatched chunks are recorded but not repaired in
-  5.3.1. `--dry-run` is a marker reserved for a future auto-repair pass.
+  5.3.1 (see [Upcoming](#sync-table-upcoming)).
 - **No views.** Only physical tables and index physical names are accepted.
-- The default `--to-time` is `now - 1 hour`. To compare data written less
-  than one hour ago, pass an explicit `--to-time`.
 
-## See also [#sync-table-see-also]
+## Upcoming [#sync-table-upcoming]
 
-- [Bulk Loading](/docs/features/bulk-loading) — the other heavyweight
-  data-movement MapReduce tool that ships with Phoenix.
-- [Change Data Capture](/docs/features/change-data-capture) — for streaming
-  delta capture instead of post-hoc verification.
+A future iteration of the tool will add a **repair phase** that converts
+recorded `MISMATCHED` chunks into upserts on the target cluster, turning
+detection into verify-and-repair in a single workflow. The current
+`--dry-run` flag is reserved for that mode.
