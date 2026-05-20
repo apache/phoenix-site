@@ -117,3 +117,82 @@ service.submit(new Runnable() {
     }
 });
 ```
+
+## Scan latency metrics [#scan-latency-metrics]
+
+Phoenix 5.3.1 surfaces HBase's per-scan latency and IO metrics through the
+request-level metrics API, giving per-query visibility into where a scan
+actually spent its time
+([PHOENIX-7704](https://issues.apache.org/jira/browse/PHOENIX-7704)).
+
+| Metric                       | Description                                                                 |
+| ---------------------------- | --------------------------------------------------------------------------- |
+| `FS_READ_TIME`               | Time (ms) spent in the underlying filesystem (HDFS/S3) for HFile reads.     |
+| `BYTES_READ_FROM_FS`         | Bytes read from the filesystem — cold reads that missed HBase block cache.  |
+| `BYTES_READ_FROM_MEMSTORE`   | Bytes read from memstore — un-flushed cells.                                |
+| `BYTES_READ_FROM_BLOCKCACHE` | Bytes served from the HBase block cache — warm reads.                       |
+| `BLOCK_READ_OPS_COUNT`       | Number of HFile blocks read from filesystem (HDFS/S3).                      |
+| `RPC_SCAN_PROCESSING_TIME`   | Time (ms) the RegionServer spent processing the scan RPC in handler thread. |
+| `RPC_SCAN_QUEUE_WAIT_TIME`   | Time (ms) the scan RPC spent in the RegionServer's call queue.              |
+
+These are request-level metrics — they appear in the per-table map returned by
+`PhoenixRuntime.getRequestReadMetricInfo(rs)` alongside the existing entries:
+
+```java
+try (ResultSet rs = stmt.executeQuery(sql)) {
+    while (rs.next()) {
+        // ...
+    }
+    Map<String, Map<MetricType, Long>> readMetrics =
+            PhoenixRuntime.getRequestReadMetricInfo(rs);
+    long fsReadMs = readMetrics.get(tableName).get(MetricType.FS_READ_TIME);
+    long blocksRead = readMetrics.get(tableName).get(MetricType.BLOCK_READ_OPS_COUNT);
+    // ...
+}
+```
+
+They piggyback on `phoenix.trace.read.metrics.enabled` (the existing
+request-level metrics switch, on by default) and require no additional
+configuration. Values originate from HBase 2.6.4+; on older HBase versions
+they are silently zero.
+
+## Top-N slowest parallel scans [#top-n-slowest-scans]
+
+For diagnosing tail-latency on a single statement issuing multiple HBase scans, Phoenix can retain the
+top-N slowest scan paths it issued while executing a query — useful when a
+query fans out across many regions and you want to find the worst few
+([PHOENIX-7729](https://issues.apache.org/jira/browse/PHOENIX-7729)).
+
+### Enabling
+
+Off by default. Set the count to a positive number on the connection
+(`Properties`) or globally in `hbase-site.xml`:
+
+| Property                                 | Default | Description                                                                                                                      |
+| ---------------------------------------- | ------: | -------------------------------------------------------------------------------------------------------------------------------- |
+| `phoenix.slowest.scan.metrics.count`     |     `0` | N — number of slowest scans to retain. `0` disables the feature.                                                                 |
+| `phoenix.scan.metrics.by.region.enabled` | `false` | When `true` (and `count > 0`), the per-scan record also carries the region name and serving RegionServer. Requires HBase 2.6.3+. |
+
+Request-level metrics (`phoenix.trace.read.metrics.enabled`) must also be on,
+which is the default.
+
+### Retrieving the result
+
+`PhoenixRuntime.getTopNSlowestScanMetrics(rs)` returns the slowest scan paths
+seen while executing the query, as a list of JSON-object lists — one outer
+entry per slow scan path, one inner entry per HBase table touched on that
+path. Forward to your telemetry sink as needed.
+
+```java
+try (ResultSet rs = stmt.executeQuery(sql)) {
+    while (rs.next()) {
+        // ...
+    }
+    List<List<JsonObject>> slowest = PhoenixRuntime.getTopNSlowestScanMetrics(rs);
+    for (List<JsonObject> path : slowest) {
+        for (JsonObject scan : path) {
+            log.info("slow scan on {}: {}", scan.get("table"), scan);
+        }
+    }
+}
+```

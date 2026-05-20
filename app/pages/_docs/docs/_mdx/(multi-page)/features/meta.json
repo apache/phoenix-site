@@ -4,6 +4,7 @@
     "transactions",
     "user-defined-functions",
     "secondary-indexes",
+    "eventually-consistent-indexes",
     "storage-formats",
     "atomic-upsert",
     "namespace-mapping",
@@ -25,8 +26,11 @@
     "bson",
     "change-data-capture",
     "bulk-loading",
+    "phoenix-sync-table",
     "query-server",
+    "high-availability",
     "metrics",
+    "row-size",
     "tracing",
     "cursor"
   ]

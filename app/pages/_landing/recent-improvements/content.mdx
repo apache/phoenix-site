@@ -1,5 +1,14 @@
 # New Features
 
+## 5.3.1 [#release-5-3-1]
+
+1. **[Eventually Consistent Global Indexes](/docs/features/eventually-consistent-indexes)**. Relaxes the strong-consistency contract on global indexes for write-heavy workloads that can tolerate brief index/data divergence in exchange for higher write throughput and reduced write amplification ([PHOENIX-7794](https://issues.apache.org/jira/browse/PHOENIX-7794)).
+1. **Multi-row `UPSERT ... VALUES`**. Standard SQL multi-row value constructors are now supported in a single `UPSERT` statement, eliminating per-row round-trips for client-side bulk inserts ([PHOENIX-7198](https://issues.apache.org/jira/browse/PHOENIX-7198)).
+1. **[`ROW_SIZE()` SQL function](/docs/features/row-size)**. Returns the serialized byte size of a row — useful for hot-row diagnosis and capacity planning directly from SQL ([PHOENIX-7705](https://issues.apache.org/jira/browse/PHOENIX-7705)).
+1. **[Graceful Failover for Phoenix HA](/docs/features/high-availability#ha-graceful)**. Coordinated active-to-standby role transitions in the Failover HA policy so in-flight clients drain cleanly during planned failover instead of being hard-killed ([PHOENIX-7493](https://issues.apache.org/jira/browse/PHOENIX-7493)).
+1. **Improved Scan Metrics**. Phoenix now surfaces HBase's [per-scan latency metrics](/docs/features/metrics#scan-latency-metrics) end-to-end and adds [top-N slowest parallel scan reporting](/docs/features/metrics#top-n-slowest-scans), giving operators per-query visibility into scan tail-latency without resorting to RegionServer-level metrics ([PHOENIX-7704](https://issues.apache.org/jira/browse/PHOENIX-7704), [PHOENIX-7729](https://issues.apache.org/jira/browse/PHOENIX-7729)).
+1. **[`PhoenixSyncTable` data-validation tool](/docs/features/phoenix-sync-table)**. New MapReduce-based tool that compares row data between a source and a target cluster for the same Phoenix table — useful for verifying replication, snapshot-based migrations, and DR drills ([PHOENIX-7751](https://issues.apache.org/jira/browse/PHOENIX-7751)).
+
 ## 5.3.0 [#release-5-3-0]
 
 1. **[Change Data Capture](/docs/features/change-data-capture)**. Stream row-level changes as ordered, partitioned events with configurable pre/post/change scopes. Includes TTL-delete events and partition tracking that survives region splits, merges, and table drops ([PHOENIX-7001](https://issues.apache.org/jira/browse/PHOENIX-7001)).
