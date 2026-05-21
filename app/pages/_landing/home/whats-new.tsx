@@ -16,7 +16,14 @@
 // limitations under the License.
 //
 
-import { ArrowRight, Braces, Globe, RadioTower, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  Braces,
+  Globe,
+  RadioTower,
+  Sparkles,
+  Workflow
+} from "lucide-react";
 import { Link } from "@/components/link";
 
 export function WhatsNewSection() {
@@ -38,6 +45,12 @@ export function WhatsNewSection() {
       desc: "Stream row-level changes as ordered, partitioned events — read with standard SQL, with full split/merge lineage.",
       href: "/docs/features/change-data-capture",
       Icon: RadioTower
+    },
+    {
+      title: "Eventually Consistent Indexes",
+      desc: "Move global secondary index maintenance off the write path for write-heavy workloads — higher throughput, bounded staleness, no query-side changes.",
+      href: "/docs/features/eventually-consistent-indexes",
+      Icon: Workflow
     }
   ];
 
@@ -47,16 +60,16 @@ export function WhatsNewSection() {
         <div className="mb-8 text-center">
           <div className="bg-primary/10 text-primary border-primary/20 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold tracking-wide uppercase">
             <Sparkles className="size-3.5" aria-hidden />
-            What's New in 5.3.0
+            What's New in 5.3.1
           </div>
           <h2 className="mt-4 text-3xl font-semibold tracking-tight md:text-4xl">
             Latest Phoenix Highlights
           </h2>
           <p className="text-muted-foreground mt-2">
-            Recent capabilities now available in the 5.3.0 release.
+            Recent capabilities now available in the 5.3.1 release.
           </p>
         </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
           {items.map(({ title, desc, href, Icon }) => (
             <Link
               key={title}
@@ -85,10 +98,10 @@ export function WhatsNewSection() {
         </div>
         <div className="mt-8 text-center">
           <Link
-            to="/recent-improvements#release-5-3-0"
+            to="/recent-improvements#release-5-3-1"
             className="text-primary inline-flex items-center gap-1 text-sm font-medium hover:underline"
           >
-            See all features in 5.3.0
+            See all features in 5.3.1
             <ArrowRight className="size-3.5" aria-hidden />
           </Link>
         </div>

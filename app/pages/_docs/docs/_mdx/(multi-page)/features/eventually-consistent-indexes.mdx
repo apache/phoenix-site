@@ -1,0 +1,146 @@
+---
+title: "Eventually Consistent Global Indexes"
+description: "Global secondary indexes maintained asynchronously off the data-table write path — for write-heavy workloads that can tolerate a bounded staleness window on the index in exchange for higher write throughput."
+---
+
+An **eventually consistent global index** behaves like a regular Phoenix
+[global index](/docs/features/secondary-indexes#global-indexes) at the SQL
+level — same DDL, same `INCLUDE`, same query planning — but Phoenix maintains
+it asynchronously instead of on the synchronous write path. Writes commit
+faster on the data table, the index catches up shortly after, and reads from
+the index are read-repaired against the data table so they never return
+incorrect data. Introduced in Phoenix 5.3.1
+([PHOENIX-7794](https://issues.apache.org/jira/browse/PHOENIX-7794)).
+
+## When to use it [#ec-indexes-when]
+
+Pick eventually consistent over the default (strong) consistency when **both**
+are true:
+
+- Synchronous index maintenance is your write-path bottleneck — typically a
+  data table fanning out to several large indexes per mutation.
+- A bounded staleness window on the index (seconds) is acceptable for the
+  queries that hit it.
+
+Stay with the default `CONSISTENCY=STRONG` for indexes that back
+read-your-write flows — e.g. "insert a row, then immediately query it via the
+new index" inside a single user request.
+
+This is a property of **global** indexes only. `CONSISTENCY=EVENTUAL` on a
+`LOCAL` index parses but has no runtime effect.
+
+## Creating an EC index [#ec-indexes-create]
+
+`CONSISTENCY=EVENTUAL` is set in the trailing properties slot of `CREATE INDEX`:
+
+```sql
+CREATE INDEX my_idx
+  ON my_table (v1)
+  INCLUDE (v2)
+  CONSISTENCY=EVENTUAL;
+```
+
+`UNCOVERED` and `ASYNC` compose normally:
+
+```sql
+CREATE UNCOVERED INDEX my_idx ON my_table (city, name) CONSISTENCY=EVENTUAL;
+CREATE INDEX my_idx ON my_table (v1) INCLUDE (v2) ASYNC CONSISTENCY=EVENTUAL;
+```
+
+The default is `CONSISTENCY=STRONG`. Flip an existing index in either direction:
+
+```sql
+ALTER INDEX my_idx ON my_table CONSISTENCY=EVENTUAL;
+ALTER INDEX my_idx ON my_table CONSISTENCY=STRONG;
+```
+
+The consistency mode is a per-index property — not a connection setting and
+not a query hint. Every reader of the index sees the same mode.
+
+## How it works [#ec-indexes-how]
+
+EC indexes are maintained by a per-region background consumer that reads a
+[Change Data Capture](/docs/features/change-data-capture) stream on the data
+table and applies the resulting mutations to the index. The first EC index
+on a table provisions the stream automatically; subsequent EC indexes on the
+same table share it.
+
+The consumer supports two strategies for turning a CDC event into an index
+mutation, with opposite write-vs-read IO tradeoffs:
+
+- **Derive on consume (default).** The CDC event carries a lightweight
+  data-row-state marker; the consumer re-reads the data row at consume time
+  to compute the index mutation. Cheap on the write path, one extra
+  data-table read per event on the consume path. Relies on
+  `phoenix.max.lookback.age.seconds` being long enough for the data table to
+  retain the before image of every modified row until the consumer catches up.
+- **Serialize on write.** The index mutation is computed at write time and
+  serialized into the CDC event itself; the consumer just replays it. More
+  write IO (and optionally compressed), no extra read on consume. Useful when
+  the consumer's data-table read is the bottleneck or max-lookback is tight.
+
+Toggle with `phoenix.index.cdc.mutation.serialize` (see Tuning). For most
+workloads the default — derive on consume — is the right choice.
+
+## How reads behave [#ec-indexes-reads]
+
+There is **no query-side change** — no hint, no new syntax. The planner picks
+an EC index exactly like a STRONG index. The visibility contract differs in
+two ways:
+
+- A row recently inserted on the data table may not yet appear in the index.
+- An existing index row's covered column values may be stale until the next
+  update is applied.
+
+Phoenix never returns incorrect rows: any index row not yet caught up is
+verified against the data table before being returned, exactly like a STRONG
+index. The practical visibility window is **a few seconds** on a healthy
+cluster, governed by the tunables below.
+
+## Tuning [#ec-indexes-tuning]
+
+Set on the RegionServer side in `hbase-site.xml`. The defaults are sensible
+for most clusters; the two knobs you will typically reach for are batch size
+(throughput) and timestamp buffer (visibility delay floor).
+
+| Property                                                 | Default | Description                                                                                                                                                                                         |
+| -------------------------------------------------------- | ------: | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `phoenix.index.cdc.consumer.enabled`                     |  `true` | Master switch for the async index maintenance subsystem. Disable to halt all EC-index maintenance cluster-wide.                                                                                     |
+| `phoenix.index.cdc.consumer.batch.size`                  |   `500` | Events drained per iteration. Larger amortizes overhead; smaller bounds staleness on bursty workloads.                                                                                              |
+| `phoenix.index.cdc.consumer.poll.interval.ms`            |  `1000` | Sleep when there is no work to do. Raise to reduce idle wake-ups.                                                                                                                                   |
+| `phoenix.index.cdc.consumer.timestamp.buffer.ms`         |  `5000` | Safety buffer subtracted from "now" before consuming. Floor for visibility delay.                                                                                                                   |
+| `phoenix.index.cdc.consumer.startup.delay.ms`            | `10000` | Delay before a freshly opened region starts consuming.                                                                                                                                              |
+| `phoenix.index.cdc.consumer.max.data.visibility.retries` |    `10` | Retries when the data row is not yet visible to the consumer.                                                                                                                                       |
+| `phoenix.index.cdc.consumer.retry.pause.ms`              |  `2000` | Sleep between data-visibility retries.                                                                                                                                                              |
+| `phoenix.index.cdc.mutation.serialize`                   | `false` | Selects the consumer strategy (see [How it works](#ec-indexes-how)). `false` derives index mutations at consume time (lower write IO); `true` serializes them at write time (no consume-side read). |
+| `phoenix.index.cdc.mutations.compress.enabled`           | `false` | Snappy-compress the serialized index mutation. Only relevant when `phoenix.index.cdc.mutation.serialize=true`.                                                                                      |
+
+With defaults, expect end-to-end index visibility of **~5–10 seconds**.
+
+## Limitations [#ec-indexes-limitations]
+
+- **Global indexes only.** `LOCAL INDEX ... CONSISTENCY=EVENTUAL` is a no-op.
+- **Designed and tested for non-transactional tables.** Combining EC indexes
+  with transactional tables is undefined in 5.3.1.
+- **Salted data tables are not supported** — the underlying change stream
+  Phoenix needs to maintain an EC index is incompatible with salting.
+- **Data-table max lookback age must outlive the async lag.** Increase
+  `phoenix.max.lookback.age.seconds` on the data table if you tune the
+  consumer for low throughput or you expect long catch-up periods.
+
+## Operational notes [#ec-indexes-ops]
+
+- The first EC index on a table provisions the underlying change stream
+  automatically. Subsequent EC indexes on the same table reuse it.
+- Region splits and merges are handled transparently — no operator action is
+  required to keep the index up to date through topology changes.
+- `ALTER INDEX ... CONSISTENCY=STRONG` returns the index to synchronous
+  maintenance for **new** writes. Any in-flight async work continues to flow
+  through until the queue drains.
+
+## See also [#ec-indexes-see-also]
+
+- [Secondary Indexes](/docs/features/secondary-indexes) — global, local,
+  covered, uncovered, and functional indexes.
+- [Change Data Capture](/docs/features/change-data-capture) — exposed
+  Phoenix-level change streams for application use.

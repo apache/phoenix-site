@@ -17,4 +17,4 @@
 //
 
 // Update this value when a new Phoenix release becomes current in docs.
-export const PHOENIX_VERSION = "5.3.0";
+export const PHOENIX_VERSION = "5.3.1";

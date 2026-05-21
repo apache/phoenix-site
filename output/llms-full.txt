@@ -2752,6 +2752,326 @@ VALUES (1, CURRENT_TIME(), 'abc', CURRENT_TIME(), 512, 1024);
 ```
 
 
+# Eventually Consistent Global Indexes (/docs/features/eventually-consistent-indexes)
+An **eventually consistent global index** behaves like a regular Phoenix
+[global index](/docs/features/secondary-indexes#global-indexes) at the SQL
+level — same DDL, same `INCLUDE`, same query planning — but Phoenix maintains
+it asynchronously instead of on the synchronous write path. Writes commit
+faster on the data table, the index catches up shortly after, and reads from
+the index are read-repaired against the data table so they never return
+incorrect data. Introduced in Phoenix 5.3.1
+([PHOENIX-7794](https://issues.apache.org/jira/browse/PHOENIX-7794)).
+
+## When to use it
+
+Pick eventually consistent over the default (strong) consistency when **both**
+are true:
+
+* Synchronous index maintenance is your write-path bottleneck — typically a
+  data table fanning out to several large indexes per mutation.
+* A bounded staleness window on the index (seconds) is acceptable for the
+  queries that hit it.
+
+Stay with the default `CONSISTENCY=STRONG` for indexes that back
+read-your-write flows — e.g. "insert a row, then immediately query it via the
+new index" inside a single user request.
+
+This is a property of **global** indexes only. `CONSISTENCY=EVENTUAL` on a
+`LOCAL` index parses but has no runtime effect.
+
+## Creating an EC index
+
+`CONSISTENCY=EVENTUAL` is set in the trailing properties slot of `CREATE INDEX`:
+
+```sql
+CREATE INDEX my_idx
+  ON my_table (v1)
+  INCLUDE (v2)
+  CONSISTENCY=EVENTUAL;
+```
+
+`UNCOVERED` and `ASYNC` compose normally:
+
+```sql
+CREATE UNCOVERED INDEX my_idx ON my_table (city, name) CONSISTENCY=EVENTUAL;
+CREATE INDEX my_idx ON my_table (v1) INCLUDE (v2) ASYNC CONSISTENCY=EVENTUAL;
+```
+
+The default is `CONSISTENCY=STRONG`. Flip an existing index in either direction:
+
+```sql
+ALTER INDEX my_idx ON my_table CONSISTENCY=EVENTUAL;
+ALTER INDEX my_idx ON my_table CONSISTENCY=STRONG;
+```
+
+The consistency mode is a per-index property — not a connection setting and
+not a query hint. Every reader of the index sees the same mode.
+
+## How it works
+
+EC indexes are maintained by a per-region background consumer that reads a
+[Change Data Capture](/docs/features/change-data-capture) stream on the data
+table and applies the resulting mutations to the index. The first EC index
+on a table provisions the stream automatically; subsequent EC indexes on the
+same table share it.
+
+The consumer supports two strategies for turning a CDC event into an index
+mutation, with opposite write-vs-read IO tradeoffs:
+
+* **Derive on consume (default).** The CDC event carries a lightweight
+  data-row-state marker; the consumer re-reads the data row at consume time
+  to compute the index mutation. Cheap on the write path, one extra
+  data-table read per event on the consume path. Relies on
+  `phoenix.max.lookback.age.seconds` being long enough for the data table to
+  retain the before image of every modified row until the consumer catches up.
+* **Serialize on write.** The index mutation is computed at write time and
+  serialized into the CDC event itself; the consumer just replays it. More
+  write IO (and optionally compressed), no extra read on consume. Useful when
+  the consumer's data-table read is the bottleneck or max-lookback is tight.
+
+Toggle with `phoenix.index.cdc.mutation.serialize` (see Tuning). For most
+workloads the default — derive on consume — is the right choice.
+
+## How reads behave
+
+There is **no query-side change** — no hint, no new syntax. The planner picks
+an EC index exactly like a STRONG index. The visibility contract differs in
+two ways:
+
+* A row recently inserted on the data table may not yet appear in the index.
+* An existing index row's covered column values may be stale until the next
+  update is applied.
+
+Phoenix never returns incorrect rows: any index row not yet caught up is
+verified against the data table before being returned, exactly like a STRONG
+index. The practical visibility window is **a few seconds** on a healthy
+cluster, governed by the tunables below.
+
+## Tuning
+
+Set on the RegionServer side in `hbase-site.xml`. The defaults are sensible
+for most clusters; the two knobs you will typically reach for are batch size
+(throughput) and timestamp buffer (visibility delay floor).
+
+| Property                                                 | Default | Description                                                                                                                                                                                         |
+| -------------------------------------------------------- | ------: | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `phoenix.index.cdc.consumer.enabled`                     |  `true` | Master switch for the async index maintenance subsystem. Disable to halt all EC-index maintenance cluster-wide.                                                                                     |
+| `phoenix.index.cdc.consumer.batch.size`                  |   `500` | Events drained per iteration. Larger amortizes overhead; smaller bounds staleness on bursty workloads.                                                                                              |
+| `phoenix.index.cdc.consumer.poll.interval.ms`            |  `1000` | Sleep when there is no work to do. Raise to reduce idle wake-ups.                                                                                                                                   |
+| `phoenix.index.cdc.consumer.timestamp.buffer.ms`         |  `5000` | Safety buffer subtracted from "now" before consuming. Floor for visibility delay.                                                                                                                   |
+| `phoenix.index.cdc.consumer.startup.delay.ms`            | `10000` | Delay before a freshly opened region starts consuming.                                                                                                                                              |
+| `phoenix.index.cdc.consumer.max.data.visibility.retries` |    `10` | Retries when the data row is not yet visible to the consumer.                                                                                                                                       |
+| `phoenix.index.cdc.consumer.retry.pause.ms`              |  `2000` | Sleep between data-visibility retries.                                                                                                                                                              |
+| `phoenix.index.cdc.mutation.serialize`                   | `false` | Selects the consumer strategy (see [How it works](#ec-indexes-how)). `false` derives index mutations at consume time (lower write IO); `true` serializes them at write time (no consume-side read). |
+| `phoenix.index.cdc.mutations.compress.enabled`           | `false` | Snappy-compress the serialized index mutation. Only relevant when `phoenix.index.cdc.mutation.serialize=true`.                                                                                      |
+
+With defaults, expect end-to-end index visibility of **\~5–10 seconds**.
+
+## Limitations
+
+* **Global indexes only.** `LOCAL INDEX ... CONSISTENCY=EVENTUAL` is a no-op.
+* **Designed and tested for non-transactional tables.** Combining EC indexes
+  with transactional tables is undefined in 5.3.1.
+* **Salted data tables are not supported** — the underlying change stream
+  Phoenix needs to maintain an EC index is incompatible with salting.
+* **Data-table max lookback age must outlive the async lag.** Increase
+  `phoenix.max.lookback.age.seconds` on the data table if you tune the
+  consumer for low throughput or you expect long catch-up periods.
+
+## Operational notes
+
+* The first EC index on a table provisions the underlying change stream
+  automatically. Subsequent EC indexes on the same table reuse it.
+* Region splits and merges are handled transparently — no operator action is
+  required to keep the index up to date through topology changes.
+* `ALTER INDEX ... CONSISTENCY=STRONG` returns the index to synchronous
+  maintenance for **new** writes. Any in-flight async work continues to flow
+  through until the queue drains.
+
+## See also
+
+* [Secondary Indexes](/docs/features/secondary-indexes) — global, local,
+  covered, uncovered, and functional indexes.
+* [Change Data Capture](/docs/features/change-data-capture) — exposed
+  Phoenix-level change streams for application use.
+
+
+# High Availability (/docs/features/high-availability)
+Phoenix High Availability (HA) lets a JDBC client transparently target a pair
+of HBase clusters that mirror the same Phoenix schema, so an operator-driven
+or fault-driven failover never requires the application to restart, reconnect,
+or rewrite URLs.
+
+Phoenix 5.3.1 adds **graceful failover** — an intermediate `ACTIVE_TO_STANDBY`
+role that lets writes drain server-side before the peer is promoted — plus
+support for HBase's `MASTER` and `RPC` connection registries
+([PHOENIX-7493](https://issues.apache.org/jira/browse/PHOENIX-7493),
+[PHOENIX-7495](https://issues.apache.org/jira/browse/PHOENIX-7495),
+[PHOENIX-7586](https://issues.apache.org/jira/browse/PHOENIX-7586)).
+
+## Concepts
+
+An **HA group** is a named tuple of two HBase clusters and an HA policy,
+shared by every client that participates. The current role of each cluster
+lives in a JSON record in ZooKeeper, replicated to both clusters' ZK
+ensembles and watched by the client; role changes are picked up
+automatically.
+
+### Cluster roles
+
+| Role                | Clients can connect? | Meaning                                                                                                                                                              |
+| ------------------- | :------------------: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ACTIVE`            |          yes         | Cluster is serving live reads and writes.                                                                                                                            |
+| `STANDBY`           |          yes         | Cluster is reachable but not the current primary. `FAILOVER` clients refuse to bind; `PARALLEL` clients still bind.                                                  |
+| `ACTIVE_TO_STANDBY` |          yes         | Transitional state during graceful failover. `FAILOVER` connections are closed; `PARALLEL` clients still bind. Writes may be rejected (see Graceful failover below). |
+| `OFFLINE`           |          no          | Cluster is intentionally taken out of rotation.                                                                                                                      |
+| `UNKNOWN`           |          no          | Role has not been initialized or the record could not be read.                                                                                                       |
+
+### HA policies
+
+The policy is part of the HA-group record. Clients do not pick it — operators
+do, when provisioning the group.
+
+* **`FAILOVER`** — exactly one cluster (the `ACTIVE`) serves the connection at
+  any moment. The client transparently re-binds on role change.
+* **`PARALLEL`** — every statement is issued to **both** clusters in parallel,
+  with the faster result returned. Useful when both clusters carry identical
+  data and you want to mask single-cluster tail latency.
+
+### Failover sub-policies (FAILOVER only)
+
+Controls how a FAILOVER connection reacts when its bound cluster transitions
+away from `ACTIVE`:
+
+| `phoenix.ha.failover.policy` | Behavior                                                                                                                              |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `explicit` (default)         | Subsequent operations throw `FailoverSQLException`; the application calls `failover()` to rebind to the new `ACTIVE`.                 |
+| `active`                     | Connection transparently rebinds to the new `ACTIVE` on the next statement, up to `phoenix.ha.failover.count` attempts (default `3`). |
+
+## JDBC URL
+
+The HA URL is a bracketed pair of per-cluster endpoints separated by `|`,
+optionally followed by a principal:
+
+```
+jdbc:phoenix+zk:[zk1\:2181::/hbase|zk2\:2181::/hbase]:my_principal
+```
+
+The presence of `|` inside the URL is what triggers the HA code path. The two
+URLs inside the brackets are always ZooKeeper quorums — Phoenix uses them to
+read the HA-group record.
+
+The per-cluster connection Phoenix opens underneath may use any of the
+supported HBase registries (`ZK`, `MASTER`, or `RPC`), based on what the
+operator configured in the HA-group record. `RPC` requires HBase 2.5+.
+
+### Connecting
+
+Set the HA group name as a JDBC property and open a connection like any other:
+
+```java
+Properties props = new Properties();
+props.setProperty("phoenix.ha.group.name", "myGroup");
+try (Connection conn = DriverManager.getConnection(
+        "jdbc:phoenix+zk:[zk1\\:2181::/hbase|zk2\\:2181::/hbase]", props)) {
+    // Normal JDBC usage.
+}
+```
+
+The returned `Connection` honors the policy declared in the HA-group record.
+
+## Graceful failover
+
+Graceful failover is a two-step demotion of the `ACTIVE` cluster:
+
+1. **`ACTIVE → ACTIVE_TO_STANDBY`.** The operator flips the source cluster
+   into `ACTIVE_TO_STANDBY`. `FAILOVER` clients' wrapped connections to the
+   demoting cluster are closed (subsequent statements raise
+   `FailoverSQLException`, or rebind on the next statement under the
+   `active` sub-policy). `PARALLEL` clients continue to operate against
+   both clusters. On the server side, with
+   `phoenix.cluster.role.based.mutation.block.enabled=true`, new mutations
+   on the demoting cluster are rejected with `MutationBlockedIOException`
+   so replication to the peer can drain. No cluster is `ACTIVE` during
+   this step, so new `FAILOVER` connections cannot be opened until step 2.
+2. **`ACTIVE_TO_STANDBY → STANDBY` (peer promoted to `ACTIVE`).** Once
+   replication has caught up, the operator demotes the source the rest of
+   the way and promotes the peer. New `FAILOVER` connections (and `active`
+   sub-policy retries pending from step 1) now bind to the new `ACTIVE`;
+   `explicit` clients call `failover()` themselves.
+
+Rolling back is supported: an `ACTIVE → ACTIVE_TO_STANDBY → ACTIVE` sequence
+restores the source to `ACTIVE` without further role transitions. `PARALLEL`
+clients remain operational throughout; `FAILOVER` clients reopen connections
+to the restored `ACTIVE` once it returns.
+
+## Configuration
+
+All HA-related keys. All can be set in `hbase-site.xml` on the client and/or
+as JDBC connection properties.
+
+### Required
+
+| Key                     | Notes                                                              |
+| ----------------------- | ------------------------------------------------------------------ |
+| `phoenix.ha.group.name` | Name of the HA group — must match the operator-provisioned record. |
+
+### ZooKeeper tuning (client side)
+
+| Key                                   | Default |
+| ------------------------------------- | ------: |
+| `phoenix.ha.zk.connection.timeout.ms` |  `4000` |
+| `phoenix.ha.zk.session.timeout.ms`    |  `4000` |
+| `phoenix.ha.zk.retry.base.sleep.ms`   |  `1000` |
+| `phoenix.ha.zk.retry.max`             |     `5` |
+| `phoenix.ha.zk.retry.max.sleep.ms`    | `10000` |
+
+### Fallback to a single cluster
+
+| Key                           | Default                                                                                            |
+| ----------------------------- | -------------------------------------------------------------------------------------------------- |
+| `phoenix.ha.fallback.enabled` | `true` — if the HA record cannot be read from either ZK, fall back to a single-cluster connection. |
+| `phoenix.ha.fallback.cluster` | (empty) — JDBC URL of the fallback cluster.                                                        |
+
+### Failover behavior
+
+| Key                                | Default                                                                                |
+| ---------------------------------- | -------------------------------------------------------------------------------------- |
+| `phoenix.ha.transition.timeout.ms` | `300000` (5 min) — time the client gets to close connections during a role transition. |
+| `phoenix.ha.failover.policy`       | `explicit` — or `active` to auto-rebind.                                               |
+| `phoenix.ha.failover.count`        | `3` — max auto-rebind attempts for the `active` sub-policy.                            |
+| `phoenix.ha.failover.timeout.ms`   | `10000` — wait timeout for a single failover operation.                                |
+
+### Server-side write blocking
+
+| Key                                                 | Default                                                                                                                                             |
+| --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `phoenix.cluster.role.based.mutation.block.enabled` | `false` — set `true` in the source cluster's `hbase-site.xml` to reject writes while the cluster is in `ACTIVE_TO_STANDBY`. Readers are unaffected. |
+
+## Operator workflow
+
+A canonical graceful failover from cluster A → cluster B:
+
+1. Confirm `phoenix.cluster.role.based.mutation.block.enabled=true` is set on
+   cluster A and that replication A → B is healthy.
+2. Set A → `ACTIVE_TO_STANDBY`, B remains `STANDBY`. Writes to A start being
+   rejected. `FAILOVER` connections to A are closed; `PARALLEL` clients
+   continue to operate against both clusters.
+3. Wait for A → B replication lag to reach zero.
+4. Promote: A → `STANDBY`, B → `ACTIVE`. `active` clients transparently
+   rebind; `explicit` clients receive `FailoverSQLException` and call
+   `failover()` themselves.
+
+For an unplanned failover, skip step 2 and go directly to step 4. The
+`ACTIVE_TO_STANDBY` role is a graceful-failover convenience, not a
+correctness requirement.
+
+## See also
+
+* [Metrics](/docs/features/metrics) — client metrics are emitted by both
+  wrapped and HA connections.
+
+
 # Metrics (/docs/features/metrics)
 Phoenix surfaces various metrics that provide an insight into what is going on within the Phoenix client as it is executing various SQL statements. These metrics are collected within the client JVM in two ways:
 
@@ -2866,6 +3186,85 @@ service.submit(new Runnable() {
         }
     }
 });
+```
+
+## Scan latency metrics
+
+Phoenix 5.3.1 surfaces HBase's per-scan latency and IO metrics through the
+request-level metrics API, giving per-query visibility into where a scan
+actually spent its time
+([PHOENIX-7704](https://issues.apache.org/jira/browse/PHOENIX-7704)).
+
+| Metric                       | Description                                                                 |
+| ---------------------------- | --------------------------------------------------------------------------- |
+| `FS_READ_TIME`               | Time (ms) spent in the underlying filesystem (HDFS/S3) for HFile reads.     |
+| `BYTES_READ_FROM_FS`         | Bytes read from the filesystem — cold reads that missed HBase block cache.  |
+| `BYTES_READ_FROM_MEMSTORE`   | Bytes read from memstore — un-flushed cells.                                |
+| `BYTES_READ_FROM_BLOCKCACHE` | Bytes served from the HBase block cache — warm reads.                       |
+| `BLOCK_READ_OPS_COUNT`       | Number of HFile blocks read from filesystem (HDFS/S3).                      |
+| `RPC_SCAN_PROCESSING_TIME`   | Time (ms) the RegionServer spent processing the scan RPC in handler thread. |
+| `RPC_SCAN_QUEUE_WAIT_TIME`   | Time (ms) the scan RPC spent in the RegionServer's call queue.              |
+
+These are request-level metrics — they appear in the per-table map returned by
+`PhoenixRuntime.getRequestReadMetricInfo(rs)` alongside the existing entries:
+
+```java
+try (ResultSet rs = stmt.executeQuery(sql)) {
+    while (rs.next()) {
+        // ...
+    }
+    Map<String, Map<MetricType, Long>> readMetrics =
+            PhoenixRuntime.getRequestReadMetricInfo(rs);
+    long fsReadMs = readMetrics.get(tableName).get(MetricType.FS_READ_TIME);
+    long blocksRead = readMetrics.get(tableName).get(MetricType.BLOCK_READ_OPS_COUNT);
+    // ...
+}
+```
+
+They piggyback on `phoenix.trace.read.metrics.enabled` (the existing
+request-level metrics switch, on by default) and require no additional
+configuration. Values originate from HBase 2.6.4+; on older HBase versions
+they are silently zero.
+
+## Top-N slowest parallel scans
+
+For diagnosing tail-latency on a single statement issuing multiple HBase scans, Phoenix can retain the
+top-N slowest scan paths it issued while executing a query — useful when a
+query fans out across many regions and you want to find the worst few
+([PHOENIX-7729](https://issues.apache.org/jira/browse/PHOENIX-7729)).
+
+### Enabling
+
+Off by default. Set the count to a positive number on the connection
+(`Properties`) or globally in `hbase-site.xml`:
+
+| Property                                 | Default | Description                                                                                                                      |
+| ---------------------------------------- | ------: | -------------------------------------------------------------------------------------------------------------------------------- |
+| `phoenix.slowest.scan.metrics.count`     |     `0` | N — number of slowest scans to retain. `0` disables the feature.                                                                 |
+| `phoenix.scan.metrics.by.region.enabled` | `false` | When `true` (and `count > 0`), the per-scan record also carries the region name and serving RegionServer. Requires HBase 2.6.3+. |
+
+Request-level metrics (`phoenix.trace.read.metrics.enabled`) must also be on,
+which is the default.
+
+### Retrieving the result
+
+`PhoenixRuntime.getTopNSlowestScanMetrics(rs)` returns the slowest scan paths
+seen while executing the query, as a list of JSON-object lists — one outer
+entry per slow scan path, one inner entry per HBase table touched on that
+path. Forward to your telemetry sink as needed.
+
+```java
+try (ResultSet rs = stmt.executeQuery(sql)) {
+    while (rs.next()) {
+        // ...
+    }
+    List<List<JsonObject>> slowest = PhoenixRuntime.getTopNSlowestScanMetrics(rs);
+    for (List<JsonObject> path : slowest) {
+        for (JsonObject scan : path) {
+            log.info("slow scan on {}: {}", scan.get("table"), scan);
+        }
+    }
+}
 ```
 
 
@@ -3178,6 +3577,176 @@ mechanisms read/write the same underlying timestamp, so `PHOENIX_ROW_TIMESTAMP()
 returns the value of the `ROW_TIMESTAMP` column for that row.
 
 
+# PhoenixSyncTable Tool (/docs/features/phoenix-sync-table)
+`PhoenixSyncTableTool` is a MapReduce-based divergence detector for Phoenix
+tables that are replicated (or migrated) between two HBase clusters. For each
+region-aligned chunk it computes an SHA-256 hash on both clusters server-side
+and compares only the hashes — full rows never leave their cluster. Chunks
+whose hashes disagree are checkpointed to a Phoenix output table
+(`PHOENIX_SYNC_TABLE_CHECKPOINT`) for later inspection. Available in Phoenix
+5.3.1 ([PHOENIX-7751](https://issues.apache.org/jira/browse/PHOENIX-7751)).
+
+The tool is conceptually similar to HBase's `HashTable`/`SyncTable` pair but
+is Phoenix-aware (honors tenant id, indexes, the column-encoding scheme, and
+a bounded time range via `--from-time`/`--to-time`) and runs as a **single**
+MapReduce job, writing results directly to a Phoenix table instead of staging
+hashes in HDFS between two jobs. The output table is queryable with SQL.
+
+Two operational properties differentiate it further from `HashTable`/`SyncTable`:
+
+* **Resumable via checkpointing.** Both mapper-region completion and
+  per-chunk progress are persisted to the checkpoint table during the run.
+  On a failure or re-run with the same `(table, target cluster, from-time,
+  to-time)` window, completed mapper regions are filtered out of the input
+  splits and finished chunks are skipped — no need to redo verified work.
+* **Optional split coalescing (`--coalesce-split`).** When enabled, adjacent
+  region splits co-located on the same RegionServer are grouped into a
+  single mapper, reducing mapper count (and target-cluster RPC fan-out) on
+  tables with many small regions. Off by default; enable for wide tables
+  where per-mapper overhead dominates.
+
+`PhoenixSyncTableTool` performs **detection only** in 5.3.1; it does not
+modify the target cluster.
+
+## When to use it
+
+Reach for `PhoenixSyncTableTool` to verify:
+
+* A cluster migration that used HBase snapshots, replication, or both — to
+  confirm the target is byte-for-byte identical after cutover.
+* Long-running HBase replication — to detect cases where a replication peer
+  has silently drifted.
+* DR drills — to confirm the standby is in sync before a planned failover.
+
+For ad-hoc row-count or row-key spot-checks you usually want a small SQL
+query instead; `PhoenixSyncTableTool` is the right choice when you need
+**full-data** confidence with bounded network cost.
+
+## Running the tool
+
+The tool runs through `hbase` (or `hadoop jar`) and takes only two mandatory
+flags — the source table name and the target cluster's ZooKeeper quorum.
+
+```bash
+hbase org.apache.phoenix.mapreduce.PhoenixSyncTableTool \
+  --table-name MY_SCHEMA.MY_TABLE \
+  --target-cluster zk1,zk2,zk3:2181:/hbase \
+  --run-foreground
+```
+
+The source cluster comes from the Hadoop/HBase configuration the job is
+submitted under, so `--target-cluster` is the ZooKeeper quorum of the
+**other** cluster. Accepted quorum formats:
+
+* `host:port:/znode`
+* `h1,h2:port:/znode`
+* `h1:p1,h2:p2:/znode`
+
+### Flags
+
+| Short     | Long                  | Required | Default              | Purpose                                                                                                                  |
+| --------- | --------------------- | :------: | -------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `-tn`     | `--table-name`        |    yes   | —                    | Source table (physical name; index physical names are also accepted).                                                    |
+| `-tc`     | `--target-cluster`    |    yes   | —                    | ZK quorum of the target cluster.                                                                                         |
+| `-s`      | `--schema`            |    no    | —                    | Phoenix schema name.                                                                                                     |
+| `-tenant` | `--tenant-id`         |    no    | —                    | Tenant id for tenant-specific sync.                                                                                      |
+| `-ft`     | `--from-time`         |    no    | `0`                  | Lower bound of the cell-timestamp window, in ms.                                                                         |
+| `-tt`     | `--to-time`           |    no    | `now - 1 hour`       | Upper bound; also used as `CURRENT_SCN`. The 1-hour buffer gives async replication time to catch up.                     |
+| `-cs`     | `--chunk-size`        |    no    | `1073741824` (1 GiB) | Approximate chunk size in bytes. Smaller chunks narrow the divergence search radius at the cost of more checkpoint rows. |
+| `-rs`     | `--raw-scan`          |    no    | `false`              | Include delete markers.                                                                                                  |
+| `-rav`    | `--read-all-versions` |    no    | `false`              | Compare every cell version, not just the latest.                                                                         |
+| `-coal`   | `--coalesce-split`    |    no    | `false`              | Coalesce multiple source regions into one mapper.                                                                        |
+| `-runfg`  | `--run-foreground`    |    no    | `false`              | Block until the job completes (default is fire-and-forget submit).                                                       |
+| `-dr`     | `--dry-run`           |    no    | `false`              | Marker only — reserved for a future auto-repair extension.                                                               |
+| `-h`      | `--help`              |    no    | —                    | Print help and exit.                                                                                                     |
+
+The mapper count is implicitly the number of source-table regions (one
+mapper per region) unless `--coalesce-split` is set.
+
+## Output
+
+### MapReduce counters
+
+When `--run-foreground` is set, the tool logs counters from the
+`PhoenixSyncTableMapper$SyncCounters` group:
+
+* `MAPPERS_VERIFIED`, `MAPPERS_MISMATCHED`
+* `CHUNKS_VERIFIED`, `CHUNKS_MISMATCHED`
+* `SOURCE_ROWS_PROCESSED`, `TARGET_ROWS_PROCESSED`
+
+### `PHOENIX_SYNC_TABLE_CHECKPOINT`
+
+The tool auto-creates a Phoenix table on the **source** cluster (90-day TTL,
+Snappy compression) with one row per chunk and per region. To list
+divergences from the last run:
+
+```sql
+SELECT START_ROW_KEY, END_ROW_KEY, COUNTERS, EXECUTION_END_TIME
+FROM   PHOENIX_SYNC_TABLE_CHECKPOINT
+WHERE  TABLE_NAME = 'MY_TABLE'
+  AND  TARGET_CLUSTER = 'zk1,zk2,zk3:2181:/hbase'
+  AND  TYPE = 'CHUNK'
+  AND  STATUS = 'MISMATCHED';
+```
+
+Each row carries `STATUS` (`VERIFIED` or `MISMATCHED`), `TYPE` (`CHUNK` or
+`REGION`), the key range, and a comma-separated `COUNTERS` string with
+per-chunk source and target row counts.
+
+### Resumability
+
+A re-run of the same `(table, target, from-time, to-time, tenant)` tuple
+picks up where the previous run left off — already-verified sub-ranges are
+skipped.
+
+## Prerequisites
+
+* **Cross-cluster line of sight.** Mapper YARN nodes need ZooKeeper and RPC
+  reachability to **both** clusters' RegionServers.
+* **Both clusters must run Phoenix 5.3.1+.**
+* **Live read, not snapshot-based.** Both clusters are scanned through the
+  regular Phoenix read path.
+* **Kerberos** delegation tokens for the target cluster are acquired
+  automatically when security is enabled.
+* The submitter principal needs `READ` on the physical HBase tables on both
+  clusters, plus `WRITE` to `PHOENIX_SYNC_TABLE_CHECKPOINT` on the source.
+* Views and logical (not physical) index names are rejected. Pass the
+  physical index table name to validate an index.
+
+## Tuning
+
+`--chunk-size` is the main lever:
+
+* Larger chunks (e.g. 4 GiB) reduce checkpoint rows and per-chunk overhead
+  but make every mismatch report a coarser range.
+* Smaller chunks (e.g. 64 MiB) narrow the mismatch search radius and produce
+  more checkpoint rows.
+
+The tool runs at long-scan timescales. Adjust these client-side timeouts
+(set in the Hadoop `Configuration` the job is submitted with) if you see
+scanner timeouts on very large regions:
+
+| Property                                    | Default       |
+| ------------------------------------------- | ------------- |
+| `phoenix.sync.table.query.timeout`          | \~150 minutes |
+| `phoenix.sync.table.rpc.timeout`            | 30 minutes    |
+| `phoenix.sync.table.client.scanner.timeout` | 30 minutes    |
+| `phoenix.sync.table.rpc.retries.counter`    | 5             |
+
+## Limitations
+
+* **Detection only.** Mismatched chunks are recorded but not repaired in
+  5.3.1 (see [Upcoming](#sync-table-upcoming)).
+* **No views.** Only physical tables and index physical names are accepted.
+
+## Upcoming
+
+A future iteration of the tool will add a **repair phase** that converts
+recorded `MISMATCHED` chunks into upserts on the target cluster, turning
+detection into verify-and-repair in a single workflow. The current
+`--dry-run` flag is reserved for that mode.
+
+
 # Query Server (/docs/features/query-server)
 The Phoenix Query Server provides an alternative means for interaction with
 Phoenix and HBase.
@@ -3457,6 +4026,95 @@ The following properties configure this load balancer:
 | `phoenix.queryserver.zookeeper.acl.password` | Password for optional DIGEST ZooKeeper ACL.                    | `phoenix`     |
 
 
+# ROW_SIZE() and RAW_ROW_SIZE() (/docs/features/row-size)
+`ROW_SIZE()` and `RAW_ROW_SIZE()` return the HBase byte footprint of the row
+currently being scanned. Both are zero-argument scalar functions that return
+`UNSIGNED_LONG`. Available in Phoenix 5.3.1
+([PHOENIX-7705](https://issues.apache.org/jira/browse/PHOENIX-7705)).
+
+|             | `ROW_SIZE()`                        | `RAW_ROW_SIZE()`                                  |
+| ----------- | ----------------------------------- | ------------------------------------------------- |
+| Arguments   | none                                | none                                              |
+| Return type | `UNSIGNED_LONG`                     | `UNSIGNED_LONG`                                   |
+| Counts      | latest visible version of each cell | all retained cell versions **and** delete markers |
+
+Each cell's contribution is its full HBase footprint — row key, column
+family, qualifier, timestamp, type byte, tags, and value — so the result is
+**not** equal to the sum of user-visible column value lengths.
+
+## Usage
+
+`ROW_SIZE()` is only valid **as an argument to an aggregate** in the `SELECT`
+list, or inside a `WHERE` clause. A bare projection (`SELECT ROW_SIZE() FROM t`)
+is rejected at compile time.
+
+### Total table footprint
+
+```sql
+SELECT SUM(ROW_SIZE()) FROM my_table;
+```
+
+### Per-row size
+
+Group by the primary key so each group is a single row:
+
+```sql
+SELECT SUM(ROW_SIZE()) FROM my_table GROUP BY id;
+```
+
+### Distribution
+
+```sql
+SELECT AVG(ROW_SIZE()), MIN(ROW_SIZE()), MAX(ROW_SIZE()) FROM my_table;
+```
+
+### Find rows whose footprint exceeds a threshold
+
+`ROW_SIZE()` is also valid in `WHERE`:
+
+```sql
+SELECT COUNT(1)
+FROM my_table
+WHERE ROW_SIZE() > 1024 AND status = 'ACTIVE';
+```
+
+### Including delete markers and old versions
+
+```sql
+SELECT organization_id, SUM(RAW_ROW_SIZE())
+FROM my_table
+GROUP BY organization_id;
+```
+
+`RAW_ROW_SIZE()` counts every retained cell version and the bytes of any
+delete-family or delete-column tombstones — useful for measuring the
+post-compaction-debt footprint of a row.
+
+## Limitations and caveats
+
+* **Wrap in an aggregate.** `SELECT ROW_SIZE() FROM t` is rejected. Use
+  `SUM(ROW_SIZE())` (with `GROUP BY <pk>` for per-row values).
+* **Forces a full row read.** A query using either function reads more bytes
+  per row than the same query without it, because the scan can no longer
+  use empty-column / key-only / encoded-qualifier optimizations. Reach for
+  these functions for diagnostics, not hot-path scans.
+* **`RAW_ROW_SIZE()` reads all versions and tombstones.** Both the byte count
+  and the row count it produces will exceed `ROW_SIZE()` on the same data.
+* **Cell footprint, not user-data size.** Adding a column generally
+  increases `ROW_SIZE()` by more than that column's value byte length.
+* **Measures whatever physical row the planner scans.** If the optimizer
+  chooses a secondary index, `ROW_SIZE()` will measure the index row, not
+  the data row. Pin the plan with a hint (e.g. `/*+ NO_INDEX */`) if you
+  need a specific physical answer.
+
+## See also
+
+* [Metrics](/docs/features/metrics) — runtime measurements on the client
+  side (scan bytes, mutation bytes, scan latency, etc.).
+* [Statistics Collection](/docs/features/statistics-collection) — aggregate
+  estimates without scanning every row.
+
+
 # Row Timestamp Column (/docs/features/row-timestamp-column)
 Phoenix 4.6 provides a way to map HBase’s native row timestamp to a Phoenix column. This helps you take advantage of HBase optimizations for time ranges in store files, along with query optimizations built into Phoenix.
 
@@ -3592,6 +4250,8 @@ Each are useful in different scenarios and have their own failure profiles and p
 ## Global Indexes
 
 Global indexing targets *read heavy* uses cases. With global indexes, all the performance penalties for indexes occur at write time. We intercept the data table updates on write ([DELETE](/docs/grammar#delete), [UPSERT VALUES](/docs/grammar#upsert-values) and [UPSERT SELECT](/docs/grammar#upsert-select)), build the index update and then sent any necessary updates to all interested index tables. At read time, Phoenix will select the index table to use that will produce the fastest query time and directly scan it just like any other HBase table. An index will not be used for a query that references a column that isn't part of the index.
+
+For write-heavy workloads where synchronous index maintenance is the bottleneck and a bounded staleness window on the index is acceptable, a global index can be created with `CONSISTENCY=EVENTUAL` to move its maintenance off the data-table write path. See [Eventually Consistent Global Indexes](/docs/features/eventually-consistent-indexes).
 
 ## Local Indexes
 
@@ -14733,6 +15393,8 @@ Each are useful in different scenarios and have their own failure profiles and p
 
 Global indexing targets *read heavy* uses cases. With global indexes, all the performance penalties for indexes occur at write time. We intercept the data table updates on write ([DELETE](/docs/grammar#delete), [UPSERT VALUES](/docs/grammar#upsert-values) and [UPSERT SELECT](/docs/grammar#upsert-select)), build the index update and then sent any necessary updates to all interested index tables. At read time, Phoenix will select the index table to use that will produce the fastest query time and directly scan it just like any other HBase table. An index will not be used for a query that references a column that isn't part of the index.
 
+For write-heavy workloads where synchronous index maintenance is the bottleneck and a bounded staleness window on the index is acceptable, a global index can be created with `CONSISTENCY=EVENTUAL` to move its maintenance off the data-table write path. See [Eventually Consistent Global Indexes](/docs/features/eventually-consistent-indexes).
+
 ## Local Indexes
 
 Local indexing targets *write heavy*, *space constrained* use cases. Just like with global indexes, Phoenix will automatically select whether or not to use a local index at query-time. With local indexes, index data and table data co-reside on same server preventing any network overhead during writes. Local indexes can be used even when the query isn't fully covered (i.e. Phoenix automatically retrieve the columns not in the index through point gets against the data table). Unlike global indexes, all local indexes of a table are stored in a single, separate shared table prior to 4.8.0 version. From 4.8.0 onwards we are storing all local index data in the separate shadow column families in the same data table. At read time when the local index is used, every region must be examined for the data as the exact region location of index data cannot be predetermined. Thus some overhead occurs at read-time.
@@ -17745,6 +18407,85 @@ service.submit(new Runnable() {
         }
     }
 });
+```
+
+## Scan latency metrics
+
+Phoenix 5.3.1 surfaces HBase's per-scan latency and IO metrics through the
+request-level metrics API, giving per-query visibility into where a scan
+actually spent its time
+([PHOENIX-7704](https://issues.apache.org/jira/browse/PHOENIX-7704)).
+
+| Metric                       | Description                                                                 |
+| ---------------------------- | --------------------------------------------------------------------------- |
+| `FS_READ_TIME`               | Time (ms) spent in the underlying filesystem (HDFS/S3) for HFile reads.     |
+| `BYTES_READ_FROM_FS`         | Bytes read from the filesystem — cold reads that missed HBase block cache.  |
+| `BYTES_READ_FROM_MEMSTORE`   | Bytes read from memstore — un-flushed cells.                                |
+| `BYTES_READ_FROM_BLOCKCACHE` | Bytes served from the HBase block cache — warm reads.                       |
+| `BLOCK_READ_OPS_COUNT`       | Number of HFile blocks read from filesystem (HDFS/S3).                      |
+| `RPC_SCAN_PROCESSING_TIME`   | Time (ms) the RegionServer spent processing the scan RPC in handler thread. |
+| `RPC_SCAN_QUEUE_WAIT_TIME`   | Time (ms) the scan RPC spent in the RegionServer's call queue.              |
+
+These are request-level metrics — they appear in the per-table map returned by
+`PhoenixRuntime.getRequestReadMetricInfo(rs)` alongside the existing entries:
+
+```java
+try (ResultSet rs = stmt.executeQuery(sql)) {
+    while (rs.next()) {
+        // ...
+    }
+    Map<String, Map<MetricType, Long>> readMetrics =
+            PhoenixRuntime.getRequestReadMetricInfo(rs);
+    long fsReadMs = readMetrics.get(tableName).get(MetricType.FS_READ_TIME);
+    long blocksRead = readMetrics.get(tableName).get(MetricType.BLOCK_READ_OPS_COUNT);
+    // ...
+}
+```
+
+They piggyback on `phoenix.trace.read.metrics.enabled` (the existing
+request-level metrics switch, on by default) and require no additional
+configuration. Values originate from HBase 2.6.4+; on older HBase versions
+they are silently zero.
+
+## Top-N slowest parallel scans
+
+For diagnosing tail-latency on a single statement issuing multiple HBase scans, Phoenix can retain the
+top-N slowest scan paths it issued while executing a query — useful when a
+query fans out across many regions and you want to find the worst few
+([PHOENIX-7729](https://issues.apache.org/jira/browse/PHOENIX-7729)).
+
+### Enabling
+
+Off by default. Set the count to a positive number on the connection
+(`Properties`) or globally in `hbase-site.xml`:
+
+| Property                                 | Default | Description                                                                                                                      |
+| ---------------------------------------- | ------: | -------------------------------------------------------------------------------------------------------------------------------- |
+| `phoenix.slowest.scan.metrics.count`     |     `0` | N — number of slowest scans to retain. `0` disables the feature.                                                                 |
+| `phoenix.scan.metrics.by.region.enabled` | `false` | When `true` (and `count > 0`), the per-scan record also carries the region name and serving RegionServer. Requires HBase 2.6.3+. |
+
+Request-level metrics (`phoenix.trace.read.metrics.enabled`) must also be on,
+which is the default.
+
+### Retrieving the result
+
+`PhoenixRuntime.getTopNSlowestScanMetrics(rs)` returns the slowest scan paths
+seen while executing the query, as a list of JSON-object lists — one outer
+entry per slow scan path, one inner entry per HBase table touched on that
+path. Forward to your telemetry sink as needed.
+
+```java
+try (ResultSet rs = stmt.executeQuery(sql)) {
+    while (rs.next()) {
+        // ...
+    }
+    List<List<JsonObject>> slowest = PhoenixRuntime.getTopNSlowestScanMetrics(rs);
+    for (List<JsonObject> path : slowest) {
+        for (JsonObject scan : path) {
+            log.info("slow scan on {}: {}", scan.get("table"), scan);
+        }
+    }
+}
 ```
 
 ***
