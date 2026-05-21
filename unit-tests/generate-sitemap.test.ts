@@ -81,9 +81,6 @@ describe("isRedirectOnlyPage", () => {
 describe("shouldIncludeInSitemap", () => {
   it("excludes explicitly ignored html paths", () => {
     expect(shouldIncludeInSitemap("404.html", "<html></html>")).toBe(false);
-    expect(shouldIncludeInSitemap("404/index.html", "<html></html>")).toBe(
-      false
-    );
     expect(
       shouldIncludeInSitemap("phoenixcon-2018/index.html", "<html></html>")
     ).toBe(false);

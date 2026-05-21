@@ -26,6 +26,41 @@
         --ring: oklch(0.708 0 0);
       }
 
+      @media (prefers-color-scheme: dark) {
+        :root {
+          color-scheme: dark;
+          --background: oklch(0.17 0 0);
+          --foreground: oklch(0.92 0 0);
+          --muted-foreground: oklch(0.62 0 0);
+          --border: oklch(0.3 0 0);
+          --primary: oklch(68.67% 0.18445 44.756);
+          --primary-foreground: oklch(97% 0 0);
+          --ring: oklch(55.3% 0.1419 46.007);
+        }
+      }
+
+      html.light {
+        color-scheme: light;
+        --background: oklch(1 0 0);
+        --foreground: oklch(0.145 0 0);
+        --muted-foreground: oklch(0.556 0 0);
+        --border: oklch(0.922 0 0);
+        --primary: oklch(68.67% 0.18445 44.756);
+        --primary-foreground: oklch(0.985 0 0);
+        --ring: oklch(0.708 0 0);
+      }
+
+      html.dark {
+        color-scheme: dark;
+        --background: oklch(0.17 0 0);
+        --foreground: oklch(0.92 0 0);
+        --muted-foreground: oklch(0.62 0 0);
+        --border: oklch(0.3 0 0);
+        --primary: oklch(68.67% 0.18445 44.756);
+        --primary-foreground: oklch(97% 0 0);
+        --ring: oklch(55.3% 0.1419 46.007);
+      }
+
       * {
         box-sizing: border-box;
       }
@@ -68,6 +103,36 @@
         width: 9rem;
         height: auto;
         margin-bottom: 2rem;
+      }
+
+      .logo-dark {
+        display: none;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        .logo-light {
+          display: none;
+        }
+
+        .logo-dark {
+          display: inline;
+        }
+      }
+
+      html.light .logo-light {
+        display: inline;
+      }
+
+      html.light .logo-dark {
+        display: none;
+      }
+
+      html.dark .logo-light {
+        display: none;
+      }
+
+      html.dark .logo-dark {
+        display: inline;
       }
 
       .eyebrow {
@@ -137,11 +202,34 @@
           0 0 0 3px color-mix(in oklch, var(--primary) 50%, transparent);
       }
     </style>
+    <script>
+      (function () {
+        try {
+          var theme = localStorage.getItem("theme");
+          var root = document.documentElement;
+
+          if (theme === "light" || theme === "dark") {
+            root.classList.add(theme);
+          }
+        } catch (_) {
+          // Keep the CSS prefers-color-scheme fallback if storage is unavailable.
+        }
+      })();
+    </script>
   </head>
   <body>
     <main>
       <section class="content" aria-labelledby="page-title">
-        <img class="logo" src="/images/logo.svg" alt="Apache Phoenix" />
+        <img
+          class="logo logo-light"
+          src="/images/logo.svg"
+          alt="Apache Phoenix"
+        />
+        <img
+          class="logo logo-dark"
+          src="/images/dark-theme-logo.svg"
+          alt="Apache Phoenix"
+        />
         <p class="eyebrow">404</p>
         <h1 id="page-title">Page not found</h1>
         <p class="message">
