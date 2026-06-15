@@ -1,1 +1,0 @@
-import{j as n,L as i}from"./chunk-EPOLDU6W-B5LwAila.js";const c=t=>{const s="https://phoenix.apache.org",o=typeof t.to=="string"?t.to:`${t.to.pathname??""}${t.to.search??""}${t.to.hash??""}`,a=/^\/[^?#]*\.[^/?#]+(?:[?#].*)?$/i.test(o),e=o?.startsWith(s)||a;return n.jsx(i,{reloadDocument:e,...t})};export{c as L};

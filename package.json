@@ -47,13 +47,13 @@
     "@radix-ui/react-slot": "latest",
     "@radix-ui/react-tabs": "1.1.2",
     "@radix-ui/react-tooltip": "1.1.6",
-    "@react-router/node": "^7.12.0",
-    "@react-router/serve": "^7.12.0",
+    "@react-router/node": "^7.17.0",
+    "@react-router/serve": "^7.17.0",
     "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "fumadocs-core": "^16.0.10",
-    "fumadocs-mdx": "^15.0.12",
+    "fumadocs-mdx": "^13.0.7",
     "fumadocs-ui": "^16.0.10",
     "isbot": "^5.1.31",
     "katex": "^0.16.27",
@@ -63,7 +63,7 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-markdown": "^10.1.0",
-    "react-router": "^7.15.0",
+    "react-router": "^7.17.0",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-highlight": "^7.0.2",
     "rehype-katex": "^7.0.1",
@@ -80,7 +80,7 @@
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.36.0",
     "@playwright/test": "^1.57.0",
-    "@react-router/dev": "^7.12.0",
+    "@react-router/dev": "^7.17.0",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.3.1",
     "@testing-library/jest-dom": "^6.9.1",
@@ -113,8 +113,11 @@
     "tw-animate-css": "1.3.3",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.45.0",
-    "vite": "^8.0.16",
+    "vite": "^7.3.2",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^4.1.0"
+  },
+  "overrides": {
+    "esbuild": "^0.28.1"
   }
 }
