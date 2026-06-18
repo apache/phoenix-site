@@ -26,6 +26,15 @@ export default {
   // Config options...
   // Server-side render by default, to enable SPA mode set this to `false`
   ssr: false,
+  // Opt out React Router v8 behaviors to silence future flag warnings.
+  // We can opt in later once all of them are ready for static React Router websites.
+  future: {
+    v8_middleware: false,
+    v8_splitRouteModules: false,
+    v8_viteEnvironmentApi: false,
+    v8_passThroughRequests: false,
+    v8_trailingSlashAwareDataRequests: false
+  },
   async prerender({ getStaticPaths }) {
     const paths: string[] = [...getStaticPaths()];
     for await (const entry of glob("**/*.mdx", { cwd: "app/pages/_docs/docs/_mdx" })) {

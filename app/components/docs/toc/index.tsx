@@ -60,7 +60,7 @@ export function TOCScrollArea({
     <div
       ref={mergeRefs(viewRef, ref)}
       className={cn(
-        "relative ms-px min-h-0 overflow-auto mask-[linear-gradient(to_bottom,transparent,white_16px,white_calc(100%-16px),transparent)] py-3 text-sm [scrollbar-width:none]",
+        "relative ms-px min-h-0 scrollbar-none overflow-auto mask-[linear-gradient(to_bottom,transparent,white_16px,white_calc(100%-16px),transparent)] py-3 text-sm",
         className
       )}
       {...props}
