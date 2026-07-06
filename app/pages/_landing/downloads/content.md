@@ -9,8 +9,8 @@ Follow [Verify the Integrity of the Files](https://www.apache.org/dyn/closer.cgi
 Phoenix 4.16.1 runs on Apache HBase 1.3, 1.4, 1.5, and 1.6.
 
 Phoenix 5.1.3 runs on Apache HBase 2.1, 2.2, 2.3, 2.4, and 2.5.
-Phoenix 5.2.1 runs on Apache HBase 2.4, 2.5, and 2.6.
-Phoenix 5.3.1 runs on Apache HBase 2.5 and 2.6.
+Phoenix 5.2.2 runs on Apache HBase 2.4, 2.5, and 2.6.
+Phoenix 5.3.2 runs on Apache HBase 2.5 and 2.6.
 
 Please follow the appropriate link depending on your HBase version.
 
@@ -18,8 +18,10 @@ Please follow the appropriate link depending on your HBase version.
 
 | Phoenix Version | Release Date | Download                                          | Release Notes                   | Changes                                                                                               |
 | --------------- | ------------ | ------------------------------------------------- | ------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| 5.3.2           | 4 Jul 2026   | [Download](https://downloads.apache.org/phoenix/) | [Release Notes](/release-notes) | [Changes](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12334393&projectId=12315120) |
 | 5.3.1           | 18 May 2026  | [Download](https://downloads.apache.org/phoenix/) | [Release Notes](/release-notes) | [Changes](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12334393&projectId=12315120) |
 | 5.3.0           | 2 Oct 2025   | [Download](https://downloads.apache.org/phoenix/) | [Release Notes](/release-notes) | [Changes](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12334393&projectId=12315120) |
+| 5.2.2           | 4 Jul 2026   | [Download](https://downloads.apache.org/phoenix/) | [Release Notes](/release-notes) | [Changes](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12334393&projectId=12315120) |
 | 5.2.1           | 12 Nov 2024  | [Download](https://downloads.apache.org/phoenix/) | [Release Notes](/release-notes) | [Changes](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12334393&projectId=12315120) |
 | 5.2.0           | 16 Apr 2024  | [Download](https://downloads.apache.org/phoenix/) | [Release Notes](/release-notes) | [Changes](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12334393&projectId=12315120) |
 | 5.1.3           | 30 Dec 2022  | [Download](https://downloads.apache.org/phoenix/) | [Release Notes](/release-notes) | [Changes](https://issues.apache.org/jira/secure/ReleaseNote.jspa?version=12334393&projectId=12315120) |
