@@ -2,7 +2,7 @@
 
 This page describes the security model of Apache Phoenix.
 
-Phoenix is a JDBC driver, SQL parser, and query planner layered on top of the Apache HBase client in the client JVM, together with a set of Coprocessor extensions installed inside Apache HBase regionervers.
+Phoenix is a JDBC driver, SQL parser, and query planner layered on top of the Apache HBase client in the client JVM, together with a set of Coprocessor extensions installed inside Apache HBase RegionServers.
 
 This page is intended to help operators deploy Phoenix safely, to help security researchers understand what constitutes a legitimate vulnerability, and to help the [Apache Security Team](https://www.apache.org/security/) efficiently triage incoming reports.
 
@@ -113,7 +113,7 @@ After the `PhoenixAccessController` (see next section) has performed its own per
 
 Phoenix provides an optional access control enforcement mechanism, `PhoenixAccessController`, that bridges Phoenix DDL to the HBase access control checks. It is loaded when `phoenix.acls.enabled=true` (default `false`).
 
-When enabled, and paired with the HBase `AccessController`,`GRANT` and `REVOKE` SQL statements are translated to `AccessControlClient` calls against HBase; and `CREATE`, `ALTER`, and `DROP` of `TABLE`, `VIEW`, `INDEX`, and `SCHEMA` are gated on HBase permissions (`READ`, `EXEC`, `CREATE`, `ADMIN`) on the appropriate resources.
+When enabled, and paired with the HBase `AccessController` , `GRANT` and `REVOKE` SQL statements are translated to `AccessControlClient` calls against HBase; and `CREATE`, `ALTER`, and `DROP` of `TABLE`, `VIEW`, `INDEX`, and `SCHEMA` are gated on HBase permissions (`READ`, `EXEC`, `CREATE`, `ADMIN`) on the appropriate resources.
 
 `SHOW GRANTS` and equivalent inspection surfaces reflect HBase's state.
 
@@ -123,7 +123,7 @@ Phoenix does not maintain an independent privilege store.
 
 Phoenix's `TenantId` is a JDBC connection property that the query compiler translates into a leading row key prefix on multi-tenant tables. Views inject `WHERE` clauses and synthetic primary key values at compile time. 
 
-This is logical isolation, performed by the client. A caller with HBase `READ` privileges on the physical table can read across tenants regardless of the JDBC `TenantId` on their connection. Real cross-tenant isolation in production requires enabling HBase ACLs on the physical tables, typically combined with Phoenix's schema-to-namespace mapping (see the [Namespace Mapping](/docs/features/namespace-mapping) documentation). Cross-tenants reads without those mechanisms enabled are not security vulnerabilities.
+This is logical isolation, performed by the client. A caller with HBase `READ` privileges on the physical table can read across tenants regardless of the JDBC `TenantId` on their connection. Real cross-tenant isolation in production requires enabling HBase ACLs on the physical tables, typically combined with Phoenix's schema-to-namespace mapping (see the [Namespace Mapping](/docs/features/namespace-mapping) documentation). Cross-tenant reads without those mechanisms enabled are not security vulnerabilities.
 
 ## Server-Side Query Execution and Mutations
 
@@ -139,7 +139,7 @@ Phoenix supports user defined scalar functions. The feature is off by default, e
 
 When enabled, user defined functions, delivered as Java code packaged in JARs, may be loaded via HBase's `DynamicClassLoader` from `hbase.dynamic.jars.dir` _only_. Other jar paths are rejected. Function definitions are persisted in `SYSTEM.FUNCTION`.
 
-Anyone who can both write to `hbase.dynamic.jars.dir` on the underlying storage layer and register a `FUNCTION` in `SYSTEM.FUNCTION` enables code execution on every RegionServer that evaluates SQL expressions which invoke the registered functions. Operators enabling UDFs should appropriately restruct HDFS/S3 write access to the jar directory and Phoenix privileges to execute DDL, using the appropriate mechanisms.
+Anyone who can both write to `hbase.dynamic.jars.dir` on the underlying storage layer and register a `FUNCTION` in `SYSTEM.FUNCTION` enables code execution on every RegionServer that evaluates SQL expressions which invoke the registered functions. Operators enabling UDFs should appropriately restrict HDFS/S3 write access to the jar directory and Phoenix privileges to execute DDL, using the appropriate mechanisms.
 
 ## Query Log and Audit Log (SYSTEM.LOG)
 
@@ -147,7 +147,7 @@ Phoenix can persist client side query and audit information into the `SYSTEM.LOG
 
 When enabled, at `INFO` or higher, Phoenix will persist the SQL statement text (which may contain literals with sensitive data), together with client IP, user, tenant, and query identifiers. At `TRACE` level, Phoenix additionally persists bind parameter values and detailed scan metrics.
 
-Operators who enable audit or query logging must restrict read access to `SYSTEM.LOG` with approriate ACLs. Persisting SQL text and bind values in a shared table is an operator choice, not a Phoenix default. Sensitive data appearing in `SYSTEM.LOG` under user controlled logging levels is not, in itself, a Phoenix vulnerability.
+Operators who enable audit or query logging must restrict read access to `SYSTEM.LOG` with appropriate ACLs. Persisting SQL text and bind values in a shared table is an operator choice, not a Phoenix default. Sensitive data appearing in `SYSTEM.LOG` under user controlled logging levels is not, in itself, a Phoenix vulnerability.
 
 ## MapReduce, Bulk Load, and Command Line Tools
 
@@ -196,7 +196,7 @@ The following categories of reports do not constitute security vulnerabilities i
 - **UDF-mediated code execution by users who can write to `hbase.dynamic.jars.dir` and register a `FUNCTION`** — Both prerequisites are controlled by the operator, who will accept the related risks and requirement to implement necessary controls.
 - **Server-side `UPSERT SELECT` / `DELETE` aggregates writing under the service principal** — When the operator has explicitly enabled the `phoenix.client.enable.server.*` toggles, the operator will accept the related risks and requirement to implement necessary controls..
 - **Presence of a Kerberos principal or keytab file _path_ in a JDBC URL or a log line** — These are not credentials themselves. Phoenix's driver logs the principal and keytab path at `INFO` on Kerberos login by design.
-- **SQL injection resulting from application code that concatenates user input into SQL** — Phoenix supports parameterized `PreparedStatement`. Applications that build SQL by string concatenation are responsible for their own escaping and santization.
+- **SQL injection resulting from application code that concatenates user input into SQL** — Phoenix supports parameterized `PreparedStatement`. Applications that build SQL by string concatenation are responsible for their own escaping and sanitization.
 - **Behavior of the Phoenix Query Server (PQS)** — Its security model is documented at [apache/phoenix-queryserver](https://github.com/apache/phoenix-queryserver) and is out of scope for this page.
 - **Denial of service through expensive user queries when operator-configured limits are absent or set high** — Phoenix provides resource controls such as `phoenix.query.timeoutMs`, `phoenix.query.maxServerCacheBytes`, `phoenix.query.maxGlobalMemoryPercentage`, and `phoenix.query.maxTenantMemoryPercentage`. Operators are responsible for setting these for their workload.
 - **Blind or timing-based SQL inference by a caller who already holds `SELECT` on the target data** — response-time variation is inherent to SQL engines and does not, on its own, constitute an authorization bypass.
@@ -236,7 +236,7 @@ Applications that require per-column cryptographic protection must implement tha
 - [Apache HBase Security Model](https://hbase.apache.org/security-model/) — the canonical upstream security model this page layers on top of.
 - [Apache HBase Reference Guide: Securing HBase](https://hbase.apache.org/book.html#security) — comprehensive HBase security configuration guide.
 - [Phoenix Namespace Mapping](/docs/features/namespace-mapping) — schema-to-namespace mapping and the permissions it requires.
-- [Phoenix Grammar (`GRANT` / `REVOKE`)](/docs/grammar) — Phoenix SQL access-control statements and their mapping to HBase ACLs.
+- [Phoenix Grammar (`GRANT` and `REVOKE`)](/docs/grammar) — Phoenix SQL access-control statements and their mapping to HBase ACLs.
 - [Phoenix User-Defined Functions](/docs/features/user-defined-functions) — enabling and locking down UDFs.
 - [Phoenix Query Server (PQS)](/docs/features/query-server) — with the definitive security model maintained by the [apache/phoenix-queryserver](https://github.com/apache/phoenix-queryserver) project.
 - [Apache Software Foundation Security Policy](https://www.apache.org/security/) — the ASF-wide security policy and vulnerability handling process.
