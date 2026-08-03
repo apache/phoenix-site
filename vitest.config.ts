@@ -18,13 +18,12 @@
 
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
-import tsconfigPaths from "vite-tsconfig-paths";
 import { resolve } from "path";
 import mdx from "fumadocs-mdx/vite";
 import * as MdxConfig from "./source.config";
 
 export default defineConfig({
-  plugins: [mdx(MdxConfig), react(), tsconfigPaths()],
+  plugins: [mdx(MdxConfig), react()],
   test: {
     globals: true,
     environment: "happy-dom",
