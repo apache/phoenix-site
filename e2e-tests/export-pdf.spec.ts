@@ -21,6 +21,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { fileNameVariants } from "../app/lib/export-pdf/export-pdf-types";
+import { isRouteErrorBoundaryVisible } from "./helpers/error-boundary";
 
 const outDir = "public/books";
 const marginInches = 0.4;
@@ -158,11 +159,7 @@ test("export documentation pdfs", async ({ browser, browserName }) => {
       { timeout: 10000 }
     );
 
-    const errorBoundaryVisible = await page
-      .locator("main")
-      .filter({ hasText: "Oops!" })
-      .isVisible()
-      .catch(() => false);
+    const errorBoundaryVisible = await isRouteErrorBoundaryVisible(page);
     if (errorBoundaryVisible || pageErrors.length > 0) {
       throw new Error(
         `Export page failed for theme "${variant.theme}".\n` +

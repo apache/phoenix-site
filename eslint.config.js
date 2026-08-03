@@ -21,7 +21,8 @@ import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
 import tseslint from "typescript-eslint";
 import { defineConfig, globalIgnores } from "eslint/config";
-import importPlugin from "eslint-plugin-import";
+import { importX } from "eslint-plugin-import-x";
+import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
 import prettier from "eslint-plugin-prettier";
 
 // Custom rule to enforce Apache License header
@@ -57,9 +58,9 @@ const apacheLicenseRule = {
 
     return {
       Program(node) {
-        const sourceCode = context.sourceCode || context.getSourceCode();
+        const sourceCode = context.sourceCode;
         const text = sourceCode.getText();
-        
+
         if (!text.startsWith(REQUIRED_HEADER)) {
           context.report({
             node,
@@ -89,19 +90,20 @@ const noReactRouterLinkRule = {
     return {
       ImportDeclaration(node) {
         // Allow the custom Link component file itself to import from react-router
-        const filename = context.getFilename();
-        if (filename.endsWith('components/link.tsx')) {
+        const filename = context.filename;
+        if (filename.endsWith("components/link.tsx")) {
           return;
         }
-        
+
         // Check if importing from 'react-router'
-        if (node.source.value === 'react-router') {
+        if (node.source.value === "react-router") {
           // Check if any of the imported specifiers is 'Link'
           const linkImport = node.specifiers.find(
-            specifier => 
-              (specifier.type === 'ImportSpecifier' && specifier.imported.name === 'Link')
+            (specifier) =>
+              specifier.type === "ImportSpecifier" &&
+              specifier.imported.name === "Link"
           );
-          
+
           if (linkImport) {
             context.report({
               node: linkImport,
@@ -131,7 +133,6 @@ export default defineConfig([
     extends: [
       js.configs.recommended,
       tseslint.configs.recommended,
-      reactHooks.configs["recommended-latest"],
     ],
     languageOptions: {
       ecmaVersion: 2020,
@@ -139,7 +140,8 @@ export default defineConfig([
     },
     plugins: {
       prettier,
-      import: importPlugin,
+      "import-x": importX,
+      "react-hooks": reactHooks,
       custom: {
         rules: {
           "apache-license": apacheLicenseRule,
@@ -148,16 +150,16 @@ export default defineConfig([
       }
     },
     settings: {
-      // so import/no-unresolved understands TS paths and "@/*"
-      "import/resolver": {
-        typescript: {
-          project: ['./tsconfig.app.json', './tsconfig.node.json'],
-        },
-      },
+      // so import-x/no-unresolved understands TS paths and "@/*"
+      "import-x/resolver-next": [
+        createTypeScriptImportResolver({
+          project: ["./tsconfig.json"]
+        })
+      ]
     },
     rules: {
-      "import/no-unresolved": "error",
-      "import/no-duplicates": "warn",
+      "import-x/no-unresolved": "error",
+      "import-x/no-duplicates": "warn",
 
       "no-implicit-globals": "off",
       "no-empty-pattern": "off",
@@ -171,12 +173,15 @@ export default defineConfig([
       "react/no-unescaped-entities": "off",
 
       "prettier/prettier": "error",
-      
+
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
+
       // Enforce Apache License header
       "custom/apache-license": "error",
-      
+
       // Prevent importing Link from react-router
-      "custom/no-react-router-link": "error",
-    },
-  },
+      "custom/no-react-router-link": "error"
+    }
+  }
 ]);

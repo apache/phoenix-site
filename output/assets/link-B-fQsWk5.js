@@ -1,0 +1,1 @@
+import{j as n}from"./jsx-runtime-CUISpl0r.js";import{L as i}from"./lib-DBY93Xwc.js";const r=t=>{const s="https://phoenix.apache.org",o=typeof t.to=="string"?t.to:`${t.to.pathname??""}${t.to.search??""}${t.to.hash??""}`,a=/^\/[^?#]*\.[^/?#]+(?:[?#].*)?$/i.test(o),e=o?.startsWith(s)||a;return n.jsx(i,{reloadDocument:e,...t})};export{r as L};
