@@ -61,6 +61,10 @@ export const projectLinks: LinkType[] = [
   {
     label: "Roadmap",
     to: "/roadmap"
+  },
+  {
+    label: "Security Model",
+    to: "/security-model"
   }
 ];
 
