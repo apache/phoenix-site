@@ -18,7 +18,7 @@ Phoenix follows the [Apache Software Foundation's vulnerability handling policy]
 
 ## Assumption: Operator-Secured Production Deployments
 
-Phoenix requires operators to configure authentication and authorization on the underlying HBase cluster for production deployments. This is the foundational assumption of the Phoenix security model. 
+Phoenix requires operators to configure authentication and authorization on the underlying HBase cluster for production deployments. This is the foundational assumption of the Phoenix security model.
 
 Phoenix ships with developer friendly defaults that match HBase's development friendly defaults, and it adds Phoenix-only opt in toggles that are also off by default, notably `phoenix.acls.enabled=false`, `phoenix.functions.allowUserDefinedFunctions=false`, the server-side mutation toggles `phoenix.client.enable.server.upsert.select` and companions, `phoenix.log.level=OFF`, `phoenix.audit.log.level=OFF`, and the optional `phoenix-tracing-webapp`. These defaults are intended solely to aid development, testing, and set up of CI/CD environments. They do not imply under any circumstances that deploying or running Phoenix without security is safe or desirable for production use.
 
@@ -117,11 +117,11 @@ When enabled, and paired with the HBase `AccessController` , `GRANT` and `REVOKE
 
 `SHOW GRANTS` and equivalent inspection surfaces reflect HBase's state.
 
-Phoenix does not maintain an independent privilege store. 
+Phoenix does not maintain an independent privilege store.
 
 ## Multi-Tenancy and Views
 
-Phoenix's `TenantId` is a JDBC connection property that the query compiler translates into a leading row key prefix on multi-tenant tables. Views inject `WHERE` clauses and synthetic primary key values at compile time. 
+Phoenix's `TenantId` is a JDBC connection property that the query compiler translates into a leading row key prefix on multi-tenant tables. Views inject `WHERE` clauses and synthetic primary key values at compile time.
 
 This is logical isolation, performed by the client. A caller with HBase `READ` privileges on the physical table can read across tenants regardless of the JDBC `TenantId` on their connection. Real cross-tenant isolation in production requires enabling HBase ACLs on the physical tables, typically combined with Phoenix's schema-to-namespace mapping (see the [Namespace Mapping](/docs/features/namespace-mapping) documentation). Cross-tenant reads without those mechanisms enabled are not security vulnerabilities.
 
