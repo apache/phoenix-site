@@ -16,34 +16,20 @@
 // limitations under the License.
 //
 
-import "@testing-library/jest-dom";
-import { cleanup } from "@testing-library/react";
-import { afterEach } from "vitest";
+import type { Route } from "./+types/security-model";
+import { SecurityModelPage } from "@/pages/_landing/security-model";
 
-if (!globalThis.localStorage) {
-  const values = new Map<string, string>();
-  const localStorage: Storage = {
-    get length() {
-      return values.size;
-    },
-    clear: () => {
-      values.clear();
-    },
-    getItem: (key) => values.get(key) ?? null,
-    key: (index) => [...values.keys()][index] ?? null,
-    removeItem: (key) => {
-      values.delete(key);
-    },
-    setItem: (key, value) => {
-      values.set(key, String(value));
+export function meta({}: Route.MetaArgs) {
+  return [
+    { title: "Security Model - Apache Phoenix" },
+    {
+      name: "description",
+      content:
+        "Apache Phoenix security model: assumptions, trust boundaries, and what constitutes a valid security vulnerability report."
     }
-
-  Object.defineProperty(globalThis, "localStorage", {
-    configurable: true,
-    value: localStorage
-  });
+  ];
 }
 
-afterEach(() => {
-  cleanup();
-});
+export default function SecurityModel() {
+  return <SecurityModelPage />;
+}

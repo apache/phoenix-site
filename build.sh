@@ -31,10 +31,16 @@ install_node() {
 if ! command -v node > /dev/null 2>&1 || ! command -v npm > /dev/null 2>&1; then
   echo "node/npm not found — bootstrapping via nvm..."
   install_node
-elif [ -f "$NVM_DIR/nvm.sh" ]; then
+else
+  NODE_MAJOR="$(node --version | cut -d. -f1 | tr -d v)"
+  if [ "$NODE_MAJOR" -ne "$REQUIRED_NODE_MAJOR" ]; then
+    echo "Node.js ${REQUIRED_NODE_MAJOR} is required (found $(node --version)) — bootstrapping via nvm..."
+    install_node
+  elif [ -f "$NVM_DIR/nvm.sh" ]; then
   # nvm is present but may not be sourced in this shell
   # shellcheck source=/dev/null
-  . "$NVM_DIR/nvm.sh"
+    . "$NVM_DIR/nvm.sh"
+  fi
 fi
 
 echo "node $(node --version), npm $(npm --version) -- OK"
