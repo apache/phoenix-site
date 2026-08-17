@@ -39,9 +39,9 @@ Examples:
 
 Before you begin, ensure you have the following installed:
 
-- Node.js version 22
+- Node.js version 24
   - Download from [nodejs.org](https://nodejs.org/)
-  - Verify installation: `node --version` (should show v22.12+)
+  - Verify installation: `node --version` (should show v24+)
 
 - npm
   - Comes bundled with Node.js
@@ -180,10 +180,10 @@ The ESLint configuration includes `custom/no-react-router-link` to enforce this 
 #### 1. Install Dependencies
 
 ```bash
-npm install
+npm ci
 ```
 
-This downloads all required packages from npm.
+This installs exactly the dependency versions recorded in `package-lock.json`.
 
 #### 2. Generate Docs Metadata and Language Pages
 
@@ -388,7 +388,7 @@ Or change the port in `vite.config.ts`.
 2. Reinstall dependencies:
 
    ```bash
-   npm install
+   npm ci
    ```
 
 3. Try building again:

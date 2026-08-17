@@ -107,7 +107,7 @@ export function TocThumb({
     return () => {
       observer.disconnect();
     };
-  }, [containerRef, onPrint]);
+  });
 
   useOnChange(active, () => {
     if (containerRef.current) {

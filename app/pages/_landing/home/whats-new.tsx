@@ -74,23 +74,21 @@ export function WhatsNewSection() {
             <Link
               key={title}
               to={href}
-              className="group border-border/60 bg-card hover:border-primary/60 flex flex-col rounded-xl border p-5 shadow-sm transition-colors hover:shadow-md"
+              className="group border-border/60 bg-card hover:border-primary/60 flex h-full flex-col rounded-xl border p-6 shadow-sm transition-colors hover:shadow-md"
             >
-              <div className="flex items-start gap-3">
+              <div className="flex flex-1 flex-col">
                 <Icon
-                  className="text-primary mt-0.5 size-[26px] shrink-0"
+                  className="text-primary mb-4 size-7 shrink-0"
                   aria-hidden
                 />
-                <div className="flex-1">
-                  <h3 className="text-foreground text-lg font-semibold">
-                    {title}
-                  </h3>
-                  <p className="text-muted-foreground mt-1 text-sm leading-6">
-                    {desc}
-                  </p>
-                </div>
+                <h3 className="text-foreground min-h-14 text-lg leading-7 font-semibold text-balance">
+                  {title}
+                </h3>
+                <p className="text-muted-foreground mt-2 text-sm leading-6">
+                  {desc}
+                </p>
               </div>
-              <span className="text-primary mt-4 inline-flex items-center gap-1 text-sm font-medium group-hover:underline">
+              <span className="text-primary mt-6 inline-flex items-center gap-1 text-sm font-medium group-hover:underline">
                 Learn more <ArrowRight className="size-3.5" aria-hidden />
               </span>
             </Link>

@@ -8,7 +8,7 @@ for more information about this effort.
 # Phoenix ORM library (/docs/addons/phoenix-orm-library)
 
 
-<img alt="PHO logo" src={__img0} placeholder="blur" />
+<img alt="PHO logo" src={__img0} />
 
 PHO is an Object Relational Mapping (ORM) library for building and executing queries on HBase using Apache Phoenix.
 It provides ORM-style mappings and DSL-style query building. Initially developed and open sourced by eHarmony, it is available on [GitHub](https://github.com/eHarmony/pho).
@@ -319,7 +319,7 @@ SELECT region_name FROM regions WHERE zips[1] = '94030' AND zips[2] = '94030' AN
 # Building Website (/docs/contributing/building-website)
 ## Prerequisites
 
-* Node.js 22.x (minimum `22.12.0`)
+* Node.js 24.x
 * npm (bundled with Node.js)
 
 ## Building Phoenix Project Website
@@ -4983,7 +4983,7 @@ Here, `[[a - b], [d - e]]` represents ranges for `KEY1`, and `[1, 2]` represents
 
 The following diagram illustrates graphically how the skip scan is able to jump around the key space:
 
-<img alt="Skip Scan Example" src={__img0} placeholder="blur" />
+<img alt="Skip Scan Example" src={__img0} />
 
 
 # Statistics Collection (/docs/features/statistics-collection)
@@ -5244,7 +5244,7 @@ ALTER TABLE my_table SET GUIDE_POSTS_WIDTH = 10000000;
 
 * A denser guidepost setting improves sampling accuracy, but may reduce performance. A comparison is shown below.
 
-<img alt="Table sampling performance" src={__img0} placeholder="blur" />
+<img alt="Table sampling performance" src={__img0} />
 
 
 # Tracing (/docs/features/tracing)
@@ -5447,25 +5447,25 @@ Execute the command below:
 
 The tracing web app for Apache Phoenix includes: feature list, dependency tree, trace count, trace distribution, and timeline.
 
-<img alt="trace-web-app-dashboard" src={__img0} placeholder="blur" />
+<img alt="trace-web-app-dashboard" src={__img0} />
 
 ### List
 
 The most recent traces are listed down. The limiting value entered on the textbox is used to determine the trace count displayed. With each trace, there is a link to view either the dependency tree or the timeline.
 
-<img alt="trace-list" src={__img1} placeholder="blur" />
+<img alt="trace-list" src={__img1} />
 
 ### Dependency tree
 
 The dependency tree shows traces for a given trace ID in a tree view. Parent-child relationships are displayed clearly. Tooltip data includes host name, parent ID, span ID, start time, end time, description, and duration. Each node is collapsible and expandable. The SQL query is shown for each tree rendering. Clear is used to remove the tree from view.
 
-<img alt="trace-dependency-tree" src={__img2} placeholder="blur" />
+<img alt="trace-dependency-tree" src={__img2} />
 
 ### Trace count
 
 The trace list is categorized by description. The trace count chart can be viewed as pie, line, bar, or area chart. The chart selector is collapsible and can be hidden.
 
-<img alt="trace-count-chart" src={__img3} placeholder="blur" />
+<img alt="trace-count-chart" src={__img3} />
 
 ### Trace distribution
 
@@ -5475,7 +5475,7 @@ The trace distribution chart shows traces across Phoenix hosts on which they are
 
 The traces can be viewed along the time axis for a given trace id. Traces can be added or cleared from the timeline. There should be a minimum of two traces starting at two different times for the system to draw its timeline. This feature helps the user to easily compare execution times between traces and within the same trace.
 
-<img alt="trace-time-line" src={__img4} placeholder="blur" />
+<img alt="trace-time-line" src={__img4} />
 
 
 # Transactions (/docs/features/transactions)
@@ -7683,7 +7683,7 @@ The table below outlines the full set of Phoenix-specific configuration properti
 # Performance Testing (/docs/fundamentals/performance-testing)
 
 
-<img alt="pherf" src={__img0} placeholder="blur" />
+<img alt="pherf" src={__img0} />
 
 ## Overview
 
@@ -7862,14 +7862,14 @@ Below are charts showing relative performance between Phoenix and some other rel
 
 ### Phoenix vs Hive (running over HDFS and HBase)
 
-<img alt="Phoenix vs Hive" src={__img0} placeholder="blur" />
+<img alt="Phoenix vs Hive" src={__img0} />
 
 Query: `SELECT COUNT(1)` from a table over 10M and 100M rows. Data has 5 narrow columns. Number of region
 servers: 4 (HBase heap: 10GB, processor: 6 cores @ 3.3GHz Xeon).
 
 ### Phoenix vs Impala (running over HBase)
 
-<img alt="Phoenix vs Impala" src={__img1} placeholder="blur" />
+<img alt="Phoenix vs Impala" src={__img1} />
 
 Query: `SELECT COUNT(1)` from a table over 1M and 5M rows. Data has 3 narrow columns. Number of region servers: 1 (virtual machine, HBase heap: 2GB, processor: 2 cores @ 3.3GHz Xeon).
 
@@ -7896,7 +7896,7 @@ Running a query similar to the following shows significant performance gains whe
 
 The following chart shows in-memory query performance for the query above with 10M rows on 4 region servers, when 10% of rows match the filter. Note: `cf-a` is approximately 8 bytes and `cf-b` is approximately 400 bytes wide.
 
-<img alt="Ess. CF" src={__img2} placeholder="blur" />
+<img alt="Ess. CF" src={__img2} />
 
 ### Skip Scan
 
@@ -7910,7 +7910,7 @@ Running a query similar to the following shows significant performance gains whe
 
 The following chart shows in-memory query performance of the query above with 10M rows on 4 region servers when 1% random keys over the full key range are passed in the `IN` clause. Note: all `VARCHAR` columns are approximately 15 bytes.
 
-<img alt="SkipScan" src={__img3} placeholder="blur" />
+<img alt="SkipScan" src={__img3} />
 
 ### Salting
 
@@ -7924,13 +7924,13 @@ Consider the following schema:
 
 The following chart shows write performance with and without salting, where the table is split into 4 regions on a 4-region-server cluster (note: for optimal performance, salt bucket count should match region server count).
 
-<img alt="Salted-Write" src={__img4} placeholder="blur" />
+<img alt="Salted-Write" src={__img4} />
 
 The following chart shows in-memory query performance for a 10M-row table where `host='NA'` matches 3.3M rows.
 
 `select count(1) from t where host='NA'`
 
-<img alt="Salted-Read" src={__img5} placeholder="blur" />
+<img alt="Salted-Read" src={__img5} />
 
 ### Top-N
 
@@ -7938,7 +7938,7 @@ The following chart shows in-memory query time for a Top-N query over 10M rows u
 
 `select core from t order by core desc limit 10`
 
-<img alt="Phoenix vs Hive" src={__img6} placeholder="blur" />
+<img alt="Phoenix vs Hive" src={__img6} />
 
 
 # Tuning Guide (/docs/fundamentals/tuning-guide)
@@ -9960,7 +9960,7 @@ To execute SQL scripts from the command line, you can include a SQL file argumen
 $ sqlline.py [zk quorum hosts] ../examples/stock_symbol.sql
 ```
 
-<img alt="sqlline" src={__img0} placeholder="blur" />
+<img alt="sqlline" src={__img0} />
 
 For more information, see the [manual](https://julianhyde.github.io/sqlline/manual.html).
 
@@ -10034,7 +10034,7 @@ If you'd rather use a client GUI to interact with Phoenix, download and install 
 
 Through SQuirreL, you can issue SQL statements in the SQL tab (create tables, insert data, run queries), and inspect table metadata in the Object tab (for example, list tables, columns, primary keys, and types).
 
-<img alt="squirrel" src={__img1} placeholder="blur" />
+<img alt="squirrel" src={__img1} />
 
 Note that most graphical clients that support generic JDBC drives should also work, and the setup process is usually similar.
 
@@ -10294,7 +10294,7 @@ Apache Kafka™ is a distributed, partitioned, replicated commit log service. It
 
 At a high level, producers send messages over the network to the Kafka cluster, which then serves them to consumers:
 
-<img alt="Kafka Producer and Consumer" src={__img0} placeholder="blur" />
+<img alt="Kafka Producer and Consumer" src={__img0} />
 
 Phoenix provides **PhoenixConsumer** to receive messages from Kafka producers.
 
@@ -13153,7 +13153,7 @@ To execute SQL scripts from the command line, you can include a SQL file argumen
 $ sqlline.py [zk quorum hosts] ../examples/stock_symbol.sql
 ```
 
-<img alt="sqlline" src={__img0} placeholder="blur" />
+<img alt="sqlline" src={__img0} />
 
 For more information, see the [manual](https://julianhyde.github.io/sqlline/manual.html).
 
@@ -13227,7 +13227,7 @@ If you'd rather use a client GUI to interact with Phoenix, download and install 
 
 Through SQuirreL, you can issue SQL statements in the SQL tab (create tables, insert data, run queries), and inspect table metadata in the Object tab (for example, list tables, columns, primary keys, and types).
 
-<img alt="squirrel" src={__img1} placeholder="blur" />
+<img alt="squirrel" src={__img1} />
 
 Note that most graphical clients that support generic JDBC drives should also work, and the setup process is usually similar.
 
@@ -13375,14 +13375,14 @@ Below are charts showing relative performance between Phoenix and some other rel
 
 ### Phoenix vs Hive (running over HDFS and HBase)
 
-<img alt="Phoenix vs Hive" src={__img2} placeholder="blur" />
+<img alt="Phoenix vs Hive" src={__img2} />
 
 Query: `SELECT COUNT(1)` from a table over 10M and 100M rows. Data has 5 narrow columns. Number of region
 servers: 4 (HBase heap: 10GB, processor: 6 cores @ 3.3GHz Xeon).
 
 ### Phoenix vs Impala (running over HBase)
 
-<img alt="Phoenix vs Impala" src={__img3} placeholder="blur" />
+<img alt="Phoenix vs Impala" src={__img3} />
 
 Query: `SELECT COUNT(1)` from a table over 1M and 5M rows. Data has 3 narrow columns. Number of region servers: 1 (virtual machine, HBase heap: 2GB, processor: 2 cores @ 3.3GHz Xeon).
 
@@ -13409,7 +13409,7 @@ Running a query similar to the following shows significant performance gains whe
 
 The following chart shows in-memory query performance for the query above with 10M rows on 4 region servers, when 10% of rows match the filter. Note: `cf-a` is approximately 8 bytes and `cf-b` is approximately 400 bytes wide.
 
-<img alt="Ess. CF" src={__img4} placeholder="blur" />
+<img alt="Ess. CF" src={__img4} />
 
 ### Skip Scan
 
@@ -13423,7 +13423,7 @@ Running a query similar to the following shows significant performance gains whe
 
 The following chart shows in-memory query performance of the query above with 10M rows on 4 region servers when 1% random keys over the full key range are passed in the `IN` clause. Note: all `VARCHAR` columns are approximately 15 bytes.
 
-<img alt="SkipScan" src={__img5} placeholder="blur" />
+<img alt="SkipScan" src={__img5} />
 
 ### Salting
 
@@ -13437,13 +13437,13 @@ Consider the following schema:
 
 The following chart shows write performance with and without salting, where the table is split into 4 regions on a 4-region-server cluster (note: for optimal performance, salt bucket count should match region server count).
 
-<img alt="Salted-Write" src={__img6} placeholder="blur" />
+<img alt="Salted-Write" src={__img6} />
 
 The following chart shows in-memory query performance for a 10M-row table where `host='NA'` matches 3.3M rows.
 
 `select count(1) from t where host='NA'`
 
-<img alt="Salted-Read" src={__img7} placeholder="blur" />
+<img alt="Salted-Read" src={__img7} />
 
 ### Top-N
 
@@ -13451,13 +13451,13 @@ The following chart shows in-memory query time for a Top-N query over 10M rows u
 
 `select core from t order by core desc limit 10`
 
-<img alt="Phoenix vs Hive" src={__img8} placeholder="blur" />
+<img alt="Phoenix vs Hive" src={__img8} />
 
 ***
 
 # Performance Testing
 
-<img alt="pherf" src={__img9} placeholder="blur" />
+<img alt="pherf" src={__img9} />
 
 ## Overview
 
@@ -14669,7 +14669,7 @@ Apache Kafka™ is a distributed, partitioned, replicated commit log service. It
 
 At a high level, producers send messages over the network to the Kafka cluster, which then serves them to consumers:
 
-<img alt="Kafka Producer and Consumer" src={__img10} placeholder="blur" />
+<img alt="Kafka Producer and Consumer" src={__img10} />
 
 Phoenix provides **PhoenixConsumer** to receive messages from Kafka producers.
 
@@ -14828,7 +14828,7 @@ print(cursor.fetchone()['USERNAME'])
 
 ## Phoenix ORM library
 
-<img alt="PHO logo" src={__img11} placeholder="blur" />
+<img alt="PHO logo" src={__img11} />
 
 PHO is an Object Relational Mapping (ORM) library for building and executing queries on HBase using Apache Phoenix.
 It provides ORM-style mappings and DSL-style query building. Initially developed and open sourced by eHarmony, it is available on [GitHub](https://github.com/eHarmony/pho).
@@ -16703,7 +16703,7 @@ Here, `[[a - b], [d - e]]` represents ranges for `KEY1`, and `[1, 2]` represents
 
 The following diagram illustrates graphically how the skip scan is able to jump around the key space:
 
-<img alt="Skip Scan Example" src={__img12} placeholder="blur" />
+<img alt="Skip Scan Example" src={__img12} />
 
 ***
 
@@ -16877,7 +16877,7 @@ ALTER TABLE my_table SET GUIDE_POSTS_WIDTH = 10000000;
 
 * A denser guidepost setting improves sampling accuracy, but may reduce performance. A comparison is shown below.
 
-<img alt="Table sampling performance" src={__img13} placeholder="blur" />
+<img alt="Table sampling performance" src={__img13} />
 
 ***
 
@@ -18681,25 +18681,25 @@ Execute the command below:
 
 The tracing web app for Apache Phoenix includes: feature list, dependency tree, trace count, trace distribution, and timeline.
 
-<img alt="trace-web-app-dashboard" src={__img14} placeholder="blur" />
+<img alt="trace-web-app-dashboard" src={__img14} />
 
 ### List
 
 The most recent traces are listed down. The limiting value entered on the textbox is used to determine the trace count displayed. With each trace, there is a link to view either the dependency tree or the timeline.
 
-<img alt="trace-list" src={__img15} placeholder="blur" />
+<img alt="trace-list" src={__img15} />
 
 ### Dependency tree
 
 The dependency tree shows traces for a given trace ID in a tree view. Parent-child relationships are displayed clearly. Tooltip data includes host name, parent ID, span ID, start time, end time, description, and duration. Each node is collapsible and expandable. The SQL query is shown for each tree rendering. Clear is used to remove the tree from view.
 
-<img alt="trace-dependency-tree" src={__img16} placeholder="blur" />
+<img alt="trace-dependency-tree" src={__img16} />
 
 ### Trace count
 
 The trace list is categorized by description. The trace count chart can be viewed as pie, line, bar, or area chart. The chart selector is collapsible and can be hidden.
 
-<img alt="trace-count-chart" src={__img17} placeholder="blur" />
+<img alt="trace-count-chart" src={__img17} />
 
 ### Trace distribution
 
@@ -18709,7 +18709,7 @@ The trace distribution chart shows traces across Phoenix hosts on which they are
 
 The traces can be viewed along the time axis for a given trace id. Traces can be added or cleared from the timeline. There should be a minimum of two traces starting at two different times for the system to draw its timeline. This feature helps the user to easily compare execution times between traces and within the same trace.
 
-<img alt="trace-time-line" src={__img18} placeholder="blur" />
+<img alt="trace-time-line" src={__img18} />
 
 ***
 
@@ -23123,7 +23123,7 @@ This will automatically create the local clone of your repository for you. You w
 
 ## Prerequisites
 
-* Node.js 22.x (minimum `22.12.0`)
+* Node.js 24.x
 * npm (bundled with Node.js)
 
 ## Building Phoenix Project Website
