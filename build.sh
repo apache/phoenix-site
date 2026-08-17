@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-REQUIRED_NODE_MAJOR=22
+REQUIRED_NODE_MAJOR=24
 NVM_VERSION="v0.40.3"
 export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
 

@@ -18,7 +18,10 @@
 
 import { docs } from "@/.source";
 import { toClientRenderer } from "fumadocs-mdx/runtime/vite";
-import { DocsLayout } from "@/components/docs/layout/docs";
+import {
+  DocsLayout,
+  type DocsLayoutProps
+} from "@/components/docs/layout/docs";
 import {
   DocsBody as FumaDocsBody,
   DocsDescription as FumaDocsDescription,
@@ -27,7 +30,6 @@ import {
 } from "@/components/docs/layout/docs/page";
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import type * as PageTree from "fumadocs-core/page-tree";
-import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
 import { useParams } from "react-router";
 import { useEffect } from "react";
 import { getPageTreePeers } from "fumadocs-core/page-tree";
@@ -52,7 +54,9 @@ const baseMdxComponents: MDXComponents = {
   RailroadDiagram
 };
 
-export function baseOptions(): BaseLayoutProps {
+type BaseOptions = Omit<DocsLayoutProps, "children" | "tree">;
+
+export function baseOptions(): BaseOptions {
   return {
     nav: {
       title: (
