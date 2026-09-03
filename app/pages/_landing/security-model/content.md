@@ -4,7 +4,7 @@ This page describes the security model of Apache Phoenix.
 
 Phoenix is a JDBC driver, SQL parser, and query planner layered on top of the Apache HBase client in the client JVM, together with a set of Coprocessor extensions installed inside Apache HBase RegionServers.
 
-This page is intended to help operators deploy Phoenix safely, to help security researchers understand what constitutes a legitimate vulnerability, and to help the [Apache Security Team](https://www.apache.org/security/) efficiently triage incoming reports.
+This page is intended to help operators deploy Phoenix safely, to help security researchers understand what constitutes a legitimate vulnerability, and to help the Apache Phoenix security team efficiently triage incoming reports.
 
 This page was created following the [ASF recommendation for documenting project security models](https://cwiki.apache.org/confluence/display/SECURITY/Documenting+your+security+model).
 
@@ -12,7 +12,7 @@ Phoenix inherits and layers on Apache HBase's [security model](https://hbase.apa
 
 ## Reporting Security Vulnerabilities
 
-To report an undisclosed, sensitive security vulnerability in Apache Phoenix, please send your report privately via email to the Apache Software Foundation's security team at [security@apache.org](mailto:security@apache.org). Please do not use JIRA or any public channel for security reports.
+To report an undisclosed, sensitive security vulnerability in Apache Phoenix, please send your report privately via email to the Apache Phoenix security team at [security@phoenix.apache.org](mailto:security@phoenix.apache.org?subject=%5BSECURITY%5D). Please do not use JIRA or any public channel for security reports.
 
 Phoenix follows the [Apache Software Foundation's vulnerability handling policy](https://www.apache.org/security/).
 
@@ -167,7 +167,7 @@ The Phoenix tracing webapp was discussed above in the [Gateway Services](#gatewa
 
 ## What Is Considered a Vulnerability
 
-The following categories of issues are considered valid security vulnerabilities and should be reported to [security@apache.org](mailto:security@apache.org).
+The following categories of issues are considered valid security vulnerabilities and should be reported to [security@phoenix.apache.org](mailto:security@phoenix.apache.org?subject=%5BSECURITY%5D).
 
 - **Authentication bypass** — Circumventing configured HBase authentication through the Phoenix JDBC driver, or through a Phoenix coprocessor RPC, to reach HBase resources without valid credentials.
 - **Authorization bypass or privilege escalation** — Bypass of `PhoenixAccessController` checks when `phoenix.acls.enabled=true`, or any Phoenix code path that lets an authenticated user perform HBase operations beyond their granted ACL permissions, including gaining administrative or superuser capabilities.
