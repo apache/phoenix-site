@@ -2,10 +2,16 @@
 
 These are the mailing lists that have been established for this project. For each list, there is a subscribe, unsubscribe and post link.
 
-| Name           | Subscribe                                                | Unsubscribe                                                  | Post                                      | Archive                                                                  |
-| -------------- | -------------------------------------------------------- | ------------------------------------------------------------ | ----------------------------------------- | ------------------------------------------------------------------------ |
-| User List      | [Subscribe](mailto:user-subscribe@phoenix.apache.org)    | [Unsubscribe](mailto:user-unsubscribe@phoenix.apache.org)    | [Post](mailto:user@phoenix.apache.org)    | [Archive](https://lists.apache.org/list.html?user@phoenix.apache.org)    |
-| Developer List | [Subscribe](mailto:dev-subscribe@phoenix.apache.org)     | [Unsubscribe](mailto:dev-unsubscribe@phoenix.apache.org)     | [Post](mailto:dev@phoenix.apache.org)     | [Archive](https://lists.apache.org/list.html?dev@phoenix.apache.org)     |
-| Private List   | [Subscribe](mailto:private-subscribe@phoenix.apache.org) | [Unsubscribe](mailto:private-unsubscribe@phoenix.apache.org) | [Post](mailto:private@phoenix.apache.org) | &nbsp;                                                                   |
-| Commits List   | [Subscribe](mailto:commits-subscribe@phoenix.apache.org) | [Unsubscribe](mailto:commits-unsubscribe@phoenix.apache.org) | &nbsp;                                    | [Archive](https://lists.apache.org/list.html?commits@phoenix.apache.org) |
-| Issues List    | [Subscribe](mailto:issues-subscribe@phoenix.apache.org)  | [Unsubscribe](mailto:issues-unsubscribe@phoenix.apache.org)  | &nbsp;                                    | [Archive](https://lists.apache.org/list.html?issues@phoenix.apache.org)  |
+| Name           | Subscribe                                                | Unsubscribe                                                  | Post                                                              | Archive                                                                  |
+| -------------- | -------------------------------------------------------- | ------------------------------------------------------------ | ----------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| User List      | [Subscribe](mailto:user-subscribe@phoenix.apache.org)    | [Unsubscribe](mailto:user-unsubscribe@phoenix.apache.org)    | [Post](mailto:user@phoenix.apache.org)                            | [Archive](https://lists.apache.org/list.html?user@phoenix.apache.org)    |
+| Developer List | [Subscribe](mailto:dev-subscribe@phoenix.apache.org)     | [Unsubscribe](mailto:dev-unsubscribe@phoenix.apache.org)     | [Post](mailto:dev@phoenix.apache.org)                             | [Archive](https://lists.apache.org/list.html?dev@phoenix.apache.org)     |
+| Private List   | [Subscribe](mailto:private-subscribe@phoenix.apache.org) | [Unsubscribe](mailto:private-unsubscribe@phoenix.apache.org) | [Post](mailto:private@phoenix.apache.org)                         | &nbsp;                                                                   |
+| Commits List   | [Subscribe](mailto:commits-subscribe@phoenix.apache.org) | [Unsubscribe](mailto:commits-unsubscribe@phoenix.apache.org) | &nbsp;                                                            | [Archive](https://lists.apache.org/list.html?commits@phoenix.apache.org) |
+| Issues List    | [Subscribe](mailto:issues-subscribe@phoenix.apache.org)  | [Unsubscribe](mailto:issues-unsubscribe@phoenix.apache.org)  | &nbsp;                                                            | [Archive](https://lists.apache.org/list.html?issues@phoenix.apache.org)  |
+| Security List  | &nbsp;                                                   | &nbsp;                                                       | [Post](mailto:security@phoenix.apache.org?subject=%5BSECURITY%5D) | &nbsp;                                                                   |
+
+The security list is private and reserved for reporting undisclosed vulnerabilities.
+Anyone can post to it,
+but only the Phoenix security team can read it.
+Please review the [security model](/security-model) before sending a report.
